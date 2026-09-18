@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialog, useDialogHotkey } from "hooks";
@@ -31,14 +31,31 @@ export const ModelIO = ({
     open: SaveClassifierDialogOpen,
   } = useDialog();
   return (
-    <>
-      <Box display="flex" justifyContent="space-evenly" width="100%">
+    <Stack
+      sx={{
+        width: "100%",
+        pt: 0.5,
+        gap: 0.5,
+      }}
+    >
+      <Typography
+        variant="overline"
+        color="text.secondary"
+        sx={{ display: "block", lineHeight: 1.6 }}
+      >
+        Model I/O
+      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <TooltipTextButton
           dataHelp={HelpItem.LoadClassificationModel}
           icon={<AddIcon />}
           label="Load Model"
           tooltipText="Load a saved or remote model"
           onClick={handleOpenImportClassifierDialog}
+          sx={{
+            font: "var(--mui-font-caption)",
+            color: "var(--mui-palette-primary-main)",
+          }}
         />
         <TooltipTextButton
           dataHelp={HelpItem.SaveClassificationModel}
@@ -51,6 +68,10 @@ export const ModelIO = ({
           }
           onClick={handleOpenSaveClassifierDialog}
           disabled={!selectedModelConfig}
+          sx={{
+            font: "var(--mui-font-caption)",
+            color: "var(--mui-palette-primary-main)",
+          }}
         />
       </Box>
       <ImportTensorflowClassificationModelDialog
@@ -64,6 +85,6 @@ export const ModelIO = ({
           open={SaveClassifierDialogOpen}
         />
       )}
-    </>
+    </Stack>
   );
 };

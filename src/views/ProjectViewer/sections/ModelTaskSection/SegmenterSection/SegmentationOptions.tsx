@@ -1,14 +1,22 @@
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 
-import { Box, MenuItem, useTheme } from "@mui/material";
+import { Box, Divider, MenuItem, Typography, useTheme } from "@mui/material";
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
-import { StyledSelect, WithLabel } from "components/inputs";
+import { StyledSelect } from "components/inputs";
 
 import { arrayRange } from "utils/arrayUtils";
 
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
 import type { SelectChangeEvent } from "@mui/material";
+
+const HEADER_SX = {
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+  fontSize: 10,
+  lineHeight: 1.6,
+} as const;
 
 export const SegmenterOptions = () => {
   const theme = useTheme();
@@ -34,53 +42,83 @@ export const SegmenterOptions = () => {
     });
   };
 
-  return !loadedModel ? null : (
+  return !loadedModel || availableChannels.length === 0 ? null : (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        pb: 1,
-        borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
-      {arrayRange(loadedModel.requiredChannels).map((i) => (
-        <WithLabel
-          key={`channel-select=${i}`}
-          label={`Channel ${i + 1}:`}
-          labelProps={{
-            variant: "caption",
-            sx: { mr: "1rem", whiteSpace: "nowrap" },
+      <Box sx={{ pb: 1.75 }}>
+        <Typography
+          variant="overline"
+          color="text.secondary"
+          sx={{ display: "block", lineHeight: 1.6, mb: 1.25 }}
+        >
+          Channel Mapping
+        </Typography>
+
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "max-content 16px 1fr",
+            alignItems: "center",
+            columnGap: 1.25,
+            rowGap: 1.125,
+            px: 1,
           }}
         >
-          <StyledSelect
-            value={selectedChannels[i] ?? ""}
-            onChange={(event) => handleSelectedChannelChange(event, i)}
-            fullWidth
-            fontSize={theme.typography.caption.fontSize}
-            displayEmpty={true}
-            renderValue={(value) => {
-              return value === ""
-                ? "Select Channel"
-                : channelMetas[value as string].name;
-            }}
-          >
-            {availableChannels.map((channel) => (
-              <MenuItem
-                key={channel.id}
-                dense
-                value={channel.id}
-                sx={{
-                  borderRadius: 0,
-                  minHeight: "1rem",
+          {/* Column headers */}
+          <Typography variant="caption" color="text.disabled" sx={HEADER_SX}>
+            Model Input
+          </Typography>
+          <Box />
+          <Typography variant="caption" color="text.disabled" sx={HEADER_SX}>
+            Image Source
+          </Typography>
+          <Divider sx={{ gridColumn: "1 / -1" }} />
+
+          {/* One row per channel the model requires */}
+          {arrayRange(loadedModel.requiredChannels).map((idx) => (
+            <Fragment key={idx}>
+              <Typography variant="body2" color="text.secondary">
+                Channel {idx + 1}
+              </Typography>
+
+              <ArrowRightAltIcon
+                sx={{ fontSize: 16, color: "text.disabled", opacity: 0.6 }}
+              />
+
+              <StyledSelect
+                value={selectedChannels[idx] ?? ""}
+                onChange={(event) => handleSelectedChannelChange(event, idx)}
+                fontSize={theme.typography.caption.fontSize}
+                displayEmpty={true}
+                renderValue={(value) => {
+                  return value === ""
+                    ? "Select Channel"
+                    : channelMetas[value as string].name;
                 }}
               >
-                {channel.name}
-              </MenuItem>
-            ))}
-          </StyledSelect>
-        </WithLabel>
-      ))}
+                {availableChannels.map((channel) => (
+                  <MenuItem
+                    key={channel.id}
+                    dense
+                    value={channel.id}
+                    sx={{
+                      borderRadius: 0,
+                      minHeight: "1rem",
+                    }}
+                  >
+                    {channel.name}
+                  </MenuItem>
+                ))}
+              </StyledSelect>
+            </Fragment>
+          ))}
+        </Box>
+      </Box>
     </Box>
   );
 };

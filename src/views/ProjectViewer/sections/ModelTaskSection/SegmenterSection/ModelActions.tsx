@@ -32,13 +32,17 @@ export const ModelActions = () => {
     };
   }, [modelStatus, loadedModel, error]);
   return (
-    <Box width="100%" display="flex" justifyContent={"center"}>
+    <Box width="100%" display="flex" justifyContent="center">
       {/* Predict Button */}
       <TooltipTextButton
         tooltipText={predictInfo.helperText}
         onClick={predictSegmenter}
         disabled={predictInfo.disabled}
         label="Segment"
+        sx={{
+          font: "var(--mui-font-caption)",
+          color: "var(--mui-palette-primary-main)",
+        }}
       />
     </Box>
   );

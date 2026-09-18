@@ -1,5 +1,5 @@
 import { Clear as ClearIcon, Check as CheckIcon } from "@mui/icons-material";
-import { List } from "@mui/material";
+import { Box, List } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
@@ -15,28 +15,37 @@ export const PredictionListItems = () => {
   const t = useTranslation();
 
   return (
-    <List dense>
-      <CustomListItemButton
-        primaryText={t("Clear predictions")}
-        onClick={clearPredictions}
-        icon={
-          <ClearIcon
-            sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
-          />
-        }
-        primaryTypographyProps={{ variant: "body2" }}
-      />
-      <ListItemHoldButton
-        onHoldComplete={acceptPredictions}
-        primaryText="Accept Predictions (Hold)"
-        icon={
-          <CheckIcon
-            sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
-          />
-        }
-        holdDuration={100}
-        primaryTypographyProps={{ variant: "body2" }}
-      />
-    </List>
+    <Box sx={{ width: "100%" }}>
+      <List dense>
+        <CustomListItemButton
+          primaryText={t("Clear predictions")}
+          onClick={clearPredictions}
+          icon={
+            <ClearIcon
+              sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
+            />
+          }
+          primaryTypographyProps={{
+            variant: "caption",
+            textTransform: "uppercase",
+          }}
+          sx={{ borderRadius: 0 }}
+        />
+        <ListItemHoldButton
+          onHoldComplete={acceptPredictions}
+          primaryText="Accept Predictions (Hold)"
+          icon={
+            <CheckIcon
+              sx={(theme) => ({ fontSize: theme.typography.body1.fontSize })}
+            />
+          }
+          holdDuration={100}
+          primaryTypographyProps={{
+            variant: "caption",
+            textTransform: "uppercase",
+          }}
+        />
+      </List>
+    </Box>
   );
 };
