@@ -195,6 +195,17 @@ export const selectPlotData = createSelector(
     Object.entries(annotations).forEach(([id, annotation]) => {
       if (!annotation.features) return;
       const computed = annotation.features;
+      const intensityMeasurements: Record<string, number> = {};
+      annotation.channelsRef.forEach((channel) => {
+        CHANNEL_MEASUREMENTS.forEach((msrmt) => {
+          const val = annotation.intensityMeasurements?.[channel.id]?.[msrmt];
+          if (val !== undefined) {
+            intensityMeasurements[
+              toChannelMeasurementLabel(channel.name, msrmt)
+            ] = val;
+          }
+        });
+      });
 
       parsedMeasurementData[id] = {
         id,
@@ -203,7 +214,7 @@ export const selectPlotData = createSelector(
         partition: annotation.partition,
         timepoint: 0,
         preview: "",
-        measurements: { ...computed },
+        measurements: { ...computed, ...intensityMeasurements },
       };
     });
 
