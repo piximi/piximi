@@ -50,5 +50,5 @@ and you are running Docker Desktop, you will need to increase memory resources. 
 Alternatively, download the pre-built image and run it directly from Docker Hub:
 
 ```
-docker run -p 3000:3000 --name piximi gnodar01/piximi:0.1.0
+docker run -p 3000:3000 --name piximi bethcimini/piximi:1.1.5
 ```
