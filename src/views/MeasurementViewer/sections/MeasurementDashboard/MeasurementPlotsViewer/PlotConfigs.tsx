@@ -20,7 +20,7 @@ export const HistogramConfig = () => {
 export const ScatterConfig = () => {
   return (
     <>
-      <MeasurementSelect type="x-axis" timeSeries={true} />
+      <MeasurementSelect type="x-axis" />
       <MeasurementSelect type="y-axis" />
       <MeasurementSelect type="size" nullable={true} />
       <SplitSelect type="color" nullable={true} />
