@@ -199,7 +199,8 @@ export const ProjectViewerCategories = () => {
       <FunctionalDivider
         headerText="Categories"
         containerStyle={{ marginTop: 1 }}
-        typographyVariant="body2"
+        typographyVariant="caption"
+        textTransform="uppercase"
         actions={
           <Stack direction="row">
             <TooltipWithDisable
