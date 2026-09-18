@@ -63,9 +63,11 @@ export const IntensityMeasurementOptions = ({
     else if (!Array.isArray(newSelectedItems))
       newSelectedItems = [newSelectedItems];
     // Omit top level category "computed"
-
+    const onlyMeasurements = newSelectedItems.filter(
+      (id) => id !== "intensity",
+    );
     // Process newSelectedItems array to determine newly added and removed
-    const changes = getDifferences(selectedItems, newSelectedItems);
+    const changes = getDifferences(selectedItems, onlyMeasurements);
 
     if (changes.added.length > 0) {
       dispatch(
