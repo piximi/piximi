@@ -106,7 +106,7 @@ function buildPolygon(
   const boxH = bbox[3] - bbox[1];
   const boxW = bbox[2] - bbox[0];
 
-  if (boxW <= 0 || boxH <= 0) return;
+  if (boxW <= 0 || boxH <= 0 || xMin === xMax || yMin === yMax) return;
 
   const cropDims = { x: bbox[0], y: bbox[1], width: boxW, height: boxH };
 
@@ -179,7 +179,7 @@ export const predictStardist = async (
   NMS_scoreThresh: number = 0.3,
   NMS_maxOutputSize: number = 500,
   NMS_softNmsSigma: number = 0.0,
-) => {
+): Promise<PredictedAnnotationObject[]> => {
   // [batchSize, H, W, 33]
   const res = model.execute(imTensor) as Tensor4D;
   const preds = (await res.array())[0];
@@ -201,6 +201,7 @@ export const predictStardist = async (
     inputImDims,
     NMS_scoreThresh,
   );
+  if (generatedBboxes.length === 0) return [];
 
   const indexTensor = tidy(() => {
     const bboxTensor = tensor2d(generatedBboxes);
