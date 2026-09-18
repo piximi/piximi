@@ -85,6 +85,10 @@ const FitClassifierButton = ({
         disabled={!precheck.modelTrainable}
         icon={<ScatterPlotIcon />}
         label="Fit"
+        sx={{
+          font: "var(--mui-font-caption)",
+          color: "var(--mui-palette-primary-main)",
+        }}
       />
 
       <FitClassifierDialog
@@ -148,6 +152,10 @@ const PredictClassifierButton = ({
         )
       }
       label="Predict"
+      sx={{
+        font: "var(--mui-font-caption)",
+        color: "var(--mui-palette-primary-main)",
+      }}
     />
   );
 };
@@ -198,6 +206,10 @@ const EvaluateClassifierButton = ({
         disabled={activeRuns.length === 0}
         icon={<AssessmentIcon />}
         label="Evaluate"
+        sx={{
+          font: "var(--mui-font-caption)",
+          color: "var(--mui-palette-primary-main)",
+        }}
       />
 
       <EvaluateClassifierDialog

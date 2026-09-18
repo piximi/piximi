@@ -61,6 +61,7 @@ export const ListItemHoldButton = ({
         onTouchStart={handleMouseDown}
         onTouchEnd={handleMouseUp}
         sx={(theme) => ({
+          borderRadius: 0,
           backgroundImage:
             loadPercent > 0
               ? `linear-gradient(to right, ${alpha(

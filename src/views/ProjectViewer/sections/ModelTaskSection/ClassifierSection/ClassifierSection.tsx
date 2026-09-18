@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 
-import { Box } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 
 import { useParameterizedSelector } from "store/hooks";
 import { selectModelLifecycleStatus } from "store/classifier/selectors";
@@ -11,7 +11,6 @@ import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selector
 import { PredictionListItems } from "../PredictionListItems";
 import { ModelActions } from "./ModelActions";
 import { ModelSelection } from "./ModelSelection";
-import { ModelIO } from "./ModelIO";
 
 export const ClassifierSection = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
@@ -32,8 +31,8 @@ export const ClassifierSection = () => {
         px={1}
         gap={1}
       >
-        <ModelIO selectedModelConfig={modelConfig} />
         <ModelSelection selectedModelConfig={modelConfig} />
+        <Divider flexItem />
         <ModelActions />
       </Box>
       {modelStatus === "waiting" && <PredictionListItems />}
