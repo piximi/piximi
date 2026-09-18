@@ -43,6 +43,7 @@ export function scanline(
     (e1: Edge, e2: Edge) => getYMin(e2) - getYMin(e1),
   );
 
+  if (edgeTable.length === 0) return maskImage;
   const activeEdgeTable: Array<Edge> = [];
   let yScan = getYMin(edgeTable.at(-1)!);
   const allSpans = [];
