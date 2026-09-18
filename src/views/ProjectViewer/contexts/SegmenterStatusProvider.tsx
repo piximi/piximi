@@ -29,6 +29,10 @@ type ErrorContext = {
   message: string;
   severity: number;
 };
+type Precheck = {
+  images: boolean; // success -> true
+  channels: boolean; // success -> true
+};
 
 const SegmenterStatusContext = createContext<{
   isReady: boolean;
@@ -66,44 +70,51 @@ export const SegmenterStatusProvider = ({
   >(undefined);
   const projectImages = useSelector(selectExtendedImages);
 
-  const [isReady, setIsReady] = useState(true);
-  const [error, setError] = useState<ErrorContext>();
-
   const [modelStatus, setModelStatus] = useState<SegmentationState>("idle");
   const channelMetas = useSelector(selectChannelMetaEntities);
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
+  const precheck: Precheck = useMemo(
+    () => ({
+      images: projectImages.length > 0,
+      channels:
+        selectedChannels.length > 0 ||
+        selectedChannels.every((id) => id !== ""),
+    }),
+    [projectImages, selectedChannels],
+  );
 
-  useEffect(() => {
-    let newError: ErrorContext | undefined = error;
-    let newIsReady = true;
-
-    if (projectImages.length === 0) {
-      newIsReady = false;
-      if (!newError || newError.severity > 1) {
-        newError = {
-          reason: ErrorReason.NoInferenceImages,
-          message: "No images available for inference",
-          severity: 2,
-        };
-      }
+  const isReady = useMemo(
+    () => Object.values(precheck).every((b) => b),
+    [precheck],
+  );
+  const activeErrors = useMemo(() => {
+    const newErrors: ErrorContext[] = [];
+    if (!precheck.images) {
+      newErrors.push({
+        reason: ErrorReason.NoInferenceImages,
+        message: "No images available for inference",
+        severity: 1,
+      });
     }
-    if (
-      selectedChannels.length === 0 ||
-      selectedChannels.some((id) => id === "")
-    ) {
-      newIsReady = false;
-      if (!newError || newError.severity > 2) {
-        newError = {
-          reason: ErrorReason.ChannelMismatch,
-          message: "Select channels for segmentation",
-          severity: 3,
-        };
-      }
+    if (!precheck.channels) {
+      newErrors.push({
+        reason: ErrorReason.ChannelMismatch,
+        message: "Select channels for segmentation",
+        severity: 2,
+      });
     }
-    setIsReady(newIsReady);
-    setError(newError);
-  }, [loadedModel, projectImages, selectedChannels]);
+    return newErrors;
+  }, [precheck]);
 
+  const error = useMemo(
+    () =>
+      activeErrors.length === 0
+        ? undefined
+        : activeErrors.reduce((prev, curr) =>
+            curr.severity < prev.severity ? curr : prev,
+          ),
+    [activeErrors],
+  );
   useEffect(() => {
     if (loadedModel) {
       const metas = Object.values(channelMetas);
