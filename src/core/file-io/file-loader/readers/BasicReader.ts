@@ -1,4 +1,5 @@
 import {
+  decode,
   decodeJpeg,
   decodePng,
   Stack as IJSStack,
@@ -11,7 +12,7 @@ import { MIME } from "../types";
 import type { IFileReader, ReaderInput, ReaderOutput } from "../types";
 
 export const basicReader: IFileReader = {
-  supportedTypes: [MIME.PNG, MIME.JPEG, MIME.HEIC],
+  supportedTypes: [MIME.PNG, MIME.JPEG, MIME.HEIC, MIME.BMP],
   async extract(input: ReaderInput): Promise<ReaderOutput> {
     let image: IJSImage;
     const imageData = new Uint8Array(input.fileData);
@@ -19,6 +20,8 @@ export const basicReader: IFileReader = {
       image = decodeJpeg(imageData);
     } else if (input.mimeType === MIME.PNG) {
       image = decodePng(imageData);
+    } else if (input.mimeType === MIME.BMP) {
+      image = decode(imageData);
     } else {
       const decoder = new libheif.HeifDecoder();
       const decoded = decoder.decode(imageData); // imageData = new Uint8Array(input.fileData)
