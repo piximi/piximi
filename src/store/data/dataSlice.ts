@@ -11,6 +11,8 @@ import {
 } from "core/entities";
 import { Partition } from "core/dl/enums";
 
+import { projectReset } from "store/actions";
+
 import { representsUnknown } from "utils/stringUtils";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
@@ -1195,5 +1197,8 @@ export const dataSlice = createSlice({
         action.payload,
       );
     },
+  },
+  extraReducers(builder) {
+    builder.addCase(projectReset, () => ({ ...initialState }));
   },
 });
