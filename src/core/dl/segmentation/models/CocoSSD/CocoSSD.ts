@@ -76,22 +76,33 @@ export class CocoSSD extends Segmenter {
     loadCb(100, "1/2 Preprocessing images");
     // imTensor disposed in `predictCoco`
     const annotations: Array<PredictedAnnotationObject[]> = [];
+    let failedImages = 0;
     try {
       for await (const [idx, imTensor] of infT.entries()) {
         await CancelSource.throwIfSignaled(cancelToken);
-        loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
-        const annotObj = await predictCoco(
-          graphModel,
-          imTensor,
-          this.segmentedKinds,
+        loadCb(
+          Math.round((idx / infT.length) * 100),
+          `2/2 Segmenting image ${idx + 1} of ${infT.length}`,
         );
-        annotations.push(annotObj);
+        try {
+          const annotObj = await predictCoco(
+            graphModel,
+            imTensor,
+            this.segmentedKinds,
+          );
+          annotations.push(annotObj);
+        } catch {
+          failedImages++;
+        }
       }
     } catch (err) {
       if (err instanceof TaskCancelledError)
         return { cancelled: true, annotations };
       else throw err as Error;
     }
+
+    if (failedImages > 0)
+      loadCb(100, `2/2 Could not segment ${failedImages} of ${infT.length}`);
 
     return { annotations };
   }

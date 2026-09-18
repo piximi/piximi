@@ -64,23 +64,34 @@ export class Glas extends Segmenter {
     const infT = await inferenceDataset.toArray();
     // imTensor disposed in `predictGlas`
     loadCb(100, "1/2 Preprocessing images");
+    let failedImages = 0;
     try {
       for await (const [idx, imTensor] of infT.entries()) {
         await CancelSource.throwIfSignaled(cancelToken);
-        loadCb(Math.round((idx / infT.length) * 100), "2/2 Segmenting image");
-        const annObj = await predictGlas(
-          graphModel,
-          imTensor,
-          this.segmentedKind,
-          inferenceDataDims![idx],
+        loadCb(
+          Math.round((idx / infT.length) * 100),
+          `2/2 Segmenting image ${idx + 1} of ${infT.length}`,
         );
-        annotations.push(annObj);
+        try {
+          const annObj = await predictGlas(
+            graphModel,
+            imTensor,
+            this.segmentedKind,
+            inferenceDataDims![idx],
+          );
+          annotations.push(annObj);
+        } catch {
+          failedImages++;
+        }
       }
     } catch (err) {
       if (err instanceof TaskCancelledError)
         return { cancelled: true, annotations };
       else throw err as Error;
     }
+
+    if (failedImages > 0)
+      loadCb(100, `2/2 Could not segment ${failedImages} of ${infT.length}`);
 
     return { annotations };
   }

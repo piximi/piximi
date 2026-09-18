@@ -50,7 +50,7 @@ export abstract class Stardist extends Segmenter {
       throw Error(`"${this.name}" Model must a Graph, not Layers`);
     }
 
-    loadCb(0, "Preprocessing images");
+    loadCb(0, "1/2 Preprocessing images");
     const inferenceDataDims = items.map((item) => {
       const { height, width } = item.shape;
       const { padX, padY } = this._getPaddings(height, width);
@@ -67,24 +67,29 @@ export abstract class Stardist extends Segmenter {
     const graphModel = this._model as GraphModel;
 
     const infT = await inferenceDataset.toArray();
-    loadCb(100, "Preprocessing images");
+    loadCb(100, "1/2 Preprocessing images");
     const annotations: Array<PredictedAnnotationObject[]> = [];
     // imTensor disposed in `predictStardist`
+    let failedImages = 0;
     try {
       for await (const [idx, imTensor] of infT.entries()) {
         await CancelSource.throwIfSignaled(cancelToken);
 
         loadCb(
           Math.round((idx / infT.length) * 100),
-          `Segmenting image ${idx + 1} of ${infT.length}`,
+          `2/2 Segmenting image ${idx + 1} of ${infT.length}`,
         );
-        const annotObj = await predictStardist(
-          graphModel,
-          imTensor,
-          this.segmentedKind,
-          inferenceDataDims![idx],
-        );
-        annotations.push(annotObj);
+        try {
+          const annotObj = await predictStardist(
+            graphModel,
+            imTensor,
+            this.segmentedKind,
+            inferenceDataDims![idx],
+          );
+          annotations.push(annotObj);
+        } catch {
+          failedImages++;
+        }
       }
     } catch (err) {
       if ((err as Error).name === "TaskCancelledError")
@@ -93,6 +98,8 @@ export abstract class Stardist extends Segmenter {
         throw err as Error;
       }
     }
+    if (failedImages > 0)
+      loadCb(100, `2/2 Error segmenting ${failedImages} of ${infT.length}`);
 
     return { annotations };
   }
