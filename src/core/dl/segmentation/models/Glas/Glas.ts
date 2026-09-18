@@ -91,7 +91,7 @@ export class Glas extends Segmenter {
     }
 
     if (failedImages > 0)
-      loadCb(100, `2/2 Could not segment ${failedImages} of ${infT.length}`);
+      loadCb(100, `2/2 Error segmenting ${failedImages} of ${infT.length}`);
 
     return { annotations };
   }
