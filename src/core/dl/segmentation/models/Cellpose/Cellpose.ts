@@ -93,26 +93,33 @@ export class Cellpose extends Segmenter {
     const triton = await api.getService(this._service);
 
     loadCb(100, "2/3 Connecting to server");
+    let failedImages = 0;
     try {
       for await (const [idx, imTensor] of infT.entries()) {
         await CancelSource.throwIfSignaled(cancelToken);
-        const annotObj = await predictCellpose(
-          imTensor,
-          this.segmentedKind,
-          triton,
-        );
-        annotations.push(annotObj);
-
         loadCb(
           Math.round(((idx + 1) / infT.length) * 100),
           `3/3: Segmenting ${idx + 1} of ${infT.length} images`,
         );
+        try {
+          const annotObj = await predictCellpose(
+            imTensor,
+            this.segmentedKind,
+            triton,
+          );
+          annotations.push(annotObj);
+        } catch {
+          failedImages++;
+        }
       }
     } catch (err) {
       if (err instanceof TaskCancelledError)
         return { cancelled: true, annotations };
       else throw err as Error;
     }
+
+    if (failedImages > 0)
+      loadCb(100, `2/2 Error segmenting ${failedImages} of ${infT.length}`);
 
     return { annotations };
   }
