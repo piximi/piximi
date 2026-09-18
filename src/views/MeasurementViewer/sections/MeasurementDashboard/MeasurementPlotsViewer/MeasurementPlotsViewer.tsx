@@ -105,7 +105,7 @@ export const MeasurementPlotsViewer = () => {
       case ChartType.Swarm:
         return <SwarmConfig />;
     }
-  }, [selectedPlot.chartConfig.chart]);
+  }, [selectedPlot.chartConfig]);
 
   return (
     <Box

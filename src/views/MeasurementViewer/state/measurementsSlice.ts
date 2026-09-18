@@ -170,6 +170,14 @@ export const measurementsSlice = createSlice({
         group.computedMeasurements,
         (msrmnt) => !measurements.includes(msrmnt),
       );
+      Object.values(group.plots).forEach((plot) => {
+        (["x-axis", "y-axis", "size"] as const).forEach((key) => {
+          const val = plot.chartConfig[key];
+          if (val !== undefined && measurements.includes(val as FeatureKey)) {
+            plot.chartConfig[key] = undefined;
+          }
+        });
+      });
     },
     setImageComputedMeasurements(
       state,
@@ -210,6 +218,14 @@ export const measurementsSlice = createSlice({
         group.computedMeasurements,
         (msrmnt) => !measurements.includes(msrmnt),
       );
+      Object.values(group.plots).forEach((plot) => {
+        (["x-axis", "y-axis", "size"] as const).forEach((key) => {
+          const val = plot.chartConfig[key];
+          if (val !== undefined && measurements.includes(val)) {
+            plot.chartConfig[key] = undefined;
+          }
+        });
+      });
     },
     addIntensityMeasurements(
       state,
@@ -237,6 +253,14 @@ export const measurementsSlice = createSlice({
         group.intensityMeasurements,
         (msrmnt) => !measurements.includes(msrmnt),
       );
+      Object.values(group.plots).forEach((plot) => {
+        (["x-axis", "y-axis", "size"] as const).forEach((key) => {
+          const val = plot.chartConfig[key];
+          if (val !== undefined && measurements.includes(val)) {
+            plot.chartConfig[key] = undefined;
+          }
+        });
+      });
     },
 
     setActiveGroupPlotId(state, action: PayloadAction<string>) {
