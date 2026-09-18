@@ -22,7 +22,6 @@ export const MeasurementDashboardSwitcher = () => {
     () => Object.keys(measurementGroups),
     [measurementGroups],
   );
-  //TODO: change to dict lookup
   const renderTableTitle = useCallback(
     (groupId: string) => {
       return measurementGroups[groupId].name;
