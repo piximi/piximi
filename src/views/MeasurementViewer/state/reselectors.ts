@@ -196,7 +196,6 @@ export const selectPlotData = createSelector(
       if (!annotation.features) return;
       const computed = annotation.features;
 
-      const { comX, comY, ...computesSansCOM } = computed;
       parsedMeasurementData[id] = {
         id,
         kind: annotation.kindId,
@@ -204,7 +203,7 @@ export const selectPlotData = createSelector(
         partition: annotation.partition,
         timepoint: 0,
         preview: "",
-        measurements: { ...computesSansCOM },
+        measurements: { ...computed },
       };
     });
 
