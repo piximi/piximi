@@ -3,11 +3,9 @@ import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
-  AppBar,
   Box,
   Button,
   IconButton,
-  Toolbar,
   Checkbox,
   FormGroup,
   FormControlLabel,
@@ -16,12 +14,7 @@ import {
   LinearProgress,
   Typography,
 } from "@mui/material";
-import {
-  Close,
-  PlayCircleOutline,
-  Stop,
-  ErrorOutline,
-} from "@mui/icons-material";
+import { PlayCircleOutline, Stop, ErrorOutline } from "@mui/icons-material";
 
 import { useClassifierApi } from "core/dl/classification";
 
@@ -35,8 +28,6 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
-import { APPLICATION_COLORS } from "utils/constants";
-
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { useClassifierHistory } from "@ProjectViewer/contexts/ClassifierHistoryProvider";
@@ -47,13 +38,50 @@ import {
   useAcceptClearPredictions,
 } from "@ProjectViewer/hooks";
 
-type FitClassifierDialogAppBarProps = {
-  closeDialog: any;
+type FitClassifierProgressBarProps = {
+  epochs: number;
+  currentEpoch: number;
 };
 
-export const FitClassifierDialogAppBar = ({
-  closeDialog,
-}: FitClassifierDialogAppBarProps) => {
+const FitClassifierProgressBar = ({
+  epochs,
+  currentEpoch,
+}: FitClassifierProgressBarProps) => {
+  const progressPercentage = (currentEpoch / epochs) * 100;
+  const settingUpTraining = currentEpoch === 0;
+
+  return (
+    <div>
+      {settingUpTraining ? (
+        <div>
+          <Box sx={{ width: 200, mr: 5 }}>
+            <LinearProgress />
+          </Box>
+          <Box sx={{ minWidth: 50 }}>
+            <Typography variant="body2" color="text.secondary">
+              {" "}
+              {"Setting up training..."}{" "}
+            </Typography>
+          </Box>
+        </div>
+      ) : (
+        <div>
+          <Box sx={{ width: 200, mr: 5 }}>
+            <LinearProgress variant="determinate" value={progressPercentage} />
+          </Box>
+          <Box sx={{ minWidth: 50 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+            >{`Epoch ${currentEpoch} of ${epochs}`}</Typography>
+          </Box>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const FitClassifierDialogActions = () => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const modelStatus = useParameterizedSelector(
@@ -110,74 +138,58 @@ export const FitClassifierDialogAppBar = ({
   };
 
   return (
-    <AppBar
-      sx={{
-        position: "sticky",
-        backgroundColor: "transparent",
-        boxShadow: "none",
-        borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
-      }}
-    >
-      <Toolbar>
-        <IconButton
-          edge="start"
-          color="primary"
-          onClick={closeDialog}
-          aria-label="Close"
+    <Box sx={{ width: "100%", display: "flex" }}>
+      <Box sx={{ flexGrow: 1 }} />
+      {!!error && (
+        <Tooltip
+          slotProps={{
+            tooltip: {
+              sx: (theme) => ({
+                backgroundColor: theme.palette.warning.main,
+                fontSize: theme.typography.body2.fontSize,
+                color: theme.palette.getContrastText(
+                  theme.palette.warning.main,
+                ),
+                maxWidth: "none",
+              }),
+            },
+          }}
+          title={error.message}
         >
-          <Close />
-        </IconButton>
+          <Icon>
+            <ErrorOutline color="warning" />
+          </Icon>
+        </Tooltip>
+      )}
 
-        <Box sx={{ flexGrow: 1 }} />
-        {!!error && (
-          <Tooltip
-            slotProps={{
-              tooltip: {
-                sx: (theme) => ({
-                  backgroundColor: theme.palette.warning.main,
-                  fontSize: theme.typography.body2.fontSize,
-                  color: theme.palette.getContrastText(
-                    theme.palette.warning.main,
-                  ),
-                  maxWidth: "none",
-                }),
-              },
-            }}
-            title={error.message}
-          >
-            <Icon>
-              <ErrorOutline color="warning" />
-            </Icon>
-          </Tooltip>
-        )}
-
-        {showProgressBar ? (
+      {showProgressBar ? (
+        <>
           <FitClassifierProgressBar
             epochs={totalEpochs}
             currentEpoch={currentEpoch}
           />
-        ) : (
-          <Button
-            variant="outlined"
-            onClick={handleFit}
-            disabled={!isReady}
-            startIcon={<PlayCircleOutline />}
-            sx={{ mx: 1 }}
-          >
-            Fit Classifier
-          </Button>
-        )}
+          <TooltipWithDisable title="Stop fitting the model" placement="bottom">
+            <IconButton
+              onClick={onStopFitting}
+              disabled={modelStatus !== "training"}
+              color="primary"
+            >
+              <Stop />
+            </IconButton>
+          </TooltipWithDisable>
+        </>
+      ) : (
+        <Button
+          variant="outlined"
+          onClick={handleFit}
+          disabled={!isReady}
+          startIcon={<PlayCircleOutline />}
+          sx={{ mx: 1 }}
+        >
+          Fit Classifier
+        </Button>
+      )}
 
-        <TooltipWithDisable title="Stop fitting the model" placement="bottom">
-          <IconButton
-            onClick={onStopFitting}
-            disabled={modelStatus !== "training"}
-            color="primary"
-          >
-            <Stop />
-          </IconButton>
-        </TooltipWithDisable>
-      </Toolbar>
       <ConfirmationDialog
         isOpen={open}
         onClose={onClose}
@@ -208,49 +220,6 @@ export const FitClassifierDialogAppBar = ({
           onClose();
         }}
       />
-    </AppBar>
-  );
-};
-
-type FitClassifierProgressBarProps = {
-  epochs: number;
-  currentEpoch: number;
-};
-
-const FitClassifierProgressBar = ({
-  epochs,
-  currentEpoch,
-}: FitClassifierProgressBarProps) => {
-  const progressPercentage = (currentEpoch / epochs) * 100;
-  const settingUpTraining = currentEpoch === 0;
-
-  return (
-    <div>
-      {settingUpTraining ? (
-        <div>
-          <Box sx={{ width: 200, mr: 5 }}>
-            <LinearProgress />
-          </Box>
-          <Box sx={{ minWidth: 50 }}>
-            <Typography variant="body2" color="text.secondary">
-              {" "}
-              {"Setting up training..."}{" "}
-            </Typography>
-          </Box>
-        </div>
-      ) : (
-        <div>
-          <Box sx={{ width: 200, mr: 5 }}>
-            <LinearProgress variant="determinate" value={progressPercentage} />
-          </Box>
-          <Box sx={{ minWidth: 50 }}>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-            >{`Epoch ${currentEpoch} of ${epochs}`}</Typography>
-          </Box>
-        </div>
-      )}
-    </div>
+    </Box>
   );
 };

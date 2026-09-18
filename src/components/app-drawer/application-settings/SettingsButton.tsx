@@ -1,17 +1,15 @@
 import {
   Dialog,
   DialogContent,
-  DialogTitle,
   IconButton,
   Stack,
   Tooltip,
 } from "@mui/material";
-import {
-  Close as CloseIcon,
-  SettingsOutlined as SettingsIcon,
-} from "@mui/icons-material";
+import { SettingsOutlined as SettingsIcon } from "@mui/icons-material";
 
 import { useDialogHotkey, useHotkeys } from "hooks";
+
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { HotkeyContext } from "utils/enums";
 
@@ -36,20 +34,7 @@ const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
   return (
     <Dialog onClose={onClose} open={open} fullWidth maxWidth="xs">
-      <DialogTitle sx={{ m: 0, p: 2 }}>Settings</DialogTitle>
-
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={(theme) => ({
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: theme.palette.grey[500],
-        })}
-      >
-        <CloseIcon />
-      </IconButton>
+      <DialogTitleBar title="Settings" closeDialog={onClose} />
 
       <DialogContent sx={{ px: 0, pb: 2.5, pt: 1 }}>
         <Stack gap={2}>

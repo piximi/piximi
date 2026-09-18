@@ -7,7 +7,6 @@ import {
   Button,
   Dialog,
   DialogContent,
-  DialogTitle,
   Modal,
   Tabs,
   Typography,
@@ -25,6 +24,8 @@ import {
   MODEL_MANIFEST_FILENAME,
   MODEL_RUNS_FILENAME,
 } from "core/file-io/consts";
+
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { classifierSlice } from "store/classifier";
 
@@ -335,7 +336,7 @@ export const ImportTensorflowClassificationModelDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="sm" onClose={onClose} open={open}>
-      <DialogTitle>Load Classification Model</DialogTitle>
+      <DialogTitleBar title="Load Classification Model" closeDialog={onClose} />
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
         <ToolTipTab label="Upload Local" value="1" placement="top" />

@@ -1,18 +1,10 @@
 import { useState } from "react";
 
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Stack,
-  Tab,
-  Tabs,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { Box, Dialog, DialogContent, Stack, Tab, Tabs } from "@mui/material";
 
 import { useTranslation } from "hooks";
+
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { ExampleProjectCard } from "./ExampleProjectCard";
 import { exampleProjects } from "./exampleProjects";
@@ -47,27 +39,11 @@ export const ExampleProjectDialog = (props: ExampleProjectDialogProps) => {
         },
       }}
     >
-      <DialogTitle
-        sx={{
-          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-          margin: 0,
-          padding: (theme) => theme.spacing(2),
-        }}
-      >
-        {t("Open Example Project")}
-        <IconButton
-          aria-label="Close"
-          sx={(theme) => ({
-            color: theme.palette.grey[500],
-            position: "absolute",
-            right: theme.spacing(1),
-            top: theme.spacing(1),
-          })}
-          onClick={(event) => onClose(event, "escapeKeyDown")}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+      <DialogTitleBar
+        title={t("Open Example Project")}
+        closeDialog={(event) => onClose(event, "escapeKeyDown")}
+      />
+
       <DialogContent
         sx={{
           display: "flex",

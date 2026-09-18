@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
+
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectActiveModelName,
@@ -26,7 +28,6 @@ import { DialogTransitionSlide } from "@ProjectViewer/components/dialogs";
 
 import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
 import { ConfusionMatrix } from "./ConfusionMatrix";
-import { EvaluateClassifierDialogAppBar } from "./EvaluateClassifierAppBar";
 
 import type { Category } from "core/entities";
 import type { Run } from "core/dl/classification/types";
@@ -97,7 +98,7 @@ export const EvaluateClassifierDialog = ({
       slots={{ transition: DialogTransitionSlide }}
       sx={{ zIndex: 1203, height: "100%" }}
     >
-      <EvaluateClassifierDialogAppBar closeDialog={closeDialog} />
+      <DialogTitleBar title="Model Evaluation" closeDialog={closeDialog} />
 
       <Box
         sx={{

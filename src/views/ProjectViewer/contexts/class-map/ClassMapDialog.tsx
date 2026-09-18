@@ -9,7 +9,6 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   FormControl,
   FormControlLabel,
   MenuItem,
@@ -20,6 +19,7 @@ import {
 import { generateCategory, CATEGORY_COLORS } from "core/entities";
 
 import { StyledSelect } from "components/inputs";
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { dataSlice } from "store/data";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
@@ -109,7 +109,10 @@ export const ClassMapDialog = ({
 
   return (
     <Dialog open={open} onClose={onDismiss}>
-      <DialogTitle>{"Configure Category-Class Mapping"}</DialogTitle>
+      <DialogTitleBar
+        title="Configure Category-Class Mapping"
+        closeDialog={onDismiss}
+      />
       <DialogContent>
         <DialogContentText>
           {"Map project categories to the model's pretrained classes"}

@@ -9,10 +9,11 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   FormControl,
   FormControlLabel,
 } from "@mui/material";
+
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectShowSaveProjectDialog } from "store/applicationSettings/selectors";
@@ -43,7 +44,10 @@ const ConfirmReplaceDialog = ({
       onClose={onDismiss}
       data-testid="confirm-replace-dialog"
     >
-      <DialogTitle>{"Current Project will be lost"}</DialogTitle>
+      <DialogTitleBar
+        title="Current Project will be lost"
+        closeDialog={onDismiss}
+      />
       <DialogContent>
         <DialogContentText>
           {

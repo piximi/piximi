@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { Box, Dialog, DialogContent, Tabs } from "@mui/material";
+import { Box, Dialog, DialogActions, DialogContent, Tabs } from "@mui/material";
+
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { useParameterizedSelector } from "store/hooks";
 import { selectModelLifecycleStatus } from "store/classifier/selectors";
@@ -22,7 +24,7 @@ import {
   ModelSettings,
   RunSummaryTable,
 } from "./panels";
-import { FitClassifierDialogAppBar } from "./FitClassifierDialogAppBar";
+import { FitClassifierDialogActions } from "./FitClassifierDialogActions";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -95,7 +97,7 @@ export const FitClassifierDialog = ({
         //height: "80%",
       }}
     >
-      <FitClassifierDialogAppBar closeDialog={closeDialog} />
+      <DialogTitleBar title="Fit Model" closeDialog={closeDialog} />
 
       <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
         <ToolTipTab label="HyperParameters" value="1" placement="top" />
@@ -142,6 +144,9 @@ export const FitClassifierDialog = ({
           {modelConfig?.modelSummary && <RunSummaryTable />}
         </Box>
       </DialogContent>
+      <DialogActions>
+        <FitClassifierDialogActions />
+      </DialogActions>
     </Dialog>
   );
 };

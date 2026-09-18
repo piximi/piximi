@@ -1,15 +1,8 @@
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-  IconButton,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { Button, Dialog, DialogContent, DialogActions } from "@mui/material";
 
 import { useHotkeys } from "hooks";
+
+import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { HotkeyContext } from "utils/enums";
 
@@ -73,24 +66,7 @@ export const ConfirmationDialog = ({
 
   return (
     <Dialog fullWidth onClose={handleClose} open={isOpen} {...rest}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        px={1}
-        pb={1.5}
-        pt={1}
-      >
-        <DialogTitle sx={{ p: 1 }}>{title}</DialogTitle>
-        <IconButton
-          onClick={handleClose}
-          sx={() => ({
-            maxHeight: "40px",
-          })}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
+      <DialogTitleBar title={title} closeDialog={handleClose} />
 
       {content && <DialogContent>{content}</DialogContent>}
 
