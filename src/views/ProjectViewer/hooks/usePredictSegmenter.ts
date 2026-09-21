@@ -15,6 +15,7 @@ import { selectAllKinds, selectExtendedImages } from "store/data/selectors";
 
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType } from "utils/enums";
+import { useMeasurementsApi } from "utils/measurements/hooks/useMeasurementsApi";
 
 import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
 
@@ -43,6 +44,7 @@ export const usePredictSegmenter = () => {
   const { setModelStatus, loadedModel, selectedChannels } =
     useSegmenterStatus();
   const segApi = useSegmenterApi();
+  const measurementsApi = useMeasurementsApi();
   const Cancel = new CancelSource();
 
   const handleError = useCallback(
@@ -249,8 +251,13 @@ export const usePredictSegmenter = () => {
 
       const annVolumes: AnnotationVolume[] = [];
       const annotations: AnnotationObject[] = [];
+      const intensityBatches: Array<{
+        channelRefs: Array<{ id: string }>;
+        objs: AnnotationObject[];
+      }> = [];
       for await (const [i, _annotations] of predictedAnnotations.entries()) {
         const image = inferenceImages[i];
+        const imageAnns: AnnotationObject[] = [];
 
         for (let j = 0; j < _annotations.length; j++) {
           const { kindName, ...predictedAnn } = _annotations[j];
@@ -290,8 +297,47 @@ export const usePredictSegmenter = () => {
           };
           annVolumes.push(annVol);
           annotations.push(finalAnn);
+          imageAnns.push(finalAnn);
+        }
+
+        if (imageAnns.length > 0) {
+          intensityBatches.push({
+            channelRefs: image.channelsRef.map((c) => ({ id: c.id })),
+            objs: imageAnns,
+          });
         }
       }
+
+      if (annotations.length > 0) {
+        try {
+          const [featureResults, intensityResults] = await Promise.all([
+            measurementsApi.computeFeatures(annotations),
+            measurementsApi.computeIntensityMeasurements(intensityBatches),
+          ]);
+          for (const ann of annotations) {
+            if (featureResults[ann.id]) ann.features = featureResults[ann.id];
+            if (intensityResults[ann.id])
+              ann.intensityMeasurements = intensityResults[ann.id];
+          }
+        } catch (error) {
+          console.warn(
+            "[predictSegmenter] measurement computation failed; annotations will be added without features/intensityMeasurements",
+            error,
+          );
+          dispatch(
+            applicationSettingsSlice.actions.updateAlertState({
+              alertState: {
+                alertType: AlertType.Warning,
+                name: "Measurement computation failed",
+                description:
+                  "Predicted annotations were added, but their measurements could not be computed.",
+                stackTrace: await getStackTraceFromError(error as Error),
+              },
+            }),
+          );
+        }
+      }
+
       batch(() => {
         dispatch(dataSlice.actions.batchAddAnnotationVolume(annVolumes));
         dispatch(dataSlice.actions.batchAddAnnotation(annotations));
