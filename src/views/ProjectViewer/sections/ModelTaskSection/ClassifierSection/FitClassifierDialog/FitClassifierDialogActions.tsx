@@ -138,7 +138,7 @@ export const FitClassifierDialogActions = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", display: "flex" }}>
+    <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
       <Box sx={{ flexGrow: 1 }} />
       {!!error && (
         <Tooltip
