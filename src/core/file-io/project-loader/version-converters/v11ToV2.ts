@@ -192,7 +192,11 @@ function convertCategories(
   };
   v11Categories.forEach((v11Cat) => {
     let v11CatId = v11Cat.id;
-    if (representsUnknown(v11CatId)) v11CatId = UNKNOWN_IMAGE_CATEGORY_ID;
+    if (
+      representsUnknown(v11CatId) &&
+      v11Kinds[v11Cat.kind].displayName === "Image"
+    )
+      v11CatId = UNKNOWN_IMAGE_CATEGORY_ID;
     v2Categories.ids.push(v11CatId);
     const scope =
       v11Kinds[v11Cat.kind].displayName === "Image"
