@@ -110,8 +110,8 @@ export function toTrainingInput(
       : [0, 0, item.shape.width, item.shape.height];
   let channelsRef: ExtendedChannel[];
   if (selectedChannels)
-    channelsRef = item.channelsRef.filter((ref) =>
-      selectedChannels.includes(ref.channelMetaId),
+    channelsRef = selectedChannels.map(
+      (sCh) => item.channelsRef.find((ch) => ch.channelMetaId === sCh)!,
     );
   else channelsRef = item.channelsRef;
   return {

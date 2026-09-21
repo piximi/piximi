@@ -171,16 +171,17 @@ export const usePredictSegmenter = () => {
     let predictedAnnotations: PredictedAnnotationObject[][];
     let predictionCancelled: boolean = false;
     try {
+      const inferenceInput = inferenceImages.map((item) =>
+        toInferenceInput(
+          item,
+          !selectedChannels.some((id) => id === "")
+            ? selectedChannels
+            : undefined,
+        ),
+      );
       const predictionResult = await segApi.predict(
         loadedModel.name,
-        inferenceImages.map((item) =>
-          toInferenceInput(
-            item,
-            !selectedChannels.some((id) => id === "")
-              ? selectedChannels
-              : undefined,
-          ),
-        ),
+        inferenceInput,
         Cancel.token,
         progressCb,
       );

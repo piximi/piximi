@@ -87,7 +87,8 @@ export abstract class Stardist extends Segmenter {
             inferenceDataDims![idx],
           );
           annotations.push(annotObj);
-        } catch {
+        } catch (e) {
+          console.error(e);
           failedImages++;
         }
       }
