@@ -122,6 +122,11 @@ export const CategoryTree = ({
       k.cats.map((c) => c.id),
       !k.allSel,
     );
+
+  const handleSelectKind = (k: KindNode) => {
+    const c = k.cats.find((c) => representsUnknown(c.id))!;
+    dispatch(imageViewerDataSlice.actions.setSelectedCategory(c));
+  };
   const handleToggleCat = (c: CategoryNode) => toggleCategories([c.id], !c.sel);
   const handleSelectCat = (c: CategoryNode) =>
     dispatch(imageViewerDataSlice.actions.setSelectedCategory(c));
@@ -290,7 +295,10 @@ export const CategoryTree = ({
                 "&:hover .kebab": { opacity: 1 },
               }}
               selected={k.id === selectedCategory.kindId}
-              onClick={() => handleToggleExpand(k.id)}
+              onClick={() => {
+                handleToggleExpand(k.id);
+                handleSelectKind(k);
+              }}
             >
               {expanded[k.id] ? (
                 <ExpandMoreIcon sx={{ fontSize: 20, color: "action.active" }} />
