@@ -74,8 +74,18 @@ export const ColorPicker = ({ color, onColorChange }: ColorIconButtonProps) => {
           horizontal: "center",
         }}
       >
-        <ChromePicker color={color} onChange={onChange} />
+        <Box
+          sx={{
+            "& .chrome-picker input": {
+              color: "var(--mui-palette-text-primary)!important",
+            },
+          }}
+        >
+          <ChromePicker color={color} onChange={onChange} disableAlpha />
+        </Box>
       </Popover>
     </Fragment>
   );
 };
+
+//    styles={{ body: { "& > #rc-editable-input-1": { color: "white" } } }}
