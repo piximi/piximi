@@ -38,6 +38,8 @@ import { representsUnknown } from "utils/stringUtils";
 import { getCategoryIconStyle } from "utils/styleUtils";
 import { HotkeyContext } from "utils/enums";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
@@ -265,7 +267,10 @@ export const CategoryTree = ({
   };
 
   return (
-    <Box sx={{ flex: 1, overflow: "auto" }}>
+    <Box
+      sx={{ flex: 1, overflow: "auto" }}
+      data-help={HelpItem.CategorySelection}
+    >
       {header}
       <List
         disablePadding

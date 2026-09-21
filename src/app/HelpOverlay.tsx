@@ -24,13 +24,37 @@ import { helpContent } from "data/help/HelpContent";
 
 import type { HelpItem } from "data/help/HelpContent";
 
+// MUI only blocks real clicks on disabled elements that render as a native
+// <button> (via the HTML `disabled` attribute); components that render as a
+// <div> (e.g. Chip) rely solely on `pointer-events: none` for both hover and
+// click suppression, with no JS-level guard on their `onClick`. Restoring
+// pointer-events for hover (see globalStyles below) would make those
+// click-through again, so the same elements are also used to block their
+// clicks in handleClick.
+const DISABLED_HELP_SELECTOR =
+  "[data-help].Mui-disabled, [data-help][disabled]";
+const DISABLED_HELP_SELECTOR_SCOPED =
+  "html [data-help].Mui-disabled, html [data-help][disabled]";
+
+const findHelpTarget = (start: HTMLElement, maxDepth = 3) => {
+  let target = start;
+  let helpItem = target.getAttribute("data-help");
+  let depth = 0;
+  while (target.parentElement && !helpItem && depth < maxDepth) {
+    target = target.parentElement;
+    helpItem = target.getAttribute("data-help");
+    depth++;
+  }
+  return { target, helpItem };
+};
+
 const HelpOverlay = () => {
   const muiTheme = useTheme();
-  const { helpMode, setHelpMode } = useHelp()!;
+  const { helpMode, setHelpMode } = useHelp();
   const [helpText, setHelpText] = useState<string | null>(null);
   const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
   const [helpItem, setHelpItem] = useState<HelpItem | null>(null);
-  const [priorityHelp, setPriotityHelp] = useState<HelpItem | null>(null);
+  const [priorityHelp, setPriorityHelp] = useState<HelpItem | null>(null);
 
   const helpToggle = (event: KeyboardEvent) => {
     if (event.key === "H" && event.shiftKey) {
@@ -52,22 +76,13 @@ const HelpOverlay = () => {
 
     const handleMouseMove = (e: MouseEvent) => {
       if (priorityHelp) return;
-      let currentTarget = e.target as HTMLElement;
-      let helpItem = currentTarget.getAttribute("data-help");
-      let parentLevel = 0;
-      while (currentTarget && currentTarget.parentElement && !helpItem) {
-        helpItem = currentTarget.getAttribute("data-help");
-        if (helpItem || parentLevel >= 3) break;
-
-        currentTarget = currentTarget.parentElement;
-        parentLevel++;
-      }
+      const { target: currentTarget, helpItem } = findHelpTarget(
+        e.target as HTMLElement,
+      );
       if (currentTarget === lastTarget) return;
       setLastTarget(currentTarget);
       if (helpItem) {
-        const helpText = helpContent["help-items"][helpItem as HelpItem]
-          ? helpContent["help-items"][helpItem as HelpItem].brief
-          : null;
+        const helpText = helpContent[helpItem as HelpItem] ?? null;
         setHelpText(helpText);
         setHelpItem(helpItem as HelpItem);
         e.preventDefault();
@@ -75,32 +90,26 @@ const HelpOverlay = () => {
       }
     };
     const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest(DISABLED_HELP_SELECTOR)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
       if (!e.shiftKey) return;
 
       e.preventDefault();
       e.stopPropagation();
 
-      let currentTarget = e.target as HTMLElement;
-      let _helpItem = currentTarget.getAttribute("data-help");
-      let parentLevel = 0;
-      while (currentTarget && currentTarget.parentElement && !_helpItem) {
-        _helpItem = currentTarget.getAttribute("data-help");
-
-        if (_helpItem || parentLevel >= 3) break;
-
-        currentTarget = currentTarget.parentElement;
-        parentLevel++;
-      }
+      const { helpItem: _helpItem } = findHelpTarget(target);
       if (priorityHelp === _helpItem) {
-        setPriotityHelp(null);
+        setPriorityHelp(null);
         return;
       }
-      setPriotityHelp(_helpItem as HelpItem);
+      setPriorityHelp(_helpItem as HelpItem);
 
       if (_helpItem && _helpItem !== helpItem) {
-        const helpText = helpContent["help-items"][_helpItem as HelpItem]
-          ? helpContent["help-items"][_helpItem as HelpItem].brief
-          : null;
+        const helpText = helpContent[_helpItem as HelpItem] ?? null;
         setHelpText(helpText);
         setHelpItem(_helpItem as HelpItem);
       }
@@ -119,13 +128,24 @@ const HelpOverlay = () => {
         styles={(theme) => ({
           "html [data-help]": helpMode
             ? {
-                outline: `2px dashed ${theme.palette.info.main}`,
-                outlineOffset: "-3px",
+                boxShadow: `inset 0 0 0.5rem 1px ${theme.palette.info.main}`,
               }
             : {},
-          [`html [data-help=${priorityHelp ?? "undefined"}]`]: {
-            outlineColor: theme.palette.secondary.main,
-          },
+          // MUI sets pointer-events: none on disabled controls, which removes
+          // them from mouse hit-testing entirely - restore it while help mode
+          // is on so hovering a disabled data-help element still works.
+          // (handleClick below blocks clicks on these so this doesn't also
+          // make them actionable.)
+          ...(helpMode && {
+            [DISABLED_HELP_SELECTOR_SCOPED]: {
+              pointerEvents: "auto",
+            },
+          }),
+          ...(priorityHelp && {
+            [`html [data-help="${priorityHelp}"]`]: {
+              outlineColor: theme.palette.secondary.main,
+            },
+          }),
         })}
       />
     ),
@@ -174,10 +194,6 @@ const HelpOverlay = () => {
                 />
               )}
             </Typography>
-            {/* <Typography variant="body2" whiteSpace={"pre-line"}>
-              {helpText}
-            </Typography> */}
-            {/* <Markdown remarkPlugins={[remarkGfm]} components={{"ul":List}}>{helpText}</Markdown> */}
             <MuiMarkdown
               overrides={{
                 ...getOverrides({}),

@@ -50,6 +50,7 @@ type ToolOptions = {
   icon: (color: string) => ReactElement;
   hotKey?: string[];
   options?: SliderOptions;
+  help?: HelpItem;
 };
 type ToolMap = Record<string, ToolOptions>;
 
@@ -84,49 +85,58 @@ const toolMap: ToolMap = {
     operation: ToolType.RectangularAnnotation,
     icon: (color) => <RectangleAnnotation color={color} />,
     hotKey: ["shift", "R"],
+    help: HelpItem.RectangleTool,
   },
   "Ellipse Tool": {
     operation: ToolType.EllipticalAnnotation,
     icon: (color) => <EllipticalAnnotation color={color} />,
     hotKey: ["shift", "E"],
+    help: HelpItem.EllipseTool,
   },
   "Polygon Tool": {
     operation: ToolType.PolygonalAnnotation,
     icon: (color) => <PolygonAnnotation color={color} />,
     hotKey: ["shift", "P"],
+    help: HelpItem.PolygonTool,
   },
   "Pen Tool": {
     operation: ToolType.PenAnnotation,
     icon: (color) => <FreehandAnnotation color={color} />,
     options: DEFAULT_PEN_TOOL_OPTIONS,
     hotKey: ["shift", "F"],
+    help: HelpItem.PenTool,
   },
   "Lasso Tool": {
     operation: ToolType.LassoAnnotation,
     icon: (color) => <LassoAnnotation color={color} />,
     hotKey: ["shift", "L"],
+    help: HelpItem.LassoTool,
   },
   "Magnetic Tool": {
     operation: ToolType.MagneticAnnotation,
     icon: (color) => <MagneticAnnotation color={color} />,
     hotKey: ["shift", "M"],
+    help: HelpItem.MagneticTool,
   },
   "Color Tool": {
     operation: ToolType.ColorAnnotation,
     icon: (color) => <ColorAnnotation color={color} />,
     hotKey: ["shift", "C"],
+    help: HelpItem.ColorTool,
   },
   "Quick Annotation Tool": {
     operation: ToolType.QuickAnnotation,
     icon: (color) => <QuickAnnotation color={color} />,
     options: DEFAULT_QUICK_TOOL_OPTIONS,
     hotKey: ["shift", "Q"],
+    help: HelpItem.QuickAnnotationTool,
   },
   "Threshold Tool": {
     operation: ToolType.ThresholdAnnotation,
     icon: (color) => <Margin sx={{ color }} />,
     options: DEFAULT_THRESHOLD_TOOL_OPTIONS,
     hotKey: ["shift", "T"],
+    help: HelpItem.ThresholdTool,
   },
 };
 
@@ -144,10 +154,7 @@ const AnnotationToolBar = () => {
   };
 
   return (
-    <Stack
-      data-help={HelpItem.ObjectCreationTools}
-      sx={{ height: "100%", bgcolor: "background.paper" }}
-    >
+    <Stack sx={{ height: "100%", bgcolor: "background.paper" }}>
       {Object.keys(toolMap).map((name, idx) => {
         const tool = toolMap[name];
 
@@ -164,6 +171,7 @@ const AnnotationToolBar = () => {
                 : theme.palette.action.active,
             )}
             hotkey={tool.hotKey}
+            data-help={tool.help}
             PopoverComponent={
               tool.operation === ToolType.ThresholdAnnotation ? (
                 <ThresholdOptions toolOptions={tool.options!} />
@@ -188,6 +196,7 @@ const AnnotationToolBar = () => {
                 ? theme.palette.primary.dark
                 : theme.palette.action.active,
             )}
+            data-help={tool.help}
           />
         );
       })}

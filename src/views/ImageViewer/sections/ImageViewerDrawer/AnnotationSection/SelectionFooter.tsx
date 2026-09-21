@@ -24,6 +24,8 @@ import { dataSlice } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { ExportOptionsPanel } from "./ExportOptionsPanel";
 
 import type { OpScope, ScopeId } from "./types";
@@ -141,6 +143,7 @@ export const SelectionFooter = ({
           startIcon={<DownloadIcon />}
           endIcon={<ArrowDropUpIcon />}
           onClick={(e) => setExpAnchor(e.currentTarget)}
+          data-help={HelpItem.ExportAnnotation}
         >
           Export
         </Button>

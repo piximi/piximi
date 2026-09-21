@@ -5,6 +5,8 @@ import { Box } from "@mui/material";
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveExtendedChannels } from "store/data/selectors";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 
 import { ChannelConfig } from "./ChannelConfig";
@@ -29,6 +31,7 @@ export const ChannelList = () => {
         overflowY: "scroll",
         width: "100%",
       }}
+      data-help={HelpItem.ChannelAdjustment}
     >
       {activeChannels.map((ch) => (
         <ChannelConfig key={ch.id} channel={ch} />

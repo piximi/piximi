@@ -9,6 +9,8 @@ import { OBJECT_FEATURES } from "core/entities";
 import { getDifferences } from "utils/arrayUtils";
 import { formatString } from "utils/stringUtils";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { measurementsSlice } from "@MeasurementViewer/state";
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
 import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
@@ -76,7 +78,7 @@ export const ComputedObjectMeasurementOptions = ({
   };
 
   return (
-    <Box>
+    <Box data-help={HelpItem.ObjectMeasurements}>
       <StyledRichTreeView
         items={computedMeasurementItems}
         multiSelect

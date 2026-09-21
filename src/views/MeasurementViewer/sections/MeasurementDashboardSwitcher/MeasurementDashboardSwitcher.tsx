@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { CustomTabs } from "@MeasurementViewer/components/custom-tab-switcher";
 import { measurementsSlice } from "@MeasurementViewer/state";
 import {
@@ -60,6 +62,7 @@ export const MeasurementDashboardSwitcher = () => {
         editable={true}
         handleTabEdit={handleEditGroupName}
         handleTabClose={handleDeleteGroup}
+        tabHelp={{ tabBar: HelpItem.MeasurementGroupTabs }}
       >
         {groupIds.map((id) => (
           <MeasurementDashboard key={`measurement-table-${id}`} />

@@ -13,6 +13,8 @@ import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import CloseIcon from "@mui/icons-material/Close";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import type { MouseEvent } from "react";
 
 import type { ExtendedKind } from "core/entities";
@@ -190,6 +192,7 @@ export const FilterPipeline = ({
         py: 1,
         height: theme.spacing(17),
       })}
+      data-help={HelpItem.AnnotationFilterSection}
     >
       {/*Title*/}
       <Box

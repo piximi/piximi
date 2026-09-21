@@ -6,6 +6,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { ExpandIcon } from "components/ui";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { useCriterionToggles } from "./useCriterionToggles";
 
 import type { FeatureKey } from "core/entities";
@@ -133,6 +135,7 @@ export const FeatureFilters = ({
           py: 1.25,
           cursor: "pointer",
         }}
+        data-help={HelpItem.FeatureFilters}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
           <Typography

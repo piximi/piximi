@@ -20,6 +20,8 @@ import {
 
 import { HotkeyContext } from "utils/enums";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { TooltipTextButton } from "@ProjectViewer/components";
 import {
   useClassifierStatus,
@@ -89,6 +91,7 @@ const FitClassifierButton = ({
           font: "var(--mui-font-caption)",
           color: "var(--mui-palette-primary-main)",
         }}
+        data-help={HelpItem.FitModelDialog}
       />
 
       <FitClassifierDialog
@@ -156,6 +159,7 @@ const PredictClassifierButton = ({
         font: "var(--mui-font-caption)",
         color: "var(--mui-palette-primary-main)",
       }}
+      data-help={HelpItem.PredictModel}
     />
   );
 };
@@ -210,6 +214,7 @@ const EvaluateClassifierButton = ({
           font: "var(--mui-font-caption)",
           color: "var(--mui-palette-primary-main)",
         }}
+        data-help={HelpItem.EvaluateModel}
       />
 
       <EvaluateClassifierDialog

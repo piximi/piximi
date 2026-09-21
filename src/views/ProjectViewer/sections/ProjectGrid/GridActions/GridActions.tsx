@@ -16,6 +16,8 @@ import { ToolButton } from "components/inputs";
 import { HotkeyContext } from "utils/enums";
 import { pluralize } from "utils/stringUtils";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { useGridActions } from "@ProjectViewer/hooks";
 
 import { ZoomControl } from "./ZoomControl";
@@ -106,6 +108,7 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
             onClick={onOpenDeleteImagesDialog}
             icon={<DeleteIcon />}
             hotkey={["del"]}
+            data-help={HelpItem.DeleteObject}
           />
         </>
       )}

@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Box } from "@mui/material";
 import { useGridApiRef } from "@mui/x-data-grid";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import {
   TextToggleButton,
   TextToggleButtonGroup,
@@ -51,6 +53,7 @@ export const MeasurementDashboard = () => {
           exclusive
           onChange={handleChange}
           size="small"
+          data-help={HelpItem.MeasurementGroupView}
         >
           <TextToggleButton value="table">Table View</TextToggleButton>
           <TextToggleButton value="plots">Plot View</TextToggleButton>
