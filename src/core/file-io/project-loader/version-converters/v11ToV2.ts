@@ -2,6 +2,7 @@ import { Image as IJSImage } from "image-js-latest";
 
 import {
   generateUUID,
+  UNKNOWN_IMAGE_CATEGORY_ID,
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
@@ -190,16 +191,18 @@ function convertCategories(
     entities: { [UNKNOWN_KIND_CATEGORY_ID]: UNKNOWN_KIND_CATEGORY },
   };
   v11Categories.forEach((v11Cat) => {
-    v2Categories.ids.push(v11Cat.id);
+    let v11CatId = v11Cat.id;
+    if (representsUnknown(v11CatId)) v11CatId = UNKNOWN_IMAGE_CATEGORY_ID;
+    v2Categories.ids.push(v11CatId);
     const scope =
       v11Kinds[v11Cat.kind].displayName === "Image"
         ? { type: "image" as const }
         : { type: "annotation" as const, kindId: v11Cat.kind };
     v2Categories.entities[v11Cat.id] = {
-      id: v11Cat.id,
+      id: v11CatId,
       name: v11Cat.name,
       color: v11Cat.color,
-      isUnknown: representsUnknown(v11Cat.id),
+      isUnknown: representsUnknown(v11CatId),
       ...scope,
     };
   });
@@ -282,7 +285,9 @@ function convertThings(
       name: image.name,
       seriesId: v2Series.id,
       shape: { planes, width, height, channels },
-      categoryId: image.categoryId,
+      categoryId: representsUnknown(image.categoryId)
+        ? UNKNOWN_IMAGE_CATEGORY_ID
+        : image.categoryId,
       activePlaneId: "",
       timepoint: 0,
       bitDepth,
