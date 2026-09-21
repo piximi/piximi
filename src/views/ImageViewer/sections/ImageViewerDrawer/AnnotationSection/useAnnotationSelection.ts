@@ -78,7 +78,7 @@ export const useAnnotationSelection = () => {
     dispatch(imageViewerDataSlice.actions.setPlaneScope(scope));
   };
 
-  const [mode, setMode] = useState<LayerMode>("hide");
+  const [mode, setMode] = useState<LayerMode>("keep");
 
   // ---- derived ----
   const view = useSelector(selectVisibleAnnotations);
