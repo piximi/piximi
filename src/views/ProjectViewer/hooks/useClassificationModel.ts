@@ -21,7 +21,10 @@ export const useClassificationModel = () => {
 
   const cfApi = useClassifierApi();
   useEffect(() => {
-    if (!activeModelName) return;
+    if (!activeModelName) {
+      setModelInfo(undefined);
+      return;
+    }
     let cancelled = false;
     cfApi.getModelInfo(activeModelName).then((result) => {
       if (cancelled) return;
