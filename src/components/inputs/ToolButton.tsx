@@ -149,6 +149,7 @@ export const InteractivePopoverToolButton = ({
   PopoverComponent,
   icon,
   hotkey,
+  ...attributes
 }: ToolProps & {
   onClickOpen?: boolean;
   PopoverComponent: ReactElement;
@@ -170,6 +171,7 @@ export const InteractivePopoverToolButton = ({
     <Box
       sx={(theme) => ({
         position: "relative",
+        left: "-2px",
         display: "flex",
         flexDirection: "row-reverse",
         overflowY: "visible",
@@ -196,10 +198,10 @@ export const InteractivePopoverToolButton = ({
             }}
             sx={{
               zIndex: 1001,
-              ml: "1px",
               borderRadius: 0,
             }}
             size="small"
+            {...attributes}
           >
             {icon}
           </IconButton>
@@ -215,7 +217,7 @@ export const InteractivePopoverToolButton = ({
             position: "absolute",
             right: "100%",
             top: "50%",
-            transform: `translateY(-50%) translateX(${optionsOpen ? "-8px" : "calc(100% - 16px)"})`,
+            transform: `translateY(-50%) translateX(${optionsOpen ? "-8px" : "calc(100% - 14px)"})`,
             zIndex: -1,
           }}
         >
