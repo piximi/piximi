@@ -4,7 +4,10 @@ import { useSelector } from "react-redux";
 
 import { useClassifierApi } from "core/dl/classification";
 
-import { selectActiveModelName } from "store/classifier/selectors";
+import {
+  selectActiveModelName,
+  selectModelLifecycleStatus,
+} from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
@@ -15,6 +18,10 @@ export const useClassificationModel = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const activeModelName = useParameterizedSelector(
     selectActiveModelName,
+    modelTarget,
+  );
+  const modelStatus = useParameterizedSelector(
+    selectModelLifecycleStatus,
     modelTarget,
   );
   const [modelInfo, setModelInfo] = useState<ModelInfoDTO>();
@@ -40,6 +47,6 @@ export const useClassificationModel = () => {
     return () => {
       cancelled = true;
     };
-  }, [activeModelName]);
+  }, [activeModelName, modelStatus]);
   return modelInfo;
 };
