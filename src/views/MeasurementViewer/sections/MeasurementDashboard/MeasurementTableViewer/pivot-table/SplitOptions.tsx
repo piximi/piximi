@@ -1,5 +1,7 @@
 import { Box, Divider, Typography } from "@mui/material";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { PivotConfigurator } from "./PivotConfigurator";
 
 export const SplitOptions = () => {
@@ -13,7 +15,7 @@ export const SplitOptions = () => {
         borderRadius: 1,
       }}
     >
-      <Box sx={{ height: "38px" }}>
+      <Box sx={{ height: "38px" }} data-help={HelpItem.MeasurementSplits}>
         <Typography variant="h6" sx={{ px: 1, py: 0.5, fontSize: "1rem" }}>
           Split Options
         </Typography>

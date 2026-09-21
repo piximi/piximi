@@ -1,7 +1,5 @@
 import { createContext, useContext, useState } from "react";
 
-import { Box } from "@mui/material";
-
 const HelpContext = createContext<null | {
   helpMode: boolean;
   setHelpMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,9 +10,13 @@ export const HelpProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <HelpContext.Provider value={{ helpMode, setHelpMode }}>
-      <Box>{children}</Box>
+      {children}
     </HelpContext.Provider>
   );
 };
 
-export const useHelp = () => useContext(HelpContext);
+export const useHelp = () => {
+  const ctx = useContext(HelpContext);
+  if (!ctx) throw new Error("useHelp must be used within a HelpProvider");
+  return ctx;
+};

@@ -13,6 +13,8 @@ import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { HotkeyContext } from "utils/enums";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { ProjectSettings } from "./ProjectSettings";
 import { UISettings } from "./UISettings";
 
@@ -54,7 +56,7 @@ export const SettingsButton = () => {
   return (
     <>
       <Tooltip title="Settings">
-        <IconButton onClick={onOpen} size="small">
+        <IconButton onClick={onOpen} size="small" data-help={HelpItem.Settings}>
           <SettingsIcon />
         </IconButton>
       </Tooltip>

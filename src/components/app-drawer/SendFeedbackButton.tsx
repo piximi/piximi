@@ -15,6 +15,8 @@ import { ConfirmationDialog } from "components/dialogs";
 import { createGitHubIssue } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 
+import { HelpItem } from "data/help/HelpContent";
+
 type SendFeedbackDialogProps = {
   onClose: () => void;
   open: boolean;
@@ -94,7 +96,11 @@ export const SendFeedbackButton = () => {
   return (
     <>
       <Tooltip title="Send Feedback">
-        <IconButton onClick={onOpen} size="small">
+        <IconButton
+          onClick={onOpen}
+          size="small"
+          data-help={HelpItem.SendFeedback}
+        >
           <FeedbackIcon />
         </IconButton>
       </Tooltip>

@@ -120,6 +120,7 @@ export const AnnotationView = () => {
           height: DIMENSIONS.toolDrawerWidth,
           borderBottom: `1px solid ${theme.palette.divider}`,
         })}
+        data-help={HelpItem.KindTabs}
       >
         <Box sx={{ flex: 1, display: "flex" }}>
           {visibleKinds.map((state) => (

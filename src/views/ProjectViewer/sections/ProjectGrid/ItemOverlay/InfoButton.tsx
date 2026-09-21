@@ -3,6 +3,8 @@ import { Info as InfoOutlinedIcon } from "@mui/icons-material";
 
 import { haloFilter } from "utils/styleUtils";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { useInformationPopover } from "../information-popover";
 
 export const InfoButton = ({
@@ -24,7 +26,11 @@ export const InfoButton = ({
   };
 
   return (
-    <IconButton onClick={handleOpenDetails} sx={{ p: 0 }}>
+    <IconButton
+      onClick={handleOpenDetails}
+      sx={{ p: 0 }}
+      data-help={HelpItem.GridItemInfo}
+    >
       <InfoOutlinedIcon
         sx={{
           ml: "8px",

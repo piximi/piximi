@@ -177,6 +177,7 @@ export const ModelSelection = ({
           onChange={handleModelChange}
           variant="standard"
           disabled={kindModelNames.length === 0}
+          data-help={HelpItem.ClassificationModelSelect}
         >
           <MenuItem
             dense
@@ -211,6 +212,7 @@ export const ModelSelection = ({
             sx={{ pr: 0 }}
             onClick={handleDisposeModel}
             disabled={!selectedModelConfig}
+            data-help={HelpItem.DeleteModel}
           >
             <DeleteIcon sx={{ fontSize: "1.15rem" }} />
           </IconButton>

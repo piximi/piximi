@@ -25,6 +25,8 @@ import {
 import { findReplicateName } from "utils/stringUtils";
 import { logger } from "utils/logUtils";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {
   ErrorReason,
@@ -131,6 +133,7 @@ const ModelArchiitectureOptions = ({
           variant: "body2",
           sx: { mr: "1rem", whiteSpace: "nowrap" },
         }}
+        data-help={HelpItem.ModelArchitecture}
       >
         <StyledSelect
           value={newModelArch}

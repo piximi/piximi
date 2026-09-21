@@ -18,6 +18,8 @@ import { ToolButton } from "components/inputs";
 
 import { HotkeyContext } from "utils/enums";
 
+import { HelpItem } from "data/help/HelpContent";
+
 import {
   CombineAnnotationsIcon,
   IntersectAnnotationsIcon,
@@ -261,6 +263,7 @@ export const SelectionButtons = ({
           transition: "all ease-in-out 0.25s",
           zIndex: 999,
         }}
+        data-help={HelpItem.ObjectManipulationTools}
       >
         <ToolButton
           name={t("Confirm")}
