@@ -655,6 +655,10 @@ export const selectAllExtendedKinds = createSelector(
   (ext) => Object.values(ext),
 );
 
+export const selectKindNames = createSelector(selectAllKinds, (kinds) =>
+  kinds.map((k) => k.name),
+);
+
 /*
  * ───────────────────────────────────────────────────────────────────────
  * ── Channels ───────────────────────────────────────────────────────────

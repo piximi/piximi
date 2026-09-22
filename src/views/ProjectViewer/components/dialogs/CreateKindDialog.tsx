@@ -26,8 +26,6 @@ export const CreateKindDialog = ({
   existingKinds,
 }: CreateCategoriesDialogProps) => {
   const [name, setName] = useState<string>("");
-  const [errorHelperText, setErrorHelperText] = useState<string>(" ");
-  const [isInvalidName, setIsInvalidName] = useState<boolean>(false);
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -39,28 +37,28 @@ export const CreateKindDialog = ({
   };
 
   const validateInput = useCallback(
-    (categoryName: string) => {
+    (kindName: string) => {
       let validInput = true;
       let helperText = " ";
-
-      if (categoryName === "") {
+      if (kindName === "") {
         helperText = "Please type a kind name.";
         validInput = false;
       } else if (
         existingKinds
           .map((kind) => kind.toString().toUpperCase())
-          .includes(categoryName.toUpperCase())
+          .includes(kindName.toUpperCase())
       ) {
         helperText =
           "Kind names must be unique. A kind with this name already exits.";
         validInput = false;
       }
-      setErrorHelperText(helperText);
-      setIsInvalidName(!validInput);
-      return validInput;
+
+      return { isInvalid: !validInput, helperText };
     },
     [existingKinds],
   );
+  const { isInvalid: isInvalidName, helperText: errorHelperText } =
+    validateInput(name);
 
   const handleConfirm = () => {
     const { kind, unknownCategory } = generateKind(name);
