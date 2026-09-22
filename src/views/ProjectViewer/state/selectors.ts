@@ -18,14 +18,6 @@ export const selectActiveView = ({
   return project.activeView;
 };
 
-export const selectProjectImageChannels = ({
-  project,
-}: {
-  project: ProjectState;
-}) => {
-  return project.imageChannels;
-};
-
 export const selectProjectName = ({ project }: { project: ProjectState }) => {
   return project.name;
 };

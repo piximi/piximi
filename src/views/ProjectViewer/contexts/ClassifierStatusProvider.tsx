@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useImmer } from "use-immer";
 
-import { Partition } from "core/dl/enums";
+import { ModelStatus, Partition } from "core/dl/enums";
 import { getDefaultModelParams } from "core/dl/classification/utils";
 import { representsUnknown, type Shape } from "core/entities";
 
@@ -26,16 +26,14 @@ import {
 import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
+import { selectExperimentChannels } from "store/data/selectors";
 
 import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
 import {
   selectActiveLabeledItems,
   selectActiveItemsByPartition,
 } from "@ProjectViewer/state/reselectors";
-import {
-  selectProjectImageChannels,
-  selectActiveClassifierModelTarget,
-} from "@ProjectViewer/state/selectors";
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import type React from "react";
 
@@ -120,7 +118,7 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
 
 const useModelParams = () => {
   const dispatch = useDispatch();
-  const projectChannels = useSelector(selectProjectImageChannels);
+  const ExperimentChannels = useSelector(selectExperimentChannels);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const modelPreprocessingSettings = useParameterizedSelector(
     selectModelPreprocessSettings,
@@ -134,7 +132,7 @@ const useModelParams = () => {
   const [userDefinedSeed, setUserDefinedSeed] = useState<number | undefined>();
 
   const [newModelParams, updateNewModelParams] = useImmer(
-    getDefaultModelParams(projectChannels),
+    getDefaultModelParams(ExperimentChannels),
   );
   const modelParams = useMemo(() => {
     if (modelPreprocessingSettings && modelOptimizerSettings)
@@ -204,8 +202,8 @@ const useModelParams = () => {
       });
       return;
     }
-    handleSetModelParams(getDefaultModelParams(projectChannels));
-  }, [modelOptimizerSettings, modelPreprocessingSettings, projectChannels]);
+    handleSetModelParams(getDefaultModelParams(ExperimentChannels));
+  }, [modelOptimizerSettings, modelPreprocessingSettings, ExperimentChannels]);
   return {
     modelParams,
     newModelName,
@@ -243,7 +241,7 @@ export const ClassifierStatusProvider = ({
     modelTarget,
   );
   const activeLabeledItems = useSelector(selectActiveLabeledItems);
-  const projectChannels = useSelector(selectProjectImageChannels);
+  const experimentChannels = useSelector(selectExperimentChannels);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
@@ -261,6 +259,10 @@ export const ClassifierStatusProvider = ({
     handleSetModelParams,
   } = useModelParams();
 
+  const isFitting = useMemo(
+    () => classifierStatus === "loading" || classifierStatus === "training",
+    [ModelStatus],
+  );
   const precheck: Precheck = useMemo(
     () => ({
       modelTrainable: !modelConfig || modelConfig.trainable,
@@ -270,25 +272,24 @@ export const ClassifierStatusProvider = ({
         representsUnknown(item.categoryId),
       ),
       channelsValid:
-        modelConfig?.preprocessingSettings && projectChannels
-          ? projectChannels !==
+        modelConfig?.preprocessingSettings && experimentChannels
+          ? experimentChannels ===
             modelConfig.preprocessingSettings.inputShape.channels
           : true,
       modelNameValid:
         !!modelConfig ||
-        classifierStatus === "loading" ||
-        classifierStatus === "training" ||
+        isFitting ||
         !restrictedClassifierNames.includes(newModelName),
     }),
     [
       modelConfig,
-      projectChannels,
+      experimentChannels,
       newModelName,
       restrictedClassifierNames,
       modelIsValid,
       activeLabeledItems,
       classifierStatus,
-      modelIsTrained,
+      inferenceItems,
     ],
   );
 
@@ -321,7 +322,7 @@ export const ClassifierStatusProvider = ({
     if (!precheck.channelsValid) {
       newErrors.push({
         reason: ErrorReason.ChannelMismatch,
-        message: `The model requires ${modelConfig?.preprocessingSettings?.inputShape.channels}-channel images, but the project images have ${projectChannels}`,
+        message: `The model requires ${modelConfig?.preprocessingSettings?.inputShape.channels}-channel images, but the project images have ${experimentChannels}`,
         severity: 2,
       });
     }
@@ -342,7 +343,7 @@ export const ClassifierStatusProvider = ({
     }
 
     return newErrors;
-  }, [precheck, modelConfig, projectChannels, modelTarget, newModelName]);
+  }, [precheck, modelConfig, experimentChannels, modelTarget, newModelName]);
 
   const error = useMemo(
     () =>

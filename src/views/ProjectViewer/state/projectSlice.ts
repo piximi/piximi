@@ -47,7 +47,6 @@ const initialState: ProjectState = {
     },
   },
   highlightedCategory: undefined,
-  imageChannels: undefined,
 };
 
 function handleImageCategoryDelete(
@@ -82,13 +81,6 @@ export const projectSlice = createSlice({
   name: "project",
   initialState: initialState,
   reducers: {
-    setProjectImageChannels(
-      state,
-      action: PayloadAction<{ channels: number | undefined }>,
-    ) {
-      state.imageChannels = action.payload.channels;
-    },
-
     setProject(state, action: PayloadAction<{ project: ProjectState }>) {
       return action.payload.project;
     },

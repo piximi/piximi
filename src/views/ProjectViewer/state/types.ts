@@ -71,5 +71,4 @@ export type ProjectState = {
   imageGridState: ImageGridState;
   annotationGridState: AnnotationGridState;
   highlightedCategory: string | undefined;
-  imageChannels: number | undefined;
 };
