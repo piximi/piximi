@@ -71,10 +71,6 @@ export function convertV11ToV2(
   v11: V11PiximiState,
   onProgress: (p: number) => void,
 ): V2PiximiState {
-  const experiment: V2Experiment = {
-    id: generateUUID(),
-    name: v11.project.name,
-  };
   const { things, kinds, categories } = v11.data;
   const v2Kinds = convertKinds(Object.values(kinds.entities));
   onProgress(STAGES.kinds.end);
@@ -83,14 +79,26 @@ export function convertV11ToV2(
     Object.values(categories.entities),
   );
   onProgress(STAGES.categories.end);
+  const experimentId = generateUUID();
   const v2Data = convertThings(
-    experiment.id,
+    experimentId,
     kinds.entities,
     Object.values(things.entities),
     subProgress(onProgress, STAGES.things),
   );
   const v2ClassifierState = convertClassifier(v11.classifier, v2Kinds.entities);
-
+  let experimentChannels = v11.project.imageChannels;
+  if (!experimentChannels) {
+    const firstSeriesId = v2Data.imageSeries.ids[0];
+    if (firstSeriesId)
+      experimentChannels =
+        v2Data.imageSeries.entities[firstSeriesId].shape.channels;
+  }
+  const experiment: V2Experiment = {
+    id: experimentId,
+    name: v11.project.name,
+    channels: experimentChannels,
+  };
   return {
     data: { experiment, ...v2Data, kinds: v2Kinds, categories: v2Categories },
     classifier: v2ClassifierState,
