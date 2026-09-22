@@ -4,7 +4,7 @@ import { Menu, MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey, useMobileView } from "hooks";
 
-import { selectKindIds } from "store/data/selectors";
+import { selectKindNames } from "store/data/selectors";
 import { dataSlice } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
@@ -28,7 +28,7 @@ export const AddKindMenu = ({
 }) => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKindId);
-  const existingKinds = useSelector(selectKindIds);
+  const existingKinds = useSelector(selectKindNames);
 
   const isMobile = useMobileView();
   const {
