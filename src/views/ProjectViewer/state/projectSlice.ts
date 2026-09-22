@@ -1,13 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
-import { UNKNOWN_KIND } from "core/entities";
+import { UNKNOWN_KIND, representsUnknown } from "core/entities";
 
 import { dataSlice } from "store/data";
 import { projectReset } from "store/actions";
 
 import { findAdjacentItem, mutatingFilter } from "utils/arrayUtils";
-import { representsUnknown } from "utils/stringUtils";
 
 import { AnnotationSortType, ImageSortType } from "./types";
 

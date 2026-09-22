@@ -1,15 +1,13 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { difference } from "lodash";
 
-import { CATEGORY_COLORS } from "core/entities";
+import { CATEGORY_COLORS, representsUnknown } from "core/entities";
 
 import {
   selectAllCategories,
   selectExtendedAnnotationsByKindId,
   selectExtendedImages,
 } from "store/data/selectors";
-
-import { representsUnknown } from "utils/stringUtils";
 
 import { isFiltered } from "./filtering";
 import {

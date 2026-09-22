@@ -1,13 +1,12 @@
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import { Partition } from "core/dl/enums";
+import { representsUnknown } from "core/entities";
 
 import { classifierSlice } from "store/classifier";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { dataSlice } from "store/data";
 import { useParameterizedSelector } from "store/hooks";
-
-import { representsUnknown } from "utils/stringUtils";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {

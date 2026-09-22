@@ -7,9 +7,9 @@ import {
   OptimizationAlgorithm,
   Partition,
 } from "core/dl/enums";
+import { representsUnknown } from "core/entities";
 
 import { seededShuffle } from "utils/arrayUtils";
-import { representsUnknown } from "utils/stringUtils";
 
 import type { ModelCompileArgs, LayersModel } from "@tensorflow/tfjs";
 

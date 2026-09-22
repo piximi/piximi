@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { toInferenceInput } from "core/dl/utils";
 import { useClassifierApi } from "core/dl/classification";
+import { representsUnknown } from "core/entities";
 
 import { dataSlice } from "store/data";
 import { classifierSlice } from "store/classifier";
@@ -12,7 +13,6 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 
 import { logger } from "utils/logUtils";
-import { representsUnknown } from "utils/stringUtils";
 
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
