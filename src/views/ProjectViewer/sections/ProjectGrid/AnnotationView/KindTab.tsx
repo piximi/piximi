@@ -7,9 +7,9 @@ import {
   Edit as EditIcon,
 } from "@mui/icons-material";
 
-import { TextFieldWithBlur } from "components/inputs";
+import { representsUnknown } from "core/entities";
 
-import { representsUnknown } from "utils/stringUtils";
+import { TextFieldWithBlur } from "components/inputs";
 
 import { HelpItem } from "data/help/HelpContent";
 

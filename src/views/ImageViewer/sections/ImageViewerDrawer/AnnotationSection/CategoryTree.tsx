@@ -26,7 +26,11 @@ import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import GestureIcon from "@mui/icons-material/Gesture";
 import { Label as CategoryIcon } from "@mui/icons-material";
 
-import { generateCategory, generateKind } from "core/entities";
+import {
+  generateCategory,
+  generateKind,
+  representsUnknown,
+} from "core/entities";
 
 import { useDialogHotkey } from "hooks";
 
@@ -34,7 +38,6 @@ import { ConfirmationDialog } from "components/dialogs";
 
 import { dataSlice } from "store/data";
 
-import { representsUnknown } from "utils/stringUtils";
 import { getCategoryIconStyle } from "utils/styleUtils";
 import { HotkeyContext } from "utils/enums";
 

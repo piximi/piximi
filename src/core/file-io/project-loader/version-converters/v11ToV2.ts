@@ -7,6 +7,7 @@ import {
   UNKNOWN_KIND_CATEGORY,
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
+  representsUnknown,
 } from "core/entities";
 import { getDefaultModelInfo } from "core/dl/classification/utils";
 import { ModelArch } from "core/dl/classification/types";
@@ -18,7 +19,6 @@ import {
 
 import { processChannel } from "utils/channelUtils";
 import { CHANNEL_COLOR_MAPS, DEFAULT_COLORS } from "utils/colorUtils";
-import { representsUnknown } from "utils/stringUtils";
 
 import { subProgress } from "../progress";
 

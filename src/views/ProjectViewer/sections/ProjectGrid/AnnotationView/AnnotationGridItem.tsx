@@ -3,13 +3,12 @@ import { memo } from "react";
 import { Box, Typography } from "@mui/material";
 
 import { Partition } from "core/dl/enums";
+import { representsUnknown } from "core/entities";
 
 import { useRenderedSrc } from "hooks";
 
 import { useParameterizedSelector } from "store/hooks";
 import { selectCategoryById } from "store/data/selectors";
-
-import { representsUnknown } from "utils/stringUtils";
 
 import { altTextStyle, getIconPosition, imageStyle } from "../gridItemUtils";
 import { useGridItemStyle } from "../useGridItemStyle";

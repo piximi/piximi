@@ -3,10 +3,9 @@ import {
   UNKNOWN_IMAGE_CATEGORY_COLOR,
   UNKNOWN_IMAGE_CATEGORY_ID,
   generateUUID,
+  representsUnknown,
 } from "core/entities";
 import { Partition } from "core/dl/enums";
-
-import { representsUnknown } from "utils/stringUtils";
 
 import { subProgress } from "../progress";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "../version-readers/constants";
