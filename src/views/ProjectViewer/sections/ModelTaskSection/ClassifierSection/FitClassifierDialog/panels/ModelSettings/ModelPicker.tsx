@@ -22,7 +22,7 @@ import {
   selectKindClassifier,
 } from "store/classifier/selectors";
 
-import { findReplicateName } from "utils/stringUtils";
+import { getUniqueName } from "utils/stringUtils";
 import { logger } from "utils/logUtils";
 
 import { HelpItem } from "data/help/HelpContent";
@@ -110,19 +110,14 @@ const ModelArchiitectureOptions = ({
   useEffect(() => {
     if (userHasUpdated) return;
     const candidateName = `${modelTargetName}_${newModelArch === 0 ? "Simple-CNN" : "Mobilenet"}`;
-
-    const replicates = findReplicateName(
+    const uniqueName = getUniqueName(
       candidateName,
       restrictedClassifierNames,
+      (base, n) => `${base}${n}`,
     );
 
-    if (!replicates) {
-      setModelName(candidateName);
-      setConfirmedName(candidateName);
-      return;
-    }
-    setModelName(candidateName + replicates.length);
-    setConfirmedName(candidateName + replicates.length);
+    setModelName(uniqueName);
+    setConfirmedName(uniqueName);
   }, [userHasUpdated, restrictedClassifierNames, newModelArch]);
 
   return (

@@ -13,6 +13,7 @@ import { useImmer } from "use-immer";
 
 import { Partition } from "core/dl/enums";
 import { getDefaultModelParams } from "core/dl/classification/utils";
+import { representsUnknown, type Shape } from "core/entities";
 
 import {
   selectAllCreatedModelNames,
@@ -26,8 +27,6 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
 
-import { findReplicateName, representsUnknown } from "utils/stringUtils";
-
 import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
 import {
   selectActiveLabeledItems,
@@ -40,7 +39,6 @@ import {
 
 import type React from "react";
 
-import type { Shape } from "core/entities";
 import type {
   ClassifierModelParams,
   ModelLifecycleStatus,
@@ -276,10 +274,11 @@ export const ClassifierStatusProvider = ({
           ? projectChannels !==
             modelConfig.preprocessingSettings.inputShape.channels
           : true,
-      modelNameValid: !findReplicateName(
-        newModelName,
-        restrictedClassifierNames,
-      ),
+      modelNameValid:
+        !!modelConfig ||
+        classifierStatus === "loading" ||
+        classifierStatus === "training" ||
+        !restrictedClassifierNames.includes(newModelName),
     }),
     [
       modelConfig,
