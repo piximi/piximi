@@ -13,8 +13,6 @@ import {
   selectExtendedImageEntities,
 } from "store/data/selectors";
 
-import { formatString } from "utils/stringUtils";
-
 import { toChannelMeasurementLabel } from "@MeasurementViewer/utils";
 
 import { selectActiveMeasurementGroup } from "./selectors";
@@ -121,14 +119,14 @@ export const selectActiveInitialPivotDimensions = createSelector(
     const splitTree: Dimension[] = [];
     categorySplit.values = [...categorySet].map((category) => ({
       id: category.id,
-      label: formatString(category.name, undefined, "every-word"),
+      label: category.name,
       parentId: "category",
     }));
     splitTree.push(categorySplit);
 
     partitionSplit.values = [...partitionSet].map((ptn) => ({
       id: ptn,
-      label: formatString(ptn, undefined, "every-word"),
+      label: ptn,
       parentId: "partition",
     }));
     splitTree.push(partitionSplit);
@@ -136,7 +134,7 @@ export const selectActiveInitialPivotDimensions = createSelector(
     if (imageSet.size > 0) {
       imageSplit.values = [...imageSet].map((ptn) => ({
         id: ptn.id,
-        label: formatString(ptn.name, undefined, "every-word"),
+        label: ptn.name,
         parentId: "image",
       }));
       splitTree.push(imageSplit);
