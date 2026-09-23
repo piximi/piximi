@@ -48,13 +48,19 @@ const generateCompositeKey = (
   entity: EntityWithMeasurements,
   pivotItems: PivotItem[],
   categories: Record<string, Category>,
+  images: Record<string, ExtendedImageObject>,
 ): string | null => {
   const keyParts: string[] = [];
 
   for (const pivotItem of pivotItems) {
     if (pivotItem.isMainDimension) {
       // Main dimension - use all values (this entity's value for that dimension)
-      const value = getEntityDimensionValue(entity, pivotItem.id, categories);
+      const value = getEntityDimensionValue(
+        entity,
+        pivotItem.id,
+        categories,
+        images,
+      );
       if (value === null) return null;
       keyParts.push(value);
     } else {
@@ -63,6 +69,7 @@ const generateCompositeKey = (
         entity,
         pivotItem.parentId!,
         categories,
+        images,
       );
       const expectedValue = pivotItem.label;
       if (entityValue !== expectedValue) return null;
@@ -80,15 +87,17 @@ const getEntityDimensionValue = (
   entity: EntityWithMeasurements,
   dimensionId: string,
   categories: Record<string, Category>,
+  images: Record<string, ExtendedImageObject>,
 ): string | null => {
   switch (dimensionId) {
     case "category":
       return categories[entity.categoryId]?.name ?? null;
     case "partition":
       return entity.partition;
-    case "imageId":
+    case "image":
       // ImageObject uses its own id, AnnotationObject has imageId field
-      return "imageId" in entity ? entity.imageId : entity.id;
+      const id = "imageId" in entity ? entity.imageId : entity.id;
+      return images[id]?.name ?? null;
     case "timepoint":
       // For time-series support
       return "timepoint" in entity && entity.timepoint !== undefined
@@ -115,6 +124,7 @@ export const generateUniqueCompositeKeys = (
   entities: EntityWithMeasurements[],
   pivotItems: PivotItem[],
   categories: Record<string, Category>,
+  images: Record<string, ExtendedImageObject>,
 ): string[] => {
   if (pivotItems.length === 0) {
     return ["all"];
@@ -123,7 +133,7 @@ export const generateUniqueCompositeKeys = (
   const uniqueKeys = new Set<string>();
 
   entities.forEach((entity) => {
-    const key = generateCompositeKey(entity, pivotItems, categories);
+    const key = generateCompositeKey(entity, pivotItems, categories, images);
     if (key) {
       uniqueKeys.add(key);
     }
@@ -324,6 +334,7 @@ const aggregateByPivot = (
   getMeasurementValue: (entity: EntityWithMeasurements) => number | undefined,
   pivotItems: PivotItem[],
   categories: Record<string, Category>,
+  images: Record<string, ExtendedImageObject>,
   compositeKeys: string[],
 ): Record<string, PivotAggregation> => {
   // Initialize buckets for each composite key
@@ -340,7 +351,7 @@ const aggregateByPivot = (
     if (pivotItems.length === 0) {
       buckets["all"].push(value);
     } else {
-      const key = generateCompositeKey(entity, pivotItems, categories);
+      const key = generateCompositeKey(entity, pivotItems, categories, images);
       if (key && buckets[key]) {
         buckets[key].push(value);
       }
@@ -378,6 +389,7 @@ export type MeasurementGetter = {
 export const generatePivotRows = (
   activeEntityGroup: ImageEntityMeasurementGroup | ObjectEntityMeasurementGroup,
   categories: Record<string, Category>,
+  images: Record<string, ExtendedImageObject>,
   pivotItems: PivotItem[],
   measurementGetters: MeasurementGetter[],
 ): PivotRowData[] => {
@@ -386,6 +398,7 @@ export const generatePivotRows = (
     entities,
     pivotItems,
     categories,
+    images,
   );
 
   const rows: PivotRowData[] = [];
@@ -397,6 +410,7 @@ export const generatePivotRows = (
       getter.getValue,
       pivotItems,
       categories,
+      images,
       compositeKeys,
     );
 

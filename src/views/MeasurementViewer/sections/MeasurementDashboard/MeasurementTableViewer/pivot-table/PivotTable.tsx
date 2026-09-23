@@ -7,7 +7,10 @@ import { DataGrid } from "@mui/x-data-grid";
 
 import { CHANNEL_MEASUREMENTS } from "core/entities";
 
-import { selectCategoryEntities } from "store/data/selectors";
+import {
+  selectCategoryEntities,
+  selectExtendedImageEntities,
+} from "store/data/selectors";
 
 import { HelpItem } from "data/help/HelpContent";
 
@@ -102,6 +105,7 @@ export const PivotTable = ({
   const activeEntityGroup = useSelector(selectActiveMeasuredEntitiesGroup);
   const pivotItems = useSelector(selectActivePivotItems);
   const categories = useSelector(selectCategoryEntities);
+  const images = useSelector(selectExtendedImageEntities);
 
   // Generate composite keys based on pivot configuration
   const compositeKeys = useMemo(() => {
@@ -110,8 +114,9 @@ export const PivotTable = ({
       activeEntityGroup.entities,
       pivotItems,
       categories,
+      images,
     );
-  }, [activeEntityGroup, pivotItems, categories]);
+  }, [activeEntityGroup, pivotItems, categories, images]);
 
   // Generate columns and column grouping model
   const { columns, columnGroupingModel } = useMemo(() => {
@@ -126,10 +131,11 @@ export const PivotTable = ({
     return generatePivotRows(
       activeEntityGroup,
       categories,
+      images,
       pivotItems,
       measurementGetters,
     );
-  }, [activeEntityGroup, categories, pivotItems]);
+  }, [activeEntityGroup, categories, images, pivotItems]);
 
   return (
     <Box
