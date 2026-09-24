@@ -69,7 +69,12 @@ export const ProjectGrid = () => {
             color="primary"
             exclusive
             onChange={handleActiveViewChange}
-            sx={{ my: 0.5 }}
+            sx={{
+              "& > .MuiToggleButton-root": {
+                py: 0.5,
+                border: "none",
+              },
+            }}
           >
             <ToggleButton value="images">Images</ToggleButton>
             <ToggleButton value="annotations" disabled={annotationCount === 0}>
