@@ -46,14 +46,24 @@ export class CocoSSD extends Segmenter {
       kind: Object.keys(COCO_CLASSES),
       src: "https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v1/model.json",
       requiredChannels: 3,
+      cancellableLoad: true,
     });
   }
 
-  public async loadModel() {
+  public async loadModel(_loadCB?: LoadCB, signal?: AbortSignal) {
     if (!this.src) return;
     if (this._model) return;
 
-    this._model = await loadGraphModel(this.src);
+    /*
+     * `src` is remote (tfjs-models on GCS), so this is the one segmenter load
+     * besides Cellpose-SAM that can leave the user waiting on the network.
+     * tfjs has no signal parameter, but `LoadOptions.fetchFunc` lets us pass
+     * one down to every request it makes for the topology and weight shards.
+     */
+    this._model = await loadGraphModel(this.src, {
+      fetchFunc: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, signal ? { ...init, signal } : init),
+    });
   }
 
   public async predict(

@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 
 import { err, ok } from "../../utils";
-import { Cellpose } from "../models/Cellpose";
+import { CellposeSAM } from "../models/CellposeSAM";
 import { CocoSSD } from "../models/CocoSSD";
 import { Glas } from "../models/Glas";
 import { StardistFluo, StardistVHE } from "../models/Stardist";
@@ -27,10 +27,13 @@ import type {
 
 export class SegmenterHandler implements ISegmenterApi {
   private _availableSegmentationModels: Record<string, Segmenter> = {};
+  // In-flight `loadModel` aborters, keyed by model name. See
+  // `cancelLoadModel` for why the controller lives on this side.
+  private _loadAborters = new Map<ModelName, AbortController>();
 
   constructor() {
     this._availableSegmentationModels = {
-      Cellpose: new Cellpose(),
+      "Cellpose-SAM": new CellposeSAM(),
       "COCO-SSD": new CocoSSD(),
       GlandSegmentation: new Glas(),
       StardistVHE: new StardistVHE(),
@@ -52,6 +55,7 @@ export class SegmenterHandler implements ISegmenterApi {
       kind: model.kind,
       modelLoaded: model.modelLoaded,
       requiredChannels: model.requiredChannels,
+      cancellableLoad: model.cancellableLoad,
     };
   }
 
@@ -89,7 +93,7 @@ export class SegmenterHandler implements ISegmenterApi {
    * Segmentation Ops
    */
 
-  public async loadModel(modelName: ModelName) {
+  public async loadModel(modelName: ModelName, loadCB?: LoadCB) {
     const model = this.resolveModel(modelName);
     if (!model)
       return err(
@@ -97,12 +101,33 @@ export class SegmenterHandler implements ISegmenterApi {
         `No model registered with name "${modelName}"`,
       );
     if (model.modelLoaded) return ok();
+
+    const controller = new AbortController();
+    this._loadAborters.set(modelName, controller);
     try {
-      await model.loadModel();
+      await model.loadModel(loadCB, controller.signal);
       return ok();
     } catch (e) {
-      return err("TF_LOAD_FAILED", "Failed to load model", e);
+      const error = e as Error;
+      // `fromPretrained` rejects with a DOMException named "AbortError" when
+      // the signal trips. That is a user action, not a failure.
+      if (error.name === "AbortError")
+        return err("LOAD_CANCELLED", `Cancelled loading "${modelName}"`, error);
+      /*
+       * Surface the underlying message rather than a fixed string. Loading can
+       * fail in ways the user can act on — no WebGPU adapter, a failed download,
+       * an exhausted IndexedDB quota — and callers only ever render
+       * `reason.message`, never `reason.cause`.
+       */
+      return err("TF_LOAD_FAILED", error.message, error);
+    } finally {
+      this._loadAborters.delete(modelName);
     }
+  }
+
+  public async cancelLoadModel(modelName: ModelName) {
+    this._loadAborters.get(modelName)?.abort();
+    return ok();
   }
   public async predict(
     modelName: ModelName,

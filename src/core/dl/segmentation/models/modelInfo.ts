@@ -86,15 +86,20 @@ export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
       },
     ],
   },
-  Cellpose: {
-    name: "Cellpose",
-    displayName: "Cellpose",
-    description: "A generalist algorithm for cell and nucleus segmentation",
-    use: "Segment general cells",
+  "Cellpose-SAM": {
+    name: "Cellpose-SAM",
+    displayName: "Cellpose-SAM",
+    description:
+      "Generalist instance segmentation for cells and nuclei, running fully in-browser on WebGPU (no server). Requires a WebGPU-capable browser (Chrome >=135 / Safari >=17.4). First load downloads a ~588 MB model (cached afterward).",
+    use: "Segment general cells/nuclei locally without a network round-trip",
     output: { name: "cellpose_cells" },
     sources: [
       {
-        text: "GitHub",
+        text: "Cellpose.js GitHub",
+        url: "https://github.com/belkassaby/Cellpose.js",
+      },
+      {
+        text: "Cellpose GitHub",
         url: "https://github.com/mouseland/cellpose",
       },
     ],
@@ -104,14 +109,10 @@ export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
         url: "https://www.nature.com/articles/s41592-020-01018-x",
       },
       {
-        text: "Cellpose 2.0: how to train your own model",
-        url: "https://www.nature.com/articles/s41592-022-01663-4",
+        text: "Cellpose-SAM: superhuman generalization for cellular segmentation",
+        url: "https://www.biorxiv.org/content/10.1101/2025.04.28.651001",
       },
     ],
-    cloudWarning: `This model performs inference in the cloud ☁️; images will leave your
-          machine. This requires internet access and may take time. Please
-          choose another option if your data is sensitive and should not be
-          transmitted.`,
   },
   GlandSegmentation: {
     name: "GlandSegmentation",

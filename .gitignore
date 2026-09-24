@@ -40,3 +40,6 @@ node_modules/
 .claude
 /docs
 .worktrees
+
+# ONNX
+public/ort/
