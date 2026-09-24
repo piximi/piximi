@@ -22,7 +22,7 @@ import type {
   ChannelMeta,
   Channel,
   Experiment,
-  FeatureKey,
+  ObjectFeature,
   ImageObject,
   ImageSeries,
   Plane,
@@ -31,7 +31,7 @@ import type {
   AnnotationObject,
   AnnotationVolume,
   PredictionCorrection,
-  ChannelMeasurement,
+  IntensityMeasurement,
 } from "core/entities";
 
 import type { AtLeastOne } from "utils/types";
@@ -694,10 +694,10 @@ export const dataSlice = createSlice({
         id: string;
         boundingBox: BBox;
         encodedMask: Array<number>;
-        features: Partial<Record<FeatureKey, number>> | undefined;
+        features: Partial<Record<ObjectFeature, number>> | undefined;
         intensityMeasurements: Record<
           string,
-          Partial<Record<ChannelMeasurement, number>>
+          Partial<Record<IntensityMeasurement, number>>
         >;
       }>,
     ) {

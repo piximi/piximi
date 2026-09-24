@@ -6,9 +6,9 @@ import { decodeRleArray } from "utils/image";
 
 import type { Roi } from "image-js-latest";
 
-import type { AnnotationObject, FeatureKey } from "core/entities";
+import type { AnnotationObject, ObjectFeature } from "core/entities";
 
-const featureOps: Record<FeatureKey, (r: Roi) => number> = {
+const featureOps: Record<ObjectFeature, (r: Roi) => number> = {
   area: (r) => r.surface,
   perimeter: (r) => r.perimeter,
   radius: (r) => r.ped / 2,

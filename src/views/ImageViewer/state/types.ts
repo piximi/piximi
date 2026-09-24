@@ -1,4 +1,4 @@
-import type { FeatureKey } from "core/entities";
+import type { ObjectFeature } from "core/entities";
 
 export type ImageViewerDataState = {
   imageStack: string[];
@@ -41,7 +41,7 @@ export interface FeatureRangeState {
   max: number;
 }
 /** The full feature-filter state, keyed by feature. */
-export type FeatureState = Record<FeatureKey, FeatureRangeState>;
+export type FeatureState = Record<ObjectFeature, FeatureRangeState>;
 
 /**
  * The live selection surface. Not a LayerCriterion: it carries editable slider
@@ -63,7 +63,7 @@ export interface SelectionLayer {
 
 /** A concrete numeric range criterion for one feature (baked into a layer). */
 export interface FeatureRange {
-  feature: FeatureKey;
+  feature: ObjectFeature;
   min: number;
   max: number;
 }

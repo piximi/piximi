@@ -1,11 +1,11 @@
 import { saveAs } from "file-saver";
 import { v4 as uuidv4 } from "uuid";
 
-import { CHANNEL_MEASUREMENTS } from "core/entities";
+import { INTENSITY_MEASUREMENTS } from "core/entities";
 
 import { ChartType } from "./types";
 
-import type { ChannelMeasurement, FeatureKey } from "core/entities";
+import type { IntensityMeasurement, ObjectFeature } from "core/entities";
 
 import type { ChartConfig } from "./types";
 
@@ -110,22 +110,22 @@ export const savePlot = (
 
 export const toChannelMeasurementLabel = (
   channelId: string,
-  measurement: ChannelMeasurement,
+  measurement: IntensityMeasurement,
 ) => {
   return measurement + "-" + channelId;
 };
 
 export const parseChannelMeasurementLabel = (
   label: string,
-): { measurement: ChannelMeasurement; channelId: string } => {
+): { measurement: IntensityMeasurement; channelId: string } => {
   const [measurement, ...rest] = label.split("-");
   const channelName = rest.join("-");
-  if (!CHANNEL_MEASUREMENTS.includes(measurement as ChannelMeasurement))
+  if (!INTENSITY_MEASUREMENTS.includes(measurement as IntensityMeasurement))
     throw new Error(
       `Could not parse values from channel measurement label"${label}`,
     );
   return {
-    measurement: measurement as ChannelMeasurement,
+    measurement: measurement as IntensityMeasurement,
     channelId: channelName,
   };
 };
@@ -144,7 +144,7 @@ export const generateInitialPlot = () => {
   };
 };
 
-export const OBJ_MEAS_LOOKUP: Record<FeatureKey, string> = {
+export const OBJ_MEAS_LOOKUP: Record<ObjectFeature, string> = {
   area: "Area",
   bboxArea: "Bounding Box Area",
   comX: "Center of Mass (X)",

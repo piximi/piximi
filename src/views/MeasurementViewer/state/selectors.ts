@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { CHANNEL_MEASUREMENTS } from "core/entities";
+import { INTENSITY_MEASUREMENTS } from "core/entities";
 
 import type {
   ImageMeasurementGroup,
@@ -58,9 +58,9 @@ export const selectActiveMeasurements = createSelector(
   (group) => {
     if (!group) return [];
     const intensityMeasurements = group.intensityMeasurements.filter(
-      (msrmnt) => !["intensity", ...CHANNEL_MEASUREMENTS].includes(msrmnt),
+      (msrmnt) => !["intensity", ...INTENSITY_MEASUREMENTS].includes(msrmnt),
     );
-    return [...group.computedMeasurements, ...intensityMeasurements];
+    return [...group.featureMeasurements, ...intensityMeasurements];
   },
 );
 

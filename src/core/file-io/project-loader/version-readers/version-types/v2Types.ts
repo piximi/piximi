@@ -7,8 +7,8 @@ import type {
   ColorMap,
   DType,
   ChannelFeature,
-  ChannelMeasurement,
-  FeatureKey,
+  IntensityMeasurement,
+  ObjectFeature,
   PredictionCorrection,
 } from "core/entities";
 import type { Partition } from "core/dl/enums";
@@ -115,7 +115,7 @@ export type V2AnnotationVolume = {
   predictionCorrected?: PredictionCorrection;
 };
 
-export type V2FeatureKey = FeatureKey;
+export type V2FeatureKey = ObjectFeature;
 export type V2AnnotationObject = {
   id: string;
   planeId: string;
@@ -129,7 +129,7 @@ export type V2AnnotationObject = {
   features?: Partial<Record<V2FeatureKey, number>>;
   intensityMeasurements?: Record<
     string,
-    Partial<Record<ChannelMeasurement, number>>
+    Partial<Record<IntensityMeasurement, number>>
   >;
 };
 
