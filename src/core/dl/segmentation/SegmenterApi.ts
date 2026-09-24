@@ -59,8 +59,16 @@ class SegmenterApi implements ISegmenterApi {
     return this.backend.hasModel(name);
   }
 
-  loadModel(modelName: ModelName) {
-    return this.backend.loadModel(modelName);
+  loadModel(modelName: ModelName, loadCB?: LoadCB) {
+    if (!loadCB) {
+      loadCB = (loadPercent: number, loadMessage: string) =>
+        logger(`${loadPercent}% Completed: ${loadMessage}`);
+    }
+    return this.backend.loadModel(modelName, Comlink.proxy(loadCB));
+  }
+
+  cancelLoadModel(modelName: ModelName) {
+    return this.backend.cancelLoadModel(modelName);
   }
   // ---- inference  ----
   predict(

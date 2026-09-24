@@ -6,7 +6,7 @@ import type { Token } from "../cancel";
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
 
 export const MODELS = [
-  "Cellpose",
+  "Cellpose-SAM",
   "StardistVHE",
   "StardistFluo",
   "GlandSegmentation",
@@ -34,6 +34,9 @@ export type SegmentaionModelDetails = {
   kind?: string | Array<string>;
   modelLoaded: boolean;
   requiredChannels: number;
+  // True only when `loadModel` actually stops on abort. Drives whether the
+  // load task is offered as cancellable; see `ModelArgs.cancellableLoad`.
+  cancellableLoad: boolean;
 };
 
 export type PredictedAnnotationObject = Omit<
@@ -56,7 +59,13 @@ export interface ISegmenterApi {
   /*
    * Segmentation Ops
    */
-  loadModel(modelName: ModelName): Promise<ApiResult<void>>;
+  loadModel(modelName: ModelName, loadCB?: LoadCB): Promise<ApiResult<void>>;
+  /*
+   * Aborts an in-flight `loadModel`. An `AbortSignal` is not structured-
+   * cloneable, so it cannot be handed to the worker; the controller lives
+   * worker-side instead and this call trips it over Comlink.
+   */
+  cancelLoadModel(modelName: ModelName): Promise<ApiResult<void>>;
   predict(
     name: ModelName,
     items: InferenceInput[],

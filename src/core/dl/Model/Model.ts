@@ -83,6 +83,13 @@ export class Model {
     return this._currentFitHistory;
   }
 
+  public get defaultInputShape() {
+    return this._model?.inputs[0].shape!.slice(1) as number[];
+  }
+  public get modelLoaded() {
+    return this._model !== undefined;
+  }
+
   public get pretrained() {
     return this._pretrained;
   }
@@ -222,11 +229,5 @@ export class Model {
         err as Error,
       );
     }
-  }
-  public get defaultInputShape() {
-    return this._model?.inputs[0].shape!.slice(1) as number[];
-  }
-  public get modelLoaded() {
-    return this._model !== undefined;
   }
 }

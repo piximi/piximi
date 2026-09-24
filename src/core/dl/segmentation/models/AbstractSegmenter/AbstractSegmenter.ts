@@ -19,6 +19,13 @@ type ModelArgs = {
   kind?: string | Array<string>;
   requiredChannels: number;
   src?: string;
+  /*
+   * Whether `loadModel` honours the `AbortSignal` it is handed. Only models
+   * that actually stop on abort should set this — the UI uses it to decide
+   * whether to offer a cancel control, and offering one that does nothing is
+   * worse than offering none. Defaults to false.
+   */
+  cancellableLoad?: boolean;
 };
 export abstract class Segmenter {
   readonly name: ModelName;
@@ -26,15 +33,23 @@ export abstract class Segmenter {
 
   private _requiredChannels: number;
   readonly src?: string;
+  readonly cancellableLoad: boolean;
 
   protected _model?: GraphModel;
   protected _classes?: string[];
 
-  constructor({ name, kind, requiredChannels, src }: ModelArgs) {
+  constructor({
+    name,
+    kind,
+    requiredChannels,
+    src,
+    cancellableLoad = false,
+  }: ModelArgs) {
     this.name = name;
     this.kind = kind;
     this._requiredChannels = requiredChannels;
     this.src = src;
+    this.cancellableLoad = cancellableLoad;
     // set defaults
     this._model = undefined;
   }
@@ -51,7 +66,10 @@ export abstract class Segmenter {
   public get requiredChannels() {
     return this._requiredChannels;
   }
-  public abstract loadModel(): Promise<void>;
+  public abstract loadModel(
+    loadCB?: LoadCB,
+    signal?: AbortSignal,
+  ): Promise<void>;
   public abstract predict(
     items: InferenceInput[],
     cancelToken: Token,
