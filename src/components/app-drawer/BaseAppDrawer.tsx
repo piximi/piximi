@@ -38,7 +38,18 @@ export const BaseAppDrawer = ({
         sx={{ position: "relative", height: "100%", minHeight: 0 }}
         justifyContent={"space-between"}
       >
-        <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>
+        <Box
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+            overflowX: "hidden",
+          }}
+        >
+          {children}
+        </Box>
 
         {!hideSettings && <ApplicationOptions />}
       </Stack>

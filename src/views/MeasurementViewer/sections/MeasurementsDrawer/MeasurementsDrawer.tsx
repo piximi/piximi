@@ -34,7 +34,14 @@ export const MeasurementsDrawer = () => {
     isTableDialogOpen,
   } = useCreateMeasurementTable();
   return (
-    <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexGrow: 1,
+        minHeight: 0,
+        gridArea: "action-drawer",
+      }}
+    >
       <BaseAppDrawer>
         <Box
           sx={{
