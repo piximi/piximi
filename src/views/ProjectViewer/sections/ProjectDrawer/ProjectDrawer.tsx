@@ -14,7 +14,14 @@ export const ProjectDrawer = () => {
   return isMobile ? (
     <></>
   ) : (
-    <Box sx={{ display: "flex", flexGrow: 1, gridArea: "action-drawer" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexGrow: 1,
+        minHeight: 0,
+        gridArea: "action-drawer",
+      }}
+    >
       <BaseAppDrawer>
         <DividerHeader
           sx={{ mt: 1 }}

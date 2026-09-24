@@ -107,6 +107,7 @@ export const AnnotationView = () => {
       sx={{
         width: "100%",
         flexGrow: 1,
+        minHeight: 0,
         display: "flex",
         overflowY: "hidden",
         flexDirection: "column",
@@ -118,6 +119,7 @@ export const AnnotationView = () => {
           display: "flex",
           justifyContent: "center",
           height: DIMENSIONS.toolDrawerWidth,
+          flexShrink: 0,
           borderBottom: `1px solid ${theme.palette.divider}`,
         })}
         data-help={HelpItem.KindTabs}
@@ -165,6 +167,7 @@ export const AnnotationView = () => {
           sx={{
             width: "100%",
             flexGrow: 1,
+            minHeight: 0,
             display: gridState.activeKindId === kind.id ? "block" : "none",
           }}
         >

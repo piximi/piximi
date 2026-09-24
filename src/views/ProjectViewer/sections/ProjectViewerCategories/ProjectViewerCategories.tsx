@@ -233,7 +233,15 @@ export const ProjectViewerCategories = () => {
         }
       />
 
-      <List dense sx={{ maxHeight: "20rem", overflowY: "scroll", pt: 0 }}>
+      <List
+        dense
+        sx={{
+          overflowY: "scroll",
+          pt: 0,
+          minHeight: "4rem",
+          flex: 1,
+        }}
+      >
         {categories.map((category: Category, idx) => {
           return (
             <CategoryItem

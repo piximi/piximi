@@ -58,6 +58,7 @@ export const ProjectGrid = () => {
             justifyContent: "center",
             alignItems: "center",
             height: DIMENSIONS.toolDrawerWidth,
+            flexShrink: 0,
             borderBottom: `1px solid ${theme.palette.divider}`,
           })}
         >
@@ -82,6 +83,7 @@ export const ProjectGrid = () => {
             width: "100%",
             flexGrow: 1,
             display: activeView === "images" ? "block" : "none",
+            minHeight: 0,
           }}
         >
           <ImageGrid />
@@ -91,6 +93,7 @@ export const ProjectGrid = () => {
             width: "100%",
             flexGrow: 1,
             display: activeView === "annotations" ? "flex" : "none",
+            minHeight: 0,
           }}
         >
           <AnnotationView />
