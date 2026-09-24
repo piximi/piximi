@@ -144,7 +144,7 @@ export class CellposeSAM extends Segmenter {
               onTileProgress: (done, total) =>
                 loadCb?.(
                   Math.round(((idx + done / total) / items.length) * 100),
-                  `Sementing image ${idx + 1} of ${items.length} — tile ${done}/${total}`,
+                  `Segmenting image ${idx + 1} of ${items.length} — tile ${done}/${total}`,
                 ),
             },
           );
