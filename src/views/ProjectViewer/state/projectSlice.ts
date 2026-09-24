@@ -242,6 +242,33 @@ export const projectSlice = createSlice({
     ) {
       state.highlightedCategory = action.payload.categoryId;
     },
+    removeStaleSelections(
+      state,
+      action: PayloadAction<{
+        imageIds: string[];
+        annotationIdsByKind: Record<string, string[]>;
+      }>,
+    ) {
+      const { imageIds, annotationIdsByKind } = action.payload;
+
+      if (imageIds.length) {
+        const staleImages = new Set(imageIds);
+        mutatingFilter(
+          state.imageGridState.selectedIds,
+          (id) => !staleImages.has(id),
+        );
+      }
+
+      for (const kindId in annotationIdsByKind) {
+        const kindState = state.annotationGridState.kindStates[kindId];
+        if (!kindState) continue;
+        const staleAnnotations = new Set(annotationIdsByKind[kindId]);
+        mutatingFilter(
+          kindState.selectedIds,
+          (id) => !staleAnnotations.has(id),
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder

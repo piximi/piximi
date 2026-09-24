@@ -203,6 +203,7 @@ export default tseslint.config(
   {
     files: [
       "src/store/productionStore.ts",
+      "src/store/listeners.ts",
       "src/store/rootReducer.ts",
       "src/store/types.ts",
       "src/app/Application.tsx",
