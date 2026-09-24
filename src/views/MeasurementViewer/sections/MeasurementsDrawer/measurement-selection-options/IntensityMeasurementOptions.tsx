@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, capitalize } from "@mui/material";
 
-import { CHANNEL_MEASUREMENTS } from "core/entities";
+import { INTENSITY_MEASUREMENTS } from "core/entities";
 
 import { selectAllChannelMetas } from "store/data/selectors";
 
@@ -45,7 +45,7 @@ export const IntensityMeasurementOptions = ({
           id: "intensity",
           label: "Intensity",
 
-          children: CHANNEL_MEASUREMENTS.map((key) => ({
+          children: INTENSITY_MEASUREMENTS.map((key) => ({
             id: key,
             label: capitalize(key),
             children: channelMetas.map((cm) => ({
@@ -64,7 +64,7 @@ export const IntensityMeasurementOptions = ({
     if (newSelectedItems === null) newSelectedItems = [];
     else if (!Array.isArray(newSelectedItems))
       newSelectedItems = [newSelectedItems];
-    // Omit top level category "computed"
+    // Omit top level category "intensity"
     const onlyMeasurements = newSelectedItems.filter(
       (id) => id !== "intensity",
     );

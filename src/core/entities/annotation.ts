@@ -1,6 +1,6 @@
 import type { BBox, DataArray, Shape } from "./primatives";
 import type { Category } from "./category";
-import type { ChannelMeasurement, ExtendedChannel } from "./channel";
+import type { IntensityMeasurement, ExtendedChannel } from "./channel";
 import type { Partition, Predictable } from "./prediction";
 
 export type AnnotationVolume = Omit<Predictable, "partition"> & {
@@ -25,7 +25,7 @@ export const OBJECT_FEATURES = [
   "comX",
   "comY",
 ] as const;
-export type FeatureKey = (typeof OBJECT_FEATURES)[number];
+export type ObjectFeature = (typeof OBJECT_FEATURES)[number];
 export type AnnotationObject = {
   id: string;
   planeId: string;
@@ -36,10 +36,10 @@ export type AnnotationObject = {
   boundingBox: BBox;
   encodedMask: Array<number>;
   decodedMask?: DataArray;
-  features?: Partial<Record<FeatureKey, number>>;
+  features?: Partial<Record<ObjectFeature, number>>;
   intensityMeasurements?: Record<
     string,
-    Partial<Record<ChannelMeasurement, number>>
+    Partial<Record<IntensityMeasurement, number>>
   >;
 };
 

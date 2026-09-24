@@ -2,7 +2,7 @@ import {
   STORES,
   type AnnotationObject,
   type BitDepth,
-  type ChannelMeasurement,
+  type IntensityMeasurement,
 } from "core/entities";
 import { DataConnector } from "core/data-connector";
 
@@ -53,7 +53,7 @@ export const computeObjectIntensityMeasurements = async (
   const dataConnector = DataConnector.getInstance();
   const objMeasurements: Record<
     string,
-    Record<string, Record<ChannelMeasurement, number>>
+    Record<string, Record<IntensityMeasurement, number>>
   > = {};
 
   for (const batch of data) {
@@ -92,7 +92,7 @@ export const computeObjectIntensityMeasurements = async (
 
       const chMeasurements: Record<
         string,
-        Record<ChannelMeasurement, number>
+        Record<IntensityMeasurement, number>
       > = {};
 
       channelData.forEach((ch) => {
@@ -178,7 +178,7 @@ export const computeObjectIntensityMeasurementsLocal = async (
 ) => {
   const objMeasurements: Record<
     string,
-    Record<string, Record<ChannelMeasurement, number>>
+    Record<string, Record<IntensityMeasurement, number>>
   > = {};
 
   for (const batch of data) {
@@ -206,7 +206,7 @@ export const computeObjectIntensityMeasurementsLocal = async (
 
       const chMeasurements: Record<
         string,
-        Record<ChannelMeasurement, number>
+        Record<IntensityMeasurement, number>
       > = {};
 
       channelData.forEach((ch) => {

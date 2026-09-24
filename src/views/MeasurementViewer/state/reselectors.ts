@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 
 import {
-  CHANNEL_MEASUREMENTS,
+  INTENSITY_MEASUREMENTS,
   type AnnotationObject,
   type Category,
   type ImageObject,
@@ -172,7 +172,7 @@ export const selectPlotData = createSelector(
     Object.entries(images).forEach(([id, image]) => {
       const channelMeasurements: Record<string, number> = {};
       image.channelsRef.forEach((channel) => {
-        CHANNEL_MEASUREMENTS.forEach((msrmt) => {
+        INTENSITY_MEASUREMENTS.forEach((msrmt) => {
           const val = channel[msrmt];
           if (val !== undefined) {
             const name = toChannelMeasurementLabel(channel.name, msrmt);
@@ -192,10 +192,10 @@ export const selectPlotData = createSelector(
     });
     Object.entries(annotations).forEach(([id, annotation]) => {
       if (!annotation.features) return;
-      const computed = annotation.features;
+      const features = annotation.features;
       const intensityMeasurements: Record<string, number> = {};
       annotation.channelsRef.forEach((channel) => {
-        CHANNEL_MEASUREMENTS.forEach((msrmt) => {
+        INTENSITY_MEASUREMENTS.forEach((msrmt) => {
           const val = annotation.intensityMeasurements?.[channel.id]?.[msrmt];
           if (val !== undefined) {
             intensityMeasurements[
@@ -212,7 +212,7 @@ export const selectPlotData = createSelector(
         partition: annotation.partition,
         timepoint: 0,
         preview: "",
-        measurements: { ...computed, ...intensityMeasurements },
+        measurements: { ...features, ...intensityMeasurements },
       };
     });
 

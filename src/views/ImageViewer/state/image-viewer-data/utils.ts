@@ -1,7 +1,7 @@
 import type {
   ExtendedAnnotationObject,
   ExtendedKind,
-  FeatureKey,
+  ObjectFeature,
 } from "core/entities";
 
 import type {
@@ -15,7 +15,7 @@ import type {
   SelectionLayer,
 } from "../types";
 
-export type FeatureParams = Record<FeatureKey, FeatureConfig>;
+export type FeatureParams = Record<ObjectFeature, FeatureConfig>;
 // Numeric features for the persistent Feature-filter section: [min, max, step].
 export const FEATURES: FeatureParams = {
   area: { label: "Area", unit: "px²", bounds: [0, 2000], step: 10 },
@@ -150,7 +150,7 @@ export const idsInCategories = (
 
 export const idsInFeatureRange = (
   annotations: ExtendedAnnotationObject[],
-  feature: FeatureKey,
+  feature: ObjectFeature,
   [min, max]: [number, number],
 ): string[] =>
   annotations
@@ -161,7 +161,7 @@ export const idsInFeatureRange = (
     .map((a) => a.id);
 
 export const activeFeatureList = (feats: FeatureState): FeatureRange[] =>
-  (Object.entries(feats) as [FeatureKey, FeatureRangeState][])
+  (Object.entries(feats) as [ObjectFeature, FeatureRangeState][])
     .filter(([, v]) => v.active)
     .map(([feature, v]) => ({
       feature,

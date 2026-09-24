@@ -1,7 +1,7 @@
 import type { BitDepth, ColorMap, DType } from "./primatives";
 import type { StorageReference } from "./storage";
 
-export const CHANNEL_MEASUREMENTS = [
+export const INTENSITY_MEASUREMENTS = [
   "maxValue",
   "minValue",
   "total",
@@ -12,9 +12,11 @@ export const CHANNEL_MEASUREMENTS = [
   "lowerQuartile",
   "upperQuartile",
 ] as const;
+export type IntensityMeasurement = (typeof INTENSITY_MEASUREMENTS)[number];
+
 export const CHANNEL_FEATURES = ["entropy", "contrast", "snr"];
-export type ChannelMeasurement = (typeof CHANNEL_MEASUREMENTS)[number];
 export type ChannelFeature = (typeof CHANNEL_FEATURES)[number];
+
 export type Channel = {
   id: string;
   planeId: string;

@@ -18,15 +18,15 @@ import { OBJ_MEAS_LOOKUP } from "@MeasurementViewer/utils";
 
 import type React from "react";
 
-import type { FeatureKey } from "core/entities";
+import type { ObjectFeature } from "core/entities";
 
 import type { CustomTreeViewBaseItem } from "@MeasurementViewer/components/CustomTreeItem";
 import type { ObjectMeasurementGroup } from "@MeasurementViewer/types";
 
-const computedMeasurementItems: CustomTreeViewBaseItem[] = [
+const featureMeasurementItems: CustomTreeViewBaseItem[] = [
   {
-    id: "computed",
-    label: "Computed",
+    id: "feature",
+    label: "Feature",
 
     children: OBJECT_FEATURES.map((key) => ({
       id: key,
@@ -45,7 +45,7 @@ export const ComputedObjectMeasurementOptions = ({
 }) => {
   const dispatch = useDispatch();
 
-  const selectedItems = useMemo(() => group.computedMeasurements, [group]);
+  const selectedItems = useMemo(() => group.featureMeasurements, [group]);
 
   const handleSelectedItemsChange = (
     event: React.SyntheticEvent | null,
@@ -54,8 +54,8 @@ export const ComputedObjectMeasurementOptions = ({
     if (newSelectedItems === null) newSelectedItems = [];
     else if (!Array.isArray(newSelectedItems))
       newSelectedItems = [newSelectedItems];
-    // Omit top level category "computed"
-    const onlyMeasurements = newSelectedItems.filter((id) => id !== "computed");
+    // Omit top level category "feature"
+    const onlyMeasurements = newSelectedItems.filter((id) => id !== "feature");
     // Process newSelectedItems array to determine newly added and removed
     const changes = getDifferences(selectedItems, onlyMeasurements);
 
@@ -63,7 +63,7 @@ export const ComputedObjectMeasurementOptions = ({
       dispatch(
         measurementsSlice.actions.addObjectComputedMeasurements({
           groupId: group.id,
-          measurements: changes.added as FeatureKey[],
+          measurements: changes.added as ObjectFeature[],
         }),
       );
     }
@@ -72,7 +72,7 @@ export const ComputedObjectMeasurementOptions = ({
       dispatch(
         measurementsSlice.actions.removeObjectComputedMeasurements({
           groupId: group.id,
-          measurements: changes.removed as FeatureKey[],
+          measurements: changes.removed as ObjectFeature[],
         }),
       );
   };
@@ -80,7 +80,7 @@ export const ComputedObjectMeasurementOptions = ({
   return (
     <Box data-help={HelpItem.ObjectMeasurements}>
       <StyledRichTreeView
-        items={computedMeasurementItems}
+        items={featureMeasurementItems}
         multiSelect
         checkboxSelection
         selectedItems={selectedItems}

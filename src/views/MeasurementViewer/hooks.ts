@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { saveAs } from "file-saver";
 
-import { CHANNEL_MEASUREMENTS } from "core/entities";
+import { INTENSITY_MEASUREMENTS } from "core/entities";
 
 import { useDialogHotkey } from "hooks";
 
@@ -57,7 +57,7 @@ const buildImageMeasurementData = (
   };
   entity.channelsRef.forEach((c) => {
     const labelSuffix = `-Intensity-Channel_${c.name}`;
-    CHANNEL_MEASUREMENTS.forEach((m) => {
+    INTENSITY_MEASUREMENTS.forEach((m) => {
       const val = c[m];
       if (!val) return;
       data[formatString(m, undefined, "every-word") + labelSuffix] = val;

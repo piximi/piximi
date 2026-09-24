@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { CHANNEL_MEASUREMENTS } from "core/entities";
+import { INTENSITY_MEASUREMENTS } from "core/entities";
 
 import {
   selectCategoryEntities,
@@ -27,7 +27,7 @@ import {
 import type { GridColumnGroup } from "@mui/x-data-grid";
 import type { GridApiCommunity } from "@mui/x-data-grid/internals";
 
-import type { FeatureKey } from "core/entities";
+import type { ObjectFeature } from "core/entities";
 
 import type {
   ImageEntityMeasurementGroup,
@@ -37,7 +37,7 @@ import type {
 import type { EntityWithMeasurements, MeasurementGetter } from "./pivotUtils";
 
 /**
- * Creates measurement getter functions for all computed and intensity measurements.
+ * Creates measurement getter functions for all feature and intensity measurements.
  */
 const createMeasurementGetters = (
   activeEntityGroup: ImageEntityMeasurementGroup | ObjectEntityMeasurementGroup,
@@ -45,13 +45,13 @@ const createMeasurementGetters = (
   const getters: MeasurementGetter[] = [];
 
   // Computed measurements
-  activeEntityGroup.computedMeasurements.forEach((measurement) => {
+  activeEntityGroup.featureMeasurements.forEach((measurement) => {
     getters.push({
       key: measurement,
       label: measurement,
       getValue: (entity: EntityWithMeasurements) => {
         if (!("kindId" in entity)) return undefined;
-        const value = entity.features?.[measurement as FeatureKey];
+        const value = entity.features?.[measurement as ObjectFeature];
         return typeof value === "number" ? value : undefined;
       },
     });
@@ -60,9 +60,10 @@ const createMeasurementGetters = (
   // Intensity measurements (excluding base keys)
   const intensityMeasurements = activeEntityGroup.intensityMeasurements.filter(
     (msrmnt) =>
-      !["intensity", ...(CHANNEL_MEASUREMENTS as unknown as string[])].includes(
-        msrmnt,
-      ),
+      ![
+        "intensity",
+        ...(INTENSITY_MEASUREMENTS as unknown as string[]),
+      ].includes(msrmnt),
   );
 
   intensityMeasurements.forEach((measurementLabel) => {

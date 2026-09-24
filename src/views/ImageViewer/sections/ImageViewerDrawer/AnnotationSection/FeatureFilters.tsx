@@ -10,7 +10,7 @@ import { HelpItem } from "data/help/HelpContent";
 
 import { useCriterionToggles } from "./useCriterionToggles";
 
-import type { FeatureKey } from "core/entities";
+import type { ObjectFeature } from "core/entities";
 
 import type { FeatureParams } from "@ImageViewer/state/image-viewer-data/utils";
 import type {
@@ -118,9 +118,9 @@ export const FeatureFilters = ({
   const [open, setFeatOpen] = useState(false);
   const handleToggleOpen = () => setFeatOpen((o) => !o);
   const activeCount = Object.values(feats).filter((f) => f.active).length;
-  const handleToggleFeat = (key: FeatureKey, bounds: [number, number]) =>
+  const handleToggleFeat = (key: ObjectFeature, bounds: [number, number]) =>
     toggleFeature(key, bounds);
-  const handleFeatRange = (key: FeatureKey, [min, max]: [number, number]) =>
+  const handleFeatRange = (key: ObjectFeature, [min, max]: [number, number]) =>
     setFeatureRange(key, [min, max]);
 
   return (
@@ -170,17 +170,17 @@ export const FeatureFilters = ({
 
       <Collapse in={open} unmountOnExit>
         <Box sx={{ px: 2, pb: 1.5 }}>
-          {(Object.entries(featureParams) as [FeatureKey, FeatureConfig][]).map(
-            ([key, cfg]) => (
-              <FeatureRow
-                key={key}
-                cfg={cfg}
-                f={feats[key]}
-                onToggle={() => handleToggleFeat(key, cfg.bounds)}
-                onCommit={(range) => handleFeatRange(key, range)}
-              />
-            ),
-          )}
+          {(
+            Object.entries(featureParams) as [ObjectFeature, FeatureConfig][]
+          ).map(([key, cfg]) => (
+            <FeatureRow
+              key={key}
+              cfg={cfg}
+              f={feats[key]}
+              onToggle={() => handleToggleFeat(key, cfg.bounds)}
+              onCommit={(range) => handleFeatRange(key, range)}
+            />
+          ))}
         </Box>
       </Collapse>
     </Box>

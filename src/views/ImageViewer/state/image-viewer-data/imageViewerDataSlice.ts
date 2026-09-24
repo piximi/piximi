@@ -9,7 +9,7 @@ import { emptySelectionLayer } from "./utils";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import type { FeatureKey } from "core/entities";
+import type { ObjectFeature } from "core/entities";
 
 import type {
   CategoryNode,
@@ -156,7 +156,7 @@ export const imageViewerDataSlice = createSlice({
     toggleFeatureSelection(
       state,
       action: PayloadAction<{
-        key: FeatureKey;
+        key: ObjectFeature;
         bounds: [number, number];
         admits?: string[];
       }>,
@@ -178,7 +178,7 @@ export const imageViewerDataSlice = createSlice({
     // tuning a slider silently discards them on the first pixel of movement.
     updateFeatureSelection(
       state,
-      action: PayloadAction<{ key: FeatureKey; range: [number, number] }>,
+      action: PayloadAction<{ key: ObjectFeature; range: [number, number] }>,
     ) {
       const feat = state.selectionLayer.features[action.payload.key];
       feat.min = action.payload.range[0];

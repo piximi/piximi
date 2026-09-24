@@ -13,7 +13,7 @@ import {
   idsInFeatureRange,
 } from "@ImageViewer/state/image-viewer-data/utils";
 
-import type { FeatureKey } from "core/entities";
+import type { ObjectFeature } from "core/entities";
 
 /**
  * The criterion half of the selection surface — category checkboxes and feature
@@ -47,7 +47,7 @@ export const useCriterionToggles = () => {
     );
   };
 
-  const toggleFeature = (key: FeatureKey, bounds: [number, number]) => {
+  const toggleFeature = (key: ObjectFeature, bounds: [number, number]) => {
     const becomingActive = !features[key].active;
     dispatch(
       imageViewerDataSlice.actions.toggleFeatureSelection({
@@ -60,7 +60,7 @@ export const useCriterionToggles = () => {
     );
   };
 
-  const setFeatureRange = (key: FeatureKey, range: [number, number]) => {
+  const setFeatureRange = (key: ObjectFeature, range: [number, number]) => {
     dispatch(
       imageViewerDataSlice.actions.updateFeatureSelection({ key, range }),
     );

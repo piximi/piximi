@@ -5,7 +5,7 @@ import type {
   ChannelFeature,
   ExtendedAnnotationObject,
   ExtendedImageObject,
-  FeatureKey,
+  ObjectFeature,
 } from "core/entities";
 import type { Partition } from "core/dl/enums";
 
@@ -110,7 +110,7 @@ export type BaseMeasurementGroup = {
 // --- Image Measurement Groups ---
 
 export type ImageMeasurementGroup = BaseMeasurementGroup & {
-  computedMeasurements: ChannelFeature[];
+  featureMeasurements: ChannelFeature[];
 };
 
 export type ImageEntityMeasurementGroup = ImageMeasurementGroup & {
@@ -121,7 +121,7 @@ export type ImageEntityMeasurementGroup = ImageMeasurementGroup & {
 
 export type ObjectMeasurementGroup = BaseMeasurementGroup & {
   kind: string;
-  computedMeasurements: FeatureKey[];
+  featureMeasurements: ObjectFeature[];
 };
 
 export type ObjectEntityMeasurementGroup = ObjectMeasurementGroup & {

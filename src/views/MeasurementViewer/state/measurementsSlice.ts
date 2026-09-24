@@ -12,7 +12,7 @@ import { generateInitialPlot } from "@MeasurementViewer/utils";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import type { ChannelFeature, FeatureKey } from "core/entities";
+import type { ChannelFeature, ObjectFeature } from "core/entities";
 
 import type {
   MeasurementsState,
@@ -62,7 +62,7 @@ export const measurementsSlice = createSlice({
         id: groupId,
         name: uniqueName,
         intensityMeasurements: [],
-        computedMeasurements: [],
+        featureMeasurements: [],
         existingMeasurements: [],
         splits: {},
         plots: { [initialPlot.id]: initialPlot },
@@ -135,45 +135,48 @@ export const measurementsSlice = createSlice({
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: FeatureKey[];
+        measurements: ObjectFeature[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
       const group = state.objectGroups[groupId];
-      group.computedMeasurements = measurements;
+      group.featureMeasurements = measurements;
     },
     addObjectComputedMeasurements(
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: FeatureKey[];
+        measurements: ObjectFeature[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
       const group = state.objectGroups[groupId];
       // Set is added guard to prevent duplicates, shouldnt ever happen,
       // and should probably be checked and prevented before dispatch
-      group.computedMeasurements = [
-        ...new Set([...group.computedMeasurements, ...measurements]),
+      group.featureMeasurements = [
+        ...new Set([...group.featureMeasurements, ...measurements]),
       ];
     },
     removeObjectComputedMeasurements(
       state,
       action: PayloadAction<{
         groupId: string;
-        measurements: FeatureKey[];
+        measurements: ObjectFeature[];
       }>,
     ) {
       const { groupId, measurements } = action.payload;
       const group = state.objectGroups[groupId];
       mutatingFilter(
-        group.computedMeasurements,
+        group.featureMeasurements,
         (msrmnt) => !measurements.includes(msrmnt),
       );
       Object.values(group.plots).forEach((plot) => {
         (["x-axis", "y-axis", "size"] as const).forEach((key) => {
           const val = plot.chartConfig[key];
-          if (val !== undefined && measurements.includes(val as FeatureKey)) {
+          if (
+            val !== undefined &&
+            measurements.includes(val as ObjectFeature)
+          ) {
             plot.chartConfig[key] = undefined;
           }
         });
@@ -188,7 +191,7 @@ export const measurementsSlice = createSlice({
     ) {
       const { groupId, measurements } = action.payload;
       const group = state.imageGroups[groupId];
-      group.computedMeasurements = measurements;
+      group.featureMeasurements = measurements;
     },
     addImageComputedMeasurements(
       state,
@@ -201,8 +204,8 @@ export const measurementsSlice = createSlice({
       const group = state.imageGroups[groupId];
       // Set is added guard to prevent duplicates, shouldnt ever happen,
       // and should probably be checked and prevented before dispatch
-      group.computedMeasurements = [
-        ...new Set([...group.computedMeasurements, ...measurements]),
+      group.featureMeasurements = [
+        ...new Set([...group.featureMeasurements, ...measurements]),
       ];
     },
     removeImageComputedMeasurements(
@@ -215,7 +218,7 @@ export const measurementsSlice = createSlice({
       const { groupId, measurements } = action.payload;
       const group = state.imageGroups[groupId];
       mutatingFilter(
-        group.computedMeasurements,
+        group.featureMeasurements,
         (msrmnt) => !measurements.includes(msrmnt),
       );
       Object.values(group.plots).forEach((plot) => {
