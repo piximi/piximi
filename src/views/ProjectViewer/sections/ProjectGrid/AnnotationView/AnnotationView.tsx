@@ -5,10 +5,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { Add as AddIcon } from "@mui/icons-material";
 import { Badge, Box, Divider, IconButton } from "@mui/material";
 
+import { UNKNOWN_KIND_ID } from "core/entities";
+
 import { useMenu, useMobileView } from "hooks";
 
 import { dataSlice } from "store/data";
-import { selectKindEntities } from "store/data/selectors";
+import {
+  selectExtendedAnnotationsByKindId,
+  selectKindEntities,
+} from "store/data/selectors";
+import { useParameterizedSelector } from "store/hooks";
 
 import { DIMENSIONS } from "utils/constants";
 import { findAdjacentItem } from "utils/arrayUtils";
@@ -26,13 +32,19 @@ export const AnnotationView = () => {
   const dispatch = useDispatch();
   const gridState = useSelector(selectAnnotationGridState);
   const kinds = useSelector(selectKindEntities);
+  const unknownAnnotations = useParameterizedSelector(
+    selectExtendedAnnotationsByKindId,
+    UNKNOWN_KIND_ID,
+  );
 
   const visibleKinds = useMemo(
     () =>
-      Object.values(gridState.kindStates).filter(
-        (state) => state.visible === true,
+      Object.values(gridState.kindStates).filter((state) =>
+        state.id === UNKNOWN_KIND_ID
+          ? state.visible === true && unknownAnnotations.length > 0
+          : state.visible === true,
       ),
-    [gridState.kindStates],
+    [gridState.kindStates, unknownAnnotations],
   );
   const minimizedKinds = useMemo(
     () =>
@@ -73,7 +85,7 @@ export const AnnotationView = () => {
         }),
       );
     },
-    [dispatch],
+    [dispatch, gridState.activeKindId],
   );
 
   const handleTabChange = (id: string) => {
@@ -101,6 +113,13 @@ export const AnnotationView = () => {
       dispatch(projectSlice.actions.setAllKindTabVisibility(true));
     }
   }, [isMobile, dispatch]);
+
+  useEffect(() => {
+    if (visibleKinds.length === 0) return;
+    if (visibleKinds.some((kind) => kind.id === gridState.activeKindId)) return;
+
+    dispatch(projectSlice.actions.setActiveKind(visibleKinds[0].id));
+  }, [visibleKinds, gridState.activeKindId, dispatch]);
 
   return (
     <Box
