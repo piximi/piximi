@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
+import { UNKNOWN_KIND_ID } from "core/entities";
+
 import {
   selectAllExtendedKinds,
   selectExtendedAnnotationsByImageId,
@@ -86,9 +88,11 @@ export const useAnnotationSelection = () => {
 
   const groups = useMemo(() => {
     let hidden = 0;
-    const list = kinds.map((k): KindNode => {
+    const list: KindNode[] = [];
+    kinds.forEach((k) => {
       const inView = view.filter((a) => a.kindId === k.id);
       const total = annotations.filter((a) => a.kindId === k.id).length;
+      if (k.id === UNKNOWN_KIND_ID && total === 0) return;
       if (inView.length === 0 && k.cats.length > 0) hidden++;
       const catsSet = new Set(selCats);
       const cats: CategoryNode[] = k.cats.map((c) => ({
@@ -98,14 +102,14 @@ export const useAnnotationSelection = () => {
         total: annotations.filter((a) => a.categoryId === c.id).length,
       }));
       const selN = k.cats.filter((c) => catsSet.has(c.id)).length;
-      return {
+      list.push({
         ...k,
         cats,
         count: inView.length,
         total,
         allSel: k.cats.length > 0 && selN === k.cats.length,
         someSel: selN > 0 && selN < k.cats.length,
-      };
+      });
     });
     return { list, hidden };
   }, [kinds, view, selCats]);

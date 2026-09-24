@@ -30,6 +30,7 @@ import {
   generateCategory,
   generateKind,
   representsUnknown,
+  UNKNOWN_KIND_CATEGORY,
 } from "core/entities";
 
 import { useDialogHotkey } from "hooks";
@@ -194,6 +195,10 @@ export const CategoryTree = ({
             category: unknownCategory,
           }),
         );
+        dispatch(
+          imageViewerDataSlice.actions.setSelectedCategory(unknownCategory),
+        );
+        setExpanded((e) => ({ ...e, [kind.id]: true }));
       } else {
         const category = generateCategory(name, color!, {
           type: "annotation",
@@ -233,7 +238,6 @@ export const CategoryTree = ({
     if (type === "kind") {
       const catIds = k ? k.cats.map((c) => c.id) : [];
       if (representsUnknown(k.id)) return;
-      const unknownK = groups.find((k) => representsUnknown(k.id))!;
       batch(() => {
         dispatch(dataSlice.actions.deleteKind(kindId));
         dispatch(
@@ -245,7 +249,7 @@ export const CategoryTree = ({
         if (catIds.includes(selectedCategory.id))
           dispatch(
             imageViewerDataSlice.actions.setSelectedCategory(
-              unknownK.cats.find((c) => representsUnknown(c.id))!,
+              UNKNOWN_KIND_CATEGORY,
             ),
           );
       });

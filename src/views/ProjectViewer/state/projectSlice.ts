@@ -247,19 +247,27 @@ export const projectSlice = createSlice({
     builder
       .addCase(projectReset, () => ({ ...initialState }))
       .addCase(dataSlice.actions.setState, (state, action) => {
-        const { kinds } = action.payload;
+        const { kinds, annotationVolumes } = action.payload;
         state.imageGridState = { ...initialState.imageGridState };
 
         state.annotationGridState.kindStates = {};
-        let unknownKindId = "";
         for (const kind of kinds) {
-          if (representsUnknown(kind.id)) unknownKindId = kind.id;
           state.annotationGridState.kindStates[kind.id] = emptyKindState(
             kind.id,
             kind.name,
           );
         }
-        state.annotationGridState.activeKindId = unknownKindId;
+        const populatedKindIds = new Set(
+          annotationVolumes.map((v) => v.kindId),
+        );
+        const unknownKind = kinds.find((kind) => representsUnknown(kind.id));
+        const activeKind =
+          unknownKind && populatedKindIds.has(unknownKind.id)
+            ? unknownKind
+            : kinds.find((kind) => populatedKindIds.has(kind.id));
+
+        state.annotationGridState.activeKindId =
+          activeKind?.id ?? unknownKind?.id ?? "";
         state.activeView = "images";
       })
       .addCase(dataSlice.actions.newExperiment, (state) => {
