@@ -31,7 +31,7 @@ export class Glas extends Segmenter {
     super({
       name: "GlandSegmentation",
       kind: KIND_NAME,
-      requiredChannels: 3,
+      channelPolicy: { mode: "fixed", count: 3 },
     });
   }
 

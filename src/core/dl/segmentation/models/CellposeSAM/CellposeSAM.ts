@@ -5,6 +5,12 @@ import { CancelSource, type CancelToken } from "core/dl/cancel";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCellposeSAM } from "./predictCellposeSAM";
+import {
+  CELLPOSE_OPTION_SCHEMA,
+  CELLPOSE_PASSTHROUGH_CHANNELS,
+  isCellposePassthrough,
+  toCellposeSegmentOptions,
+} from "./options";
 
 import type { SegmentInput } from "cellpose-js";
 import type { GraphModel } from "@tensorflow/tfjs";
@@ -13,7 +19,10 @@ import type { InferenceInput } from "core/dl/types";
 
 import type { LoadCB } from "utils/types";
 
-import type { PredictedAnnotationObject } from "../../types";
+import type {
+  PredictedAnnotationObject,
+  SegmenterOptionValues,
+} from "../../types";
 
 const KIND_NAME = "cellpose_cells";
 
@@ -26,10 +35,6 @@ const ORT_WASM_PATH = "/ort/";
 const MODEL_URL =
   (import.meta.env.VITE_CELLPOSE_SAM_MODEL_URL as string | undefined) ??
   "https://huggingface.co/ballon999/cellpose-sam-onnx/resolve/main/cpsam_fp16.onnx";
-
-// Cellpose-SAM is channel-agnostic; mirror the legacy Cellpose defaults
-// (grayscale primary, no secondary, ~30px median diameter). Tunable.
-const SEGMENT_OPTIONS = { diameter: 30, chan: 0, chan2: 0 } as const;
 
 /*
  * Cellpose-SAM (browser-side)
@@ -49,7 +54,16 @@ export class CellposeSAM extends Segmenter {
     super({
       name: "Cellpose-SAM",
       kind: KIND_NAME,
-      requiredChannels: 3,
+      /*
+       * Channel-agnostic: cellpose-js normalizes each source channel
+       * independently and truncates to the first 3, so there is nothing to map
+       * onto named model inputs.
+       */
+      channelPolicy: {
+        mode: "passthrough",
+        maxChannels: CELLPOSE_PASSTHROUGH_CHANNELS,
+      },
+      optionSchema: CELLPOSE_OPTION_SCHEMA,
       cancellableLoad: true,
     });
   }
@@ -98,12 +112,19 @@ export class CellposeSAM extends Segmenter {
     } as GraphModel;
   }
 
-  private async toSegmentInput(item: InferenceInput): Promise<SegmentInput> {
-    const xs = await channelsToTensor(
-      item.channelsRef,
-      item.shape,
-      item.region,
-    );
+  private async toSegmentInput(
+    item: InferenceInput,
+    passthrough: boolean,
+  ): Promise<SegmentInput> {
+    /*
+     * In passthrough mode cellpose-js reads only the first 3 channels, so
+     * fetching the rest would allocate an interleaved buffer it throws away.
+     * Legacy mode must keep them all — `chan = k` may index any source channel.
+     */
+    const channelsRef = passthrough
+      ? item.channelsRef.slice(0, CELLPOSE_PASSTHROUGH_CHANNELS)
+      : item.channelsRef;
+    const xs = await channelsToTensor(channelsRef, item.shape, item.region);
     // channelsToTensor yields interleaved HWC Float32 raw pixel values.
     // cellpose-js normalizes per-channel internally (percentile normalize99),
     // so the raw values are passed straight through.
@@ -117,17 +138,22 @@ export class CellposeSAM extends Segmenter {
     items: InferenceInput[],
     cancelToken: CancelToken,
     loadCb: LoadCB,
+    options?: SegmenterOptionValues,
   ) {
     if (!this._cp) {
       throw Error(`"${this.name}" Model not loaded`);
     }
+
+    // Identical for every image; only `onTileProgress` varies per item.
+    const segmentOptions = toCellposeSegmentOptions(options);
+    const passthrough = isCellposePassthrough(options);
 
     const annotations: Array<PredictedAnnotationObject[]> = [];
     let failedImages = 0;
     try {
       for await (const [idx, item] of items.entries()) {
         await CancelSource.throwIfSignaled(cancelToken);
-        const input = await this.toSegmentInput(item);
+        const input = await this.toSegmentInput(item, passthrough);
         if (loadCb) {
           loadCb(
             Math.round((idx / items.length) * 100),
@@ -140,7 +166,7 @@ export class CellposeSAM extends Segmenter {
             input,
             this.segmentedKind,
             {
-              ...SEGMENT_OPTIONS,
+              ...segmentOptions,
               onTileProgress: (done, total) =>
                 loadCb?.(
                   Math.round(((idx + done / total) / items.length) * 100),

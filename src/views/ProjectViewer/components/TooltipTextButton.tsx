@@ -16,7 +16,7 @@ type TooltipTextButtonProps = Omit<ButtonProps, "onClick"> & {
   onClick: MouseEventHandler<HTMLButtonElement>;
 };
 
-const ICON_SIZE = "1.15rem";
+const ICON_SIZE = "1.15em";
 
 export const TooltipTextButton = ({
   icon,

@@ -16,6 +16,7 @@ import type {
   ModelName,
   SegmentaionModelDetails,
   SegmentationResults,
+  SegmenterOptionValues,
 } from "../types";
 import type { Segmenter } from "../models/AbstractSegmenter";
 import type {
@@ -54,7 +55,8 @@ export class SegmenterHandler implements ISegmenterApi {
       displayName: modelInfo[model.name].displayName,
       kind: model.kind,
       modelLoaded: model.modelLoaded,
-      requiredChannels: model.requiredChannels,
+      channelPolicy: model.channelPolicy,
+      optionSchema: model.optionSchema,
       cancellableLoad: model.cancellableLoad,
     };
   }
@@ -134,6 +136,7 @@ export class SegmenterHandler implements ISegmenterApi {
     items: InferenceInput[],
     cancelToken: Token,
     loadCB?: LoadCB,
+    options?: SegmenterOptionValues,
   ): Promise<ApiResult<SegmentationResults>> {
     const model = this.resolveModel(modelName);
     if (!model)
@@ -142,7 +145,7 @@ export class SegmenterHandler implements ISegmenterApi {
         `No model registered with name "${modelName}"`,
       );
     try {
-      const result = await model.predict(items, cancelToken, loadCB);
+      const result = await model.predict(items, cancelToken, loadCB, options);
       return ok(result);
     } catch (e) {
       const error = e as Error;

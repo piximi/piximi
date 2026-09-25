@@ -12,12 +12,23 @@ import type { Token } from "core/dl/cancel";
 
 import type { LoadCB } from "utils/types";
 
-import type { ModelName, SegmentationResults } from "../../types";
+import type {
+  ChannelPolicy,
+  ModelName,
+  SegmentationResults,
+  SegmenterOptionSchema,
+  SegmenterOptionValues,
+} from "../../types";
 
 type ModelArgs = {
   name: ModelName;
   kind?: string | Array<string>;
-  requiredChannels: number;
+  channelPolicy: ChannelPolicy;
+  /*
+   * Declarative inference knobs surfaced to the UI. Must be plain data — it is
+   * structured-cloned across the Comlink boundary on the model-info DTO.
+   */
+  optionSchema?: SegmenterOptionSchema;
   src?: string;
   /*
    * Whether `loadModel` honours the `AbortSignal` it is handed. Only models
@@ -31,7 +42,8 @@ export abstract class Segmenter {
   readonly name: ModelName;
   readonly kind?: string | Array<string>;
 
-  private _requiredChannels: number;
+  readonly channelPolicy: ChannelPolicy;
+  readonly optionSchema?: SegmenterOptionSchema;
   readonly src?: string;
   readonly cancellableLoad: boolean;
 
@@ -41,13 +53,15 @@ export abstract class Segmenter {
   constructor({
     name,
     kind,
-    requiredChannels,
+    channelPolicy,
+    optionSchema,
     src,
     cancellableLoad = false,
   }: ModelArgs) {
     this.name = name;
     this.kind = kind;
-    this._requiredChannels = requiredChannels;
+    this.channelPolicy = channelPolicy;
+    this.optionSchema = optionSchema;
     this.src = src;
     this.cancellableLoad = cancellableLoad;
     // set defaults
@@ -63,17 +77,19 @@ export abstract class Segmenter {
   public get modelLoaded() {
     return this._model !== undefined;
   }
-  public get requiredChannels() {
-    return this._requiredChannels;
-  }
   public abstract loadModel(
     loadCB?: LoadCB,
     signal?: AbortSignal,
   ): Promise<void>;
+  /*
+   * `options` is a plain bag of values keyed by `optionSchema`. Models without a
+   * schema simply declare fewer parameters and never see it.
+   */
   public abstract predict(
     items: InferenceInput[],
     cancelToken: Token,
     loadCb?: LoadCB,
+    options?: SegmenterOptionValues,
   ): SegmentationResults | Promise<SegmentationResults>;
 
   public async getSavedModelFiles() {

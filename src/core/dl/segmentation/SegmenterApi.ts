@@ -8,7 +8,7 @@ import type { LoadCB } from "utils/types";
 
 import type { Token } from "../cancel";
 import type { InferenceInput } from "../types";
-import type { ISegmenterApi, ModelName } from "./types";
+import type { ISegmenterApi, ModelName, SegmenterOptionValues } from "./types";
 import type { SegmenterHandler } from "./worker/SegmenterHandler";
 
 class SegmenterApi implements ISegmenterApi {
@@ -76,6 +76,7 @@ class SegmenterApi implements ISegmenterApi {
     items: InferenceInput[],
     cancelToken: Token,
     loadCB?: LoadCB,
+    options?: SegmenterOptionValues,
   ) {
     if (!loadCB) {
       loadCB = (loadPercent: number, loadMessage: string) =>
@@ -86,6 +87,7 @@ class SegmenterApi implements ISegmenterApi {
       items,
       Comlink.proxy(cancelToken),
       Comlink.proxy(loadCB),
+      options,
     );
   }
 
