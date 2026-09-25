@@ -14,7 +14,7 @@ export class StardistFluo extends Stardist {
     super({
       name: "StardistFluo",
       kind: KIND_NAME,
-      requiredChannels: 1,
+      channelPolicy: { mode: "fixed", count: 1 },
     });
   }
 

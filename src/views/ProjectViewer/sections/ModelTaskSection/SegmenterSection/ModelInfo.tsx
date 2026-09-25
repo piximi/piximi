@@ -59,6 +59,7 @@ export const ModelInfo = () => {
           sx={{
             font: "var(--mui-font-caption)",
             color: "var(--mui-palette-primary-main)",
+            textTransform: "none",
           }}
         />
       </Box>

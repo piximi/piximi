@@ -4,6 +4,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { generateKind, generateUUID } from "core/entities";
 import { useSegmenterApi } from "core/dl/segmentation";
+import { sanitizeOptions } from "core/dl/segmentation/optionUtils";
 import { toInferenceInput } from "core/dl/utils";
 import { CancelSource } from "core/dl/cancel";
 
@@ -41,7 +42,7 @@ export const usePredictSegmenter = () => {
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
   const kinds = useSelector(selectAllKinds);
-  const { setModelStatus, loadedModel, selectedChannels } =
+  const { setModelStatus, loadedModel, channelSelection, optionValues } =
     useSegmenterStatus();
   const segApi = useSegmenterApi();
   const measurementsApi = useMeasurementsApi();
@@ -171,19 +172,16 @@ export const usePredictSegmenter = () => {
     let predictedAnnotations: PredictedAnnotationObject[][];
     let predictionCancelled: boolean = false;
     try {
+      const channelIds = channelSelection.channelIds;
       const inferenceInput = inferenceImages.map((item) =>
-        toInferenceInput(
-          item,
-          !selectedChannels.some((id) => id === "")
-            ? selectedChannels
-            : undefined,
-        ),
+        toInferenceInput(item, channelIds),
       );
       const predictionResult = await segApi.predict(
         loadedModel.name,
         inferenceInput,
         Cancel.token,
         progressCb,
+        sanitizeOptions(loadedModel.optionSchema, optionValues),
       );
       if (predictionResult.success) {
         predictedAnnotations = predictionResult.data.annotations;
@@ -362,7 +360,8 @@ export const usePredictSegmenter = () => {
     loadedModel,
     selectedImages,
     kinds,
-    selectedChannels,
+    channelSelection,
+    optionValues,
   ]);
 
   return predictSegmenter;

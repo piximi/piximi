@@ -14,7 +14,7 @@ export class StardistVHE extends Stardist {
     super({
       name: "StardistVHE",
       kind: KIND_NAME,
-      requiredChannels: 3,
+      channelPolicy: { mode: "fixed", count: 3 },
     });
   }
 

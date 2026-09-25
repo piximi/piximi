@@ -45,7 +45,7 @@ export class CocoSSD extends Segmenter {
       name: "COCO-SSD",
       kind: Object.keys(COCO_CLASSES),
       src: "https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v1/model.json",
-      requiredChannels: 3,
+      channelPolicy: { mode: "fixed", count: 3 },
       cancellableLoad: true,
     });
   }
