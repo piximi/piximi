@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isCellposePassthrough, toCellposeSegmentOptions } from "./options";
+import { CHANNEL_MODE } from "../../optionUtils";
 
 /*
  * These assertions lock the defect this module was written to fix: Cellpose-SAM
@@ -24,7 +25,7 @@ describe("toCellposeSegmentOptions", () => {
 
   it("omits chan/chan2 in passthrough even when stale values linger", () => {
     const opts = toCellposeSegmentOptions({
-      channelMode: "passthrough",
+      channelMode: CHANNEL_MODE.PASSTHROUGH,
       chan: 2,
       chan2: 1,
       diameter: 45,
@@ -47,7 +48,7 @@ describe("toCellposeSegmentOptions", () => {
   });
 
   it("defaults chan/chan2 to 0 in legacy mode", () => {
-    const opts = toCellposeSegmentOptions({ channelMode: "legacy" });
+    const opts = toCellposeSegmentOptions({ channelMode: CHANNEL_MODE.LEGACY });
 
     expect(opts.chan).toBe(0);
     expect(opts.chan2).toBe(0);
@@ -55,7 +56,7 @@ describe("toCellposeSegmentOptions", () => {
 
   it("passes explicit legacy chan/chan2 through verbatim", () => {
     const opts = toCellposeSegmentOptions({
-      channelMode: "legacy",
+      channelMode: CHANNEL_MODE.LEGACY,
       chan: 2,
       chan2: 1,
     });
@@ -92,7 +93,11 @@ describe("toCellposeSegmentOptions", () => {
 describe("isCellposePassthrough", () => {
   it("is true unless the user opts into legacy", () => {
     expect(isCellposePassthrough()).toBe(true);
-    expect(isCellposePassthrough({ channelMode: "passthrough" })).toBe(true);
-    expect(isCellposePassthrough({ channelMode: "legacy" })).toBe(false);
+    expect(
+      isCellposePassthrough({ channelMode: CHANNEL_MODE.PASSTHROUGH }),
+    ).toBe(true);
+    expect(isCellposePassthrough({ channelMode: CHANNEL_MODE.LEGACY })).toBe(
+      false,
+    );
   });
 });

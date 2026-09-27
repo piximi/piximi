@@ -1,3 +1,5 @@
+import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
+
 import { KIND_NAME, Stardist } from "../AbstractStardist";
 import { loadStardistFluo } from "./loadStardistFluo";
 
@@ -14,7 +16,7 @@ export class StardistFluo extends Stardist {
     super({
       name: "StardistFluo",
       kind: KIND_NAME,
-      channelPolicy: { mode: "fixed", count: 1 },
+      channelPolicy: { mode: CHANNEL_MODE.FIXED, count: 1 },
     });
   }
 

@@ -12,14 +12,16 @@ import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import CloseIcon from "@mui/icons-material/Close";
 
 import {
-  CHANNEL_MODE_KEY,
-  CHANNEL_MODE_LEGACY,
   isFieldVisible,
+  CHANNEL_MODE_KEY,
+  CHANNEL_MODE,
 } from "core/dl/segmentation/optionUtils";
 
 import { StyledSelect } from "components/inputs";
 
 import { arrayRange } from "utils/arrayUtils";
+
+import { channelSlotCap } from "views/ProjectViewer/utils/channelUtils";
 
 import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
@@ -68,7 +70,7 @@ export const ChannelMapping = () => {
   );
 
   const modelSelectsOwnChannels =
-    optionValues[CHANNEL_MODE_KEY] === CHANNEL_MODE_LEGACY;
+    optionValues[CHANNEL_MODE_KEY] === CHANNEL_MODE.LEGACY;
 
   const renderChannelName = (value: unknown) =>
     value === "" || value === undefined
@@ -89,11 +91,11 @@ export const ChannelMapping = () => {
   const setSlot = (event: SelectChangeEvent<unknown>, slotIndex: number) => {
     const channelId = event.target.value as string;
     setChannelSelection((selection) => {
-      const current = selection.mode === "explicit" ? selection.channelIds : [];
+      const current = selection;
       if (current[slotIndex] === channelId) return selection;
       const channelIds = [...current];
       channelIds[slotIndex] = channelId;
-      return { mode: "explicit", channelIds };
+      return channelIds;
     });
   };
 
@@ -114,16 +116,9 @@ export const ChannelMapping = () => {
     (field) => field.key !== CHANNEL_MODE_KEY,
   );
 
-  const slotCap =
-    policy.mode === "fixed"
-      ? policy.count
-      : Math.min(policy.maxChannels, availableChannels.length);
+  const slotCap = channelSlotCap(policy, availableChannels.length);
 
-  const explicitIds =
-    channelSelection.mode === "explicit" ? channelSelection.channelIds : [];
-
-  const showGrid =
-    policy.mode === "fixed" || channelSelection.mode === "explicit";
+  const explicitIds = channelSelection;
 
   return (
     <Box sx={{ pb: 1.75 }}>
@@ -135,12 +130,12 @@ export const ChannelMapping = () => {
 
       {modeField && <SegmenterOptionInput field={modeField} />}
 
-      {showGrid && !modelSelectsOwnChannels && (
+      {!modelSelectsOwnChannels && (
         <Box
           sx={{
             display: "grid",
             gridTemplateColumns:
-              policy.mode === "fixed"
+              policy.mode === CHANNEL_MODE.FIXED
                 ? "max-content 16px 1fr"
                 : "max-content 16px 1fr max-content",
             alignItems: "center",
@@ -151,21 +146,23 @@ export const ChannelMapping = () => {
           }}
         >
           <Typography variant="caption" color="text.disabled" sx={HEADER_SX}>
-            {policy.mode === "fixed" ? "Model Input" : "Slot"}
+            {policy.mode === CHANNEL_MODE.FIXED ? "Model Input" : "Slot"}
           </Typography>
           <Box />
           <Typography variant="caption" color="text.disabled" sx={HEADER_SX}>
             Image Source
           </Typography>
-          {policy.mode === "passthrough" && <Box />}
+          {policy.mode === CHANNEL_MODE.PASSTHROUGH && <Box />}
           <Divider sx={{ gridColumn: "1 / -1", mb: 1 }} />
 
           {arrayRange(
-            policy.mode === "fixed" ? policy.count : explicitIds.length,
+            policy.mode === CHANNEL_MODE.FIXED
+              ? policy.count
+              : explicitIds.length,
           ).map((idx) => (
             <Fragment key={idx}>
               <Typography variant="caption" color="text.secondary">
-                {policy.mode === "fixed"
+                {policy.mode === CHANNEL_MODE.FIXED
                   ? `Channel ${idx + 1}`
                   : `Slot ${idx + 1}`}
               </Typography>
@@ -184,16 +181,13 @@ export const ChannelMapping = () => {
                 {channelItems}
               </StyledSelect>
 
-              {policy.mode === "passthrough" && (
+              {policy.mode === CHANNEL_MODE.PASSTHROUGH && (
                 <IconButton
                   size="small"
                   aria-label={`Remove slot ${idx + 1}`}
                   disabled={explicitIds.length <= 1}
                   onClick={() =>
-                    setChannelSelection({
-                      mode: "explicit",
-                      channelIds: explicitIds.filter((_, i) => i !== idx),
-                    })
+                    setChannelSelection(explicitIds.filter((_, i) => i !== idx))
                   }
                 >
                   <CloseIcon sx={{ fontSize: 14 }} />
@@ -202,16 +196,15 @@ export const ChannelMapping = () => {
             </Fragment>
           ))}
 
-          {policy.mode === "passthrough" && explicitIds.length < slotCap && (
-            <Box sx={{ gridColumn: "1 / -1" }}>
-              <Typography
-                variant="caption"
-                color="primary"
-                sx={{ cursor: "pointer" }}
-                onClick={() =>
-                  setChannelSelection({
-                    mode: "explicit",
-                    channelIds: [
+          {policy.mode === CHANNEL_MODE.PASSTHROUGH &&
+            explicitIds.length < slotCap && (
+              <Box sx={{ gridColumn: "1 / -1" }}>
+                <Typography
+                  variant="caption"
+                  color="primary"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() =>
+                    setChannelSelection([
                       ...explicitIds,
                       availableChannels[
                         Math.min(
@@ -219,14 +212,13 @@ export const ChannelMapping = () => {
                           availableChannels.length - 1,
                         )
                       ].id,
-                    ],
-                  })
-                }
-              >
-                + Add channel
-              </Typography>
-            </Box>
-          )}
+                    ])
+                  }
+                >
+                  + Add channel
+                </Typography>
+              </Box>
+            )}
         </Box>
       )}
 

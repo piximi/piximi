@@ -6,6 +6,7 @@ import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
 import { loadGlas } from "./loadGlas";
+import { CHANNEL_MODE } from "../../optionUtils";
 
 import type { GraphModel } from "@tensorflow/tfjs";
 
@@ -31,7 +32,7 @@ export class Glas extends Segmenter {
     super({
       name: "GlandSegmentation",
       kind: KIND_NAME,
-      channelPolicy: { mode: "fixed", count: 3 },
+      channelPolicy: { mode: CHANNEL_MODE.FIXED, count: 3 },
     });
   }
 

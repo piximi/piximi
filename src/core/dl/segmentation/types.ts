@@ -2,6 +2,7 @@ import type { AnnotationObject } from "core/entities";
 
 import type { LoadCB } from "utils/types";
 
+import type { CHANNEL_MODE } from "./optionUtils";
 import type { Token } from "../cancel";
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
 
@@ -35,9 +36,10 @@ export type ModelDisplayInfo = {
  * - `passthrough`: the model is channel-agnostic and takes the source channels
  *   as-is, up to `maxChannels`. No per-input mapping, no padding.
  */
+
 export type ChannelPolicy =
-  | { mode: "fixed"; count: number }
-  | { mode: "passthrough"; maxChannels: number };
+  | { mode: typeof CHANNEL_MODE.FIXED; count: number }
+  | { mode: typeof CHANNEL_MODE.PASSTHROUGH; maxChannels: number };
 
 /* Plain-data guard so a field can depend on another field's value. */
 type SegmenterOptionCondition = {

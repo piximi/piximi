@@ -7,6 +7,7 @@ import COCO_CLASSES from "data/model-data/cocossd-classes";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
+import { CHANNEL_MODE } from "../../optionUtils";
 
 import type { GraphModel } from "@tensorflow/tfjs";
 
@@ -45,7 +46,7 @@ export class CocoSSD extends Segmenter {
       name: "COCO-SSD",
       kind: Object.keys(COCO_CLASSES),
       src: "https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v1/model.json",
-      channelPolicy: { mode: "fixed", count: 3 },
+      channelPolicy: { mode: CHANNEL_MODE.FIXED, count: 3 },
       cancellableLoad: true,
     });
   }

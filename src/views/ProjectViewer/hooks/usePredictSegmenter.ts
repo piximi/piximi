@@ -172,7 +172,7 @@ export const usePredictSegmenter = () => {
     let predictedAnnotations: PredictedAnnotationObject[][];
     let predictionCancelled: boolean = false;
     try {
-      const channelIds = channelSelection.channelIds;
+      const channelIds = channelSelection;
       const inferenceInput = inferenceImages.map((item) =>
         toInferenceInput(item, channelIds),
       );

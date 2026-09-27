@@ -11,11 +11,13 @@ import {
 } from "@mui/material";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
+import { type SegmenterOptionField } from "core/dl/segmentation/types";
+
 import { StyledSelect, TextFieldWithBlur } from "components/inputs";
 
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { getSegmentedChannelNames } from "views/ProjectViewer/utils/channelUtils";
 
-import type { SegmenterOptionField } from "core/dl/segmentation/types";
+import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
 
 const LABEL_SX = { flexShrink: 0, mr: 1, whiteSpace: "nowrap" } as const;
 
@@ -101,13 +103,8 @@ export const SegmenterOptionInput = ({
   layout?: SegmenterOptionLayout;
 }) => {
   const theme = useTheme();
-  const {
-    optionValues,
-    setOptionValue,
-    channelSelection,
-    channelMetas,
-    loadedModel,
-  } = useSegmenterStatus();
+  const { optionValues, setOptionValue, channelSelection, channelMetas } =
+    useSegmenterStatus();
 
   const value = optionValues[field.key];
 
@@ -120,20 +117,10 @@ export const SegmenterOptionInput = ({
   }, [value]);
 
   /* The channels actually being sent, in the order the model will see them. */
-  const sentChannels = useMemo(() => {
-    const all = Object.values(channelMetas);
-    if (channelSelection.mode === "explicit") {
-      return channelSelection.channelIds.map(
-        (id, idx) => channelMetas[id]?.name ?? `Channel ${idx + 1}`,
-      );
-    }
-    const policy = loadedModel?.channelPolicy;
-    const cap =
-      policy?.mode === "passthrough" && optionValues.channelMode !== "legacy"
-        ? policy.maxChannels
-        : all.length;
-    return all.slice(0, cap).map((channel) => channel.name);
-  }, [channelSelection, channelMetas, loadedModel, optionValues.channelMode]);
+  const sentChannels = useMemo(
+    () => getSegmentedChannelNames(channelSelection, channelMetas),
+    [channelSelection, channelMetas],
+  );
 
   /*
    * A slot index left over from a longer channel list would point past the end,
