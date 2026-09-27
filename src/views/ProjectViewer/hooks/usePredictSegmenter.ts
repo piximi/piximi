@@ -42,7 +42,7 @@ export const usePredictSegmenter = () => {
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
   const kinds = useSelector(selectAllKinds);
-  const { setModelStatus, loadedModel, channelSelection, optionValues } =
+  const { setModelStatus, loadedModel, channelSelection, optionValues, error } =
     useSegmenterStatus();
   const segApi = useSegmenterApi();
   const measurementsApi = useMeasurementsApi();
@@ -82,7 +82,7 @@ export const usePredictSegmenter = () => {
   );
 
   const predictSegmenter = useCallback(async () => {
-    if (!loadedModel) return;
+    if (!loadedModel || error) return;
     Cancel.reset();
     const taskId = generateUUID();
     dispatch(
@@ -106,7 +106,6 @@ export const usePredictSegmenter = () => {
           label: "Stopping...",
         }),
       );
-      //await segApi.stopExecution(selectedModel.name);
     });
     const modelInfoResult = await segApi.getModelInfo(loadedModel.name);
     let modelDetails: SegmentaionModelDetails;
@@ -213,7 +212,7 @@ export const usePredictSegmenter = () => {
         );
     } catch (error) {
       await handleError(error as Error, "Error in running predictions", taskId);
-
+      taskCancelRegistry.unregister(taskId);
       return;
     }
 
@@ -348,12 +347,16 @@ export const usePredictSegmenter = () => {
         taskId,
       );
 
+      taskCancelRegistry.unregister(taskId);
+
       return;
     }
     if (predictionCancelled)
       dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
     else dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
     setModelStatus("idle");
+
+    taskCancelRegistry.unregister(taskId);
   }, [
     handleError,
     allImages,
