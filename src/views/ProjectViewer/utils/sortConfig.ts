@@ -1,11 +1,11 @@
-import { AnnotationSortType, ImageSortType } from "./types";
+import { AnnotationSortType, ImageSortType } from "../state/types";
 
 import type {
   ExtendedAnnotationObject,
   ExtendedImageObject,
 } from "core/entities";
 
-import type { SortMap } from "./types";
+import type { SortMap } from "../state/types";
 
 // uuid -> numerical value (determenistic)
 const hash = (id: string) => {

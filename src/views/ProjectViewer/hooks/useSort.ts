@@ -5,14 +5,15 @@ import { useSelector } from "react-redux";
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveSoftmaxById } from "store/classifier/selectors";
 
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {
   ANNOTATION_SORT_CASES,
   generateSeed,
   IMAGE_SORT_CASES,
   marginOf,
   noopSort,
-} from "@ProjectViewer/state/sortConfig";
+} from "views/ProjectViewer/utils";
+
+import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import type {
   ExtendedAnnotationObject,
