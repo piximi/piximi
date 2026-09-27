@@ -1,12 +1,10 @@
 import {
-  CHANNEL_MODE_KEY,
-  CHANNEL_MODE_LEGACY,
-  CHANNEL_MODE_PASSTHROUGH,
-} from "../../optionUtils";
+  type SegmenterOptionSchema,
+  type SegmenterOptionValues,
+} from "../../types";
+import { CHANNEL_MODE, CHANNEL_MODE_KEY } from "../../optionUtils";
 
 import type { SegmentOptions } from "cellpose-js";
-
-import type { SegmenterOptionSchema, SegmenterOptionValues } from "../../types";
 
 /*
  * Cellpose-SAM inference knobs, mapped onto cellpose-js 0.6.0's `SegmentOptions`.
@@ -29,7 +27,7 @@ const GRAYSCALE_WARNING =
 
 const LEGACY_ONLY = {
   key: CHANNEL_MODE_KEY,
-  equals: CHANNEL_MODE_LEGACY,
+  equals: CHANNEL_MODE.LEGACY,
 } as const;
 
 export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
@@ -77,13 +75,13 @@ export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
           key: CHANNEL_MODE_KEY,
           label: "Mode",
           type: "select",
-          default: CHANNEL_MODE_PASSTHROUGH,
+          default: CHANNEL_MODE.PASSTHROUGH,
           choices: [
             {
-              value: CHANNEL_MODE_PASSTHROUGH,
+              value: CHANNEL_MODE.PASSTHROUGH,
               label: "Pass through (recommended)",
             },
-            { value: CHANNEL_MODE_LEGACY, label: "Legacy (chan / chan2)" },
+            { value: CHANNEL_MODE.LEGACY, label: "Legacy (chan / chan2)" },
           ],
           help:
             "Cellpose-SAM is channel-agnostic and normalizes each channel " +
@@ -158,7 +156,7 @@ export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
  * channels, while legacy must keep them all so `chan = k` can reach any of them.
  */
 export const isCellposePassthrough = (values: SegmenterOptionValues = {}) =>
-  values[CHANNEL_MODE_KEY] !== CHANNEL_MODE_LEGACY;
+  values[CHANNEL_MODE_KEY] !== CHANNEL_MODE.LEGACY;
 
 /* Channels cellpose-js reads in passthrough mode (upstream's `x[..., :3]`). */
 export const CELLPOSE_PASSTHROUGH_CHANNELS = 3;

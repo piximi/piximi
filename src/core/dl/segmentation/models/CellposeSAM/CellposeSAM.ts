@@ -11,6 +11,7 @@ import {
   isCellposePassthrough,
   toCellposeSegmentOptions,
 } from "./options";
+import { CHANNEL_MODE } from "../../optionUtils";
 
 import type { SegmentInput } from "cellpose-js";
 import type { GraphModel } from "@tensorflow/tfjs";
@@ -60,7 +61,7 @@ export class CellposeSAM extends Segmenter {
        * onto named model inputs.
        */
       channelPolicy: {
-        mode: "passthrough",
+        mode: CHANNEL_MODE.PASSTHROUGH,
         maxChannels: CELLPOSE_PASSTHROUGH_CHANNELS,
       },
       optionSchema: CELLPOSE_OPTION_SCHEMA,

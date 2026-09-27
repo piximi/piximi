@@ -4,16 +4,13 @@ import type {
   SegmenterOptionValues,
 } from "./types";
 
-/*
- * Well-known option key. A model whose channel policy is `passthrough` may
- * declare this field to offer a library-specific explicit selection (e.g.
- * cellpose's chan/chan2) as an alternative to passing channels through. The
- * channel UI hides its own picker while this is set to `CHANNEL_MODE_LEGACY`,
- * because the model's own selection supersedes it.
- */
 export const CHANNEL_MODE_KEY = "channelMode";
-export const CHANNEL_MODE_PASSTHROUGH = "passthrough";
-export const CHANNEL_MODE_LEGACY = "legacy";
+
+export enum CHANNEL_MODE {
+  PASSTHROUGH = "passthrough",
+  FIXED = "fixed",
+  LEGACY = "legacy",
+}
 
 const schemaFields = (schema?: SegmenterOptionSchema): SegmenterOptionField[] =>
   schema?.groups.flatMap((g) => g.fields) ?? [];

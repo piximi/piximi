@@ -16,54 +16,30 @@ import {
   selectExtendedImages,
 } from "store/data/selectors";
 
-import { arrayRange } from "utils/arrayUtils";
+import { getDefaultChannelIds } from "../utils/channelUtils";
+import { segmenterError } from "../utils/segmenterReadiness";
 
 import type React from "react";
 
-import type { ChannelMetaEntities } from "core/entities";
 import type {
   SegmentaionModelDetails,
   SegmentationState,
   SegmenterOptionSchema,
   SegmenterOptionValues,
 } from "core/dl/segmentation/types";
+import type { ChannelMetaEntities } from "core/entities";
 
-enum ErrorReason {
-  NotConfigured,
-  NoInferenceImages,
-  ExistingKind,
-  ChannelMismatch,
-}
-
-type ErrorContext = {
-  reason: ErrorReason;
-  message: string;
-  severity: number;
-};
-type Precheck = {
-  images: boolean; // success -> true
-  channels: boolean; // success -> true
-};
-
-/*
- * How the image's channels reach the model.
- *
- *   an ordered list of channel-meta ids. For a `fixed` model there
- *   is one slot per model input ("" = unset); for a `passthrough` model it is
- *   simply the subset, in order, that the user wants sent.
- */
-type ChannelSelection = { mode: "explicit"; channelIds: string[] };
+import type { ErrorContext } from "../utils/segmenterReadiness";
 
 const SegmenterStatusContext = createContext<{
-  isReady: boolean;
   loadedModel: SegmentaionModelDetails | undefined;
 
   setLoadedModel: React.Dispatch<
     React.SetStateAction<SegmentaionModelDetails | undefined>
   >;
   channelMetas: ChannelMetaEntities;
-  channelSelection: ChannelSelection;
-  setChannelSelection: React.Dispatch<React.SetStateAction<ChannelSelection>>;
+  channelSelection: Array<string>;
+  setChannelSelection: React.Dispatch<React.SetStateAction<Array<string>>>;
   optionValues: SegmenterOptionValues;
   setOptionValue: (
     key: string,
@@ -81,15 +57,14 @@ const SegmenterStatusContext = createContext<{
     _value: React.SetStateAction<SegmentaionModelDetails | undefined>,
   ) => {},
   channelMetas: {},
-  channelSelection: { mode: "explicit", channelIds: [] },
-  setChannelSelection: (_value: React.SetStateAction<ChannelSelection>) => {},
+  channelSelection: [],
+  setChannelSelection: (_value: React.SetStateAction<Array<string>>) => {},
   optionValues: {},
   setOptionValue: (
     _key: string,
     _value: number | boolean | string | undefined,
   ) => {},
   resetOptions: () => {},
-  isReady: true,
   modelStatus: "idle",
   setModelStatus: (_value: React.SetStateAction<SegmentationState>) => {},
   schema: undefined,
@@ -107,97 +82,32 @@ export const SegmenterStatusProvider = ({
 
   const [modelStatus, setModelStatus] = useState<SegmentationState>("idle");
   const channelMetas = useSelector(selectChannelMetaEntities);
-  const [channelSelection, setChannelSelection] = useState<ChannelSelection>({
-    mode: "explicit",
-    channelIds: [],
-  });
+  const [channelSelection, setChannelSelection] = useState<Array<string>>([]);
   const [optionValues, setOptionValues] = useState<SegmenterOptionValues>({});
-
-  const precheck: Precheck = useMemo(
-    () => ({
-      images: projectImages.length > 0,
-      channels:
-        !loadedModel ||
-        (channelSelection.channelIds.length > 0 &&
-          channelSelection.channelIds.every((id) => id !== "") &&
-          (loadedModel.channelPolicy.mode !== "fixed" ||
-            channelSelection.channelIds.length ===
-              loadedModel.channelPolicy.count)),
-    }),
-    [projectImages, channelSelection, loadedModel],
-  );
-
-  const isReady = useMemo(
-    () => Object.values(precheck).every((b) => b),
-    [precheck],
-  );
-  const activeErrors = useMemo(() => {
-    const newErrors: ErrorContext[] = [];
-    if (!precheck.images) {
-      newErrors.push({
-        reason: ErrorReason.NoInferenceImages,
-        message: "No images available for inference",
-        severity: 1,
-      });
-    }
-    if (!precheck.channels) {
-      newErrors.push({
-        reason: ErrorReason.ChannelMismatch,
-        message: "Select channels for segmentation",
-        severity: 2,
-      });
-    }
-    return newErrors;
-  }, [precheck]);
 
   const error = useMemo(
     () =>
-      activeErrors.length === 0
-        ? undefined
-        : activeErrors.reduce((prev, curr) =>
-            curr.severity < prev.severity ? curr : prev,
-          ),
-    [activeErrors],
+      segmenterError({
+        policy: loadedModel?.channelPolicy,
+        channelIds: channelSelection,
+        imageCount: projectImages.length,
+      }),
+    [loadedModel, channelSelection, projectImages],
   );
 
   const setDefaultChannelSelection = useCallback(() => {
     if (!loadedModel) {
-      setChannelSelection({
-        mode: "explicit",
-        channelIds: [],
-      });
+      setChannelSelection([]);
       return;
     }
     const availableChannels = Object.values(channelMetas);
     const policy = loadedModel.channelPolicy;
-    const slotCap =
-      policy.mode === "fixed"
-        ? policy.count
-        : Math.min(policy.maxChannels, availableChannels.length);
-    if (policy.mode === "passthrough") {
-      // The model takes the image's channels as-is by default
-      setChannelSelection({
-        mode: "explicit",
-        channelIds: availableChannels
-          .slice(0, slotCap)
-          .map((channel) => channel.id),
-      });
-    } else {
-      setChannelSelection({
-        mode: "explicit",
-        // A fixed-input graph needs every plane filled, so repeat the last
-        // available channel when the image has fewer than the model wants.
-        channelIds: arrayRange(policy.count).map((_, idx) => {
-          if (availableChannels.length === 0) {
-            return "";
-          } else if (idx >= availableChannels.length) {
-            return availableChannels.at(-1)!.id;
-          } else {
-            return availableChannels[idx].id;
-          }
-        }),
-      });
-    }
+    setChannelSelection(
+      getDefaultChannelIds(
+        policy,
+        availableChannels.map((ch) => ch.id),
+      ),
+    );
   }, [loadedModel, channelMetas]);
   useEffect(() => {
     if (!loadedModel) return;
@@ -231,7 +141,6 @@ export const SegmenterStatusProvider = ({
       optionValues,
       setOptionValue,
       resetOptions,
-      isReady,
       modelStatus,
       setModelStatus,
       error,
@@ -239,7 +148,6 @@ export const SegmenterStatusProvider = ({
     }),
     [
       loadedModel,
-      isReady,
       modelStatus,
       error,
       channelMetas,
