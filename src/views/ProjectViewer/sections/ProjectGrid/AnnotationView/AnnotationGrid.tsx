@@ -7,9 +7,10 @@ import { usePreloadSrcs } from "hooks";
 import { selectExtendedAnnotationsByKindId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
+import { isFiltered } from "views/ProjectViewer/utils";
+
 import { useAnnotationSort } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
-import { isFiltered } from "@ProjectViewer/state/filtering";
 
 import { AnnotationGridItem } from "./AnnotationGridItem";
 import { createGridCell, createItemData } from "../gridUtils";

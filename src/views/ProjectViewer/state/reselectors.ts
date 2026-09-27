@@ -9,7 +9,7 @@ import {
   selectExtendedImages,
 } from "store/data/selectors";
 
-import { isFiltered } from "./filtering";
+import { isFiltered } from "../utils";
 import {
   selectActiveKindId,
   selectActiveView,
