@@ -198,16 +198,12 @@ export const LoadSegmentationModelDialog = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog} color="primary">
-          Cancel
-        </Button>
-
         <Button
           onClick={handleLoadModel}
           color="primary"
           disabled={!selectedModel}
         >
-          Open Segmentation model
+          Load Model
         </Button>
       </DialogActions>
     </Dialog>
