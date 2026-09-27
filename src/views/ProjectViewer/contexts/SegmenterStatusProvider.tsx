@@ -22,7 +22,7 @@ import { segmenterError } from "../utils/segmenterReadiness";
 import type React from "react";
 
 import type {
-  SegmentaionModelDetails,
+  SegmentationModelDetails,
   SegmentationState,
   SegmenterOptionSchema,
   SegmenterOptionValues,
@@ -32,10 +32,10 @@ import type { ChannelMetaEntities } from "core/entities";
 import type { ErrorContext } from "../utils/segmenterReadiness";
 
 const SegmenterStatusContext = createContext<{
-  loadedModel: SegmentaionModelDetails | undefined;
+  loadedModel: SegmentationModelDetails | undefined;
 
   setLoadedModel: React.Dispatch<
-    React.SetStateAction<SegmentaionModelDetails | undefined>
+    React.SetStateAction<SegmentationModelDetails | undefined>
   >;
   channelMetas: ChannelMetaEntities;
   channelSelection: Array<string>;
@@ -54,7 +54,7 @@ const SegmenterStatusContext = createContext<{
 }>({
   loadedModel: undefined,
   setLoadedModel: (
-    _value: React.SetStateAction<SegmentaionModelDetails | undefined>,
+    _value: React.SetStateAction<SegmentationModelDetails | undefined>,
   ) => {},
   channelMetas: {},
   channelSelection: [],
@@ -76,7 +76,7 @@ export const SegmenterStatusProvider = ({
   children: React.ReactNode;
 }) => {
   const [loadedModel, setLoadedModel] = useState<
-    SegmentaionModelDetails | undefined
+    SegmentationModelDetails | undefined
   >(undefined);
   const projectImages = useSelector(selectExtendedImages);
 

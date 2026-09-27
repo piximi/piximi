@@ -31,7 +31,7 @@ import type {
 } from "core/entities";
 import type {
   PredictedAnnotationObject,
-  SegmentaionModelDetails,
+  SegmentationModelDetails,
 } from "core/dl/segmentation/types";
 
 import type { AlertState, LoadCB } from "utils/types";
@@ -108,7 +108,7 @@ export const usePredictSegmenter = () => {
       );
     });
     const modelInfoResult = await segApi.getModelInfo(loadedModel.name);
-    let modelDetails: SegmentaionModelDetails;
+    let modelDetails: SegmentationModelDetails;
     if (modelInfoResult.success) modelDetails = modelInfoResult.data;
     else {
       await handleError(

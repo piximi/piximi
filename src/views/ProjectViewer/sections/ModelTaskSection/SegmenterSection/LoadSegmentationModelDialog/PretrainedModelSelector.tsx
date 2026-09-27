@@ -15,7 +15,7 @@ import { modelInfo } from "core/dl/segmentation";
 import type {
   ModelDisplayInfo,
   ModelName,
-  SegmentaionModelDetails,
+  SegmentationModelDetails,
 } from "core/dl/segmentation/types";
 
 interface ModelOptionType {
@@ -35,8 +35,8 @@ export const PretrainedModelSelector = ({
   errorText,
   initModel = "-1",
 }: {
-  models: Array<SegmentaionModelDetails>;
-  setModel: (model: SegmentaionModelDetails | undefined) => void;
+  models: Array<SegmentationModelDetails>;
+  setModel: (model: SegmentationModelDetails | undefined) => void;
   error?: boolean;
   errorText?: string;
   initModel: string;
