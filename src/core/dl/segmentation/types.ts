@@ -120,7 +120,7 @@ export type SegmenterOptionValues = Record<
 
 export type SegmentationState = "idle" | "loading" | "predicting";
 
-export type SegmentaionModelDetails = {
+export type SegmentationModelDetails = {
   name: ModelName;
   displayName: string;
   kind?: string | Array<string>;
@@ -144,10 +144,10 @@ export type SegmentationResults = {
 export interface ISegmenterApi {
   // registry reads
   getModelNames(): Promise<ApiResult<string[]>>;
-  getModelInfo(name: ModelName): Promise<ApiResult<SegmentaionModelDetails>>;
+  getModelInfo(name: ModelName): Promise<ApiResult<SegmentationModelDetails>>;
   hasModel(name: ModelName): Promise<ApiResult<boolean>>;
   getAvailableSegmentationModels(): Promise<
-    ApiResult<Record<string, SegmentaionModelDetails>>
+    ApiResult<Record<string, SegmentationModelDetails>>
   >;
 
   /*

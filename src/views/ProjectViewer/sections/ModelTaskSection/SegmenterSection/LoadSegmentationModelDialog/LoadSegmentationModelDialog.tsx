@@ -30,7 +30,7 @@ import { PretrainedModelSelector } from "./PretrainedModelSelector";
 
 import type React from "react";
 
-import type { SegmentaionModelDetails } from "core/dl/segmentation/types";
+import type { SegmentationModelDetails } from "core/dl/segmentation/types";
 
 import type { LoadCB } from "utils/types";
 
@@ -48,13 +48,13 @@ export const LoadSegmentationModelDialog = ({
   const segApi = useSegmenterApi();
 
   const [selectedModel, setSelectedModel] = useState<
-    SegmentaionModelDetails | undefined
+    SegmentationModelDetails | undefined
   >(loadedModel);
   const [pretrainedModels, setPretrainedModels] = useState<
-    Array<SegmentaionModelDetails>
+    Array<SegmentationModelDetails>
   >([]);
 
-  const handleModelSelect = (model: SegmentaionModelDetails | undefined) => {
+  const handleModelSelect = (model: SegmentationModelDetails | undefined) => {
     setSelectedModel(model);
   };
 

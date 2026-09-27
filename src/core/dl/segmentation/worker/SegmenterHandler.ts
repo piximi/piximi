@@ -14,7 +14,7 @@ import type { LoadCB } from "utils/types";
 import type {
   ISegmenterApi,
   ModelName,
-  SegmentaionModelDetails,
+  SegmentationModelDetails,
   SegmentationResults,
   SegmenterOptionValues,
 } from "../types";
@@ -49,7 +49,7 @@ export class SegmenterHandler implements ISegmenterApi {
     return this._availableSegmentationModels[modelName] ?? null;
   }
 
-  private buildModelInfoDTO(model: Segmenter): SegmentaionModelDetails {
+  private buildModelInfoDTO(model: Segmenter): SegmentationModelDetails {
     return {
       name: model.name,
       displayName: modelInfo[model.name].displayName,
@@ -64,7 +64,7 @@ export class SegmenterHandler implements ISegmenterApi {
   public async getAvailableSegmentationModels() {
     return ok(
       Object.entries(this._availableSegmentationModels).reduce(
-        (models: Record<string, SegmentaionModelDetails>, [name, model]) => {
+        (models: Record<string, SegmentationModelDetails>, [name, model]) => {
           models[name] = this.buildModelInfoDTO(model);
           return models;
         },
