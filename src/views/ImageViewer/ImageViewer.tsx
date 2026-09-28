@@ -1,6 +1,5 @@
 import { useEffect, useCallback } from "react";
 
-import { useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -27,7 +26,6 @@ import { ThreeViewportProvider } from "./sections/ThreeStage/ThreeViewportContex
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();
-  const routerLocation = useLocation();
   const isMobile = useMobileView();
   useUnloadConfirmation();
 
@@ -80,7 +78,7 @@ export const ImageViewer = () => {
         }),
       );
     };
-  }, [dispatch, routerLocation.state]);
+  }, [dispatch]);
 
   useEffect(() => {
     window.addEventListener("error", handleError);
