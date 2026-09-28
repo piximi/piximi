@@ -4,7 +4,7 @@ import { HelpOutline as HelpIcon } from "@mui/icons-material";
 import { useHelp } from "contexts";
 
 export const HelpButton = () => {
-  const { setHelpMode } = useHelp();
+  const { setHelpMode, helpMode } = useHelp();
 
   return (
     <>
@@ -12,6 +12,7 @@ export const HelpButton = () => {
         <IconButton
           onClick={() => setHelpMode((helpMode) => !helpMode)}
           size="small"
+          color={helpMode ? "primary" : "default"}
         >
           <HelpIcon />
         </IconButton>
