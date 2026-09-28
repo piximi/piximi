@@ -6,12 +6,11 @@ import { HotkeyContext } from "utils/enums";
 
 import { HelpItem } from "data/help/HelpContent";
 
-import { TooltipTextButton } from "views/ProjectViewer/components";
-
+import { TooltipTextButton } from "@ProjectViewer/components";
 import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { LoadSegmentationModelDialog } from "./LoadSegmentationModelDialog";
-import { SegmenterOptions } from "./SegmentationOptions";
+import { SegmenterOptions } from "./SegmenterOptions";
 
 export const ModelInfo = () => {
   const { loadedModel } = useSegmenter();
