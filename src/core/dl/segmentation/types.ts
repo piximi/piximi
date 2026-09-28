@@ -86,7 +86,7 @@ type SegmenterSelectOptionfield = SegmenterOptionFieldBase & {
  * chan2). Its choices depend on what the user is sending, which only the UI
  * knows — hence a distinct type rather than a `select` with baked-in choices.
  */
-type SegmenterChannelOptionField = SegmenterOptionFieldBase & {
+export type SegmenterChannelOptionField = SegmenterOptionFieldBase & {
   type: "channelIndex";
   default: number;
   zeroLabel: string;

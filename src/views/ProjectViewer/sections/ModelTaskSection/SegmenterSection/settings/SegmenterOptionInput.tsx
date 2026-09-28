@@ -11,12 +11,16 @@ import {
 } from "@mui/material";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
-import { type SegmenterOptionField } from "core/dl/segmentation/types";
 import { getSegmentedChannelNames } from "core/dl/segmentation/channelUtils";
 
 import { StyledSelect, TextFieldWithBlur } from "components/inputs";
 
 import { useSegmenter } from "@ProjectViewer/hooks";
+
+import type {
+  SegmenterOptionField,
+  SegmenterChannelOptionField,
+} from "core/dl/segmentation/types";
 
 const LABEL_SX = { flexShrink: 0, mr: 1, whiteSpace: "nowrap" } as const;
 
@@ -94,6 +98,7 @@ const Row = ({
  * behind a `channelIndex` field, the current values behind `visibleWhen` — is
  * resolved here rather than baked into the schema.
  */
+
 export const SegmenterOptionInput = ({
   field,
   layout = "row",
@@ -102,8 +107,7 @@ export const SegmenterOptionInput = ({
   layout?: SegmenterOptionLayout;
 }) => {
   const theme = useTheme();
-  const { optionValues, setOptionValue, channelSelection, channelMetas } =
-    useSegmenter();
+  const { optionValues, setOptionValue } = useSegmenter();
 
   const value = optionValues[field.key];
 
@@ -114,23 +118,6 @@ export const SegmenterOptionInput = ({
   useEffect(() => {
     setDraft(value === undefined ? "" : String(value));
   }, [value]);
-
-  /* The channels actually being sent, in the order the model will see them. */
-  const sentChannels = useMemo(
-    () => getSegmentedChannelNames(channelSelection, channelMetas),
-    [channelSelection, channelMetas],
-  );
-
-  /*
-   * A slot index left over from a longer channel list would point past the end,
-   * so fall back to 0 ("grayscale"/"none") until the user picks again.
-   */
-  useEffect(() => {
-    if (field.type !== "channelIndex") return;
-    if (typeof value === "number" && value > sentChannels.length) {
-      setOptionValue(field.key, 0);
-    }
-  }, [field, value, sentChannels.length, setOptionValue]);
 
   const handleTextFieldBlur = () => {
     const trimmed = draft.trim();
@@ -195,39 +182,8 @@ export const SegmenterOptionInput = ({
           </StyledSelect>
         </Row>
       );
-
     case "channelIndex":
-      return (
-        <Row label={field.label} help={field.help} layout={layout}>
-          <StyledSelect
-            value={typeof value === "number" ? value : field.default}
-            onChange={(event) =>
-              setOptionValue(field.key, Number(event.target.value))
-            }
-            fontSize={theme.typography.caption.fontSize}
-            fullWidth
-          >
-            <MenuItem
-              dense
-              value={0}
-              sx={{ borderRadius: 0, minHeight: "1rem" }}
-            >
-              {field.zeroLabel}
-            </MenuItem>
-            {sentChannels.map((name, idx) => (
-              <MenuItem
-                key={`${idx}-${name}`}
-                dense
-                value={idx + 1}
-                sx={{ borderRadius: 0, minHeight: "1rem" }}
-              >
-                {`Slot ${idx + 1} — ${name}`}
-              </MenuItem>
-            ))}
-          </StyledSelect>
-        </Row>
-      );
-
+      return <ChannelIndexInput field={field} layout={layout} />;
     case "number":
       if (field.control === "slider") {
         const current =
@@ -285,4 +241,59 @@ export const SegmenterOptionInput = ({
         </Row>
       );
   }
+};
+
+const ChannelIndexInput = ({
+  field,
+  layout = "row",
+}: {
+  field: SegmenterChannelOptionField;
+  layout?: SegmenterOptionLayout;
+}) => {
+  const theme = useTheme();
+  const { optionValues, setOptionValue, channelSelection, channelMetas } =
+    useSegmenter();
+
+  const value = optionValues[field.key];
+  /* The channels actually being sent, in the order the model will see them. */
+  const sentChannels = useMemo(
+    () => getSegmentedChannelNames(channelSelection, channelMetas),
+    [channelSelection, channelMetas],
+  );
+  /*
+   * A slot index left over from a longer channel list would point past the end,
+   * so fall back to 0 ("grayscale"/"none") until the user picks again.
+   */
+  useEffect(() => {
+    if (field.type !== "channelIndex") return;
+    if (typeof value === "number" && value > sentChannels.length) {
+      setOptionValue(field.key, 0);
+    }
+  }, [field, value, sentChannels.length, setOptionValue]);
+  return (
+    <Row label={field.label} help={field.help} layout={layout}>
+      <StyledSelect
+        value={typeof value === "number" ? value : field.default}
+        onChange={(event) =>
+          setOptionValue(field.key, Number(event.target.value))
+        }
+        fontSize={theme.typography.caption.fontSize}
+        fullWidth
+      >
+        <MenuItem dense value={0} sx={{ borderRadius: 0, minHeight: "1rem" }}>
+          {field.zeroLabel}
+        </MenuItem>
+        {sentChannels.map((name, idx) => (
+          <MenuItem
+            key={`${idx}-${name}`}
+            dense
+            value={idx + 1}
+            sx={{ borderRadius: 0, minHeight: "1rem" }}
+          >
+            {`Slot ${idx + 1} — ${name}`}
+          </MenuItem>
+        ))}
+      </StyledSelect>
+    </Row>
+  );
 };
