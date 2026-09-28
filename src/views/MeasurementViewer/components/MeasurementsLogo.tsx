@@ -5,7 +5,7 @@ import { ArrowBack } from "@mui/icons-material";
 
 import { LogoIcon } from "components/ui";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 export const MeasurementsLogo = () => {
   const navigate = useNavigate();

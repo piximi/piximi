@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 
 import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import { TooltipTextButton } from "@ProjectViewer/components";
 

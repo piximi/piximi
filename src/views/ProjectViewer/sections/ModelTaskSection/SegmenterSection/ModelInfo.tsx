@@ -2,9 +2,9 @@ import { Box, Stack, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { HotkeyContext } from "utils/enums";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HotkeyContext } from "utils/enums";
 
 import { TooltipTextButton } from "@ProjectViewer/components";
 import { useSegmenter } from "@ProjectViewer/hooks";

@@ -12,10 +12,9 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 
 import { dataSlice } from "store/data";
+import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import {
   FunctionalDivider,

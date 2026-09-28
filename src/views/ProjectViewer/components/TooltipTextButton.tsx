@@ -6,7 +6,7 @@ import { useTranslation } from "hooks";
 
 import type { ButtonProps } from "@mui/material";
 
-import type { HelpItem } from "data/help/HelpContent";
+import type { HelpItem } from "help/HelpContent";
 
 type TooltipTextButtonProps = Omit<ButtonProps, "onClick"> & {
   icon?: ReactElement;

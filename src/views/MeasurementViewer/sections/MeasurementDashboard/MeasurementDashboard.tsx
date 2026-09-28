@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Box } from "@mui/material";
 import { useGridApiRef } from "@mui/x-data-grid";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import {
   TextToggleButton,

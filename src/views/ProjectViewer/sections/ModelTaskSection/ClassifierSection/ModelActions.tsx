@@ -17,10 +17,9 @@ import {
   selectModelLifecycleStatus,
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
+import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { TooltipTextButton } from "@ProjectViewer/components";
 import {

@@ -21,10 +21,9 @@ import { ConfirmationDialog } from "components/dialogs";
 
 import { selectExperiment } from "store/data/selectors";
 import { dataSlice } from "store/data";
+import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { ExportOptionsPanel } from "./ExportOptionsPanel";
 

@@ -11,9 +11,9 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
-import { HotkeyContext } from "utils/enums";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HotkeyContext } from "utils/enums";
 
 import { ProjectSettings } from "./ProjectSettings";
 import { UISettings } from "./UISettings";

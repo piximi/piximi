@@ -1,9 +1,9 @@
 import { IconButton, useTheme } from "@mui/material";
 import { Info as InfoOutlinedIcon } from "@mui/icons-material";
 
-import { haloFilter } from "utils/styleUtils";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { haloFilter } from "utils/styleUtils";
 
 import { useInformationPopover } from "../information-popover";
 

@@ -62,6 +62,7 @@ export default defineConfig({
       components: path.resolve("src/components"),
       contexts: path.resolve("src/contexts"),
       data: path.resolve("src/data"),
+      help: path.resolve("src/help"),
       hooks: path.resolve("src/hooks"),
       icons: path.resolve("src/icons"),
       images: path.resolve("src/images"),

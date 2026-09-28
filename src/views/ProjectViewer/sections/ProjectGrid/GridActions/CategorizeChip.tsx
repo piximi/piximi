@@ -6,7 +6,7 @@ import { Box, MenuItem, MenuList } from "@mui/material";
 
 import { PopperToolButton } from "components/inputs";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import type { Category } from "core/entities";
 

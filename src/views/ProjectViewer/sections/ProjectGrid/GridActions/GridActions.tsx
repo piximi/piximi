@@ -13,10 +13,10 @@ import { useDialogHotkey, useHotkeys, useMobileView } from "hooks";
 import { ConfirmationDialog } from "components/dialogs";
 import { ToolButton } from "components/inputs";
 
+import { HelpItem } from "help/HelpContent";
+
 import { HotkeyContext } from "utils/enums";
 import { pluralize } from "utils/stringUtils";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { useGridActions } from "@ProjectViewer/hooks";
 

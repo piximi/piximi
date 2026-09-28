@@ -9,10 +9,9 @@ import { useMobileView } from "hooks";
 import { IncrementalSlider, PopperToolButton } from "components/inputs";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
+import { HelpItem } from "help/HelpContent";
 
 import { DEFAULT_GRID_ITEM_WIDTH, DIMENSIONS, GRID_GAP } from "utils/constants";
-
-import { HelpItem } from "data/help/HelpContent";
 
 const minZoom = 0.6;
 

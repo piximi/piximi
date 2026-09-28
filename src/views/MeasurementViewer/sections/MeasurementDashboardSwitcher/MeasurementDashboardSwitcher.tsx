@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import { CustomTabs } from "@MeasurementViewer/components/custom-tab-switcher";
 import { measurementsSlice } from "@MeasurementViewer/state";

@@ -21,11 +21,10 @@ import {
   selectAllCreatedModelNames,
   selectKindClassifier,
 } from "store/classifier/selectors";
+import { HelpItem } from "help/HelpContent";
 
 import { getUniqueName } from "utils/stringUtils";
 import { logger } from "utils/logUtils";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {

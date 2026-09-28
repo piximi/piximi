@@ -4,8 +4,7 @@ import { Box } from "@mui/material";
 
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveExtendedChannels } from "store/data/selectors";
-
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 

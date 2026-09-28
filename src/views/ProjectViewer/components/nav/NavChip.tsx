@@ -3,7 +3,7 @@ import { ArrowForward as ForwardIcon } from "@mui/icons-material";
 
 import type { ReactNode } from "react";
 
-import type { HelpItem } from "data/help/HelpContent";
+import type { HelpItem } from "help/HelpContent";
 
 export const NavChip = ({
   tooltip,

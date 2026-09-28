@@ -7,10 +7,9 @@ import { Box, capitalize } from "@mui/material";
 import { INTENSITY_MEASUREMENTS } from "core/entities";
 
 import { selectAllChannelMetas } from "store/data/selectors";
+import { HelpItem } from "help/HelpContent";
 
 import { getDifferences } from "utils/arrayUtils";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
 import { measurementsSlice } from "@MeasurementViewer/state";

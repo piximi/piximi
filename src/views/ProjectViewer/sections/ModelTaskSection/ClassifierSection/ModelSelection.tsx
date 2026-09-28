@@ -17,11 +17,10 @@ import { StyledSelect } from "components/inputs";
 import { classifierSlice } from "store/classifier";
 import { selectKindModelNames } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
+import { HelpItem } from "help/HelpContent";
 
 import { logger } from "utils/logUtils";
 import { HotkeyContext } from "utils/enums";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { SaveFittedModelDialog } from "views/ProjectViewer/components/dialogs";
 

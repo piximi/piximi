@@ -13,7 +13,7 @@ import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import type { MouseEvent } from "react";
 
