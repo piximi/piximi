@@ -25,7 +25,7 @@ export const getInitialModelConfig = (
       modelStatus: "idle",
       channelSelection: [],
       optionValues: {
-        diameter: "auto",
+        diameter: "",
         cellPropThreshold: 0,
         resample: "false",
         niter: 200,
