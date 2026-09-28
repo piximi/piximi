@@ -24,7 +24,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { AlertType, HotkeyContext } from "utils/enums";
 import { getStackTraceFromError } from "utils/logUtils";
 
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
 
@@ -44,7 +44,7 @@ export const LoadSegmentationModelDialog = ({
   open,
 }: LoadSegmentationModelDialogProps) => {
   const dispatch = useDispatch();
-  const { loadedModel, setLoadedModel } = useSegmenterStatus();
+  const { loadedModel, setLoadedModel } = useSegmenter();
   const segApi = useSegmenterApi();
 
   const [selectedModel, setSelectedModel] = useState<

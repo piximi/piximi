@@ -8,3 +8,4 @@ export { usePredictClassifier } from "./usePredictClassifier";
 export { useEvaluateClassifier } from "./useEvaluateClassifier";
 export { usePredictSegmenter } from "./usePredictSegmenter";
 export { useConfirmReplaceDialog } from "./useConfirmReplaceProjectDialog";
+export { useSegmenter } from "./useSegmenter";

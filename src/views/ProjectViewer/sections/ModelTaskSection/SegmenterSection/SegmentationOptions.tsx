@@ -2,12 +2,12 @@ import { useState } from "react";
 
 import { Box, Button, Typography } from "@mui/material";
 
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { SegmenterOptionsPanel, ChannelMapping } from "./settings";
 
 export const SegmenterOptions = () => {
-  const { loadedModel, schema } = useSegmenterStatus();
+  const { loadedModel, schema } = useSegmenter();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const hasAdvanced = schema?.groups.some(

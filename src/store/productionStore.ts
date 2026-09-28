@@ -14,6 +14,7 @@ import { dataSlice } from "./data";
 import { rootReducer } from "./rootReducer";
 import { applicationSettingsSlice } from "./applicationSettings";
 import { projectMiddleware } from "./listeners";
+import { segmenterSlice } from "./segmenter/segmenterSlice";
 
 import type {
   Dispatch,
@@ -42,6 +43,7 @@ const preloadedState: RootState = {
   data: dataSlice.getInitialState(),
   appTasks: appTasksSlice.getInitialState(),
   project: projectSlice.getInitialState(),
+  segmenter: segmenterSlice.getInitialState(),
 };
 
 const options = {

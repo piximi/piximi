@@ -12,12 +12,11 @@ import {
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
 import { type SegmenterOptionField } from "core/dl/segmentation/types";
+import { getSegmentedChannelNames } from "core/dl/segmentation/channelUtils";
 
 import { StyledSelect, TextFieldWithBlur } from "components/inputs";
 
-import { getSegmentedChannelNames } from "views/ProjectViewer/utils/channelUtils";
-
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { useSegmenter } from "@ProjectViewer/hooks";
 
 const LABEL_SX = { flexShrink: 0, mr: 1, whiteSpace: "nowrap" } as const;
 
@@ -104,7 +103,7 @@ export const SegmenterOptionInput = ({
 }) => {
   const theme = useTheme();
   const { optionValues, setOptionValue, channelSelection, channelMetas } =
-    useSegmenterStatus();
+    useSegmenter();
 
   const value = optionValues[field.key];
 

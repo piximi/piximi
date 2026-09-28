@@ -1,9 +1,10 @@
-import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
-
 import { arrayRange } from "utils/arrayUtils";
 
+import { CHANNEL_MODE } from "./optionUtils";
+
 import type { ChannelMetaEntities } from "core/entities";
-import type { ChannelPolicy } from "core/dl/segmentation/types";
+
+import type { ChannelPolicy } from "./types";
 
 /*
  * How many channel slots a model exposes for the image at hand. A `fixed`

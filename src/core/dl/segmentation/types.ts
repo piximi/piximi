@@ -113,10 +113,9 @@ export type SegmenterOptionGroup = {
 
 export type SegmenterOptionSchema = { groups: SegmenterOptionGroup[] };
 
-export type SegmenterOptionValues = Record<
-  string,
-  number | boolean | string | undefined
->;
+export type SegmenterOptionType = number | boolean | string | undefined;
+
+export type SegmenterOptionValues = Record<string, SegmenterOptionType>;
 
 export type SegmentationState = "idle" | "loading" | "predicting";
 

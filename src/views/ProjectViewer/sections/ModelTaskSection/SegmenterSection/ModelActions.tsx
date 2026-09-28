@@ -3,12 +3,11 @@ import { useMemo } from "react";
 import { Box } from "@mui/material";
 
 import { TooltipTextButton } from "@ProjectViewer/components";
-import { usePredictSegmenter } from "@ProjectViewer/hooks";
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { usePredictSegmenter, useSegmenter } from "@ProjectViewer/hooks";
 
 export const ModelActions = () => {
   const predictSegmenter = usePredictSegmenter();
-  const { modelStatus, error, loadedModel } = useSegmenterStatus();
+  const { modelStatus, error, loadedModel } = useSegmenter();
   const predictInfo = useMemo(() => {
     let predictText: string;
 
