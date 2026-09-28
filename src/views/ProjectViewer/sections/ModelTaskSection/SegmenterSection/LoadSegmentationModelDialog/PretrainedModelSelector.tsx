@@ -88,12 +88,16 @@ export const PretrainedModelSelector = ({
 
         <FormHelperText sx={{ mx: "auto" }}>{errorText ?? " "}</FormHelperText>
       </FormControl>
-      {modelDetails && <ModelInfo modelDetails={modelDetails} />}
+      {modelDetails && <PretrainedModelDetails modelDetails={modelDetails} />}
     </Fragment>
   );
 };
 
-const ModelInfo = ({ modelDetails }: { modelDetails: ModelDetails }) => {
+const PretrainedModelDetails = ({
+  modelDetails,
+}: {
+  modelDetails: ModelDetails;
+}) => {
   return (
     <Box
       sx={{
