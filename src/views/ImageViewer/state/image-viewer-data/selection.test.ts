@@ -229,6 +229,18 @@ describe("selection scenarios", () => {
     expect(s.layer.excludeIds).toEqual([]);
     expect(s.selected()).toEqual([]);
   });
+
+  // The selection layer is global and deliberately outlives the image it was
+  // built on: `selectSelectedAnnotations` intersects it with the active image's
+  // visible annotations, so other images' ids lie dormant rather than leaking.
+  it("survives an image switch", () => {
+    const s = session().run(addCat(C1), click("a_c1f", false));
+    expect(s.selected()).not.toContain("a_c1f");
+
+    s.run(A.setActiveImageId("image-2"));
+    expect(s.layer.catIds).toEqual([C1]);
+    expect(s.layer.excludeIds).toContain("a_c1f");
+  });
 });
 
 describe("applyFilterLayer with manual overrides", () => {
@@ -253,6 +265,47 @@ describe("applyFilterLayer with manual overrides", () => {
     );
     expect(kept.map((a) => a.id)).not.toContain("a_c1");
     expect(kept).toHaveLength(3);
+  });
+
+  const areaF = { feature: "area" as const, min: F[0], max: F[1] };
+
+  // The two groups are duals: keep intersects them, hide unions what it
+  // removes. Adding a term to a layer must always leave less on screen.
+  it("intersects the groups on a keep layer", () => {
+    const kept = applyFilterLayer(
+      ALL,
+      "stack",
+      {
+        ...base,
+        mode: "keep",
+        catIds: [C1],
+        features: [areaF],
+        includeIds: [],
+        excludeIds: [],
+      },
+      0,
+    );
+    expect(kept.map((a) => a.id)).toEqual(["a_c1f"]); // in c1 AND in range
+  });
+
+  it("unions the groups on a hide layer, so a new term hides more", () => {
+    const catOnly = {
+      ...base,
+      mode: "hide" as const,
+      catIds: [C1],
+      features: [],
+      includeIds: [],
+      excludeIds: [],
+    };
+    expect(applyFilterLayer(ALL, "stack", catOnly, 0).map((a) => a.id)).toEqual(
+      ["a_c2", "a_c2f"],
+    );
+
+    // Adding the range must remove a_c2f as well — never resurrect a c1.
+    const withRange = { ...catOnly, features: [areaF] };
+    expect(
+      applyFilterLayer(ALL, "stack", withRange, 0).map((a) => a.id),
+    ).toEqual(["a_c2"]);
   });
 
   it("exempts an excluded annotation from a hide layer", () => {

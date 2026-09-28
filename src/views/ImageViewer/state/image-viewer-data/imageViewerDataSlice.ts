@@ -15,6 +15,7 @@ import type {
   CategoryNode,
   FilterLayer,
   ImageViewerDataState,
+  LayerMode,
   PlaneScope,
 } from "../types";
 
@@ -79,7 +80,6 @@ export const imageViewerDataSlice = createSlice({
     },
     setActiveImageId(state, action: PayloadAction<string | undefined>) {
       state.activeImageId = action.payload;
-      // reset selected annotations
     },
 
     updateHighlightedAnnotationCategory(
@@ -190,6 +190,13 @@ export const imageViewerDataSlice = createSlice({
     toggleFilterLayer(state) {
       if (state.filterLayer) {
         state.filterLayer.enabled = !state.filterLayer.enabled;
+      }
+    },
+    // Whether the layer keeps or hides its matches is a property of the layer,
+    // editable on its row — not a choice made before there is a layer at all.
+    setFilterLayerMode(state, action: PayloadAction<LayerMode>) {
+      if (state.filterLayer) {
+        state.filterLayer.mode = action.payload;
       }
     },
     deleteFilterLayer(state) {
