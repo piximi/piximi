@@ -1,3 +1,4 @@
+import { switchClasses } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 
 import type { ThemeOptions } from "@mui/material/styles";
@@ -5,6 +6,11 @@ import type { ThemeOptions } from "@mui/material/styles";
 declare module "@mui/material/styles" {
   interface CssThemeVariables {
     enabled: true;
+  }
+}
+declare module "@mui/material/Switch" {
+  interface SwitchPropsSizeOverrides {
+    "x-small": true;
   }
 }
 
@@ -51,6 +57,28 @@ const sharedComponentThemes: ThemeOptions["components"] = {
         color: "var(--mui-palette-text-primary)",
       },
     },
+  },
+  MuiSwitch: {
+    variants: [
+      {
+        props: { size: "x-small" },
+        style: {
+          width: 30,
+          height: 18,
+          padding: 6,
+          [`& .${switchClasses.thumb}`]: {
+            width: 12,
+            height: 12,
+          },
+          [`& .${switchClasses.switchBase}`]: {
+            padding: 3,
+            [`&.${switchClasses.checked}`]: {
+              transform: "translateX(12px)",
+            },
+          },
+        },
+      },
+    ],
   },
 };
 
