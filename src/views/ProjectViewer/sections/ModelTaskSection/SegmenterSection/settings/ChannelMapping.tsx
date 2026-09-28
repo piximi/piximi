@@ -63,6 +63,7 @@ export const ChannelMapping = () => {
     removeChannelSelection,
     addChannelSelection,
     optionValues,
+    schema,
   } = useSegmenter();
 
   const availableChannels = useMemo(
@@ -99,7 +100,7 @@ export const ChannelMapping = () => {
   const policy = loadedModel.channelPolicy;
 
   /* Option fields the model wants shown here rather than in the options panel. */
-  const channelFields = (loadedModel.optionSchema?.groups ?? [])
+  const channelFields = (schema?.groups ?? [])
     .filter((group) => group.describesChannels)
     .flatMap((group) => group.fields)
     .filter((field) => isFieldVisible(field, optionValues));
