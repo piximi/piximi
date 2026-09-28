@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
@@ -71,16 +71,10 @@ export const useAnnotationSelection = () => {
 
   const relativeFeatures = useSelector(selectRelativeFeatureBounds);
 
-  useEffect(() => {
-    dispatch(imageViewerDataSlice.actions.clearSelectionLayer());
-  }, [activeImageId, dispatch]);
-
   const planeScope = useSelector(selectPlaneScope);
   const setPlaneScope = (scope: PlaneScope) => {
     dispatch(imageViewerDataSlice.actions.setPlaneScope(scope));
   };
-
-  const [mode, setMode] = useState<LayerMode>("keep");
 
   // ---- derived ----
   const view = useSelector(selectVisibleAnnotations);
@@ -117,14 +111,17 @@ export const useAnnotationSelection = () => {
   // Current selection criterion (categories + active feature ranges).
   const activeFeats = useMemo(() => activeFeatureList(feats), [feats]);
 
-  // Counts includeIds too: this gates both the Apply-filter button and the Clear
-  // link, and a click-only selection has no categories or features at all.
-  const anySel =
-    selCats.length > 0 || activeFeats.length > 0 || includeIds.length > 0;
   const selectedIds = useMemo(
     () => selectedAnnotations.map((a) => a.id),
     [selectedAnnotations],
   );
+
+  // Counts the derived set rather than the categories and features alone: a
+  // click-only selection has neither. Manual picks are global and outlive the
+  // image they were made on, so counting includeIds directly would light up the
+  // footer and the Apply-filter button on an image where nothing is selected.
+  const anySel =
+    selCats.length > 0 || activeFeats.length > 0 || selectedIds.length > 0;
 
   // Manual deltas worth surfacing: an include only counts if the criterion
   // wouldn't have caught it anyway, an exclude only if the criterion would have.
@@ -190,32 +187,48 @@ export const useAnnotationSelection = () => {
       selCats,
       kinds,
     );
+    // Manual picks are global, but a filter built here describes what the user
+    // is looking at — `view` is the plane-scoped, already-filtered set, so ids
+    // picked on another image stay out of the layer.
+    const viewIds = new Set(view.map((a) => a.id));
+    const inView = (ids: string[]) => ids.filter((id) => viewIds.has(id));
     const layer = filterLayer
       ? {
           enabled: true,
-          mode,
+          // An update never rewrites the layer's mode — that is edited on the
+          // layer's own row.
+          mode: filterLayer.mode,
           catIds: [...new Set([...filterLayer.catIds, ...newCatIds])],
           kindIds: [...new Set([...filterLayer.kindIds, ...newKindIds])],
           features: mergeFeatureRanges(filterLayer.features, activeFeats),
           // Manual picks carry into the layer so what was highlighted is what
           // gets filtered. On a hide layer the predicate is negated, so an
           // include hides exactly that annotation and an exclude exempts it.
-          includeIds: [...new Set([...filterLayer.includeIds, ...includeIds])],
-          excludeIds: [...new Set([...filterLayer.excludeIds, ...excludeIds])],
+          includeIds: [
+            ...new Set([...filterLayer.includeIds, ...inView(includeIds)]),
+          ],
+          excludeIds: [
+            ...new Set([...filterLayer.excludeIds, ...inView(excludeIds)]),
+          ],
         }
       : {
           enabled: true,
-          mode,
+          // A layer is born keeping its matches; flip it on the row after.
+          mode: "keep" as LayerMode,
           catIds: newCatIds,
           kindIds: newKindIds,
           features: activeFeats,
-          includeIds: [...includeIds],
-          excludeIds: [...excludeIds],
+          includeIds: inView(includeIds),
+          excludeIds: inView(excludeIds),
         };
     batch(() => {
       dispatch(imageViewerDataSlice.actions.setFilterLayer(layer));
       dispatch(imageViewerDataSlice.actions.clearSelectionLayer());
     });
+  };
+
+  const handleSetFilterMode = (mode: LayerMode) => {
+    dispatch(imageViewerDataSlice.actions.setFilterLayerMode(mode));
   };
 
   const handleToggleFilter = () => {
@@ -247,8 +260,6 @@ export const useAnnotationSelection = () => {
     relativeFeatures,
     planeScope,
     setPlaneScope,
-    mode,
-    setMode,
     view,
     groups,
     anySel,
@@ -257,6 +268,7 @@ export const useAnnotationSelection = () => {
     selSummary,
     selectAll,
     clearSel,
+    handleSetFilterMode,
     handleApplyFilter,
     handleToggleFilter,
     handleDeleteFilter,

@@ -25,8 +25,6 @@ export const AnnotationSection = () => {
     relativeFeatures,
     planeScope,
     setPlaneScope,
-    mode,
-    setMode,
     view,
     groups,
     anySel,
@@ -35,6 +33,7 @@ export const AnnotationSection = () => {
     selSummary,
     selectAll,
     clearSel,
+    handleSetFilterMode,
     handleApplyFilter,
     handleToggleFilter,
     handleDeleteFilter,
@@ -140,8 +139,7 @@ export const AnnotationSection = () => {
           kinds={kinds}
           layer={filterLayer}
           viewCount={view.length}
-          mode={mode}
-          onMode={setMode}
+          onMode={handleSetFilterMode}
           onApply={handleApplyFilter}
           onToggle={handleToggleFilter}
           onDelete={handleDeleteFilter}

@@ -37,9 +37,13 @@ function FeatureRow({ cfg, f, onToggle, onCommit }: FeatureRowProps) {
   const [live, setLive] = useState<[number, number]>([f.min, f.max]);
   const [showSlider, setShowSlider] = useState(f.active);
 
+  // Clamped to this image's bounds: a range survives an image switch, so one
+  // dragged to a larger image's maximum would otherwise print a number the
+  // slider cannot reach. The stored criterion is untouched — a max above every
+  // value here simply matches everything.
   useEffect(() => {
-    setLive([f.min, f.max]);
-  }, [f.min, f.max]);
+    setLive([Math.max(f.min, cfg.bounds[0]), Math.min(f.max, cfg.bounds[1])]);
+  }, [f.min, f.max, cfg.bounds]);
 
   return (
     <Box

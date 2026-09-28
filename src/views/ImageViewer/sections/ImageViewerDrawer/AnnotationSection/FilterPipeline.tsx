@@ -2,7 +2,6 @@ import {
   alpha,
   Box,
   Button,
-  Chip,
   IconButton,
   Switch,
   ToggleButton,
@@ -57,27 +56,32 @@ const formatLayerLabel = (
   );
 };
 
-const modeChip = {
-  keep: { label: "KEEP", palette: "success" as const },
-  hide: { label: "HIDE", palette: "warning" as const },
-};
-
 interface LayerRowProps {
   layer: FilterLayer;
   kinds: ExtendedKind[];
   remaining: number;
+  onMode: (mode: LayerMode) => void;
   onToggle: () => void;
   onDelete: () => void;
 }
+
+const ROW_BOX_STYLE = {
+  minWidth: 0,
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  minHeight: "100%",
+  gap: 1,
+};
 
 function LayerRow({
   layer,
   kinds,
   remaining,
+  onMode,
   onToggle,
   onDelete,
 }: LayerRowProps) {
-  const chip = modeChip[layer.mode];
   return (
     <Box
       sx={(theme) => ({
@@ -93,20 +97,13 @@ function LayerRow({
         opacity: layer.enabled ? 1 : 0.7,
       })}
     >
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box sx={ROW_BOX_STYLE}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-          <Chip
-            label={chip.label}
-            size="small"
-            sx={(theme) => ({
-              height: 18,
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: ".4px",
-              "& .MuiChip-label": { px: 0.75 },
-              bgcolor: alpha(theme.palette[chip.palette].main, 0.14),
-              color: theme.palette[chip.palette].main,
-            })}
+          <Switch
+            size="x-small"
+            checked={layer.enabled}
+            onClick={(e) => e.stopPropagation()}
+            onChange={onToggle}
           />
           <Typography
             noWrap
@@ -118,6 +115,7 @@ function LayerRow({
             {formatLayerLabel(layer, kinds)}
           </Typography>
         </Box>
+
         <Typography
           sx={{
             fontSize: 10.5,
@@ -130,21 +128,65 @@ function LayerRow({
           {`→ ${remaining} in view`}
         </Typography>
       </Box>
-      <Switch
-        size="small"
-        checked={layer.enabled}
-        onClick={(e) => e.stopPropagation()}
-        onChange={onToggle}
-      />
-      <IconButton
-        size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-      >
-        <CloseIcon sx={{ fontSize: 17 }} />
-      </IconButton>
+      <Box sx={{ ...ROW_BOX_STYLE, alignItems: "flex-end" }}>
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          sx={{ p: 0 }}
+        >
+          <CloseIcon sx={{ fontSize: 17 }} />
+        </IconButton>
+        <ToggleButtonGroup
+          exclusive
+          size="small"
+          value={layer.mode}
+          onChange={(e: MouseEvent<HTMLElement>, v: LayerMode | null) => {
+            e.stopPropagation();
+            if (v) onMode(v);
+          }}
+          sx={{
+            height: 20,
+            "& .MuiButtonBase-root": {
+              px: 1,
+              py: 0,
+              fontSize: "0.65rem",
+              lineHeight: 1,
+            },
+          }}
+        >
+          <ToggleButton
+            value="keep"
+            sx={(theme) => ({
+              "&.Mui-selected": {
+                bgcolor: alpha(theme.palette.success.main, 0.24),
+                color: theme.palette.success.main,
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.success.dark, 0.24),
+                },
+              },
+            })}
+          >
+            Keep
+          </ToggleButton>
+          <ToggleButton
+            value="hide"
+            sx={(theme) => ({
+              "&.Mui-selected": {
+                bgcolor: alpha(theme.palette.warning.main, 0.24),
+                color: theme.palette.warning.main,
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.warning.dark, 0.24),
+                },
+              },
+            })}
+          >
+            Hide
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
     </Box>
   );
 }
@@ -154,7 +196,6 @@ interface FilterPipelineProps {
   layer: FilterLayer | undefined;
   viewCount: number;
   anySel: boolean;
-  mode: LayerMode;
   onMode: (mode: LayerMode) => void;
   onApply: () => void;
   onToggle: () => void;
@@ -165,13 +206,15 @@ interface FilterPipelineProps {
  * The single non-destructive filter layer. Applying the current selection
  * creates the layer if none exists, or merges it into the existing one
  * (union of categories/kinds, feature ranges overwritten by key).
+ *
+ * A new layer is always created as `keep`; whether it keeps or hides is a
+ * property of the layer, flipped on its own row once it exists.
  */
 export const FilterPipeline = ({
   kinds,
   layer,
   viewCount,
   anySel,
-  mode,
   onMode,
   onApply,
   onToggle,
@@ -190,7 +233,7 @@ export const FilterPipeline = ({
         borderColor: "divider",
         px: 1.5,
         py: 1,
-        height: theme.spacing(17),
+        minHeight: theme.spacing(17),
       })}
       data-help={HelpItem.AnnotationFilterSection}
     >
@@ -239,71 +282,28 @@ export const FilterPipeline = ({
           layer={layer}
           kinds={kinds}
           remaining={viewCount}
+          onMode={onMode}
           onToggle={onToggle}
           onDelete={onDelete}
         />
       )}
 
       {/* promote selection → filter */}
-      <Box sx={{ display: "flex", gap: 1 }}>
-        <ToggleButtonGroup
-          exclusive
-          size="small"
-          value={mode}
-          onChange={(_: MouseEvent<HTMLElement>, v: LayerMode | null) =>
-            v && onMode(v)
-          }
-          sx={{
-            height: 28,
-            "& .MuiButtonBase-root": {
-              py: 0,
-              fontSize: "0.75rem",
-            },
-          }}
-        >
-          <ToggleButton
-            value="keep"
-            sx={{
-              px: 1.5,
-              py: 0,
-              "&.Mui-selected": {
-                bgcolor: "success.dark",
-                "&:hover": { bgcolor: "success.dark" },
-              },
-            }}
-          >
-            Keep
-          </ToggleButton>
-          <ToggleButton
-            value="hide"
-            sx={{
-              px: 1.5,
-              py: 0,
-              "&.Mui-selected": {
-                bgcolor: "warning.dark",
-                "&:hover": { bgcolor: "warning.dark" },
-              },
-            }}
-          >
-            Hide
-          </ToggleButton>
-        </ToggleButtonGroup>
-        <Button
-          fullWidth
-          variant="contained"
-          disabled={!anySel}
-          color="primary"
-          startIcon={<LibraryAddIcon />}
-          onClick={onApply}
-          size="small"
-          sx={{
-            fontSize: "0.75rem",
-            height: 28,
-          }}
-        >
-          {layer ? "Update Filter" : "Create Filter"}
-        </Button>
-      </Box>
+      <Button
+        fullWidth
+        variant="contained"
+        disabled={!anySel}
+        color="primary"
+        startIcon={<LibraryAddIcon />}
+        onClick={onApply}
+        size="small"
+        sx={{
+          fontSize: "0.75rem",
+          height: 28,
+        }}
+      >
+        {layer ? "Update Filter" : "Create Filter"}
+      </Button>
     </Box>
   );
 };

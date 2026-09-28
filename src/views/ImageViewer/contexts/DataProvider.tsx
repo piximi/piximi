@@ -10,6 +10,9 @@ import { dataSlice } from "store/data";
 
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 
+import { annotatorSlice } from "../state/annotator";
+import { ToolType } from "../utils/enums";
+
 import type { ReactNode } from "react";
 
 import type { UnsubscribeListener } from "@reduxjs/toolkit";
@@ -58,13 +61,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       );
       // Annotations hand-picked in the ProjectViewer match no category or
       // feature criterion, so they seed the sticky include set.
-      if (initialAnnotationIds.length)
+      if (initialAnnotationIds.length) {
+        dispatch(annotatorSlice.actions.setToolType(ToolType.Pointer));
         dispatch(
           imageViewerDataSlice.actions.toggleAnnotationSelection({
             ids: initialAnnotationIds,
             on: true,
           }),
         );
+      }
     });
   }, [routerLocation.state]);
   return (
