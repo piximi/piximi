@@ -30,10 +30,10 @@ import { SettingsButton } from "components/app-drawer/application-settings/Setti
 import { SendFeedbackButton } from "components/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/app-drawer/HelpButton";
 
+import { HelpItem } from "help/HelpContent";
+
 import { DIMENSIONS } from "utils/constants";
 import { capitalize } from "utils/stringUtils";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { ItemFilters } from "@ProjectViewer/components/";
 import { selectActiveStateIsFiltered } from "@ProjectViewer/state/selectors";

@@ -6,7 +6,7 @@ import { useNumberField } from "hooks";
 
 import { WithLabel } from "components/inputs";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 

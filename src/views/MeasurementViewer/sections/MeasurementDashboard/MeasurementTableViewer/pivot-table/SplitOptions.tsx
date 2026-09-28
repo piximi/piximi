@@ -1,6 +1,6 @@
 import { Box, Divider, Typography } from "@mui/material";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import { PivotConfigurator } from "./PivotConfigurator";
 

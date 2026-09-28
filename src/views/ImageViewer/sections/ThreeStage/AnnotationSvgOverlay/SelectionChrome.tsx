@@ -16,9 +16,9 @@ import { useHotkeys, useTranslation } from "hooks";
 
 import { ToolButton } from "components/inputs";
 
-import { HotkeyContext } from "utils/enums";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HotkeyContext } from "utils/enums";
 
 import {
   CombineAnnotationsIcon,

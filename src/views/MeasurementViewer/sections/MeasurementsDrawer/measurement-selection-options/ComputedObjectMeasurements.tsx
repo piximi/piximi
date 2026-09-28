@@ -6,10 +6,10 @@ import { Box } from "@mui/material";
 
 import { OBJECT_FEATURES } from "core/entities";
 
+import { HelpItem } from "help/HelpContent";
+
 import { getDifferences } from "utils/arrayUtils";
 import { formatString } from "utils/stringUtils";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { measurementsSlice } from "@MeasurementViewer/state";
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";

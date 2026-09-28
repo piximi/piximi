@@ -6,9 +6,9 @@ import { IconButton, Tooltip } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
-import { HotkeyContext } from "utils/enums";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HotkeyContext } from "utils/enums";
 
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { annotatorSlice } from "views/ImageViewer/state/annotator";

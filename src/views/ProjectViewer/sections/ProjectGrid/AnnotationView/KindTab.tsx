@@ -11,7 +11,7 @@ import { representsUnknown } from "core/entities";
 
 import { TextFieldWithBlur } from "components/inputs";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import type React from "react";
 

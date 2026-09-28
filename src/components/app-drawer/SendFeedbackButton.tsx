@@ -12,10 +12,10 @@ import { useDialog, useTranslation } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
 
+import { HelpItem } from "help/HelpContent";
+
 import { createGitHubIssue } from "utils/logUtils";
 import { AlertType } from "utils/enums";
-
-import { HelpItem } from "data/help/HelpContent";
 
 type SendFeedbackDialogProps = {
   onClose: () => void;

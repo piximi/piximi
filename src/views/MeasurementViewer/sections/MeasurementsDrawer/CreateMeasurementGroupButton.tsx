@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 export const CreateMeasurementGroupButton = ({
   handleOpenTableDialog,

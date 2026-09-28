@@ -38,11 +38,10 @@ import { useDialogHotkey } from "hooks";
 import { ConfirmationDialog } from "components/dialogs";
 
 import { dataSlice } from "store/data";
+import { HelpItem } from "help/HelpContent";
 
 import { getCategoryIconStyle } from "utils/styleUtils";
 import { HotkeyContext } from "utils/enums";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";

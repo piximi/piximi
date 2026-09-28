@@ -15,12 +15,12 @@ import { HelpProvider } from "contexts";
 import { AlertBar, TaskProgressToasts } from "components/app-shell";
 
 import { selectAlertState } from "store/applicationSettings/selectors";
+import HelpOverlay from "help/HelpOverlay";
 
 import { ProjectViewer } from "views/ProjectViewer";
 import { ImageViewer } from "views/ImageViewer";
 import { MeasurementView } from "views/MeasurementViewer";
 
-import HelpOverlay from "./HelpOverlay";
 import { WelcomeScreen } from "./WelcomeScreen";
 
 export const Application = () => {

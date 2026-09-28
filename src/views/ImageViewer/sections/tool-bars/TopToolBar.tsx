@@ -19,9 +19,9 @@ import { useTranslation } from "hooks";
 
 import { ToolButton } from "components/inputs";
 
-import { DIMENSIONS } from "utils/constants";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { DIMENSIONS } from "utils/constants";
 
 import { CursorZoom, StageZoom } from "icons";
 

@@ -4,9 +4,9 @@ import { useDialogHotkey } from "hooks";
 
 import { SaveProjectDialog } from "components/dialogs";
 
-import { HotkeyContext } from "utils/enums";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HotkeyContext } from "utils/enums";
 
 import { TooltipTextButton } from "@ProjectViewer/components";
 

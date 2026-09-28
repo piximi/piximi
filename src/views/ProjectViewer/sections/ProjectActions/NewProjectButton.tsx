@@ -3,10 +3,9 @@ import { useDispatch } from "react-redux";
 import AddIcon from "@mui/icons-material/Add";
 
 import { projectReset } from "store/actions";
+import { HelpItem } from "help/HelpContent";
 
 import { clearCache } from "utils/renderedSrcsCache";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { TooltipTextButton } from "@ProjectViewer/components";
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";

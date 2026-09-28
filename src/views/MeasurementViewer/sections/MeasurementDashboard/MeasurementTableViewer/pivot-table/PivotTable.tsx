@@ -11,8 +11,7 @@ import {
   selectCategoryEntities,
   selectExtendedImageEntities,
 } from "store/data/selectors";
-
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import { selectActivePivotItems } from "@MeasurementViewer/state/selectors";
 import { selectActiveMeasuredEntitiesGroup } from "@MeasurementViewer/state/reselectors";

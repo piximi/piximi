@@ -8,8 +8,7 @@ import { TextFieldWithBlur } from "components/inputs";
 
 import { selectExperiment } from "store/data/selectors";
 import { dataSlice } from "store/data";
-
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 export const ExperimentNameTextField = () => {
   const dispatch = useDispatch();

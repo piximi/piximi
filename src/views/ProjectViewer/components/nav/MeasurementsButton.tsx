@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Straighten as StraightenIcon } from "@mui/icons-material";
 
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import { NavChip } from "./NavChip";
 

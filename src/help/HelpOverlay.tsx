@@ -17,12 +17,12 @@ import { Lock as LockIcon } from "@mui/icons-material";
 
 import { useHelp } from "contexts";
 
+import { helpContent } from "help/HelpContent";
+
 import { logger } from "utils/logUtils";
 import { formatString } from "utils/stringUtils";
 
-import { helpContent } from "data/help/HelpContent";
-
-import type { HelpItem } from "data/help/HelpContent";
+import type { HelpItem } from "help/HelpContent";
 
 // MUI only blocks real clicks on disabled elements that render as a native
 // <button> (via the HTML `disabled` attribute); components that render as a

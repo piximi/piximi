@@ -6,9 +6,9 @@ import { LossFunction as LossFunctionEnum } from "core/dl/enums";
 
 import { StyledSelect, WithLabel } from "components/inputs";
 
-import { enumKeys } from "utils/objectUtils";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { enumKeys } from "utils/objectUtils";
 
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 

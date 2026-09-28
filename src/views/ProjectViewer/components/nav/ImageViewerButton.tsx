@@ -6,8 +6,7 @@ import { useSelector } from "react-redux";
 import { ImageSearch as GestureIcon } from "@mui/icons-material";
 
 import { selectAnnotationEntities } from "store/data/selectors";
-
-import { HelpItem } from "data/help/HelpContent";
+import { HelpItem } from "help/HelpContent";
 
 import {
   selectKindStates,

@@ -11,9 +11,9 @@ import {
   InteractivePopoverToolButton,
 } from "components/inputs";
 
-import { DIMENSIONS } from "utils/constants";
+import { HelpItem } from "help/HelpContent";
 
-import { HelpItem } from "data/help/HelpContent";
+import { DIMENSIONS } from "utils/constants";
 
 import {
   ColorAnnotation,

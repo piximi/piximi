@@ -23,10 +23,10 @@ import { SettingsButton } from "components/app-drawer/application-settings/Setti
 import { SendFeedbackButton } from "components/app-drawer/SendFeedbackButton";
 import { HelpButton } from "components/app-drawer/HelpButton";
 
+import { HelpItem } from "help/HelpContent";
+
 import { capitalize } from "utils/stringUtils";
 import { DIMENSIONS } from "utils/constants";
-
-import { HelpItem } from "data/help/HelpContent";
 
 import { ImageList } from "../ImageViewerDrawer/ImageSection";
 import { MobileCategoriesPanel } from "../ImageViewerDrawer/AnnotationSection/MobileCategoriesPanel";
