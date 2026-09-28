@@ -1,5 +1,7 @@
 import type { AnnotationObject } from "core/entities";
 
+import type { HelpItem } from "help/HelpContent";
+
 import type { LoadCB } from "utils/types";
 
 import type { CHANNEL_MODE } from "./optionUtils";
@@ -50,7 +52,8 @@ type SegmenterOptionCondition = {
 type SegmenterOptionFieldBase = {
   key: string;
   label: string;
-  help?: string;
+  help?: HelpItem;
+  tooltip?: string;
   advanced?: boolean;
   visibleWhen?: SegmenterOptionCondition;
 };

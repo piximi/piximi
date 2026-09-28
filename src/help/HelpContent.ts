@@ -38,6 +38,15 @@ export enum HelpItem {
   TrainPercentage = "train-percentage",
   DataShuffling = "data-shuffling",
   ModelArchitecture = "model-architecture",
+  // Project Viewer -- Segmenter Options
+  ModelInput = "model-input",
+  ImageSource = "image-source",
+  CellposeDiameter = "cellpose-cell-diameter",
+  CellposeCellProbability = "cellpose-cell-probability-threshold",
+  CellposeChannelMode = "cellpose-channel-mode",
+  CellposePrimaryChannel = "cellpose-primary-channel",
+  CellposeSecondaryChannel = "cellpose-secondary-channel",
+  CellposeResample = "cellpose-resample",
   // Project Viewer -- Right-Bar
   FilterImageGrid = "filter-image-grid",
   GridItemInfo = "grid-item-info",
@@ -235,6 +244,38 @@ This is expecially true when cropping the images prior to training.
 `,
   [HelpItem.ModelArchitecture]: `
 Model architecture refers to the algorithm will our model use to compute its answers.`,
+  [HelpItem.ModelInput]: `
+The inputs handed to the segmentation model, listed in the order the model receives them.\n
+Some models expect an exact number of inputs, in which case every row must be filled. Others accept as many channels as you send, in which case you can append a row with **+ Add channel** or drop one with the remove button beside it.\n
+Use the **Image Source** column to choose which image channel feeds each row.`,
+  [HelpItem.ImageSource]: `
+The channel from your image that feeds the model input on the same row.\n
+Every channel in the project is available here, and the same channel can be sent to more than one input - useful when a model expects more channels than your image actually has.`,
+  [HelpItem.CellposeDiameter]: `
+The diameter, in pixels, of a typical cell in your images.\n
+Cellpose-SAM was trained on cells whose median diameter is about 30 px, so setting this value rescales the image to match that scale before segmenting.\n
+* Leave the field **empty** (*Auto*) to segment at the image's native resolution. This is the recommended starting point for Cellpose-SAM, which copes with a wide range of cell sizes on its own.
+* Set a value when your objects are much larger or smaller than the model expects, and *Auto* is under- or over-segmenting them.`,
+  [HelpItem.CellposeCellProbability]: `
+The cutoff applied to the model's per-pixel cell probability map when deciding which pixels belong to a cell.\n
+* **Lower** values (towards -6) accept more pixels, giving **more and larger** masks. Use this when cells are being missed or clipped.
+* **Higher** values (towards 6) accept fewer pixels, giving **fewer and smaller** masks. Use this when background is being picked up as cells.\n
+A value of 0 is the Cellpose default and a good place to start.`,
+  [HelpItem.CellposeChannelMode]: `
+How the channels you select are handed to the model.\n
+**Pass through** (*recommended*): The selected channels are sent as-is. Cellpose-SAM is channel-agnostic and normalizes each channel independently, so it does not need to be told which channel is which.\n
+**Legacy (chan / chan2)**: Exposes the Cellpose 1-3 primary/secondary channel mapping. Use this only to reproduce a parameter set lifted from an existing Cellpose pipeline.\n
+*In legacy mode, a **Primary** of "Grayscale (mean)" averages the sent channels into a single plane. That is only correct when they carry the same signal (e.g. an RGB brightfield photo) - never use it for distinct fluorescence markers.*`,
+  [HelpItem.CellposePrimaryChannel]: `
+The channel Cellpose segments on in legacy mode. Pick the slot holding the cytoplasm (or whole-cell) signal.\n
+**Grayscale (mean)** averages the sent channels into one plane. This is only correct when they are the same signal (e.g. an RGB brightfield photo). ***Never use this for distinct fluorescence markers***, as averaging them blends unrelated structures together.`,
+  [HelpItem.CellposeSecondaryChannel]: `
+An optional nuclear channel, used in legacy mode to help Cellpose separate touching cells.\n
+Pick the slot holding the nuclear stain, or leave it as **None** if you do not have one.`,
+  [HelpItem.CellposeResample]: `
+Runs the flow dynamics at the image's source resolution instead of at the downsampled resolution the network sees.\n
+This gives smoother, more accurate mask outlines at the cost of extra computation.\n
+***Only has an effect when a cell diameter is set*** - without a diameter the image is never rescaled, so there is nothing to resample.`,
   [HelpItem.ExportAnnotation]: `
 Save annotations locally. Choose from a list of formats.`,
   [HelpItem.NavigateProjectView]: `

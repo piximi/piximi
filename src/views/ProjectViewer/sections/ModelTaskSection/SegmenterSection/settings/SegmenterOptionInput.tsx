@@ -22,6 +22,8 @@ import type {
   SegmenterChannelOptionField,
 } from "core/dl/segmentation/types";
 
+import type { HelpItem } from "help/HelpContent";
+
 const LABEL_SX = { flexShrink: 0, mr: 1, whiteSpace: "nowrap" } as const;
 
 /*
@@ -33,25 +35,33 @@ export type SegmenterOptionLayout = "row" | "grid";
 
 const Row = ({
   label,
+  tooltip,
   help,
   layout,
   children,
 }: {
   label: string;
-  help?: string;
+  tooltip?: string;
+  help?: HelpItem;
   layout: SegmenterOptionLayout;
   children: React.ReactNode;
 }) => {
+  /*
+   * `grid` has no wrapper to hang `data-help` on without breaking the parent's
+   * column alignment, so there the label carries it; `row` puts it on the
+   * wrapper so the whole row is one help target, control included.
+   */
   const labelNode = (
     <Tooltip
-      title={help ?? ""}
+      title={tooltip ?? ""}
       placement="top-start"
-      disableHoverListener={!help}
+      disableHoverListener={!tooltip}
     >
       <Typography
         variant="caption"
         color="text.secondary"
         sx={layout === "grid" ? undefined : LABEL_SX}
+        data-help={layout === "grid" ? help : undefined}
       >
         {label}
       </Typography>
@@ -68,6 +78,7 @@ const Row = ({
     </Fragment>
   ) : (
     <Box
+      data-help={help}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -147,7 +158,12 @@ export const SegmenterOptionInput = ({
   switch (field.type) {
     case "boolean":
       return (
-        <Row label={field.label} help={field.help} layout={layout}>
+        <Row
+          label={field.label}
+          tooltip={field.tooltip}
+          help={field.help}
+          layout={layout}
+        >
           <Switch
             size="small"
             checked={value === true}
@@ -160,7 +176,12 @@ export const SegmenterOptionInput = ({
 
     case "select":
       return (
-        <Row label={field.label} help={field.help} layout={layout}>
+        <Row
+          label={field.label}
+          tooltip={field.tooltip}
+          help={field.help}
+          layout={layout}
+        >
           <StyledSelect
             value={typeof value === "string" ? value : field.default}
             onChange={(event) =>
@@ -189,7 +210,12 @@ export const SegmenterOptionInput = ({
         const current =
           typeof value === "number" ? value : (field.default ?? 0);
         return (
-          <Row label={field.label} help={field.help} layout={layout}>
+          <Row
+            label={field.label}
+            tooltip={field.tooltip}
+            help={field.help}
+            layout={layout}
+          >
             <Box
               sx={{
                 display: "flex",
@@ -220,7 +246,12 @@ export const SegmenterOptionInput = ({
         );
       }
       return (
-        <Row label={field.label} help={field.help} layout={layout}>
+        <Row
+          label={field.label}
+          tooltip={field.tooltip}
+          help={field.help}
+          layout={layout}
+        >
           <TextFieldWithBlur
             onChange={(event) => setDraft(event.target.value)}
             onBlur={handleTextFieldBlur}
@@ -271,7 +302,12 @@ const ChannelIndexInput = ({
     }
   }, [field, value, sentChannels.length, setOptionValue]);
   return (
-    <Row label={field.label} help={field.help} layout={layout}>
+    <Row
+      label={field.label}
+      tooltip={field.tooltip}
+      help={field.help}
+      layout={layout}
+    >
       <StyledSelect
         value={typeof value === "number" ? value : field.default}
         onChange={(event) =>

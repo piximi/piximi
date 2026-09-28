@@ -1,3 +1,5 @@
+import { HelpItem } from "help/HelpContent";
+
 import {
   type SegmenterOptionSchema,
   type SegmenterOptionValues,
@@ -20,11 +22,6 @@ import type { SegmentOptions } from "cellpose-js";
 /* `tile` is pinned: CPSAM's position embeddings are baked at 256. */
 const TILE_SIZE = 256;
 
-const GRAYSCALE_WARNING =
-  "Averages the sent channels into one plane. Only correct when they are the " +
-  "same signal (e.g. an RGB brightfield photo). Never use this for distinct " +
-  "fluorescence markers.";
-
 const LEGACY_ONLY = {
   key: CHANNEL_MODE_KEY,
   equals: CHANNEL_MODE.LEGACY,
@@ -46,10 +43,10 @@ export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
           max: 500,
           step: 1,
           control: "text",
-          help:
-            "Rescales the image so the median cell spans ~30 px, the size " +
-            "Cellpose-SAM was trained on. Leave empty to segment at native " +
-            "resolution.",
+          help: HelpItem.CellposeDiameter,
+          tooltip:
+            "Rescales the image so the median cell spans ~30 px. Leave " +
+            "empty to segment at native resolution.",
         },
         {
           key: "cellprobThreshold",
@@ -61,7 +58,9 @@ export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
           step: 0.1,
           precision: 1,
           control: "slider",
-          help: "Lower values yield more and larger masks; higher values fewer.",
+          help: HelpItem.CellposeCellProbability,
+          tooltip:
+            "Lower values yield more and larger masks; higher values fewer.",
         },
       ],
     },
@@ -83,12 +82,11 @@ export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
             },
             { value: CHANNEL_MODE.LEGACY, label: "Legacy (chan / chan2)" },
           ],
-          help:
-            "Cellpose-SAM is channel-agnostic and normalizes each channel " +
-            "independently, so passthrough suits it best. Legacy exposes the " +
-            "Cellpose 1-3 primary/secondary mapping for parameter sets lifted " +
-            "from an existing pipeline. " +
-            GRAYSCALE_WARNING,
+          help: HelpItem.CellposeChannelMode,
+          tooltip:
+            "Passthrough sends the selected channels as-is, which suits " +
+            "Cellpose-SAM best. Legacy exposes the Cellpose 1-3 " +
+            "primary/secondary mapping.",
         },
         {
           key: "chan",
@@ -97,7 +95,10 @@ export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
           default: 0,
           zeroLabel: "Grayscale (mean)",
           visibleWhen: LEGACY_ONLY,
-          help: GRAYSCALE_WARNING,
+          help: HelpItem.CellposePrimaryChannel,
+          tooltip:
+            "Channel to segment on. Grayscale averages the sent channels " +
+            "into one plane; never use it for distinct markers.",
         },
         {
           key: "chan2",
@@ -106,7 +107,8 @@ export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
           default: 0,
           zeroLabel: "None",
           visibleWhen: LEGACY_ONLY,
-          help: "Optional nuclear channel.",
+          help: HelpItem.CellposeSecondaryChannel,
+          tooltip: "Optional nuclear channel.",
         },
       ],
     },
@@ -120,7 +122,10 @@ export const CELLPOSE_OPTION_SCHEMA: SegmenterOptionSchema = {
           type: "boolean",
           default: false,
           advanced: true,
-          help: "Only has an effect when a cell diameter is set.",
+          help: HelpItem.CellposeResample,
+          tooltip:
+            "Smoother outlines at the source resolution. Only has an effect " +
+            "when a cell diameter is set.",
         },
         {
           key: "niter",
