@@ -20,7 +20,7 @@ import { useMeasurementsApi } from "utils/measurements/hooks/useMeasurementsApi"
 
 import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
 
-import { useSegmenterStatus } from "../contexts/SegmenterStatusProvider";
+import { useSegmenter } from "./useSegmenter";
 
 import type {
   AnnotationCategory,
@@ -43,7 +43,7 @@ export const usePredictSegmenter = () => {
   const selectedImages = useSelector(selectSelectedImages);
   const kinds = useSelector(selectAllKinds);
   const { setModelStatus, loadedModel, channelSelection, optionValues, error } =
-    useSegmenterStatus();
+    useSegmenter();
   const segApi = useSegmenterApi();
   const measurementsApi = useMeasurementsApi();
   const Cancel = new CancelSource();

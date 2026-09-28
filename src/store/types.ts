@@ -18,6 +18,7 @@ import type { MeasurementsState } from "views/MeasurementViewer/types";
 
 import type { ImageViewerDataState } from "@ImageViewer/state/types";
 
+import type { SegmenterSliceState } from "./segmenter/types";
 import type { DataStateV2 } from "./data/types";
 import type { AppTasksState } from "./appTasks/types";
 import type { ClassifierState } from "./classifier/types";
@@ -46,6 +47,7 @@ type AppState = {
   data: DataStateV2;
   measurements: MeasurementsState;
   appTasks: AppTasksState;
+  segmenter: SegmenterSliceState;
 };
 
 export type AppDispatch = Dispatch<UnknownAction>;

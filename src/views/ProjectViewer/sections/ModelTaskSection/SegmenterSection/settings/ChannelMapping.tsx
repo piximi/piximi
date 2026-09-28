@@ -16,14 +16,13 @@ import {
   CHANNEL_MODE_KEY,
   CHANNEL_MODE,
 } from "core/dl/segmentation/optionUtils";
+import { channelSlotCap } from "core/dl/segmentation/channelUtils";
 
 import { StyledSelect } from "components/inputs";
 
 import { arrayRange } from "utils/arrayUtils";
 
-import { channelSlotCap } from "views/ProjectViewer/utils/channelUtils";
-
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { SegmenterOptionInput } from "./SegmenterOptionInput";
 
@@ -61,8 +60,10 @@ export const ChannelMapping = () => {
     channelMetas,
     channelSelection,
     setChannelSelection,
+    removeChannelSelection,
+    addChannelSelection,
     optionValues,
-  } = useSegmenterStatus();
+  } = useSegmenter();
 
   const availableChannels = useMemo(
     () => Object.values(channelMetas),
@@ -90,13 +91,7 @@ export const ChannelMapping = () => {
 
   const setSlot = (event: SelectChangeEvent<unknown>, slotIndex: number) => {
     const channelId = event.target.value as string;
-    setChannelSelection((selection) => {
-      const current = selection;
-      if (current[slotIndex] === channelId) return selection;
-      const channelIds = [...current];
-      channelIds[slotIndex] = channelId;
-      return channelIds;
-    });
+    setChannelSelection(slotIndex, channelId);
   };
 
   if (!loadedModel || availableChannels.length === 0) return null;
@@ -186,9 +181,7 @@ export const ChannelMapping = () => {
                   size="small"
                   aria-label={`Remove slot ${idx + 1}`}
                   disabled={explicitIds.length <= 1}
-                  onClick={() =>
-                    setChannelSelection(explicitIds.filter((_, i) => i !== idx))
-                  }
+                  onClick={() => removeChannelSelection(idx)}
                 >
                   <CloseIcon sx={{ fontSize: 14 }} />
                 </IconButton>
@@ -203,17 +196,7 @@ export const ChannelMapping = () => {
                   variant="caption"
                   color="primary"
                   sx={{ cursor: "pointer" }}
-                  onClick={() =>
-                    setChannelSelection([
-                      ...explicitIds,
-                      availableChannels[
-                        Math.min(
-                          explicitIds.length,
-                          availableChannels.length - 1,
-                        )
-                      ].id,
-                    ])
-                  }
+                  onClick={addChannelSelection}
                 >
                   + Add channel
                 </Typography>

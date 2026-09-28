@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
-
+import { CHANNEL_MODE } from "./optionUtils";
 import {
   channelSlotCap,
   getDefaultChannelIds,

@@ -8,13 +8,13 @@ import { HelpItem } from "data/help/HelpContent";
 
 import { TooltipTextButton } from "views/ProjectViewer/components";
 
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { LoadSegmentationModelDialog } from "./LoadSegmentationModelDialog";
 import { SegmenterOptions } from "./SegmentationOptions";
 
 export const ModelInfo = () => {
-  const { loadedModel } = useSegmenterStatus();
+  const { loadedModel } = useSegmenter();
   const {
     onClose: onCloseImportSegmenterDialog,
     onOpen: onOpenImportSegmenterDialog,

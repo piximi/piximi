@@ -2,7 +2,7 @@ import { Box, Button, Collapse, Divider, Typography } from "@mui/material";
 
 import { isFieldVisible } from "core/dl/segmentation/optionUtils";
 
-import { useSegmenterStatus } from "@ProjectViewer/contexts/SegmenterStatusProvider";
+import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { SegmenterOptionInput } from "./SegmenterOptionInput";
 
@@ -18,7 +18,7 @@ export const SegmenterOptionsPanel = ({
 }: {
   showAdvanced: boolean;
 }) => {
-  const { optionValues, resetOptions, schema } = useSegmenterStatus();
+  const { optionValues, resetOptions, schema } = useSegmenter();
 
   const visible = (fields: SegmenterOptionField[], advanced: boolean) =>
     fields.filter(

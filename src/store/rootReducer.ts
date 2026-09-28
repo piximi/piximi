@@ -12,6 +12,7 @@ import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/image
 
 import { dataSlice } from "./data";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
+import { segmenterSlice } from "./segmenter/segmenterSlice";
 
 const reducers = {
   classifier: classifierSlice.reducer,
@@ -23,6 +24,7 @@ const reducers = {
   data: dataSlice.reducer,
   measurements: measurementsSlice.reducer,
   appTasks: appTasksSlice.reducer,
+  segmenter: segmenterSlice.reducer,
 };
 
 export const rootReducer = combineReducers(reducers);
