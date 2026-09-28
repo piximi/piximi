@@ -20,6 +20,8 @@ import { channelSlotCap } from "core/dl/segmentation/channelUtils";
 
 import { StyledSelect } from "components/inputs";
 
+import { HelpItem } from "help/HelpContent";
+
 import { arrayRange } from "utils/arrayUtils";
 
 import { useSegmenter } from "@ProjectViewer/hooks";
@@ -141,11 +143,21 @@ export const ChannelMapping = () => {
             px: 1,
           }}
         >
-          <Typography variant="caption" color="text.disabled" sx={HEADER_SX}>
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={HEADER_SX}
+            data-help={HelpItem.ModelInput}
+          >
             {policy.mode === CHANNEL_MODE.FIXED ? "Model Input" : "Slot"}
           </Typography>
           <Box />
-          <Typography variant="caption" color="text.disabled" sx={HEADER_SX}>
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={HEADER_SX}
+            data-help={HelpItem.ImageSource}
+          >
             Image Source
           </Typography>
           {policy.mode === CHANNEL_MODE.PASSTHROUGH && <Box />}
@@ -218,11 +230,21 @@ export const ChannelMapping = () => {
             px: 1,
           }}
         >
-          <Typography variant="caption" color="text.disabled" sx={HEADER_SX}>
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={HEADER_SX}
+            data-help={HelpItem.ModelInput}
+          >
             Model Input
           </Typography>
           <Box />
-          <Typography variant="caption" color="text.disabled" sx={HEADER_SX}>
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={HEADER_SX}
+            data-help={HelpItem.ImageSource}
+          >
             Image Source
           </Typography>
           <Divider sx={{ gridColumn: "1 / -1" }} />
