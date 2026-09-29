@@ -17,7 +17,6 @@ export {
   connectPoints,
   getOverlappingAnnotations,
   getAnnotationsInBox,
-  colorOverlayROI,
   hexToRGBA,
   getIdx,
   drawRectangle,
