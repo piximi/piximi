@@ -30,7 +30,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [savedData, setSavedData] = useState<DataStateV2>();
 
   useEffect(() => {
-    const initialDataState = productionStore.getState().dataV2;
+    const initialDataState = productionStore.getState().data;
 
     setSavedData(initialDataState);
     const unsubscribe = dispatch(
