@@ -5,6 +5,7 @@ import {
   channelSlotCap,
   getDefaultChannelIds,
   getSegmentedChannelNames,
+  reconcileChannelSelection,
 } from "./channelUtils";
 
 import type { ChannelMetaEntities } from "core/entities";
@@ -121,5 +122,65 @@ describe("getDefaultChannelIds", () => {
         [],
       ),
     ).toEqual([]);
+  });
+});
+
+/*
+ * `reconcileChannelSelection` is what lets a channel mapping survive a project
+ * save/load. Before it existed, `modelLoaded` reseeded defaults unconditionally,
+ * so a restored mapping was destroyed the moment the user loaded the model it
+ * belonged to. The assertions below pin the three ways a restored selection can
+ * legitimately go stale — an id the image no longer has, a `fixed` model whose
+ * count changed, and a `passthrough` selection that now exceeds its cap — while
+ * confirming an intact one is handed back untouched.
+ */
+describe("reconcileChannelSelection", () => {
+  const three = ["a", "b", "c"];
+  const fixed2 = { mode: CHANNEL_MODE.FIXED, count: 2 } as const;
+  const pass4 = { mode: CHANNEL_MODE.PASSTHROUGH, maxChannels: 4 } as const;
+
+  it("keeps a still-valid fixed selection, preserving the user's order", () => {
+    expect(reconcileChannelSelection(fixed2, ["c", "a"], three)).toEqual([
+      "c",
+      "a",
+    ]);
+  });
+
+  it("keeps a passthrough selection shorter than the cap", () => {
+    // `channelSlotRemoved` lets the user drop slots, so a short selection is
+    // deliberate, not damage.
+    expect(reconcileChannelSelection(pass4, ["b"], three)).toEqual(["b"]);
+  });
+
+  it("reseeds defaults when a selected id is no longer in the image", () => {
+    expect(reconcileChannelSelection(fixed2, ["a", "gone"], three)).toEqual([
+      "a",
+      "b",
+    ]);
+  });
+
+  it("reseeds defaults when a fixed model's count no longer matches", () => {
+    expect(reconcileChannelSelection(fixed2, ["a", "b", "c"], three)).toEqual([
+      "a",
+      "b",
+    ]);
+  });
+
+  it("reseeds defaults when a passthrough selection exceeds the cap", () => {
+    const pass2 = { mode: CHANNEL_MODE.PASSTHROUGH, maxChannels: 2 } as const;
+    expect(reconcileChannelSelection(pass2, three, three)).toEqual(["a", "b"]);
+  });
+
+  it("reseeds defaults for an empty selection, the fresh-state case", () => {
+    expect(reconcileChannelSelection(fixed2, [], three)).toEqual(["a", "b"]);
+  });
+
+  it("treats an unfilled fixed slot as stale rather than preserving it", () => {
+    // "" is the placeholder a short image leaves behind; it is never a real id,
+    // so it must not survive reconciliation.
+    expect(reconcileChannelSelection(fixed2, ["a", ""], three)).toEqual([
+      "a",
+      "b",
+    ]);
   });
 });

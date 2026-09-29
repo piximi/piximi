@@ -27,12 +27,17 @@ import {
   ZARR_V2_RUN,
   ZARR_V2_RUN_HISTORY_COLUMNS,
   ZARR_V2_RUNS,
+  ZARR_V2_SEGMENTER,
   ZARR_V2_SHAPE,
 } from "../../zarr/types";
 import { subProgress } from "../progress";
 
 import type { EntityState } from "@reduxjs/toolkit";
 
+import type {
+  SerializedSegmenterModelConfig,
+  SerializedSegmenterState,
+} from "core/file-io/project-saver/types";
 import type { Partition } from "core/dl/enums";
 import type {
   ModelArch,
@@ -53,6 +58,7 @@ import type {
   PredictionCorrection,
   Shape,
 } from "core/entities";
+import type { SegmenterOptionValues } from "core/dl/segmentation/types";
 
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
@@ -215,10 +221,13 @@ export const readV2 = async (
 
   const classifierGroup = await getGroup(rootGroup, ZARR_V2_GROUP.Classifier);
   const classifier = await readClassifier(classifierGroup);
+  const segmenterGroup = await getGroup(rootGroup, ZARR_V2_GROUP.Segmenter);
+  const segmenter = await readSegmenter(segmenterGroup);
   onProgress(STAGES.classifier.end);
 
   return {
     classifier,
+    segmenter,
     data: {
       experiment,
       imageSeries,
@@ -648,6 +657,51 @@ const readAnnotations = async (
       encodedMask: Array.from(masks.subarray(offsets[i], offsets[i + 1])),
     })),
   );
+};
+
+/*
+ * Inverse of the writer's `optionValueEntries`: `null` was `undefined`.
+ *
+ * The cast is the wire boundary — a file can hold anything. Values are checked
+ * for real in `hydrateSegmenterState`, which is where an unusable one gets
+ * dropped in favour of the model's default.
+ */
+const readOptionValues = (
+  entries: Array<[string, unknown]>,
+): SegmenterOptionValues =>
+  Object.fromEntries(
+    entries.map(([key, value]) => [key, value === null ? undefined : value]),
+  ) as SegmenterOptionValues;
+
+const readSegmenter = async (
+  segmenterGroup: Group,
+): Promise<SerializedSegmenterState> => {
+  const models = (await getAttr(
+    segmenterGroup,
+    ZARR_V2_SEGMENTER.Models,
+  )) as string[];
+  const channelSelections = (await getAttr(
+    segmenterGroup,
+    ZARR_V2_SEGMENTER.ChannelSelection,
+  )) as string[][];
+  const optionValues = (await getAttr(
+    segmenterGroup,
+    ZARR_V2_SEGMENTER.OptionValues,
+  )) as Array<Array<[string, unknown]>>;
+
+  const configs: SerializedSegmenterModelConfig[] = models.map((model, i) => ({
+    model,
+    channelSelection: channelSelections[i],
+    optionValues: readOptionValues(optionValues[i]),
+  }));
+
+  return {
+    loadedModel: (await getAttr(
+      segmenterGroup,
+      ZARR_V2_SEGMENTER.LoadedModel,
+    )) as Nullable<string>,
+    configs,
+  };
 };
 
 const readClassifier = async (

@@ -102,6 +102,11 @@ export function convertV11ToV2(
   return {
     data: { experiment, ...v2Data, kinds: v2Kinds, categories: v2Categories },
     classifier: v2ClassifierState,
+    // No format before v2 recorded segmenter config, so there is nothing to
+    // carry forward. An empty `configs` hydrates to the same fresh state a new
+    // project gets. v0.1 and v0.2 funnel through here too, so this is the only
+    // place the back-fill is needed.
+    segmenter: { loadedModel: null, configs: [] },
   };
 }
 

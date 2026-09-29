@@ -95,6 +95,13 @@ describe.each(FIXTURES)("legacy project $version ($file)", (fixture) => {
     }
   });
 
+  it("back-fills an empty segmenter config, which no pre-v2 format stored", async () => {
+    // `convertV11ToV2` supplies this; v0.1 and v0.2 reach it through v1.1.
+    const { project } = await load(fixture.file);
+
+    expect(project.segmenter).toEqual({ loadedModel: null, configs: [] });
+  });
+
   /**
    * The assertion that catches an under-specified selection.
    *

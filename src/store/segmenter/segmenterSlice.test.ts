@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
+import { MODELS } from "core/dl/segmentation/types";
 
-import { getInitialModelConfig, segmenterSlice } from "./segmenterSlice";
+import {
+  createModelConfigMap,
+  getInitialModelConfig,
+  segmenterSlice,
+} from "./segmenterSlice";
 
 import type { SegmentationModelDetails } from "core/dl/segmentation/types";
 
@@ -231,5 +236,93 @@ describe("segmenterSlice", () => {
     expect(resetState.configMap[model.name].optionValues).toEqual(
       CELLPOSE_INIT_CONFIG.optionValues,
     );
+  });
+});
+
+/*
+ * These cover what project persistence added to the slice.
+ *
+ * The `modelLoaded` cases are the load-bearing ones: it used to reseed the
+ * channel selection unconditionally, which meant a mapping restored from a
+ * saved project was wiped the instant its model was loaded — the only moment
+ * the mapping became visible at all. It now reseeds only when what is there
+ * cannot be used.
+ */
+describe("segmenterSlice persistence support", () => {
+  it("builds a config for every model name it is given", () => {
+    const map = createModelConfigMap(MODELS);
+
+    expect(Object.keys(map).sort()).toEqual([...MODELS].sort());
+    expect(map["Cellpose-SAM"]).toEqual(getInitialModelConfig("Cellpose-SAM"));
+  });
+
+  it("keeps a restored channel selection when the model loads", () => {
+    const restored = reducer(
+      getInitialState(),
+      actions.setSegmenter({
+        segmenter: {
+          loadedModel: undefined,
+          configMap: {
+            ...createModelConfigMap(MODELS),
+            "Cellpose-SAM": {
+              ...CELLPOSE_INIT_CONFIG,
+              channelSelection: ["c", "a"],
+            },
+          },
+        },
+      }),
+    );
+
+    const state = reducer(
+      restored,
+      actions.modelLoaded({ model, availableChannelIds: ["a", "b", "c"] }),
+    );
+
+    expect(state.configMap[model.name].channelSelection).toEqual(["c", "a"]);
+  });
+
+  it("reseeds when a restored selection names a channel the image lacks", () => {
+    const restored = reducer(
+      getInitialState(),
+      actions.setSegmenter({
+        segmenter: {
+          loadedModel: undefined,
+          configMap: {
+            ...createModelConfigMap(MODELS),
+            "Cellpose-SAM": {
+              ...CELLPOSE_INIT_CONFIG,
+              channelSelection: ["a", "gone"],
+            },
+          },
+        },
+      }),
+    );
+
+    const state = reducer(
+      restored,
+      actions.modelLoaded({ model, availableChannelIds: ["a", "b", "c"] }),
+    );
+
+    expect(state.configMap[model.name].channelSelection).toEqual(["a", "b"]);
+  });
+
+  it("replaces the whole slice on setSegmenter", () => {
+    const configMap = createModelConfigMap(MODELS);
+    configMap.StardistVHE = {
+      ...configMap.StardistVHE,
+      optionValues: { probThresh: 0.7 },
+    };
+
+    const state = reducer(
+      getInitialState(),
+      actions.setSegmenter({
+        segmenter: { loadedModel: undefined, configMap },
+      }),
+    );
+
+    expect(state.configMap.StardistVHE.optionValues).toEqual({
+      probThresh: 0.7,
+    });
+    expect(state.loadedModel).toBeUndefined();
   });
 });

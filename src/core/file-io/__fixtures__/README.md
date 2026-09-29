@@ -8,6 +8,20 @@ every archive users already have on disk fails to open.
 If a test that reads one of these fails, the reader has regressed. Fix the
 reader, not the fixture.
 
+### The one edit ever made to them
+
+A `segmenter/` group (`.zgroup` + `.zattrs`, empty `models` /
+`channel_selection` / `option_values`, `loaded_model: null`) was appended to
+both archives when segmenter config became part of the project format. The v2
+writer had never written that group, so without it `readV2` — which reads it
+unconditionally, back-filling being the converters' job — could not open these
+files at all.
+
+Appending is not regenerating: every byte the original writer produced is still
+present and unchanged, so the coverage above is intact. This is the only
+sanctioned way to touch these archives, and only when the reader gains a
+requirement that the old writer could not have satisfied.
+
 ## Contents
 
 | file | Piximi format | Zarr format on disk |

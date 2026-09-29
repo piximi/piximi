@@ -42,3 +42,29 @@ export const getSegmentedChannelNames = (
   channelMetas: ChannelMetaEntities,
 ): string[] =>
   channelIds.map((id, idx) => channelMetas[id]?.name ?? `Channel ${idx + 1}`);
+
+/*
+ * Which channel ids a model should use, given whatever the project already
+ * holds for it. A selection restored from a saved project is kept when it
+ * still makes sense against the image at hand; anything else falls back to the
+ * model's defaults.
+ *
+ * The length is checked against the policy because the model may have changed
+ * between saves: a `fixed` graph demands exactly its count, while a
+ * `passthrough` one accepts any non-empty selection up to its cap — the user
+ * may deliberately have dropped slots via `channelSlotRemoved`.
+ */
+export const reconcileChannelSelection = (
+  policy: ChannelPolicy,
+  saved: string[],
+  availableIds: string[],
+): string[] => {
+  const usable =
+    saved.length > 0 &&
+    saved.every((id) => availableIds.includes(id)) &&
+    (policy.mode === CHANNEL_MODE.FIXED
+      ? saved.length === policy.count
+      : saved.length <= channelSlotCap(policy, availableIds.length));
+
+  return usable ? saved : getDefaultChannelIds(policy, availableIds);
+};

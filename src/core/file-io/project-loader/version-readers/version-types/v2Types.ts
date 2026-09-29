@@ -1,5 +1,6 @@
 import type { EntityState } from "@reduxjs/toolkit";
 
+import type { SerializedSegmenterState } from "core/file-io/project-saver/types";
 import type {
   BitDepth,
   DataArray,
@@ -161,7 +162,10 @@ export type V2KindClassifier = KindClassifier;
 
 export type V2ClassifierState = ClassifierState;
 
+export type V2SegmenterState = SerializedSegmenterState;
+
 export type V2PiximiState = {
   classifier: V2ClassifierState;
+  segmenter: V2SegmenterState;
   data: V2DataState;
 };
