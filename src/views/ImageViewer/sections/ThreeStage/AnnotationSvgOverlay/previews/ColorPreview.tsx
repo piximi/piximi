@@ -1,11 +1,6 @@
-import type { ColorAnnotationTool } from "views/ImageViewer/utils/tools";
+import { AnchoredLabel } from "./AnchoredLabel";
 
-const TEXT_OFFSET = 6;
-const TEXT_FONTSIZE = 12;
-const TEXT_BG_OFFSET_Y = 20;
-const TEXT_CHAR_WIDTH = 7;
-const TEXT_BG_RADIUS = 4;
-const TEXT_BG_HEIGHT = 20;
+import type { ColorAnnotationTool } from "views/ImageViewer/utils/tools";
 
 export const ColorPreview = ({
   operator,
@@ -45,23 +40,8 @@ export const ColorPreview = ({
         strokeWidth={1}
         vectorEffect="non-scaling-stroke"
       />
-      <rect
-        x={toolTipPosition.x}
-        y={toolTipPosition.y - TEXT_BG_OFFSET_Y}
-        width={text.length * TEXT_CHAR_WIDTH}
-        height={TEXT_BG_HEIGHT}
-        rx={TEXT_BG_RADIUS}
-        ry={TEXT_BG_RADIUS}
-        fill="#000000bf"
-      />
-      <text
-        x={toolTipPosition.x + TEXT_OFFSET}
-        y={toolTipPosition.y - TEXT_OFFSET}
-        fill="#fff"
-        fontSize={TEXT_FONTSIZE}
-      >
-        {text}
-      </text>
+
+      <AnchoredLabel x={toolTipPosition.x} y={toolTipPosition.y} text={text} />
     </g>
   );
 };

@@ -17,12 +17,15 @@ import { selectHasSelection } from "@ImageViewer/state/image-viewer-data/reselec
 
 import { useThreeViewport } from "../ThreeViewportContext";
 import { MarchingAntsKeyframes } from "./marchingAnts";
-import { RectanglePreview } from "./previews/RectanglePreview";
-import { EllipsePreview } from "./previews/EllipsePreview";
-import { PolylinePreview } from "./previews/PolylinePreview";
-import { PenPreview } from "./previews/PenPreview";
-import { ColorPreview } from "./previews/ColorPreview";
-import { QuickPreview } from "./previews/QuickPreview";
+import {
+  RectanglePreview,
+  EllipsePreview,
+  PolylinePreview,
+  PenPreview,
+  ColorPreview,
+  QuickPreview,
+  MeasurePreview,
+} from "./previews";
 import { WorkingAnnotationImage } from "./WorkingAnnotationImage";
 import {
   OverlapBorders,
@@ -39,6 +42,7 @@ import type {
   EllipticalAnnotationTool,
   LassoAnnotationTool,
   MagneticAnnotationTool,
+  MeasureTool,
   PenAnnotationTool,
   PolygonalAnnotationTool,
   QuickAnnotationTool,
@@ -73,6 +77,8 @@ const LivePreview = ({
       return <ColorPreview operator={operator as ColorAnnotationTool} />;
     case ToolType.QuickAnnotation:
       return <QuickPreview operator={operator as QuickAnnotationTool} />;
+    case ToolType.Measure:
+      return <MeasurePreview operator={operator as MeasureTool} />;
     default:
       return null;
   }
@@ -155,7 +161,8 @@ export const AnnotationSvgOverlay = ({
       <g ref={gRef} data-draw-tick={drawTick}>
         {(isAnnotating ||
           toolType === ToolType.QuickAnnotation ||
-          toolType === ToolType.Pointer) && (
+          toolType === ToolType.Pointer ||
+          toolType === ToolType.Measure) && (
           <LivePreview operator={annotationTool} toolType={toolType} />
         )}
         <WorkingAnnotationImage />
