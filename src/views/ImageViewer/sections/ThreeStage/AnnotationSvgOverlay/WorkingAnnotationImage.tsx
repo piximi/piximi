@@ -2,7 +2,8 @@ import { useMemo } from "react";
 
 import { useSelector } from "react-redux";
 
-import { colorOverlayROI, hexToRGBA } from "utils/image";
+import { hexToRGBA } from "utils/image";
+import { maskToDataURL } from "utils/image/imageHelper";
 
 import { selectFullWorkingAnnotation } from "views/ImageViewer/state/annotator/reselectors";
 
@@ -10,20 +11,13 @@ import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/sel
 import { selectPendingOperation } from "@ImageViewer/state/operations/reselectors";
 
 /**
- * The in-progress "working" annotation (drawn but not yet confirmed) rendered as
- * an SVG raster: the same `colorOverlayROI` bitmap the committed meshes use
- * (interior alpha 128, border 255), positioned at the bounding box in image
- * coordinates inside the overlay `<g>`. Re-rasterizes when the mask/box/color
- * change — including the threshold slider re-running `updateMask`. On Confirm it
+ * The in-progress "working" annotation (drawn but not yet confirmed), rasterized
+ * by `maskToDataURL` and positioned at its bounding box in image coordinates
+ * inside the overlay `<g>`. Re-rasterizes when the mask, box or colour changes —
+ * including the threshold slider re-running `updateMask`. On Confirm it
  * graduates into the Three.js scene.
  */
-export const WorkingAnnotationImage = ({
-  imageWidth,
-  imageHeight,
-}: {
-  imageWidth: number;
-  imageHeight: number;
-}) => {
+export const WorkingAnnotationImage = () => {
   const workingAnnotation = useSelector(selectFullWorkingAnnotation);
   const pendingOperation = useSelector(selectPendingOperation);
 
@@ -31,17 +25,14 @@ export const WorkingAnnotationImage = ({
 
   const href = useMemo(() => {
     if (!workingAnnotation || !workingAnnotation.decodedMask) return undefined;
-
-    const img = colorOverlayROI(
+    const bb = workingAnnotation.boundingBox;
+    return maskToDataURL(
       workingAnnotation.decodedMask,
-      workingAnnotation.boundingBox,
-      imageWidth,
-      imageHeight,
-      hexToRGBA(selectedCategory.color, 0),
-      1,
+      bb[2] - bb[0],
+      bb[3] - bb[1],
+      hexToRGBA(selectedCategory.color, 0) as [number, number, number],
     );
-    return img?.src;
-  }, [workingAnnotation]);
+  }, [workingAnnotation, selectedCategory.color]);
 
   if (!workingAnnotation || !href) return null;
   // While an operation is staged the target's own mesh already shows the combined

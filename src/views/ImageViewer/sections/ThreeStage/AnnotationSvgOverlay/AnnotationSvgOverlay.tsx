@@ -155,10 +155,7 @@ export const AnnotationSvgOverlay = ({
         {(isAnnotating || toolType === ToolType.QuickAnnotation) && (
           <LivePreview operator={annotationTool} toolType={toolType} />
         )}
-        <WorkingAnnotationImage
-          imageWidth={annotationTool.image.width}
-          imageHeight={annotationTool.image.height}
-        />
+        <WorkingAnnotationImage />
         {chromeBoundingBox && (
           <SelectionBorder boundingBox={chromeBoundingBox} />
         )}

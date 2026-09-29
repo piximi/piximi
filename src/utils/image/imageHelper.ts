@@ -1,7 +1,3 @@
-import IJSImage from "image-js";
-
-import { logger } from "utils/logUtils";
-
 import { pointsAreEqual } from "./point-operations";
 import { decodeRleArray } from "./rle";
 
@@ -166,98 +162,56 @@ export const getAnnotationsInBox = (
   });
 };
 
-/*
- * From encoded mask data, get the decoded data and return results as an HTMLImageElement to be used by Konva.Image
- * Warning: the mask produced from the decoded data is scaled to fit the stage.
- *          when creating an image from mask, the original width/height should be scaled by the same scale factor
+/**
+ * Rasterize a bbox-sized binary mask to an RGBA data URL, for the SVG overlay's
+ * `<image>` element, which needs a URL rather than pixel data. Interior pixels
+ * get alpha 128 and border pixels 255, matching what `annotationMask.frag`
+ * applies to the Three.js meshes.
  */
-export const colorOverlayROI = (
-  decodedMask: DataArray,
-  boundingBox: [number, number, number, number],
-  imageWidth: number,
-  imageHeight: number,
-  color: Array<number>,
-  scalingFactor: number,
-): HTMLImageElement | undefined => {
-  if (!decodedMask) return undefined;
+export const maskToDataURL = (
+  mask: DataArray,
+  w: number,
+  h: number,
+  color: [number, number, number],
+): string | undefined => {
+  if (!mask || w <= 0 || h <= 0 || mask.length !== w * h) return undefined;
 
-  const endX = Math.min(imageWidth, boundingBox[2]);
-  const endY = Math.min(imageHeight, boundingBox[3]);
+  // Zero-filled, so background pixels are already transparent.
+  const rgba = new Uint8ClampedArray(w * h * 4);
+  const [r, g, b] = color;
 
-  //extract bounding box params
-  const boxWidth = endX - boundingBox[0];
-  const boxHeight = endY - boundingBox[1];
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      if (!mask[i]) continue;
 
-  // const boxWidth = boundingBox[2] - boundingBox[0];
-  // const boxHeight = boundingBox[3] - boundingBox[1];
+      // Border if any 4-neighbour is background or out of bounds — the same
+      // rule annotationMask.frag applies via maskAt.
+      const border =
+        x === 0 ||
+        x === w - 1 ||
+        y === 0 ||
+        y === h - 1 ||
+        !mask[i - 1] ||
+        !mask[i + 1] ||
+        !mask[i - w] ||
+        !mask[i + w];
 
-  if (!boxWidth || !boxHeight) return undefined;
-  let croppedImage = new IJSImage(
-    boxWidth,
-    boxHeight,
-    Array(boxHeight * boxWidth).fill(0),
-    {
-      components: 1,
-      alpha: 0,
-    },
-  ).resize({ factor: scalingFactor });
-  try {
-    croppedImage = new IJSImage(boxWidth, boxHeight, decodedMask, {
-      components: 1,
-      alpha: 0,
-    }).resize({ factor: scalingFactor });
-  } catch (err) {
-    if (import.meta.env.NODE_ENV !== "production") {
-      logger("could not create crop", { level: "error" });
-      logger(`boundingbox: ${boundingBox}`);
-      logger(`boxWidth: ${boxWidth}`);
-      logger(`boxHeight: ${boxHeight}`);
-      logger(`bwxbh: ${boxHeight * boxWidth}`);
-      logger(`decodedMask length: ${decodedMask.length}`);
-      logger(`diff: ${boxHeight * boxWidth - decodedMask.length}`);
-      logger(err, { level: "error" });
+      const o = i * 4;
+      rgba[o] = r;
+      rgba[o + 1] = g;
+      rgba[o + 2] = b;
+      rgba[o + 3] = border ? 255 : 128;
     }
   }
 
-  const colorROIImage = new IJSImage(boxWidth, boxHeight, {
-    components: 3,
-    alpha: 1,
-  }).resize({ factor: scalingFactor });
-
-  const checkNeighbors = (arr: IJSImage, x: number, y: number): boolean => {
-    if (x === 0 || x === croppedImage.width - 1) return true;
-    for (const [dx, dy] of [
-      [0, 1],
-      [1, 0],
-      [0, -1],
-      [-1, 0],
-    ]) {
-      if (!arr.getPixelXY(x + dx, y + dy)[0]) return true;
-    }
-    return false;
-  };
-
-  for (let i = 0; i < croppedImage.width; i++) {
-    for (let j = 0; j < croppedImage.height; j++) {
-      if (croppedImage.getPixelXY(i, j)[0] > 0) {
-        if (checkNeighbors(croppedImage, i, j)) {
-          colorROIImage.setPixelXY(i, j, [color[0], color[1], color[2], 255]);
-        } else {
-          colorROIImage.setPixelXY(i, j, [color[0], color[1], color[2], 128]);
-        }
-      } else {
-        colorROIImage.setPixelXY(i, j, [0, 0, 0, 0]);
-      }
-    }
-  }
-
-  const src = colorROIImage.toDataURL("image-png", {
-    useCanvas: true,
-  });
-  const image = new Image();
-  image.src = src;
-
-  return image;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return undefined;
+  ctx.putImageData(new ImageData(rgba, w, h), 0, 0);
+  return canvas.toDataURL();
 };
 
 /*
