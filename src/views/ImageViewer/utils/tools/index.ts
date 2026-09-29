@@ -11,3 +11,4 @@ export { RectangularAnnotationTool } from "./RectangularAnnotationTool";
 export { SelectionTool } from "./SelectionTool";
 export { ThresholdAnnotationTool } from "./ThresholdAnnotationTool";
 export { AnnotationTool } from "./AnnotationTool";
+export { MeasureTool } from "./MeasureTool";

@@ -31,4 +31,5 @@ export enum ToolType {
   QuickAnnotation,
   RectangularAnnotation,
   ThresholdAnnotation,
+  Measure,
 }

@@ -65,7 +65,7 @@ export const useThreeAnnotationHandlers = ({
         annotatorSlice.actions.setAnnotationState(AnnotationState.Blank),
       );
     });
-  }, [dispatch, annotationTool]);
+  }, [dispatch]);
 
   const {
     onPointerMouseDown,

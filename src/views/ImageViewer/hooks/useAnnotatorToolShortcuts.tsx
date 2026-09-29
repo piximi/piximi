@@ -19,11 +19,8 @@ export const useAnnotatorToolShortcuts = () => {
   const images = useSelector(selectImageStackIds);
   const activeImageId = useSelector(selectActiveImageId);
 
-  /*
-   * Select color tool (C)
-   */
   useHotkeys(
-    "shift+C,shift+D,shift+E,shift+H,shift+I,shift+L,shift+M,shift+P,shift+Q,shift+R,shift+S,shift+T,shift+Z",
+    "shift+C,shift+D,shift+E,shift+I,shift+L,shift+M,shift+P,shift+Q,shift+R,shift+S,shift+T,shift+F",
     (event, _handler) => {
       if (!event.repeat) {
         const key = event.key;
@@ -33,7 +30,7 @@ export const useAnnotatorToolShortcuts = () => {
               annotatorSlice.actions.setToolType(ToolType.ColorAnnotation),
             );
             break;
-          case "D":
+          case "F":
             dispatch(
               annotatorSlice.actions.setToolType(ToolType.PenAnnotation),
             );
@@ -82,6 +79,9 @@ export const useAnnotatorToolShortcuts = () => {
             dispatch(
               annotatorSlice.actions.setToolType(ToolType.ThresholdAnnotation),
             );
+            break;
+          case "D":
+            dispatch(annotatorSlice.actions.setToolType(ToolType.Measure));
             break;
         }
       }

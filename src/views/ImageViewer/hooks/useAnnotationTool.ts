@@ -22,6 +22,7 @@ import {
   ThresholdAnnotationTool,
   SelectionTool,
   BlankAnnotationTool,
+  MeasureTool,
 } from "views/ImageViewer/utils/tools";
 import { ToolType } from "views/ImageViewer/utils/enums";
 
@@ -91,6 +92,10 @@ export const useAnnotationTool = (ijsImage: IJSImage | null) => {
         return;
       case ToolType.Pointer:
         setOperator(new SelectionTool(ijsImage));
+
+        return;
+      case ToolType.Measure:
+        setOperator(new MeasureTool(ijsImage));
 
         return;
       default:

@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Divider, Stack, Typography, useTheme } from "@mui/material";
-import { Margin } from "@mui/icons-material";
+import { Margin, Straighten } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
@@ -75,12 +75,20 @@ const DEFAULT_THRESHOLD_TOOL_OPTIONS: SliderOptions = {
   initial: 150,
 };
 
-const toolMap: ToolMap = {
+const utilityTools: ToolMap = {
   "Selection Tool": {
     operation: ToolType.Pointer,
     icon: (color) => <Selection color={color} />,
     hotKey: ["shift", "S"],
   },
+  "Measure Tool": {
+    operation: ToolType.Measure,
+    icon: (color) => <Straighten sx={{ color }} />,
+    hotKey: ["shift", "D"],
+  },
+};
+
+const annotationTools: ToolMap = {
   "Rectangle Tool": {
     operation: ToolType.RectangularAnnotation,
     icon: (color) => <RectangleAnnotation color={color} />,
@@ -140,21 +148,18 @@ const toolMap: ToolMap = {
   },
 };
 
-const AnnotationToolBar = () => {
+const ToolList = ({ toolMap }: { toolMap: ToolMap }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const t = useTranslation();
 
   const activeTool = useSelector(selectToolType);
-  useAnnotatorToolShortcuts();
-
   const handleToolClick = (toolName: string) => {
     if (activeTool !== toolMap[toolName].operation)
       dispatch(annotatorSlice.actions.setToolType(toolMap[toolName].operation));
   };
-
   return (
-    <Stack sx={{ height: "100%", bgcolor: "background.paper" }}>
+    <>
       {Object.keys(toolMap).map((name, idx) => {
         const tool = toolMap[name];
 
@@ -200,6 +205,18 @@ const AnnotationToolBar = () => {
           />
         );
       })}
+    </>
+  );
+};
+
+const AnnotationToolBar = () => {
+  useAnnotatorToolShortcuts();
+
+  return (
+    <Stack sx={{ height: "100%", bgcolor: "background.paper" }}>
+      <ToolList toolMap={utilityTools} />
+      <Divider flexItem sx={{ my: 0.5 }} />
+      <ToolList toolMap={annotationTools} />
     </Stack>
   );
 };
