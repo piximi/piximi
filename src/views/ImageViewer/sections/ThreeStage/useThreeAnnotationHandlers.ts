@@ -126,8 +126,7 @@ export const useThreeAnnotationHandlers = ({
       return screenToImage(e.clientX - rect.left, e.clientY - rect.top, vp);
     };
 
-    const skipTool = (t: ToolType) =>
-      t === ToolType.Zoom || t === ToolType.ColorAdjustment;
+    const skipTool = (t: ToolType) => t === ToolType.ColorAdjustment;
 
     const onMouseDown = (e: MouseEvent) => {
       if (e.button !== 0 || e.altKey || isPanningRef.current) return;
