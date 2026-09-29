@@ -9,6 +9,8 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
+import { segmenterSlice } from "store/segmenter";
+import { hydrateSegmenterState } from "store/segmenter/hydrate";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { projectReset } from "store/actions";
 
@@ -115,7 +117,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
           }
           return;
         }
-        const { data, classifier } = result.project;
+        const { data, classifier, segmenter } = result.project;
         clearCache();
         batch(() => {
           dispatch(projectReset());
@@ -125,6 +127,15 @@ export function useProjectLoader(): UseProjectLoaderReturn {
             }),
           );
           dispatch(dataSlice.actions.setState(data));
+          // After projectReset, which wipes the slice back to defaults.
+          dispatch(
+            segmenterSlice.actions.setSegmenter({
+              segmenter: hydrateSegmenterState(
+                segmenter,
+                data.channelMetas.map((meta) => meta.id),
+              ),
+            }),
+          );
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
@@ -222,7 +233,7 @@ export function useProjectLoader(): UseProjectLoaderReturn {
           }
           return;
         }
-        const { data, classifier } = result.project;
+        const { data, classifier, segmenter } = result.project;
 
         clearCache();
         batch(() => {
@@ -233,6 +244,15 @@ export function useProjectLoader(): UseProjectLoaderReturn {
             }),
           );
           dispatch(dataSlice.actions.setState(data));
+          // After projectReset, which wipes the slice back to defaults.
+          dispatch(
+            segmenterSlice.actions.setSegmenter({
+              segmenter: hydrateSegmenterState(
+                segmenter,
+                data.channelMetas.map((meta) => meta.id),
+              ),
+            }),
+          );
         });
 
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));

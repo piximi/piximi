@@ -11,6 +11,14 @@ import {
   Partition,
 } from "core/dl/enums";
 import { ModelArch } from "core/dl/classification/types";
+import { MODELS } from "core/dl/segmentation/types";
+import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
+
+import {
+  createModelConfigMap,
+  segmenterSlice,
+} from "store/segmenter/segmenterSlice";
+import { hydrateSegmenterState } from "store/segmenter/hydrate";
 
 import { MODEL_JSON_FILENAME, MODEL_WEIGHTS_FILENAME } from "../consts";
 import { PiximiStore, ZipStore } from "../zarr/stores";
@@ -33,9 +41,11 @@ import type {
 } from "core/entities";
 import type { SerializedModels } from "core/dl/types";
 import type { ModelInfo, Run } from "core/dl/classification/types";
+import type { SegmentationModelDetails } from "core/dl/segmentation/types";
 
 import type { DataStateV2 } from "store/data/types";
 import type { ClassifierState } from "store/classifier/types";
+import type { SegmenterSliceState } from "store/segmenter/types";
 
 import type { ChannelDataAccessor, SerializableProject } from "./types";
 
@@ -467,7 +477,33 @@ const buildFixture = () => {
     },
   };
 
-  return { data, classifier } satisfies SerializableProject;
+  /*
+   * Deliberately not the initial state: one model carrying a real channel
+   * mapping and hand-tuned options, another left alone. `diameter: undefined`
+   * is the case the format has to work for — it means "let the library pick",
+   * which is not the same as the key being absent, and plain JSON loses the
+   * difference.
+   */
+  const segmenter: SegmenterSliceState = {
+    loadedModel: undefined,
+    configMap: {
+      ...createModelConfigMap(MODELS),
+      "Cellpose-SAM": {
+        model: "Cellpose-SAM",
+        modelStatus: "idle",
+        channelSelection: ["meta-3", "meta-1"],
+        optionValues: {
+          diameter: undefined,
+          cellPropThreshold: 0.25,
+          resample: "true",
+          niter: 450,
+          maxSizeFraction: 0.4,
+        },
+      },
+    },
+  };
+
+  return { data, classifier, segmenter } satisfies SerializableProject;
 };
 
 const channelAccessor: ChannelDataAccessor = async (channelIds) => {
@@ -602,6 +638,84 @@ describe("v2 project round trip", () => {
     const result = await readV2(store, () => {});
 
     expect(result.classifier).toEqual(fixture.classifier);
+  });
+
+  it("preserves segmenter channel mappings and option values", async () => {
+    const { fixture, store } = await writeFixture();
+    const result = await readV2(store, () => {});
+
+    const cellpose = result.segmenter.configs.find(
+      (c) => c.model === "Cellpose-SAM",
+    );
+    expect(cellpose?.channelSelection).toEqual(["meta-3", "meta-1"]);
+    expect(cellpose?.optionValues).toEqual(
+      fixture.segmenter.configMap["Cellpose-SAM"].optionValues,
+    );
+  });
+
+  it("keeps an option explicitly set to undefined distinct from an absent one", async () => {
+    // JSON drops undefined, so without the null placeholder the key would
+    // vanish and the model runner would no longer be told to use its default.
+    const { store } = await writeFixture();
+    const result = await readV2(store, () => {});
+
+    const cellpose = result.segmenter.configs.find(
+      (c) => c.model === "Cellpose-SAM",
+    )!;
+    expect("diameter" in cellpose.optionValues).toBe(true);
+    expect(cellpose.optionValues.diameter).toBeUndefined();
+  });
+
+  it("writes a config for every model, not just the configured one", async () => {
+    const { store } = await writeFixture();
+    const result = await readV2(store, () => {});
+
+    expect(result.segmenter.configs.map((c) => c.model).sort()).toEqual(
+      [...MODELS].sort(),
+    );
+  });
+
+  /*
+   * The end-to-end point of persisting the segmenter at all. Restoring the
+   * config is only half of it: nothing surfaces until the user loads the model
+   * again, and `modelLoaded` used to reseed the mapping at exactly that moment.
+   * This drives the whole path — write, read, hydrate, load the model — and
+   * pins the mapping surviving all four steps.
+   */
+  it("survives a round trip and the model load that follows it", async () => {
+    const { fixture, store } = await writeFixture();
+    const result = await readV2(store, () => {});
+
+    const restored = hydrateSegmenterState(
+      result.segmenter,
+      Object.keys(fixture.data.channelMetas.entities),
+    );
+
+    const loaded = segmenterSlice.reducer(
+      segmenterSlice.reducer(
+        segmenterSlice.getInitialState(),
+        segmenterSlice.actions.setSegmenter({ segmenter: restored }),
+      ),
+      segmenterSlice.actions.modelLoaded({
+        model: {
+          name: "Cellpose-SAM",
+          channelPolicy: { mode: CHANNEL_MODE.FIXED, count: 2 },
+        } as unknown as SegmentationModelDetails,
+        availableChannelIds: Object.keys(fixture.data.channelMetas.entities),
+      }),
+    );
+
+    const config = loaded.configMap["Cellpose-SAM"];
+    expect(config.channelSelection).toEqual(["meta-3", "meta-1"]);
+    expect(config.optionValues.niter).toBe(450);
+    expect(config.optionValues.cellPropThreshold).toBe(0.25);
+  });
+
+  it("records no loaded model when none was loaded at save time", async () => {
+    const { store } = await writeFixture();
+    const result = await readV2(store, () => {});
+
+    expect(result.segmenter.loadedModel).toBeNull();
   });
 
   it("does not truncate an input shape larger than 255", async () => {

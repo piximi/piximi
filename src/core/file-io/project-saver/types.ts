@@ -1,9 +1,36 @@
+import type { SegmenterOptionValues } from "core/dl/segmentation/types";
 import type { SerializedModels } from "core/dl/types";
 
 import type { ClassifierState } from "store/classifier/types";
 import type { DataStateV2 } from "store/data/types";
+import type { SegmenterSliceState } from "store/segmenter/types";
 
 import type { Progress } from "utils/types";
+
+/*
+ * The segmenter config as a project file carries it.
+ *
+ * Deliberately narrower than `SegmenterSliceState`:
+ *  - `loadedModel` is a bare name, not the `SegmentationModelDetails` DTO. That
+ *    DTO is owned by the segmenter worker's registry and embeds an
+ *    `optionSchema`; persisting it would pin an old schema into the file. It is
+ *    written as provenance only and is not read back into state.
+ *  - `modelStatus` is absent. It is per-session, like the classifier's status,
+ *    which is why that one is written as a hardcoded "idle".
+ *
+ * `model` is a plain `string` rather than `ModelName` because a file may carry
+ * a model that has since been retired; the loader drops those.
+ */
+export type SerializedSegmenterModelConfig = {
+  model: string;
+  channelSelection: Array<string>;
+  optionValues: SegmenterOptionValues;
+};
+
+export type SerializedSegmenterState = {
+  loadedModel: string | null;
+  configs: Array<SerializedSegmenterModelConfig>;
+};
 
 /**
  * The slices a project file captures, as they exist in Redux at save time.
@@ -14,6 +41,7 @@ import type { Progress } from "utils/types";
 export type SerializableProject = {
   data: DataStateV2;
   classifier: ClassifierState;
+  segmenter: SegmenterSliceState;
 };
 
 export type SaveProjectInput = {

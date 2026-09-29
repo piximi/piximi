@@ -1,7 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { getDefaultChannelIds } from "core/dl/segmentation/channelUtils";
+import {
+  getDefaultChannelIds,
+  reconcileChannelSelection,
+} from "core/dl/segmentation/channelUtils";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
+import { MODELS } from "core/dl/segmentation/types";
 
 import { projectReset } from "store/actions";
 
@@ -40,15 +44,22 @@ export const getInitialModelConfig = (
   };
 };
 
+/*
+ * A fresh config for each named model. Derived from the names rather than
+ * written out key-by-key so a model added to `MODELS` cannot be forgotten here,
+ * and so the project loader can build the same map before overlaying whatever
+ * a saved project carried.
+ */
+export const createModelConfigMap = (
+  modelNames: readonly ModelName[],
+): Record<ModelName, SegmenterModelConfig> =>
+  Object.fromEntries(
+    modelNames.map((name) => [name, getInitialModelConfig(name)]),
+  ) as Record<ModelName, SegmenterModelConfig>;
+
 export const getInitialState = (): SegmenterSliceState => ({
   loadedModel: undefined,
-  configMap: {
-    "Cellpose-SAM": getInitialModelConfig("Cellpose-SAM"),
-    StardistVHE: getInitialModelConfig("StardistVHE"),
-    StardistFluo: getInitialModelConfig("StardistFluo"),
-    GlandSegmentation: getInitialModelConfig("GlandSegmentation"),
-    "COCO-SSD": getInitialModelConfig("COCO-SSD"),
-  },
+  configMap: createModelConfigMap(MODELS),
 });
 export const segmenterSlice = createSlice({
   name: "segmenter",
@@ -56,6 +67,14 @@ export const segmenterSlice = createSlice({
   reducers: {
     resetSegmenterState() {
       return getInitialState();
+    },
+    setSegmenter(
+      state,
+      action: PayloadAction<{ segmenter: SegmenterSliceState }>,
+    ) {
+      // WARNING, don't do below (overwrites draft object)
+      // state = action.payload.segmenter;
+      return action.payload.segmenter;
     },
     modelLoaded(
       state,
@@ -66,8 +85,12 @@ export const segmenterSlice = createSlice({
     ) {
       const { model, availableChannelIds } = action.payload;
       state.loadedModel = model;
-      state.configMap[model.name].channelSelection = getDefaultChannelIds(
+      // Reconcile rather than reseed: a selection restored from a saved project
+      // is only visible once its model is loaded, so overwriting here would
+      // destroy it at the exact moment it became usable.
+      state.configMap[model.name].channelSelection = reconcileChannelSelection(
         model.channelPolicy,
+        state.configMap[model.name].channelSelection,
         availableChannelIds,
       );
     },

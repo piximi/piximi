@@ -16,6 +16,7 @@ import type { ClassifierState } from "store/classifier/types";
 
 import type { Progress } from "utils/types";
 
+import type { SerializedSegmenterState } from "../project-saver/types";
 import type { V2PiximiState } from "./version-readers/version-types/v2Types";
 
 export type UploadStage =
@@ -49,6 +50,7 @@ export type LoadProjectOutput = {
 
 export type DeserializedProject = {
   classifier: ClassifierState;
+  segmenter: SerializedSegmenterState;
   data: {
     experiment: Experiment;
     imageSeries: ImageSeries[];

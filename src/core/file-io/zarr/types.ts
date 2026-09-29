@@ -52,6 +52,7 @@ export const ZARR_V01_CATEGORY = {
 export const ZARR_V2_GROUP = {
   Data: "data",
   Classifier: "classifier",
+  Segmenter: "segmenter",
   ImageSeries: "image_series",
   Images: "images",
   Planes: "planes",
@@ -219,6 +220,25 @@ export const ZARR_V2_CLASSIFIER = {
   ActiveModel: "active_model",
   NewModelArch: "new_model_arch",
   Status: "status",
+} as const;
+
+/**
+ * `segmenter/` group attrs — parallel arrays indexed by model, plus one scalar.
+ *
+ * `LoadedModel` records which model was in use when the project was saved. It
+ * is provenance: the loader does not restore it, because the weights live in
+ * the segmenter worker's registry and would not be there after a load.
+ *
+ * `OptionValues` holds `[key, value]` entry pairs rather than an object, for
+ * the same reason `class_map` does — but here the hazard is `undefined`, a
+ * legal option value meaning "let the library decide", which JSON drops. It is
+ * stored as `null` and restored as `undefined`, so key presence survives.
+ */
+export const ZARR_V2_SEGMENTER = {
+  LoadedModel: "loaded_model",
+  Models: "models",
+  ChannelSelection: "channel_selection",
+  OptionValues: "option_values",
 } as const;
 
 export const ZARR_V2_MODEL_INFO = {

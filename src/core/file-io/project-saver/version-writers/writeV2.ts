@@ -21,6 +21,7 @@ import {
   ZARR_V2_RUN,
   ZARR_V2_RUN_HISTORY_COLUMNS,
   ZARR_V2_RUNS,
+  ZARR_V2_SEGMENTER,
   ZARR_V2_SHAPE,
 } from "../../zarr/types";
 import { createGroup, createRootGroup, writeArray } from "../zarr/writers";
@@ -36,6 +37,7 @@ import type {
   PreprocessSettings,
   Run,
 } from "core/dl/classification/types";
+import type { SegmenterOptionValues } from "core/dl/segmentation/types";
 import type {
   AnnotationObject,
   AnnotationVolume,
@@ -51,6 +53,7 @@ import type {
 } from "core/entities";
 
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
+import type { SegmenterSliceState } from "store/segmenter/types";
 
 import type { WritableGroup as Group } from "../zarr/writers";
 import type { WriteStore } from "../../zarr/stores";
@@ -71,6 +74,11 @@ import type { ChannelDataAccessor, SerializableProject } from "../types";
  *    `loadProject` recomputes unconditionally after any version read.
  *  - `AnnotationObject.decodedMask`, derivable from `encodedMask`.
  *  - `KindClassifier.activeSoftmaxById`, a per-session prediction artifact.
+ *  - `SegmenterModelConfig.modelStatus`, per-session for the same reason the
+ *    classifier's status is written as a hardcoded "idle".
+ *  - the `SegmentationModelDetails` behind `segmenter.loadedModel`. Only its
+ *    name is kept; the rest (channel policy, option schema) belongs to the
+ *    segmenter worker's registry and would go stale in a file.
  */
 
 const STAGES = {
@@ -142,7 +150,7 @@ export const writeV2 = async (
     [ZARR_V2_ROOT.AppVersion]: appVersion,
   });
 
-  const { data, classifier } = project;
+  const { data, classifier, segmenter } = project;
   const dataGroup = await createGroup(root, ZARR_V2_GROUP.Data, {
     [ZARR_V2_DATA.ExperimentId]: data.experiment.id,
     [ZARR_V2_DATA.ExperimentName]: data.experiment.name,
@@ -168,6 +176,8 @@ export const writeV2 = async (
   onProgress(STAGES.annotations.end);
 
   await writeClassifier(root, classifier);
+  // A handful of attributes; not worth its own slice of the progress budget.
+  await writeSegmenter(root, segmenter);
   onProgress(STAGES.classifier.end);
 };
 
@@ -378,6 +388,31 @@ const writeAnnotations = async (
   if (totalRuns > 0) {
     await writeArray(group, ZARR_V2_DATASET.AnnotationMasks, masks);
   }
+};
+
+/*
+ * Option values are `Record<string, number | boolean | string | undefined>`.
+ * The `undefined` is the problem: JSON drops the key entirely, but an absent
+ * key and a key set to `undefined` mean different things to the model runner.
+ * Entry pairs with `null` in place of `undefined` keep both the key and the
+ * distinction.
+ */
+const optionValueEntries = (options: SegmenterOptionValues) =>
+  Object.entries(options).map(([key, value]) => [key, value ?? null]);
+
+const writeSegmenter = async (root: Group, segmenter: SegmenterSliceState) => {
+  const configs = Object.values(segmenter.configMap);
+
+  await createGroup(root, ZARR_V2_GROUP.Segmenter, {
+    [ZARR_V2_SEGMENTER.LoadedModel]: segmenter.loadedModel?.name ?? null,
+    [ZARR_V2_SEGMENTER.Models]: configs.map((c) => c.model),
+    [ZARR_V2_SEGMENTER.ChannelSelection]: configs.map(
+      (c) => c.channelSelection,
+    ),
+    [ZARR_V2_SEGMENTER.OptionValues]: configs.map((c) =>
+      optionValueEntries(c.optionValues),
+    ),
+  });
 };
 
 const writeClassifier = async (root: Group, classifier: ClassifierState) => {

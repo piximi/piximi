@@ -64,10 +64,10 @@ export const useProjectSaver = (): UseProjectSaverReturn => {
           );
         });
 
-        const { data, classifier } = store.getState();
+        const { data, classifier, segmenter } = store.getState();
         const result = await projectSaver.saveProject({
           name,
-          project: { data, classifier },
+          project: { data, classifier, segmenter },
         });
 
         if (!result.success) {

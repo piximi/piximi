@@ -2,6 +2,9 @@ import { readFile } from "node:fs/promises";
 
 import { describe, expect, it } from "vitest";
 
+import { hydrateSegmenterState } from "store/segmenter/hydrate";
+import { getInitialState } from "store/segmenter/segmenterSlice";
+
 import { loadProject } from "./loadProject";
 
 import type { LoadProjectOutput } from "./types";
@@ -51,6 +54,26 @@ describe("zarr-v2-on-disk archive at Piximi format 2.x", () => {
     expect(data.kinds.ids).toEqual(["Image", "cell", "nucleus"]);
     expect(data.annotations.ids).toHaveLength(3);
     expect(data.experiment.id).toBe("exp-1");
+  });
+
+  it("reads the appended segmenter group as empty config", async () => {
+    // `readV2` reads this group unconditionally, so these archives carry a
+    // hand-appended empty one — see `__fixtures__/README.md`. Empty is the
+    // honest answer: the writer that produced them had no segmenter format.
+    const { project } = await load("golden-v2-zarrv2.zip");
+
+    expect(project.segmenter).toEqual({ loadedModel: null, configs: [] });
+  });
+
+  it("hydrates an empty segmenter group to fresh state", async () => {
+    const { project } = await load("golden-v2-zarrv2.zip");
+
+    expect(
+      hydrateSegmenterState(
+        project.segmenter,
+        project.data.channelMetas.ids as string[],
+      ),
+    ).toEqual(getInitialState());
   });
 
   it("restores channel pixels byte-exactly at both bit depths", async () => {
