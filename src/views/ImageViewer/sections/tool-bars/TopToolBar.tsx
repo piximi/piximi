@@ -7,6 +7,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  Typography,
   useTheme,
 } from "@mui/material";
 import {
@@ -136,6 +137,7 @@ const ZoomTools = () => {
 };
 
 export const TopToolBar = () => {
+  const t = useTranslation();
   return (
     <Stack
       direction="row"
@@ -162,7 +164,26 @@ export const TopToolBar = () => {
           zIndex: 1002,
         })}
       >
-        <ZoomTools />
+        <Box
+          sx={{ position: "relative", display: "flex", alignItems: "center" }}
+        >
+          <ZoomTools />
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            noWrap
+            sx={{
+              opacity: 0.6,
+              position: "absolute",
+              left: "100%",
+              ml: 1.5,
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+          >
+            {t("Hold Alt/Option to pan")}
+          </Typography>
+        </Box>
       </Box>
     </Stack>
   );
