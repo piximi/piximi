@@ -55,6 +55,7 @@ const LivePreview = ({
   switch (toolType) {
     case ToolType.RectangularAnnotation:
     case ToolType.ThresholdAnnotation:
+    case ToolType.Pointer:
       return (
         <RectanglePreview operator={operator as RectangularAnnotationTool} />
       );
@@ -152,7 +153,9 @@ export const AnnotationSvgOverlay = ({
     >
       <MarchingAntsKeyframes />
       <g ref={gRef} data-draw-tick={drawTick}>
-        {(isAnnotating || toolType === ToolType.QuickAnnotation) && (
+        {(isAnnotating ||
+          toolType === ToolType.QuickAnnotation ||
+          toolType === ToolType.Pointer) && (
           <LivePreview operator={annotationTool} toolType={toolType} />
         )}
         <WorkingAnnotationImage />

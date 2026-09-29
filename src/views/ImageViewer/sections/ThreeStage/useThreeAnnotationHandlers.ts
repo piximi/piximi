@@ -73,9 +73,6 @@ export const useThreeAnnotationHandlers = ({
     handlePointerMouseUp,
     isPickingTarget,
     pickTargetAt,
-    minimum,
-    maximum,
-    selecting,
   } = usePointerTool(absolutePosition, deselectAllAnnotations, toolType);
 
   // Latest-ref: DOM listeners are attached once but must call current values.
@@ -136,16 +133,19 @@ export const useThreeAnnotationHandlers = ({
       if (!res) return;
       applyCursor(res);
 
-      if (L.toolType === ToolType.Pointer) {
-        L.onPointerMouseDown(res.point);
-        return;
-      }
       // An outstanding target pick takes priority over drawing: the stroke that
       // needs the target already exists, so starting a new one would discard it.
       if (L.isPickingTarget) {
         L.pickTargetAt(res.point);
         return;
       }
+      if (L.toolType === ToolType.Pointer) {
+        L.onPointerMouseDown(res.point);
+        L.annotationTool.onMouseDown(res.point);
+        L.onDrawTick();
+        return;
+      }
+
       if (L.annotationTool.annotationState === AnnotationState.Annotated) {
         L.annotationTool.deselect();
         if (L.annotationMode === AnnotationMode.New) L.deselectAllAnnotations();
@@ -163,6 +163,8 @@ export const useThreeAnnotationHandlers = ({
       applyCursor(res);
       if (skipTool(L.toolType)) return;
       if (L.toolType === ToolType.Pointer) {
+        L.annotationTool.onMouseMove(res.point);
+        L.onDrawTick();
         L.handlePointerMouseMove(res.point);
         return;
       }
@@ -178,6 +180,8 @@ export const useThreeAnnotationHandlers = ({
       if (!res) return;
       if (L.toolType === ToolType.Pointer) {
         L.handlePointerMouseUp(res.point);
+        L.annotationTool.deselect();
+        L.onDrawTick();
         return;
       }
       if (L.toolType === ToolType.ObjectAnnotation) {
@@ -204,6 +208,5 @@ export const useThreeAnnotationHandlers = ({
   return {
     absolutePosition,
     outOfBounds,
-    pointerSelection: { minimum, maximum, selecting },
   };
 };

@@ -78,7 +78,6 @@ export const usePointerTool = (
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dragging, setDragging] = useState<boolean>(false);
   const [minimum, setMinimum] = useState<Point | undefined>();
-  const [maximum, setMaximum] = useState<Point | undefined>();
   const [selecting, setSelecting] = useState<boolean>(false);
 
   const selectedIds = useMemo(
@@ -212,8 +211,10 @@ export const usePointerTool = (
     (position: { x: number; y: number }) => {
       if (!position || !selecting || !minimum) return;
 
-      setDragging(Math.abs(position.x - minimum.x) >= delta);
-      setMaximum(position);
+      setDragging(
+        Math.abs(position.x - minimum.x) >= delta ||
+          Math.abs(position.y - minimum.y) >= delta,
+      );
     },
     [minimum, selecting],
   );
@@ -240,8 +241,5 @@ export const usePointerTool = (
     isPickingTarget,
     pickTargetAt,
     dragging,
-    minimum,
-    maximum,
-    selecting,
   };
 };
