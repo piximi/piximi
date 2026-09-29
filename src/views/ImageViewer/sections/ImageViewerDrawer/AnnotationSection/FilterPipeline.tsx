@@ -87,6 +87,7 @@ function LayerRow({
       sx={(theme) => ({
         display: "flex",
         alignItems: "center",
+        justifyContent: "space-between",
         gap: 0.75,
         minHeight: 44,
         px: 1,
