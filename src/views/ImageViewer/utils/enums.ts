@@ -30,6 +30,5 @@ export enum ToolType {
   PolygonalAnnotation,
   QuickAnnotation,
   RectangularAnnotation,
-  Zoom,
   ThresholdAnnotation,
 }

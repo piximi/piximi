@@ -83,9 +83,6 @@ export const useAnnotatorToolShortcuts = () => {
               annotatorSlice.actions.setToolType(ToolType.ThresholdAnnotation),
             );
             break;
-          case "Z":
-            dispatch(annotatorSlice.actions.setToolType(ToolType.Zoom));
-            break;
         }
       }
     },
