@@ -54,15 +54,35 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       routerLocation.state?.selectedItems?.imageIds ?? [];
     const initialAnnotationIds: string[] =
       routerLocation.state?.selectedItems?.annotationIds ?? [];
+    let activeImageId = initialImageIds[0];
+    const firstSelectedAnnotation = initialAnnotationIds[0];
+    const initialDataState = productionStore.getState().data as DataStateV2;
+    if (initialDataState && firstSelectedAnnotation) {
+      const annotation =
+        initialDataState.annotations.entities[firstSelectedAnnotation];
+      // should always be true, but a guard in case it isnt
+      if (initialImageIds.includes(annotation.imageId))
+        activeImageId = annotation.imageId;
+    }
+    let isAnnotated = false;
+    if (activeImageId)
+      if (
+        initialDataState &&
+        Object.values(initialDataState.annotations.entities).some(
+          (ann) => ann.imageId === activeImageId,
+        )
+      )
+        isAnnotated = true;
     batch(() => {
       dispatch(imageViewerDataSlice.actions.setImageStack(initialImageIds));
-      dispatch(
-        imageViewerDataSlice.actions.setActiveImageId(initialImageIds[0]),
-      );
+      dispatch(imageViewerDataSlice.actions.setActiveImageId(activeImageId));
+
+      // If the images have annotations, set the annotation tool to pointer
+      if (isAnnotated)
+        dispatch(annotatorSlice.actions.setToolType(ToolType.Pointer));
       // Annotations hand-picked in the ProjectViewer match no category or
       // feature criterion, so they seed the sticky include set.
       if (initialAnnotationIds.length) {
-        dispatch(annotatorSlice.actions.setToolType(ToolType.Pointer));
         dispatch(
           imageViewerDataSlice.actions.toggleAnnotationSelection({
             ids: initialAnnotationIds,
