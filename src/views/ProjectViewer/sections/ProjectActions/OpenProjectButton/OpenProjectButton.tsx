@@ -40,7 +40,7 @@ export const OpenProjectButton = () => {
     <>
       <TooltipTextButton
         dataHelp={HelpItem.OpenMenu}
-        icon={<FolderOpenIcon />}
+        startIcon={<FolderOpenIcon />}
         label="Open"
         tooltipText="Open images or a previously saved project"
         onClick={onOpen}

@@ -48,7 +48,7 @@ export const ModelIO = ({
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <TooltipTextButton
           dataHelp={HelpItem.LoadClassificationModel}
-          icon={<AddIcon />}
+          startIcon={<AddIcon />}
           label="Load Model"
           tooltipText="Load a saved or remote model"
           onClick={handleOpenImportClassifierDialog}
@@ -59,7 +59,7 @@ export const ModelIO = ({
         />
         <TooltipTextButton
           dataHelp={HelpItem.SaveClassificationModel}
-          icon={<SaveIcon />}
+          startIcon={<SaveIcon />}
           label="Save Model"
           tooltipText={
             selectedModelConfig

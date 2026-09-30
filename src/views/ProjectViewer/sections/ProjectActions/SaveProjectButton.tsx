@@ -20,7 +20,7 @@ export const SaveProjectButton = () => {
     <>
       <TooltipTextButton
         dataHelp={HelpItem.SaveProject}
-        icon={<DownloadIcon />}
+        startIcon={<DownloadIcon />}
         label="Save"
         tooltipText="Save the current project"
         onClick={onSaveProjectDialogOpen}
