@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { useSelector } from "react-redux";
 
 import { Box, Collapse, Slider, Switch, Typography } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -8,11 +10,16 @@ import { ExpandIcon } from "components/ui";
 
 import { HelpItem } from "help/HelpContent";
 
+import {
+  selectGlobalFeatureBounds,
+  selectInViewFeatureBounds,
+} from "views/ImageViewer/state/image-viewer-data/reselectors";
+import { resolveRange } from "views/ImageViewer/state/image-viewer-data/utils";
+
 import { useCriterionToggles } from "./useCriterionToggles";
 
 import type { ObjectFeature } from "core/entities";
 
-import type { FeatureParams } from "@ImageViewer/state/image-viewer-data/utils";
 import type {
   FeatureConfig,
   FeatureRangeState,
@@ -20,12 +27,12 @@ import type {
 } from "@ImageViewer/state/types";
 
 interface FeatureFiltersProps {
-  featureParams: FeatureParams;
   feats: FeatureState;
 }
 
 interface FeatureRowProps {
   cfg: FeatureConfig;
+  localBounds: [number, number];
   f: FeatureRangeState;
   onToggle: () => void;
   onCommit: (range: [number, number]) => void;
@@ -33,17 +40,24 @@ interface FeatureRowProps {
 
 // Local drag state so a slider drag only dispatches (and re-runs the filter
 // pipeline) once, on release, instead of on every intermediate drag frame.
-function FeatureRow({ cfg, f, onToggle, onCommit }: FeatureRowProps) {
-  const [live, setLive] = useState<[number, number]>([f.min, f.max]);
+function FeatureRow({
+  cfg,
+  localBounds,
+  f,
+  onToggle,
+  onCommit,
+}: FeatureRowProps) {
+  const [lo, hi] = resolveRange(f, cfg.bounds);
+  const [live, setLive] = useState<[number, number]>([lo, hi]);
   const [showSlider, setShowSlider] = useState(f.active);
 
-  // Clamped to this image's bounds: a range survives an image switch, so one
-  // dragged to a larger image's maximum would otherwise print a number the
-  // slider cannot reach. The stored criterion is untouched — a max above every
-  // value here simply matches everything.
+  const marks = useMemo(
+    () => [{ value: localBounds[0] }, { value: localBounds[1] }],
+    [localBounds],
+  );
   useEffect(() => {
-    setLive([Math.max(f.min, cfg.bounds[0]), Math.min(f.max, cfg.bounds[1])]);
-  }, [f.min, f.max, cfg.bounds]);
+    setLive([lo, hi]);
+  }, [lo, hi]);
 
   return (
     <Box
@@ -85,9 +99,10 @@ function FeatureRow({ cfg, f, onToggle, onCommit }: FeatureRowProps) {
         <ExpandIcon expanded={showSlider} sx={{ p: 0, fontSize: "1rem" }} />
       </Box>
       <Collapse in={showSlider}>
-        <Box sx={{ px: 1 }}>
+        <Box sx={{ px: 2 }}>
           <Slider
             size="small"
+            marks={marks}
             value={live}
             min={cfg.bounds[0]}
             max={cfg.bounds[1]}
@@ -96,6 +111,16 @@ function FeatureRow({ cfg, f, onToggle, onCommit }: FeatureRowProps) {
             onClick={(e) => e.stopPropagation()}
             onChange={(_, v) => setLive(v as [number, number])}
             onChangeCommitted={(_, v) => onCommit(v as [number, number])}
+            sx={{
+              "& .MuiSlider-mark": {
+                height: "10px",
+                bgcolor: "currentColor",
+              },
+              "& .MuiSlider-thumb:hover": {
+                boxShadow:
+                  "0px 0px 0px 4px rgba(var(--mui-palette-primary-mainChannel) / 0.16)",
+              },
+            }}
           />
         </Box>
       </Collapse>
@@ -110,20 +135,15 @@ function FeatureRow({ cfg, f, onToggle, onCommit }: FeatureRowProps) {
  *
  * Props:
  *   feats     { [key]: { active, min, max } }
- *   open, onToggleOpen
- *   onToggle(key)                  flip a feature's active flag
- *   onRange(key, [min, max])       update a feature's range (also activates it)
  */
-export const FeatureFilters = ({
-  featureParams,
-  feats,
-}: FeatureFiltersProps) => {
+export const FeatureFilters = ({ feats }: FeatureFiltersProps) => {
+  const featureParams = useSelector(selectGlobalFeatureBounds);
+  const relativeFeatureParams = useSelector(selectInViewFeatureBounds);
   const { toggleFeature, setFeatureRange } = useCriterionToggles();
   const [open, setFeatOpen] = useState(false);
   const handleToggleOpen = () => setFeatOpen((o) => !o);
   const activeCount = Object.values(feats).filter((f) => f.active).length;
-  const handleToggleFeat = (key: ObjectFeature, bounds: [number, number]) =>
-    toggleFeature(key, bounds);
+
   const handleFeatRange = (key: ObjectFeature, [min, max]: [number, number]) =>
     setFeatureRange(key, [min, max]);
 
@@ -162,7 +182,7 @@ export const FeatureFilters = ({
               color: activeCount ? "primary.main" : "text.disabled",
             }}
           >
-            {activeCount ? `${activeCount} active` : "none"}
+            {activeCount ? `${activeCount} active` : "none active"}
           </Typography>
           {open ? (
             <ExpandLessIcon sx={{ fontSize: 20, color: "action.active" }} />
@@ -180,8 +200,9 @@ export const FeatureFilters = ({
             <FeatureRow
               key={key}
               cfg={cfg}
+              localBounds={relativeFeatureParams[key].bounds}
               f={feats[key]}
-              onToggle={() => handleToggleFeat(key, cfg.bounds)}
+              onToggle={() => toggleFeature(key)}
               onCommit={(range) => handleFeatRange(key, range)}
             />
           ))}

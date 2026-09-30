@@ -3,6 +3,7 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { getClassifierApi } from "core/dl/classification";
 
 import { registerProjectViewerListeners } from "views/ProjectViewer/state/listeners";
+import { registerImageViewerListeners } from "views/ImageViewer/state/image-viewer-data/listeners";
 
 import { projectReset } from "./actions";
 
@@ -13,6 +14,7 @@ const startAppListening =
   projectMiddleware.startListening as TypedAppStartListening;
 
 registerProjectViewerListeners(startAppListening);
+registerImageViewerListeners(startAppListening);
 
 startAppListening({
   actionCreator: projectReset,

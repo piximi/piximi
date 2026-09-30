@@ -1,11 +1,12 @@
-import type {
-  ExtendedAnnotationObject,
-  ExtendedKind,
-  ObjectFeature,
+import {
+  OBJECT_FEATURES,
+  type ExtendedAnnotationObject,
+  type ExtendedKind,
+  type ObjectFeature,
 } from "core/entities";
 
 import type {
-  FeatureConfig,
+  FeatureParams,
   FeatureRange,
   FeatureRangeState,
   FeatureState,
@@ -16,7 +17,6 @@ import type {
   SelectionLayer,
 } from "../types";
 
-export type FeatureParams = Record<ObjectFeature, FeatureConfig>;
 // Numeric features for the persistent Feature-filter section: [min, max, step].
 export const FEATURES: FeatureParams = {
   area: { label: "Area", unit: "px²", bounds: [0, 2000], step: 10 },
@@ -31,22 +31,80 @@ export const FEATURES: FeatureParams = {
   comX: { label: "comX", unit: "px", bounds: [0, 500], step: 1 },
   comY: { label: "comY", unit: "px", bounds: [0, 500], step: 1 },
 };
-const emptyFeatureState = (features?: FeatureParams): FeatureState =>
+const emptyFeatureState = (): FeatureState =>
   Object.fromEntries(
-    Object.entries(features ?? FEATURES).map(([k, v]) => [
+    Object.keys(FEATURES).map((k) => [
       k,
-      { active: false, min: v.bounds[0], max: v.bounds[1] },
+      { active: false, min: null, max: null },
     ]),
   ) as FeatureState;
 
-export const emptySelectionLayer = (
-  features?: FeatureParams,
-): SelectionLayer => ({
+export const emptySelectionLayer = (): SelectionLayer => ({
   catIds: [],
-  features: emptyFeatureState(features),
+  features: emptyFeatureState(),
   includeIds: [],
   excludeIds: [],
 });
+
+export const resolveRange = (
+  { min, max }: FeatureRangeState,
+  [lo, hi]: [number, number],
+): [number, number] => [min ?? lo, max ?? hi];
+
+export const activeFeatureList = (
+  feats: FeatureState,
+  params: FeatureParams,
+): FeatureRange[] =>
+  (Object.entries(feats) as [ObjectFeature, FeatureRangeState][])
+    .filter(([, v]) => v.active)
+    .map(([feature, v]) => {
+      const [min, max] = resolveRange(v, params[feature].bounds);
+      return { feature, min, max };
+    });
+/**
+ * Slider limits for the feature filters: the real range of each feature across
+ * the given annotations. `FEATURES` supplies label/unit/step, and its bounds are
+ * only a fallback for a feature no annotation reports. Seeding the range from
+ * those bounds instead pins the limit at the static value (area's 2000) and
+ * stops it tracking the data at all, so deleting the largest annotation never
+ * narrows anything.
+ */
+export const generateFeatureConfig = (
+  annotations: Array<Pick<ExtendedAnnotationObject, "features">>,
+): FeatureParams => {
+  const base = Object.fromEntries(
+    Object.entries(FEATURES).map(([k, v]) => [
+      k,
+      { ...v, bounds: [...v.bounds] },
+    ]),
+  ) as FeatureParams;
+
+  const seen = new Set<ObjectFeature>();
+  annotations.forEach((ann) => {
+    OBJECT_FEATURES.forEach((f) => {
+      const featVal = ann.features?.[f];
+      if (featVal === undefined) return;
+      const cfg = base[f];
+      if (!seen.has(f)) {
+        cfg.bounds = [featVal, featVal];
+        seen.add(f);
+        return;
+      }
+      if (featVal < cfg.bounds[0]) cfg.bounds[0] = featVal;
+      else if (featVal > cfg.bounds[1]) cfg.bounds[1] = featVal;
+    });
+  });
+
+  // One annotation, or a feature that happens to be constant across them, gives
+  // min === max, which MUI's Slider renders as an unusable track.
+  seen.forEach((f) => {
+    const cfg = base[f];
+    if (cfg.bounds[0] === cfg.bounds[1])
+      cfg.bounds = [cfg.bounds[0], cfg.bounds[1] + cfg.step];
+  });
+
+  return base;
+};
 
 /**
  * A filter layer holds a *compound* criterion built from the selection surface:
@@ -145,44 +203,6 @@ export const splitSelection = (
   }
   return { kindIds, catIds };
 };
-
-/**
- * The annotation ids a newly-activated criterion term admits — the scope within
- * which manual exclusions are dropped. A term only ever clears exclusions among
- * its *own* matches, so checking a second category never resurrects an
- * annotation excluded from the first.
- *
- * Computed against every annotation on the image rather than the visible set:
- * an exclusion is a per-annotation fact, and scoping the clear to what's
- * currently visible would leave filter-hidden annotations excluded, to resurface
- * that way once the filter is disabled.
- */
-export const idsInCategories = (
-  annotations: ExtendedAnnotationObject[],
-  catIds: string[],
-): string[] =>
-  annotations.filter((a) => catIds.includes(a.categoryId)).map((a) => a.id);
-
-export const idsInFeatureRange = (
-  annotations: ExtendedAnnotationObject[],
-  feature: ObjectFeature,
-  [min, max]: [number, number],
-): string[] =>
-  annotations
-    .filter((a) => {
-      const v = a.features?.[feature];
-      return v !== undefined && v >= min && v <= max;
-    })
-    .map((a) => a.id);
-
-export const activeFeatureList = (feats: FeatureState): FeatureRange[] =>
-  (Object.entries(feats) as [ObjectFeature, FeatureRangeState][])
-    .filter(([, v]) => v.active)
-    .map(([feature, v]) => ({
-      feature,
-      min: Number(v.min),
-      max: Number(v.max),
-    }));
 
 // Merge a new selection's active feature ranges into an existing layer's
 // ranges, overwriting by feature key — a feature untouched by the new

@@ -37,8 +37,8 @@ export interface CategoryNode {
 /** Editable UI state for one feature-filter row. */
 export interface FeatureRangeState {
   active: boolean;
-  min: number;
-  max: number;
+  min: number | null;
+  max: number | null;
 }
 /** The full feature-filter state, keyed by feature. */
 export type FeatureState = Record<ObjectFeature, FeatureRangeState>;
@@ -49,10 +49,10 @@ export type FeatureState = Record<ObjectFeature, FeatureRangeState>;
  * converts it before matching.
  *
  * `includeIds`/`excludeIds` are the pointer tool's manual per-annotation
- * overrides. An include is sticky — it survives every criterion change, because
- * it expresses something the criterion cannot. An exclude only refines the
- * current criterion's result, so adding a term drops the excludes that term
- * admits (scoped to that term's matches, never wholesale).
+ * overrides, and both are unconditional: `matchesLayer` answers from them before
+ * it looks at the criterion at all. An include expresses something the criterion
+ * cannot, and neither set is disturbed by a criterion change — only deleting the
+ * annotations (`forgetAnnotationIds`) or clearing the layer drops them.
  */
 export interface SelectionLayer {
   catIds: string[];
@@ -61,6 +61,7 @@ export interface SelectionLayer {
   excludeIds: string[];
 }
 
+export type FeatureParams = Record<ObjectFeature, FeatureConfig>;
 /** A concrete numeric range criterion for one feature (baked into a layer). */
 export interface FeatureRange {
   feature: ObjectFeature;

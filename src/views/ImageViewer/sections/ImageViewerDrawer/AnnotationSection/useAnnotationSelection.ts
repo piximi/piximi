@@ -6,7 +6,6 @@ import { UNKNOWN_KIND_ID } from "core/entities";
 
 import {
   selectAllExtendedKinds,
-  selectExtendedAnnotationsByImageId,
   selectExtendedImageById,
 } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
@@ -18,7 +17,8 @@ import {
   selectSelectionLayer,
 } from "@ImageViewer/state/image-viewer-data/selectors";
 import {
-  selectRelativeFeatureBounds,
+  selectActiveImageAnnotations,
+  selectGlobalFeatureBounds,
   selectSelectedAnnotations,
   selectVisibleAnnotations,
 } from "@ImageViewer/state/image-viewer-data/reselectors";
@@ -56,10 +56,8 @@ export const useAnnotationSelection = () => {
   );
   const currentPlane = activeImage?.activePlaneIdx ?? 0;
   const totalPlanes = activeImage?.shape.planes ?? 1;
-  const annotations = useParameterizedSelector(
-    selectExtendedAnnotationsByImageId,
-    activeImageId ?? "",
-  );
+  const annotations = useSelector(selectActiveImageAnnotations);
+  const featureParams = useSelector(selectGlobalFeatureBounds);
 
   const filterLayer = useSelector(selectFilterLayer);
   const {
@@ -68,8 +66,6 @@ export const useAnnotationSelection = () => {
     includeIds,
     excludeIds,
   } = useSelector(selectSelectionLayer);
-
-  const relativeFeatures = useSelector(selectRelativeFeatureBounds);
 
   const planeScope = useSelector(selectPlaneScope);
   const setPlaneScope = (scope: PlaneScope) => {
@@ -109,7 +105,10 @@ export const useAnnotationSelection = () => {
   }, [kinds, view, selCats]);
 
   // Current selection criterion (categories + active feature ranges).
-  const activeFeats = useMemo(() => activeFeatureList(feats), [feats]);
+  const activeFeats = useMemo(
+    () => activeFeatureList(feats, featureParams),
+    [feats, featureParams],
+  );
 
   const selectedIds = useMemo(
     () => selectedAnnotations.map((a) => a.id),
@@ -257,7 +256,6 @@ export const useAnnotationSelection = () => {
     annotations,
     filterLayer,
     feats,
-    relativeFeatures,
     planeScope,
     setPlaneScope,
     view,

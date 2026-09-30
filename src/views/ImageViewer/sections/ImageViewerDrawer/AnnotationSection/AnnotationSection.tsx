@@ -22,7 +22,6 @@ export const AnnotationSection = () => {
     annotations,
     filterLayer,
     feats,
-    relativeFeatures,
     planeScope,
     setPlaneScope,
     view,
@@ -145,7 +144,7 @@ export const AnnotationSection = () => {
           onDelete={handleDeleteFilter}
           anySel={anySel}
         />
-        <FeatureFilters featureParams={relativeFeatures} feats={feats} />
+        <FeatureFilters feats={feats} />
         <CategoryTree
           groups={groups.list}
           hiddenCount={groups.hidden}

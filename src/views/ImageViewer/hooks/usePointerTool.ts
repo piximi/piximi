@@ -8,7 +8,7 @@ import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { ToolType } from "views/ImageViewer/utils/enums";
 
 import {
-  selectAllActiveAnnotations,
+  selectAllAnnotationsInPlane,
   selectSelectedAnnotations,
 } from "@ImageViewer/state/image-viewer-data/reselectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
@@ -73,7 +73,7 @@ export const usePointerTool = (
 ) => {
   const dispatch = useDispatch();
   const activeImageId = useSelector(selectActiveImageId);
-  const activeAnnotations = useSelector(selectAllActiveAnnotations);
+  const activeAnnotations = useSelector(selectAllAnnotationsInPlane);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dragging, setDragging] = useState<boolean>(false);
