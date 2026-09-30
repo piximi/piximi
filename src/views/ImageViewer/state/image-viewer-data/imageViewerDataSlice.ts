@@ -13,6 +13,8 @@ import type { ObjectFeature } from "core/entities";
 
 import type {
   CategoryNode,
+  FeatureConfig,
+  FeatureParams,
   FilterLayer,
   ImageViewerDataState,
   LayerMode,
@@ -133,49 +135,57 @@ export const imageViewerDataSlice = createSlice({
         ids,
       );
     },
-    /**
-     * `admits` are the annotation ids the categories being switched on match.
-     * Adding a term drops manual exclusions among its own matches only, so
-     * checking a second category leaves the first category's exclusions alone.
-     * Switching a category off clears nothing.
-     */
+
     toggleCatSelection(
       state,
-      action: PayloadAction<{ ids: string[]; on: boolean; admits?: string[] }>,
+      action: PayloadAction<{ ids: string[]; on: boolean }>,
     ) {
-      const { ids, on, admits } = action.payload;
+      const { ids, on } = action.payload;
       const next = new Set(state.selectionLayer.catIds);
       ids.forEach((id) => (on ? next.add(id) : next.delete(id)));
       state.selectionLayer.catIds = [...next];
-      if (on && admits?.length)
-        state.selectionLayer.excludeIds = difference(
-          state.selectionLayer.excludeIds,
-          admits,
-        );
     },
-    toggleFeatureSelection(
-      state,
-      action: PayloadAction<{
-        key: ObjectFeature;
-        bounds: [number, number];
-        admits?: string[];
-      }>,
-    ) {
-      const feat = state.selectionLayer.features[action.payload.key];
+    /**
+     * Fit the selection's explicit feature ranges into the current global bounds.
+     * Only ever narrows: deleting the one huge annotation pulls a range that reached
+     * the old limit down to the new one, and the narrowing is persisted so the stale
+     * number cannot re-widen the filter later. A null side is pinned to the bound
+     * and resolves to it on read, so it needs nothing here.
+     */
+    setGlobalFeatureBounds(state, action: PayloadAction<FeatureParams>) {
+      const params = Object.entries(action.payload) as [
+        ObjectFeature,
+        FeatureConfig,
+      ][];
+      params.forEach(([key, cfg]) => {
+        const [lo, hi] = cfg.bounds;
+        const feat = state.selectionLayer.features[key];
+        // A range with nothing left inside the new bounds has been invalidated
+        // wholesale — every annotation it described is gone. Clamping it would
+        // collapse both thumbs onto one end and read as a deliberate "exactly this
+        // value" the user never chose, so the row is released to null and switched
+        // off instead, which keeps the slider and the stored state congruent.
+        //
+        // The criterion is a pipeline: dropping an invalidated stage gives up the
+        // narrowing it contributed, so the selection widens to whatever the remaining
+        // terms match. That is intended — a stage describing no data has no business
+        // narrowing anything — and it is why this makes no attempt to preserve the
+        // previously selected set.
+        if ((feat.min ?? lo) > hi || (feat.max ?? hi) < lo) {
+          feat.min = null;
+          feat.max = null;
+          feat.active = false;
+          return;
+        }
+        if (feat.min !== null) feat.min = Math.min(Math.max(feat.min, lo), hi);
+        if (feat.max !== null) feat.max = Math.max(Math.min(feat.max, hi), lo);
+      });
+    },
+    toggleFeatureSelection(state, action: PayloadAction<ObjectFeature>) {
+      const feat = state.selectionLayer.features[action.payload];
       feat.active = !feat.active;
-      if (feat.active) {
-        feat.min = action.payload.bounds[0];
-        feat.max = action.payload.bounds[1];
-        if (action.payload.admits?.length)
-          state.selectionLayer.excludeIds = difference(
-            state.selectionLayer.excludeIds,
-            action.payload.admits,
-          );
-      }
     },
-    // Deliberately takes no `admits` and clears no exclusions: dragging the
-    // bounds of an already-active range must not wipe manual deselections, or
-    // tuning a slider silently discards them on the first pixel of movement.
+
     updateFeatureSelection(
       state,
       action: PayloadAction<{ key: ObjectFeature; range: [number, number] }>,

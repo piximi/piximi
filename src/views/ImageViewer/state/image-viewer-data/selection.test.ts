@@ -1,13 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { imageViewerDataSlice } from "./imageViewerDataSlice";
-import { selectSelectedAnnotations } from "./reselectors";
 import {
-  applyFilterLayer,
-  idsInCategories,
-  idsInFeatureRange,
-  matchesLayer,
-} from "./utils";
+  selectGlobalFeatureBounds,
+  selectSelectedAnnotations,
+} from "./reselectors";
+import { applyFilterLayer, matchesLayer } from "./utils";
 
 import type { UnknownAction } from "@reduxjs/toolkit";
 
@@ -48,19 +46,12 @@ const kinds: ExtendedKind[] = [
 
 const A = imageViewerDataSlice.actions;
 
-/** Check a category on, carrying the exclusions that category admits. */
-const addCat = (...ids: string[]) =>
-  A.toggleCatSelection({ ids, on: true, admits: idsInCategories(ALL, ids) });
-/** Uncheck a category. Removals clear no exclusions. */
+/** Check a category on*/
+const addCat = (...ids: string[]) => A.toggleCatSelection({ ids, on: true });
+/** Uncheck a category */
 const dropCat = (...ids: string[]) => A.toggleCatSelection({ ids, on: false });
-const activateF = () =>
-  A.toggleFeatureSelection({
-    key: "area",
-    bounds: F,
-    admits: idsInFeatureRange(ALL, "area", F),
-  });
-/** Same reducer, flipping the feature back off — no admits on the way out. */
-const deactivateF = () => A.toggleFeatureSelection({ key: "area", bounds: F });
+const activateF = () => A.toggleFeatureSelection("area");
+
 const widenF = () => A.updateFeatureSelection({ key: "area", range: [0, 600] });
 const click = (id: string, on: boolean) =>
   A.toggleAnnotationSelection({ ids: [id], on });
@@ -79,7 +70,12 @@ const session = () => {
     },
     selected(): string[] {
       return selectSelectedAnnotations
-        .resultFunc(ALL, state.selectionLayer, kinds)
+        .resultFunc(
+          ALL,
+          state.selectionLayer,
+          kinds,
+          selectGlobalFeatureBounds.resultFunc(ALL),
+        )
         .map((a) => a.id);
     },
     get layer() {
@@ -126,24 +122,7 @@ describe("matchesLayer", () => {
 });
 
 describe("selection scenarios", () => {
-  it("S1: adding a term restores an excluded annotation, removing one does not", () => {
-    const s = session().run(addCat(C1));
-    expect(s.selected()).toContain("a_c1f");
-
-    s.run(click("a_c1f", false));
-    expect(s.selected()).not.toContain("a_c1f");
-
-    s.run(activateF()); // an addition — clears exclusions inside the range
-    expect(s.selected()).toContain("a_c1f");
-
-    s.run(click("a_c1f", false));
-    expect(s.selected()).not.toContain("a_c1f");
-
-    s.run(deactivateF()); // a removal — clears nothing
-    expect(s.selected()).not.toContain("a_c1f");
-  });
-
-  it("S2/A: a hand-picked include survives the criterion that arrives and leaves", () => {
+  it("S1: a hand-picked include survives the criterion that arrives and leaves", () => {
     const s = session().run(click("a_c1f", true));
     expect(s.selected()).toEqual(["a_c1f"]);
 
@@ -152,22 +131,6 @@ describe("selection scenarios", () => {
 
     s.run(dropCat(C1));
     expect(s.selected()).toEqual(["a_c1f"]);
-  });
-
-  it("B: re-checking a category clears its own exclusions", () => {
-    const s = session().run(addCat(C1), click("a_c1", false));
-    expect(s.selected()).not.toContain("a_c1");
-
-    s.run(dropCat(C1));
-    expect(s.selected()).toEqual([]);
-
-    s.run(addCat(C1));
-    expect(s.selected()).toContain("a_c1");
-  });
-
-  it("C: activating a range clears an exclusion the range admits", () => {
-    const s = session().run(addCat(C1), click("a_c1f", false), activateF());
-    expect(s.selected()).toContain("a_c1f");
   });
 
   it("checking a second category does not resurrect the first's exclusion", () => {
@@ -181,20 +144,6 @@ describe("selection scenarios", () => {
     s.run(click("a_c2", false), dropCat(C1));
     expect(s.selected()).not.toContain("a_c1");
     expect(s.selected()).not.toContain("a_c2");
-  });
-
-  it("re-checking a category revives an exclusion that had gone inert", () => {
-    const s = session().run(
-      addCat(C1),
-      click("a_c1", false),
-      addCat(C2),
-      dropCat(C1),
-    );
-    expect(s.layer.excludeIds).toContain("a_c1"); // inert: matches no term
-    expect(s.selected()).not.toContain("a_c1");
-
-    s.run(addCat(C1));
-    expect(s.selected()).toContain("a_c1");
   });
 
   it("keeps an exclusion alive when the annotation still matches a remaining term", () => {
