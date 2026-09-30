@@ -2,7 +2,8 @@ import { useMemo } from "react";
 
 import { Box } from "@mui/material";
 
-import { TooltipTextButton } from "@ProjectViewer/components";
+import { TooltipTextButton } from "components/inputs";
+
 import { usePredictSegmenter, useSegmenter } from "@ProjectViewer/hooks";
 
 export const ModelActions = () => {

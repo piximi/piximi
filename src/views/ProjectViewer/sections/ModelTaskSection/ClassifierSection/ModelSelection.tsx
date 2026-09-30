@@ -12,7 +12,7 @@ import { ModelArch } from "core/dl/classification/types";
 
 import { useDialog, useDialogHotkey } from "hooks";
 
-import { StyledSelect } from "components/inputs";
+import { StyledSelect, TooltipTextButton } from "components/inputs";
 
 import { classifierSlice } from "store/classifier";
 import { selectKindModelNames } from "store/classifier/selectors";
@@ -25,10 +25,7 @@ import { HotkeyContext } from "utils/enums";
 import { SaveFittedModelDialog } from "views/ProjectViewer/components/dialogs";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import {
-  TooltipTextButton,
-  TooltipWithDisable,
-} from "@ProjectViewer/components";
+import { TooltipWithDisable } from "@ProjectViewer/components";
 
 import { ImportTensorflowClassificationModelDialog } from "../ImportTensorflowModelDialog";
 

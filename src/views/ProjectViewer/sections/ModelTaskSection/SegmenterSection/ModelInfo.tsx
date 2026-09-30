@@ -2,11 +2,12 @@ import { Box, Stack, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
+import { TooltipTextButton } from "components/inputs";
+
 import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
 
-import { TooltipTextButton } from "@ProjectViewer/components";
 import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { LoadSegmentationModelDialog } from "./LoadSegmentationModelDialog";

@@ -8,3 +8,4 @@ export {
   PopperToolButton,
   InteractivePopoverToolButton,
 } from "./ToolButton";
+export { TooltipTextButton } from "./TooltipTextButton";

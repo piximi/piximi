@@ -11,6 +11,8 @@ import {
 
 import { useDialog, useDialogHotkey } from "hooks";
 
+import { TooltipTextButton } from "components/inputs";
+
 import { useParameterizedSelector } from "store/hooks";
 import {
   selectModelIsTrained,
@@ -21,7 +23,6 @@ import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
 
-import { TooltipTextButton } from "@ProjectViewer/components";
 import {
   useClassifierStatus,
   ErrorReason,
