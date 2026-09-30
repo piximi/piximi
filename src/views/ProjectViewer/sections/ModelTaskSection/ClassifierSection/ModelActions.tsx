@@ -85,7 +85,7 @@ const FitClassifierButton = ({
         tooltipText={helperText}
         onClick={handleOpenFitClassifierDialog}
         disabled={!precheck.modelTrainable}
-        icon={<ScatterPlotIcon />}
+        startIcon={<ScatterPlotIcon />}
         label="Fit"
         sx={{
           font: "var(--mui-font-caption)",
@@ -147,7 +147,7 @@ const PredictClassifierButton = ({
       tooltipText={helperText}
       onClick={handlePredict}
       disabled={predictionDisabled}
-      icon={
+      startIcon={
         modelStatus === "predicting" ? (
           <CircularProgress disableShrink />
         ) : (
@@ -208,7 +208,7 @@ const EvaluateClassifierButton = ({
         tooltipText={helperText}
         onClick={handleEvaluate}
         disabled={activeRuns.length === 0}
-        icon={<AssessmentIcon />}
+        startIcon={<AssessmentIcon />}
         label="Evaluate"
         sx={{
           font: "var(--mui-font-caption)",

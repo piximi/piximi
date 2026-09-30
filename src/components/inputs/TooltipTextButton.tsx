@@ -8,8 +8,12 @@ import type { ButtonProps } from "@mui/material";
 
 import type { HelpItem } from "help/HelpContent";
 
-type TooltipTextButtonProps = Omit<ButtonProps, "onClick"> & {
-  icon?: ReactElement;
+type TooltipTextButtonProps = Omit<
+  ButtonProps,
+  "onClick" | "startIcon" | "endIcon"
+> & {
+  startIcon?: ReactElement;
+  endIcon?: ReactElement;
   label: string;
   tooltipText: string;
   dataHelp?: HelpItem;
@@ -19,7 +23,8 @@ type TooltipTextButtonProps = Omit<ButtonProps, "onClick"> & {
 const ICON_SIZE = "1.15em";
 
 export const TooltipTextButton = ({
-  icon,
+  startIcon,
+  endIcon,
   label,
   tooltipText,
   dataHelp,
@@ -37,13 +42,19 @@ export const TooltipTextButton = ({
           size="small"
           onClick={onClick}
           {...props}
+          sx={{ ...props.sx, px: 1, pr: endIcon ? 0.5 : 1 }}
         >
-          {icon &&
-            cloneElement(icon, {
+          {startIcon &&
+            cloneElement(startIcon, {
               size: ICON_SIZE,
               sx: { fontSize: ICON_SIZE, mr: 0.5 },
             })}
           {t(label)}
+          {endIcon &&
+            cloneElement(endIcon, {
+              size: ICON_SIZE,
+              sx: { fontSize: ICON_SIZE, ml: 0.5 },
+            })}
         </Button>
       </span>
     </Tooltip>

@@ -26,7 +26,7 @@ export const NewProjectButton = () => {
   return (
     <TooltipTextButton
       dataHelp={HelpItem.StartNewProject}
-      icon={<AddIcon />}
+      startIcon={<AddIcon />}
       label="New"
       tooltipText="Clear and start a new project"
       onClick={handleStartNewProject}
