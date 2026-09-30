@@ -83,7 +83,7 @@ export const PopperToolButton = ({
   clickAway,
   ...attributes
 }: ToolProps & {
-  popperContent: ReactElement;
+  popperContent: ReactElement | ((close: () => void) => ReactElement);
   popperPlacement?: PopperProps["placement"];
   clickAway?: boolean;
 }) => {
@@ -92,6 +92,12 @@ export const PopperToolButton = ({
   const handleTogglePopper = () => {
     setPopperAnchor((el) => (el ? null : popperAnchorRef.current!));
   };
+  const handleClosePopper = () => setPopperAnchor(null);
+
+  const content =
+    typeof popperContent === "function"
+      ? popperContent(handleClosePopper)
+      : popperContent;
 
   const id = popperAnchor ? "transition-popper" : undefined;
 
@@ -126,10 +132,10 @@ export const PopperToolButton = ({
             <Box>
               {clickAway ? (
                 <ClickAwayListener onClickAway={() => setPopperAnchor(null)}>
-                  {popperContent}
+                  {content}
                 </ClickAwayListener>
               ) : (
-                popperContent
+                content
               )}
             </Box>
           </Fade>
