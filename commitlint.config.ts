@@ -4,10 +4,8 @@ export default {
   extends: ["@commitlint/config-conventional"],
   parserPreset: {
     parserOpts: {
-      parserOpts: {
-        headerPattern: /^(\w*)(?:\(([^)]*)\))?(?:\[([^\]]*)\])?: (.*)$/,
-        headerCorrespondence: ["type", "scope", "work", "subject"],
-      },
+      headerPattern: /^(\w*)(?:\(([^)]*)\))?(?:\[([^\]]*)\])?: (.*)$/,
+      headerCorrespondence: ["type", "scope", "work", "subject"],
     },
   },
   plugins: [
