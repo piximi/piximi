@@ -1,36 +1,24 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { Box, Button, Divider, MenuItem, Typography } from "@mui/material";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 
-import {
-  exportOptions,
-  runAnnotationExport,
-} from "core/file-io/export/runAnnotationExport";
-
 import { StyledSelect } from "components/inputs";
 
-import {
-  selectAllExtendedAnnotations,
-  selectImageEntities,
-  selectKindEntities,
-} from "store/data/selectors";
+import { dataSlice } from "store/data";
 
 import type { SelectChangeEvent } from "@mui/material";
 
-import type { AnnotationExportType } from "core/file-io/export/enums";
-import type { ExportedAnnotation } from "core/file-io/export/types";
+import type { KindNode, OpScope, ScopeId } from "./types";
 
-import type { OpScope, ScopeId } from "./types";
-
-interface ExportOptionsPanelProps {
+interface RecategorizePanelProps {
   scopes: OpScope[];
   scopeToAnnotations: (scope: ScopeId) => Set<string>;
-  experimentName: string;
-  onExported: () => void;
+  onCategorized: () => void;
+  groups: KindNode[];
 }
 
 /**
@@ -38,36 +26,36 @@ interface ExportOptionsPanelProps {
  * popover and the mobile export panel so a format added in one place can't
  * drift out of sync with the other.
  */
-export const ExportOptionsPanel = ({
+export const RecategorizePanel = ({
   scopes,
   scopeToAnnotations,
-  experimentName,
-  onExported,
-}: ExportOptionsPanelProps) => {
-  const annotations = useSelector(selectAllExtendedAnnotations);
-  const images = useSelector(selectImageEntities);
-  const kinds = useSelector(selectKindEntities);
-  const [format, setFormat] = useState<AnnotationExportType>(
-    exportOptions[0].type,
-  );
+  onCategorized,
+  groups,
+}: RecategorizePanelProps) => {
+  const dispatch = useDispatch();
+  const [selectedOption, setSelectedOption] = useState<string>("");
+
   const [scope, setScope] = useState<ScopeId>("selected");
 
-  const handleExport = async () => {
-    const idsInScope = [...scopeToAnnotations(scope)];
-    const annotationsById = new Map(annotations.map((a) => [a.id, a]));
-    const exportedAnnotations: ExportedAnnotation[] = idsInScope.map((id) => {
-      const ann = annotationsById.get(id)!;
-      return {
-        ...ann,
-        kindName: kinds[ann.kindId].name,
-        imageShape: images[ann.imageId].shape,
-      };
+  const options = useMemo(() => {
+    const options: { catId: string; name: string }[] = [];
+    groups.forEach((kg) => {
+      kg.cats.forEach((c) =>
+        options.push({ catId: c.id, name: `${c.name} (${kg.name})` }),
+      );
     });
-
-    await runAnnotationExport(format, exportedAnnotations, experimentName);
+    return options;
+  }, [groups]);
+  const handleCategorize = async () => {
+    if (!selectedOption) return;
+    const updates = [...scopeToAnnotations(scope)].map((id) => ({
+      id,
+      categoryId: selectedOption,
+    }));
+    dispatch(dataSlice.actions.batchBubbleUpdateAnnotationCategory(updates));
   };
   const handleFormatChange = (event: SelectChangeEvent<unknown>) => {
-    setFormat(event.target.value as AnnotationExportType);
+    setSelectedOption(event.target.value as string);
   };
 
   return (
@@ -83,7 +71,7 @@ export const ExportOptionsPanel = ({
           color: "text.secondary",
         }}
       >
-        Export scope
+        Categorize scope
       </Typography>
       {scopes.map((s) => (
         <MenuItem
@@ -130,10 +118,18 @@ export const ExportOptionsPanel = ({
       <Box
         sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, px: 1.5, pb: 1 }}
       >
-        <StyledSelect value={format} onChange={handleFormatChange} fullWidth>
-          {exportOptions.map((option) => (
-            <MenuItem key={option.title} value={option.type} dense>
-              {option.title}
+        <StyledSelect
+          value={selectedOption}
+          onChange={handleFormatChange}
+          fullWidth
+          displayEmpty
+        >
+          <MenuItem disabled value="" dense>
+            <em>Select a category</em>
+          </MenuItem>
+          {options.map((option) => (
+            <MenuItem key={option.catId} value={option.catId} dense>
+              {option.name}
             </MenuItem>
           ))}
         </StyledSelect>
@@ -144,11 +140,11 @@ export const ExportOptionsPanel = ({
           variant="contained"
           size="small"
           onClick={() => {
-            onExported();
-            void handleExport();
+            onCategorized();
+            void handleCategorize();
           }}
         >
-          Export
+          Categorize
         </Button>
       </Box>
     </Box>

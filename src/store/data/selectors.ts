@@ -609,7 +609,7 @@ export const selectImageCategories = createSelector(
   (categories) => categories.filter((c) => c.type === "image"),
 );
 
-const selectAnnotationCategories = createSelector(
+export const selectAnnotationCategories = createSelector(
   categorySelectors.selectAll,
   (categories) => categories.filter((c) => c.type === "annotation"),
 );
