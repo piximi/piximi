@@ -800,7 +800,8 @@ export const dataSlice = createSlice({
 
       action.payload.forEach(({ id, categoryId: targetCatId, predicted }) => {
         const ann = state.annotations.entities[id];
-        if (!ann || !state.categories.entities[targetCatId]) return;
+        const targetCat = state.categories.entities[targetCatId];
+        if (!ann || targetCat?.type !== "annotation") return;
         const volume = state.annotationVolumes.entities[ann.volumeId];
         if (!volume || volume.categoryId === targetCatId) return;
 
@@ -830,6 +831,7 @@ export const dataSlice = createSlice({
         );
 
         volumeChanges[ann.volumeId] = {
+          kindId: targetCat.kindId,
           categoryId: targetCatId,
           predictedAtRunId: predicted?.predictedAtRunId,
           predictionConfidence: predicted?.predictionConfidence,

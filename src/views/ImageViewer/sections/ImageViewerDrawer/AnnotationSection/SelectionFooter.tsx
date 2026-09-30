@@ -2,22 +2,13 @@ import { useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Box,
-  Button,
-  Menu,
-  MenuItem,
-  Popover,
-  Typography,
-  Link,
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DownloadIcon from "@mui/icons-material/Download";
+import { Box, Menu, MenuItem, Popover, Typography, Link } from "@mui/material";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 
 import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
+import { TooltipTextButton } from "components/inputs";
 
 import { selectExperiment } from "store/data/selectors";
 import { dataSlice } from "store/data";
@@ -26,8 +17,9 @@ import { HelpItem } from "help/HelpContent";
 import { HotkeyContext } from "utils/enums";
 
 import { ExportOptionsPanel } from "./ExportOptionsPanel";
+import { RecategorizePanel } from "./RecategorizePanel";
 
-import type { OpScope, ScopeId } from "./types";
+import type { KindNode, OpScope, ScopeId } from "./types";
 
 interface SelectionFooterProps {
   selSummary: string;
@@ -38,6 +30,7 @@ interface SelectionFooterProps {
   totalCount: number;
   onClear: () => void;
   scopeToAnnotations: (scope: ScopeId) => Set<string>;
+  groups: KindNode[];
 }
 
 /**
@@ -54,10 +47,12 @@ export const SelectionFooter = ({
   totalCount,
   onClear,
   scopeToAnnotations,
+  groups,
 }: SelectionFooterProps) => {
   const dispatch = useDispatch();
   const [delAnchor, setDelAnchor] = useState<HTMLElement | null>(null);
   const [expAnchor, setExpAnchor] = useState<HTMLElement | null>(null);
+  const [catAnchor, setCatAnchor] = useState<HTMLElement | null>(null);
   const [pendingScope, setPendingScope] = useState<ScopeId | null>(null);
   const {
     onOpen: openDeleteConfirm,
@@ -123,30 +118,44 @@ export const SelectionFooter = ({
       </Box>
 
       {/* act on selection */}
+
       <Box sx={{ display: "flex", gap: 1 }}>
-        <Button
-          fullWidth
+        <TooltipTextButton
           color="error"
           variant="outlined"
-          size="small"
-          startIcon={<DeleteIcon />}
           endIcon={<ArrowDropUpIcon />}
           onClick={(e) => setDelAnchor(e.currentTarget)}
-        >
-          Delete
-        </Button>
-        <Button
-          fullWidth
-          variant="contained"
-          size="small"
-          startIcon={<DownloadIcon />}
+          label="Delete"
+          tooltipText="Delete annotations"
+          sx={{ fontSize: 12 }}
+        />
+        <TooltipTextButton
+          variant="outlined"
+          endIcon={<ArrowDropUpIcon />}
+          onClick={(e) => setCatAnchor(e.currentTarget)}
+          label="Categorize"
+          tooltipText="Categorize annotations"
+          sx={{ fontSize: 12 }}
+        />
+        <TooltipTextButton
+          variant="outlined"
           endIcon={<ArrowDropUpIcon />}
           onClick={(e) => setExpAnchor(e.currentTarget)}
+          label="Export"
+          tooltipText="Export annotations"
           data-help={HelpItem.ExportAnnotation}
-        >
-          Export
-        </Button>
+          sx={{ fontSize: 12 }}
+        />
       </Box>
+      {catAnchor && (
+        <CategorizePopover
+          catAnchor={catAnchor}
+          onClose={() => setCatAnchor(null)}
+          scopes={scopes}
+          scopeToAnnotations={scopeToAnnotations}
+          groups={groups}
+        />
+      )}
       {expAnchor && (
         <ExportPopover
           expAnchor={expAnchor}
@@ -170,7 +179,7 @@ export const SelectionFooter = ({
             pb: 0.75,
             fontSize: 11,
             fontWeight: 600,
-            letterSpacing: ".5px",
+            letterSpacing: ".6px",
             textTransform: "uppercase",
             color: "text.secondary",
           }}
@@ -190,7 +199,7 @@ export const SelectionFooter = ({
               py: 0,
               minHeight: 24,
               color: "error.main",
-              minWidth: 200,
+              minWidth: 150,
               borderRadius: 0,
             }}
             disabled={s.count === 0}
@@ -218,6 +227,36 @@ export const SelectionFooter = ({
         isOpen={deleteConfirmOpen}
       />
     </Box>
+  );
+};
+const CategorizePopover = ({
+  catAnchor,
+  onClose,
+  scopes,
+  scopeToAnnotations,
+  groups,
+}: {
+  catAnchor: HTMLElement;
+  onClose: () => void;
+  scopes: OpScope[];
+  scopeToAnnotations: (scope: ScopeId) => Set<string>;
+  groups: KindNode[];
+}) => {
+  return (
+    <Popover
+      anchorEl={catAnchor}
+      open
+      onClose={onClose}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+    >
+      <RecategorizePanel
+        scopes={scopes}
+        scopeToAnnotations={scopeToAnnotations}
+        onCategorized={onClose}
+        groups={groups}
+      />
+    </Popover>
   );
 };
 

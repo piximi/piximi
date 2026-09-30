@@ -160,6 +160,7 @@ export const AnnotationSection = () => {
         totalCount={annotations.length}
         onClear={clearSel}
         scopeToAnnotations={idsForScope}
+        groups={groups.list}
       />
     </Box>
   );
