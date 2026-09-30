@@ -2,12 +2,13 @@ import { useDispatch } from "react-redux";
 
 import AddIcon from "@mui/icons-material/Add";
 
+import { TooltipTextButton } from "components/inputs";
+
 import { projectReset } from "store/actions";
 import { HelpItem } from "help/HelpContent";
 
 import { clearCache } from "utils/renderedSrcsCache";
 
-import { TooltipTextButton } from "@ProjectViewer/components";
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";
 
 export const NewProjectButton = () => {

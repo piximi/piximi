@@ -3,11 +3,11 @@ import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialog, useDialogHotkey } from "hooks";
 
+import { TooltipTextButton } from "components/inputs";
+
 import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
-
-import { TooltipTextButton } from "views/ProjectViewer/components";
 
 import { SaveFittedModelDialog } from "@ProjectViewer/components/dialogs";
 

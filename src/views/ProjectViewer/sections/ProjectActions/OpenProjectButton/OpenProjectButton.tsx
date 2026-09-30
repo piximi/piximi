@@ -2,9 +2,9 @@ import { useCallback, useState } from "react";
 
 import { FolderOpen as FolderOpenIcon } from "@mui/icons-material";
 
-import { HelpItem } from "help/HelpContent";
+import { TooltipTextButton } from "components/inputs";
 
-import { TooltipTextButton } from "@ProjectViewer/components";
+import { HelpItem } from "help/HelpContent";
 
 import { OpenMenu } from "./OpenMenu";
 
