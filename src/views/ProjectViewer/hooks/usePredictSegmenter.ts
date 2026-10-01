@@ -253,6 +253,21 @@ export const usePredictSegmenter = () => {
         channelRefs: Array<{ id: string }>;
         objs: AnnotationObject[];
       }> = [];
+
+      const totalAnnotations = predictedAnnotations.reduce(
+        (cnt: number, anns) => {
+          cnt += anns.length;
+          return cnt;
+        },
+        0,
+      );
+      dispatch(
+        appTasksSlice.actions.taskUpdated({
+          id: taskId,
+          progress: -1,
+          label: `Processing ${totalAnnotations} annotations`,
+        }),
+      );
       for await (const [i, _annotations] of predictedAnnotations.entries()) {
         const image = inferenceImages[i];
         const imageAnns: AnnotationObject[] = [];
@@ -353,7 +368,13 @@ export const usePredictSegmenter = () => {
     }
     if (predictionCancelled)
       dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
-    else dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
+    else
+      dispatch(
+        appTasksSlice.actions.taskCompleted({
+          id: taskId,
+          label: "Segmentation finished",
+        }),
+      );
     setModelStatus("idle");
 
     taskCancelRegistry.unregister(taskId);
