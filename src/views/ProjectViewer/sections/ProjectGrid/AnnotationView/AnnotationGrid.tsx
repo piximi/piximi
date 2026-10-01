@@ -1,16 +1,20 @@
 import { useCallback, useMemo } from "react";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import { Box, Typography } from "@mui/material";
 
 import { usePreloadSrcs } from "hooks";
 
-import { selectExtendedAnnotationsByKindId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
-
-import { isFiltered } from "views/ProjectViewer/utils";
 
 import { useAnnotationSort } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
+import { selectVisibleAnnotationsByKind } from "@ProjectViewer/state/reselectors";
+import {
+  selectFilterSelectedImages,
+  selectSelectedImageIds,
+} from "@ProjectViewer/state/selectors";
 
 import { AnnotationGridItem } from "./AnnotationGridItem";
 import { createGridCell, createItemData } from "../gridUtils";
@@ -25,19 +29,23 @@ const Cell = createGridCell(AnnotationGridItem);
 // by the active kind selector to keep from rerendering the grid items when switching tabs
 export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
   const dispatch = useDispatch();
-  const annotations = useParameterizedSelector(
-    selectExtendedAnnotationsByKindId,
+  const visibleAnnotations = useParameterizedSelector(
+    selectVisibleAnnotationsByKind,
     kindState.id,
   );
+  const onlySelectedImages = useSelector(selectFilterSelectedImages);
+  const selectedImageIds = useSelector(selectSelectedImageIds);
   const sortFunction = useAnnotationSort(kindState.sortType);
 
   const visibleAnns = useMemo(
-    () =>
-      annotations
-        .filter((ann) => !isFiltered(ann, kindState.filters ?? {}))
-        .sort(sortFunction),
-    [annotations, kindState.filters, sortFunction],
+    () => [...visibleAnnotations].sort(sortFunction),
+    [visibleAnnotations, sortFunction],
   );
+
+  // An empty image selection filters everything out, which would otherwise
+  // render as a blank panel.
+  const awaitingImageSelection =
+    onlySelectedImages && selectedImageIds.length === 0;
   const {
     gridRef,
     gridWidth,
@@ -76,6 +84,24 @@ export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
     },
     [dispatch],
   );
+
+  if (awaitingImageSelection) {
+    return (
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          px: 4,
+        }}
+      >
+        <Typography variant="body2" color="text.secondary" align="center">
+          Select images in the image grid to see their annotations.
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <VirtualGrid

@@ -14,7 +14,12 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 
 import type { Partition } from "core/dl/enums";
 
-import type { KindState, ProjectState, ViewState } from "./types";
+import type {
+  AnnotationStatusFilter,
+  KindState,
+  ProjectState,
+  ViewState,
+} from "./types";
 
 const emptyKindState = (id: string, name: string): KindState => ({
   id,
@@ -39,12 +44,14 @@ const initialState: ProjectState = {
       predictionConfidence: { min: 0, max: 100 },
     },
     sortType: ImageSortType.None,
+    annotationStatus: "all",
   },
   annotationGridState: {
     activeKindId: UNKNOWN_KIND.id,
     kindStates: {
       [UNKNOWN_KIND.id]: emptyKindState(UNKNOWN_KIND.id, UNKNOWN_KIND.name),
     },
+    filterSelectedImages: false,
   },
   highlightedCategory: undefined,
 };
@@ -103,6 +110,12 @@ export const projectSlice = createSlice({
     setImageSortType(state, action: PayloadAction<ImageSortType>) {
       state.imageGridState.sortType = action.payload;
     },
+    setImageAnnotationStatusFilter(
+      state,
+      action: PayloadAction<AnnotationStatusFilter>,
+    ) {
+      state.imageGridState.annotationStatus = action.payload;
+    },
 
     addImageCategoryFilters(state, action: PayloadAction<string[]>) {
       const ids = action.payload;
@@ -138,6 +151,10 @@ export const projectSlice = createSlice({
     },
 
     // ~~ Annotation Grid State
+    toggleFilterSelectedImages(state) {
+      state.annotationGridState.filterSelectedImages =
+        !state.annotationGridState.filterSelectedImages;
+    },
     setActiveKind(state, action: PayloadAction<string>) {
       if (!state.annotationGridState.kindStates[action.payload]) return;
       state.annotationGridState.activeKindId = action.payload;

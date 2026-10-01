@@ -39,10 +39,12 @@ export type ImageFilters = Required<
     "categoryId" | "partition" | "predictionConfidence"
   >
 >;
+export type AnnotationStatusFilter = "all" | "annotated" | "unannotated";
 export type ImageGridState = {
   selectedIds: string[];
   filters: ImageFilters;
   sortType: ImageSortType;
+  annotationStatus: AnnotationStatusFilter;
 };
 
 export type AnnotationFilters = Required<
@@ -62,6 +64,7 @@ export type KindState = {
 export type AnnotationGridState = {
   activeKindId: string;
   kindStates: Record<string, KindState>;
+  filterSelectedImages: boolean;
 };
 
 export type ViewState = "images" | "annotations";

@@ -553,6 +553,20 @@ export const selectAnnotationVolumesByImageId = createSelector(
 );
 
 /*
+ * The ids of every image carrying at least one annotation.
+ *
+ * Derived from volumes rather than annotations: there is one volume per object
+ * against one annotation per plane per object, and `deleteAnnotation` drops a
+ * volume once its last annotation goes, so a volume always implies an
+ * annotation. Returned as a `Set` so callers can test an image in O(1) instead
+ * of reaching for the per-image selectors above.
+ */
+export const selectAnnotatedImageIds = createSelector(
+  annotationVolumeSelectors.selectAll,
+  (volumes) => new Set(volumes.map((volume) => volume.imageId)),
+);
+
+/*
  * ───────────────────────────────────────────────────────────────────────
  * ── Planes ─────────────────────────────────────────────────────────────
  * ───────────────────────────────────────────────────────────────────────
