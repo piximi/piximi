@@ -4,6 +4,8 @@ import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import type {
   AnnotationGridState,
+  AnnotationStatusFilter,
+  ImageFilters,
   ImageGridState,
   ImageSortType,
   ProjectState,
@@ -48,6 +50,22 @@ export const selectImageSortType = ({
   return project.imageGridState.sortType;
 };
 
+export const selectImageFilters = ({
+  project,
+}: {
+  project: ProjectState;
+}): ImageFilters => {
+  return project.imageGridState.filters;
+};
+
+export const selectImageAnnotationStatusFilter = ({
+  project,
+}: {
+  project: ProjectState;
+}): AnnotationStatusFilter => {
+  return project.imageGridState.annotationStatus;
+};
+
 /*
 ~~ ANNOTATION GRID
 */
@@ -58,6 +76,14 @@ export const selectAnnotationGridState = ({
   project: ProjectState;
 }): AnnotationGridState => {
   return project.annotationGridState;
+};
+
+export const selectFilterSelectedImages = ({
+  project,
+}: {
+  project: ProjectState;
+}): boolean => {
+  return project.annotationGridState.filterSelectedImages;
 };
 
 export const selectKindStates = ({ project }: { project: ProjectState }) => {
@@ -113,11 +139,24 @@ export const selectActiveStateIsFiltered = ({
       ? project.imageGridState
       : project.annotationGridState.kindStates[activeKindId];
 
-  return Boolean(
-    Object.values(activeState.filters).reduce((cnt: number, f) => {
-      cnt += Array.isArray(f) ? f.length : 100 - f.max + f.min;
-      return cnt;
-    }, 0),
+  /*
+   * `annotationStatus` and `filterSelectedImages` live beside `filters` rather
+   * than in it — neither is expressible as a `FilterType` key — so each needs
+   * its own term here to keep the indicator honest.
+   */
+  const narrowedOutsideFilters =
+    viewState === "images"
+      ? project.imageGridState.annotationStatus !== "all"
+      : project.annotationGridState.filterSelectedImages;
+
+  return (
+    narrowedOutsideFilters ||
+    Boolean(
+      Object.values(activeState.filters).reduce((cnt: number, f) => {
+        cnt += Array.isArray(f) ? f.length : 100 - f.max + f.min;
+        return cnt;
+      }, 0),
+    )
   );
 };
 
