@@ -32,11 +32,17 @@ export const appTasksSlice = createSlice({
       if (action.payload.label) task.label = action.payload.label;
     },
 
-    taskCompleted(state, action: PayloadAction<{ id: string }>) {
-      const task = state.tasks[action.payload.id];
+    taskCompleted(
+      state,
+      action: PayloadAction<{ id: string; label?: string }>,
+    ) {
+      const { id, label } = action.payload;
+      const task = state.tasks[id];
       if (!task) return;
       task.status = "success";
       task.progress = 100;
+      if (label) task.label = label;
+      else task.label = "Task completed successfuly";
       task.completedAt = Date.now();
     },
     taskFailed(state, action: PayloadAction<{ id: string; error: string }>) {
