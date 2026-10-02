@@ -25,6 +25,7 @@ export type SerializedSegmenterModelConfig = {
   model: string;
   channelSelection: Array<string>;
   optionValues: SegmenterOptionValues;
+  kindName: string | undefined;
 };
 
 export type SerializedSegmenterState = {

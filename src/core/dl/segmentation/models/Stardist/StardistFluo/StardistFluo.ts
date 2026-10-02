@@ -1,7 +1,8 @@
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 
-import { KIND_NAME, Stardist } from "../AbstractStardist";
+import { Stardist } from "../AbstractStardist";
 import { loadStardistFluo } from "./loadStardistFluo";
+import { OUTPUT_MODE } from "../../consts";
 
 /*
  * Stardist (Versatile) Fluorescence Nuclei Segmentation
@@ -15,7 +16,10 @@ export class StardistFluo extends Stardist {
   constructor() {
     super({
       name: "StardistFluo",
-      kind: KIND_NAME,
+      outputPolicy: {
+        mode: OUTPUT_MODE.SINGLE,
+        defaultKindName: "stardist_nucleas",
+      },
       channelPolicy: { mode: CHANNEL_MODE.FIXED, count: 1 },
     });
   }

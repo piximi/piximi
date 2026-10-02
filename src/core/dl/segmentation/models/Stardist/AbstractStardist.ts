@@ -10,16 +10,16 @@ import type { GraphModel } from "@tensorflow/tfjs";
 
 import type { LoadCB } from "utils/types";
 
-import type { PredictedAnnotationObject } from "../../types";
+import type {
+  PredictedAnnotationObject,
+  SegmenterOptionValues,
+} from "../../types";
 import type { InferenceInput } from "../../../types";
 
-export const KIND_NAME = "stardist_nucleus";
 /*
  * Abstract model for Stardist variants
  */
 export abstract class Stardist extends Segmenter {
-  protected readonly segmentedKind = KIND_NAME;
-
   public abstract loadModel(): Promise<void>;
 
   // This Stardist model requires image dimensions to be a multiple of 16
@@ -41,9 +41,14 @@ export abstract class Stardist extends Segmenter {
     items: InferenceInput[],
     cancelToken: Token,
     loadCb: LoadCB,
+    _options?: SegmenterOptionValues,
+    kindName?: string,
   ) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
+    }
+    if (!kindName) {
+      throw Error(`"${this.name}" requires an output kind name`);
     }
 
     if (this._model instanceof LayersModel) {
@@ -83,7 +88,7 @@ export abstract class Stardist extends Segmenter {
           const annotObj = await predictStardist(
             graphModel,
             imTensor,
-            this.segmentedKind,
+            kindName,
             inferenceDataDims![idx],
           );
           annotations.push(annotObj);

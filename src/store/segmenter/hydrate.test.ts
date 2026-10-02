@@ -40,6 +40,7 @@ describe("hydrateSegmenterState", () => {
           model: "Cellpose-SAM",
           channelSelection: ["ch-3", "ch-1"],
           optionValues: {},
+          kindName: undefined,
         },
       ],
     };
@@ -58,6 +59,7 @@ describe("hydrateSegmenterState", () => {
           model: "Cellpose-SAM",
           channelSelection: ["ch-1", "ch-gone"],
           optionValues: {},
+          kindName: undefined,
         },
       ],
     };
@@ -76,6 +78,7 @@ describe("hydrateSegmenterState", () => {
           model: "Cellpose-SAM",
           channelSelection: [],
           optionValues: { diameter: 30 },
+          kindName: undefined,
         },
       ],
     };
@@ -98,6 +101,7 @@ describe("hydrateSegmenterState", () => {
           model: "Cellpose-SAM",
           channelSelection: [],
           optionValues: { diameter: undefined },
+          kindName: undefined,
         },
       ],
     };
@@ -120,6 +124,7 @@ describe("hydrateSegmenterState", () => {
           optionValues: {
             niter: { nested: true },
           } as never,
+          kindName: undefined,
         },
       ],
     };
@@ -138,6 +143,7 @@ describe("hydrateSegmenterState", () => {
           model: "RetiredNet",
           channelSelection: ["ch-1"],
           optionValues: { whatever: 1 },
+          kindName: undefined,
         },
       ],
     };
@@ -153,11 +159,13 @@ describe("hydrateSegmenterState", () => {
           model: "Cellpose-SAM",
           channelSelection: ["ch-1"],
           optionValues: {},
+          kindName: undefined,
         },
         {
           model: "StardistVHE",
           channelSelection: ["ch-2"],
           optionValues: {},
+          kindName: undefined,
         },
       ],
     };
@@ -172,7 +180,12 @@ describe("hydrateSegmenterState", () => {
     const saved: SerializedSegmenterState = {
       loadedModel: "Cellpose-SAM",
       configs: [
-        { model: "Cellpose-SAM", channelSelection: [], optionValues: {} },
+        {
+          model: "Cellpose-SAM",
+          channelSelection: [],
+          optionValues: {},
+          kindName: undefined,
+        },
       ],
     };
 

@@ -688,11 +688,16 @@ const readSegmenter = async (
     segmenterGroup,
     ZARR_V2_SEGMENTER.OptionValues,
   )) as Array<Array<[string, unknown]>>;
+  const kindNames = (await getAttr(
+    segmenterGroup,
+    ZARR_V2_SEGMENTER.KindNames,
+  )) as Nullable<string>[];
 
   const configs: SerializedSegmenterModelConfig[] = models.map((model, i) => ({
     model,
     channelSelection: channelSelections[i],
     optionValues: readOptionValues(optionValues[i]),
+    kindName: optional(kindNames[i]),
   }));
 
   return {

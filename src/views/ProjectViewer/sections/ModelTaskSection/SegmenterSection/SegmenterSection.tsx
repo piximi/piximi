@@ -1,21 +1,19 @@
-import { Box, Divider } from "@mui/material";
+import { Stack } from "@mui/material";
 
 import { ModelActions } from "./ModelActions";
-import { ModelInfo } from "./ModelInfo";
+import { SegmenterOptions } from "./SegmenterOptions";
 
 export const SegmenterSection = () => {
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      gap={1}
-      width="100%"
-      px={1}
+    <Stack
+      sx={{
+        width: "100%",
+        gap: 0.5,
+        px: 1,
+      }}
     >
-      <ModelInfo />
-      <Divider flexItem />
       <ModelActions />
-    </Box>
+      <SegmenterOptions />
+    </Stack>
   );
 };

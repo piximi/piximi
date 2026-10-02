@@ -6,6 +6,7 @@ import {
 } from "core/dl/segmentation/channelUtils";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { MODELS } from "core/dl/segmentation/types";
+import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 
 import { projectReset } from "store/actions";
 
@@ -20,26 +21,12 @@ import type {
 
 import type { SegmenterModelConfig, SegmenterSliceState } from "./types";
 
-export const getInitialModelConfig = (
-  model: ModelName,
-): SegmenterModelConfig => {
-  if (model === "Cellpose-SAM")
-    return {
-      model: model,
-      modelStatus: "idle",
-      channelSelection: [],
-      optionValues: {
-        diameter: "",
-        cellPropThreshold: 0,
-        resample: "false",
-        niter: 200,
-        maxSizeFraction: 0.4,
-      },
-    };
+export const getBlankModelConfig = (model: ModelName): SegmenterModelConfig => {
   return {
-    model: model,
+    model,
     modelStatus: "idle",
     channelSelection: [],
+    kindName: undefined,
     optionValues: {},
   };
 };
@@ -50,16 +37,16 @@ export const getInitialModelConfig = (
  * and so the project loader can build the same map before overlaying whatever
  * a saved project carried.
  */
-export const createModelConfigMap = (
+export const createBlankModelConfigMap = (
   modelNames: readonly ModelName[],
 ): Record<ModelName, SegmenterModelConfig> =>
   Object.fromEntries(
-    modelNames.map((name) => [name, getInitialModelConfig(name)]),
+    modelNames.map((name) => [name, getBlankModelConfig(name)]),
   ) as Record<ModelName, SegmenterModelConfig>;
 
 export const getInitialState = (): SegmenterSliceState => ({
   loadedModel: undefined,
-  configMap: createModelConfigMap(MODELS),
+  configMap: createBlankModelConfigMap(MODELS),
 });
 export const segmenterSlice = createSlice({
   name: "segmenter",
@@ -85,6 +72,14 @@ export const segmenterSlice = createSlice({
     ) {
       const { model, availableChannelIds } = action.payload;
       state.loadedModel = model;
+
+      if (
+        !state.configMap[model.name].kindName &&
+        model.outputPolicy.mode === OUTPUT_MODE.SINGLE
+      )
+        state.configMap[model.name].kindName =
+          model.outputPolicy.defaultKindName;
+
       // Reconcile rather than reseed: a selection restored from a saved project
       // is only visible once its model is loaded, so overwriting here would
       // destroy it at the exact moment it became usable.
@@ -93,6 +88,12 @@ export const segmenterSlice = createSlice({
         state.configMap[model.name].channelSelection,
         availableChannelIds,
       );
+    },
+    kindNameSet(state, action: PayloadAction<string>) {
+      const model = state.loadedModel;
+      if (!model) return;
+
+      state.configMap[model.name].kindName = action.payload;
     },
     optionValueSet(
       state,
@@ -159,7 +160,7 @@ export const segmenterSlice = createSlice({
       const { availableChannelIds } = action.payload;
       const model = state.loadedModel;
       if (!model) return;
-      state.configMap[model.name] = getInitialModelConfig(model.name);
+      state.configMap[model.name] = getBlankModelConfig(model.name);
       state.configMap[model.name].channelSelection = getDefaultChannelIds(
         model.channelPolicy,
         availableChannelIds,

@@ -1,54 +1,24 @@
-import { useState } from "react";
-
-import { Box, Button, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
 import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { SegmenterOptionsPanel, ChannelMapping } from "./settings";
+import { SectionHeader } from "./SectionHeader";
+import { ModelOutput } from "./settings/ModelOutput";
 
 export const SegmenterOptions = () => {
-  const { loadedModel, schema } = useSegmenter();
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
-  const hasAdvanced = schema?.groups.some(
-    (group) =>
-      !group.describesChannels && group.fields.some((field) => field.advanced),
-  );
+  const { loadedModel } = useSegmenter();
 
   return !loadedModel ? null : (
     <Box sx={{ width: "100%" }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography
-          variant="overline"
-          color="text.secondary"
-          sx={{ display: "block", lineHeight: 1.6 }}
-        >
-          Model Settings
-        </Typography>
-        {hasAdvanced && (
-          <Button
-            size="small"
-            onClick={() => setShowAdvanced((shown) => !shown)}
-            sx={{
-              font: "var(--mui-font-caption)",
-              textTransform: "none",
-            }}
-          >
-            {showAdvanced ? "Hide Advanced" : "Show Advanced"}
-          </Button>
-        )}
-      </Box>
+      <SectionHeader title="Model Settings" />
+
       <Box
         sx={{ display: "flex", flexDirection: "column", width: "100%", px: 1 }}
       >
+        <ModelOutput />
         <ChannelMapping />
-        <SegmenterOptionsPanel showAdvanced={showAdvanced} />
+        <SegmenterOptionsPanel />
       </Box>
     </Box>
   );

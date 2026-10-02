@@ -409,6 +409,7 @@ const writeSegmenter = async (root: Group, segmenter: SegmenterSliceState) => {
     [ZARR_V2_SEGMENTER.ChannelSelection]: configs.map(
       (c) => c.channelSelection,
     ),
+    [ZARR_V2_SEGMENTER.KindNames]: configs.map((c) => c.kindName ?? null),
     [ZARR_V2_SEGMENTER.OptionValues]: configs.map((c) =>
       optionValueEntries(c.optionValues),
     ),

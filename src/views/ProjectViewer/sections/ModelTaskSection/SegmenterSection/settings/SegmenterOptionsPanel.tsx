@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Box, Button, Collapse, Divider, Typography } from "@mui/material";
 
 import { isFieldVisible } from "core/dl/segmentation/optionUtils";
@@ -13,13 +15,14 @@ import type { SegmenterOptionField } from "core/dl/segmentation/types";
  * nothing about any particular model — a segmenter without an `optionSchema`
  * simply renders nothing.
  */
-export const SegmenterOptionsPanel = ({
-  showAdvanced,
-}: {
-  showAdvanced: boolean;
-}) => {
+export const SegmenterOptionsPanel = () => {
   const { optionValues, resetOptions, schema } = useSegmenter();
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
+  const hasAdvanced = schema?.groups.some(
+    (group) =>
+      !group.describesChannels && group.fields.some((field) => field.advanced),
+  );
   const visible = (fields: SegmenterOptionField[], advanced: boolean) =>
     fields.filter(
       (field) =>
@@ -70,17 +73,37 @@ export const SegmenterOptionsPanel = ({
             </Box>
           );
         })}
-      <Button
-        size="small"
-        onClick={resetOptions}
+      <Box
         sx={{
-          font: "var(--mui-font-caption)",
-          textTransform: "none",
-          alignSelf: "flex-end",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        Restore defaults
-      </Button>
+        {hasAdvanced && (
+          <Button
+            size="small"
+            onClick={() => setShowAdvanced((shown) => !shown)}
+            sx={{
+              font: "var(--mui-font-caption)",
+              textTransform: "none",
+            }}
+          >
+            {showAdvanced ? "Hide Advanced" : "Show Advanced"}
+          </Button>
+        )}
+        <Button
+          size="small"
+          onClick={resetOptions}
+          sx={{
+            font: "var(--mui-font-caption)",
+            textTransform: "none",
+            alignSelf: "flex-end",
+          }}
+        >
+          Restore defaults
+        </Button>
+      </Box>
     </Box>
   );
 };

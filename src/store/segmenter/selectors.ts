@@ -36,6 +36,14 @@ export const selectSegmenterStatus = createSelector(
   },
 );
 
+export const selectSegmenterKindName = createSelector(
+  selectSegmenterConfig,
+  (config): string | undefined => {
+    if (!config) return undefined;
+    return config.kindName;
+  },
+);
+
 export const selectSegmenterChannels = createSelector(
   selectSegmenterConfig,
   (config): string[] => {

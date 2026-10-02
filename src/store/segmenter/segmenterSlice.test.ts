@@ -4,8 +4,8 @@ import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { MODELS } from "core/dl/segmentation/types";
 
 import {
-  createModelConfigMap,
-  getInitialModelConfig,
+  createBlankModelConfigMap,
+  getBlankModelConfig,
   segmenterSlice,
 } from "./segmenterSlice";
 
@@ -26,7 +26,7 @@ const passthroughModel = {
   channelPolicy: { mode: CHANNEL_MODE.PASSTHROUGH, maxChannels: 4 },
 } as unknown as SegmentationModelDetails;
 
-const CELLPOSE_INIT_CONFIG = getInitialModelConfig("Cellpose-SAM");
+const CELLPOSE_INIT_CONFIG = getBlankModelConfig("Cellpose-SAM");
 
 const { actions, reducer, getInitialState } = segmenterSlice;
 
@@ -250,10 +250,10 @@ describe("segmenterSlice", () => {
  */
 describe("segmenterSlice persistence support", () => {
   it("builds a config for every model name it is given", () => {
-    const map = createModelConfigMap(MODELS);
+    const map = createBlankModelConfigMap(MODELS);
 
     expect(Object.keys(map).sort()).toEqual([...MODELS].sort());
-    expect(map["Cellpose-SAM"]).toEqual(getInitialModelConfig("Cellpose-SAM"));
+    expect(map["Cellpose-SAM"]).toEqual(getBlankModelConfig("Cellpose-SAM"));
   });
 
   it("keeps a restored channel selection when the model loads", () => {
@@ -263,7 +263,7 @@ describe("segmenterSlice persistence support", () => {
         segmenter: {
           loadedModel: undefined,
           configMap: {
-            ...createModelConfigMap(MODELS),
+            ...createBlankModelConfigMap(MODELS),
             "Cellpose-SAM": {
               ...CELLPOSE_INIT_CONFIG,
               channelSelection: ["c", "a"],
@@ -288,7 +288,7 @@ describe("segmenterSlice persistence support", () => {
         segmenter: {
           loadedModel: undefined,
           configMap: {
-            ...createModelConfigMap(MODELS),
+            ...createBlankModelConfigMap(MODELS),
             "Cellpose-SAM": {
               ...CELLPOSE_INIT_CONFIG,
               channelSelection: ["a", "gone"],
@@ -307,7 +307,7 @@ describe("segmenterSlice persistence support", () => {
   });
 
   it("replaces the whole slice on setSegmenter", () => {
-    const configMap = createModelConfigMap(MODELS);
+    const configMap = createBlankModelConfigMap(MODELS);
     configMap.StardistVHE = {
       ...configMap.StardistVHE,
       optionValues: { probThresh: 0.7 },

@@ -15,6 +15,7 @@ import type { LoadCB } from "utils/types";
 import type {
   ChannelPolicy,
   ModelName,
+  OutputPolicy,
   SegmentationResults,
   SegmenterOptionSchema,
   SegmenterOptionValues,
@@ -22,7 +23,7 @@ import type {
 
 type ModelArgs = {
   name: ModelName;
-  kind?: string | Array<string>;
+  outputPolicy: OutputPolicy;
   channelPolicy: ChannelPolicy;
   /*
    * Declarative inference knobs surfaced to the UI. Must be plain data — it is
@@ -40,8 +41,7 @@ type ModelArgs = {
 };
 export abstract class Segmenter {
   readonly name: ModelName;
-  readonly kind?: string | Array<string>;
-
+  readonly outputPolicy: OutputPolicy;
   readonly channelPolicy: ChannelPolicy;
   readonly optionSchema?: SegmenterOptionSchema;
   readonly src?: string;
@@ -52,14 +52,14 @@ export abstract class Segmenter {
 
   constructor({
     name,
-    kind,
+    outputPolicy,
     channelPolicy,
     optionSchema,
     src,
     cancellableLoad = false,
   }: ModelArgs) {
     this.name = name;
-    this.kind = kind;
+    this.outputPolicy = outputPolicy;
     this.channelPolicy = channelPolicy;
     this.optionSchema = optionSchema;
     this.src = src;
@@ -84,12 +84,17 @@ export abstract class Segmenter {
   /*
    * `options` is a plain bag of values keyed by `optionSchema`. Models without a
    * schema simply declare fewer parameters and never see it.
+   *
+   * `kindName` is the kind every returned annotation lands in, resolved from the
+   * model's config. Models whose OutputPolicy is `classes` kind each detection
+   * themselves and never declare it.
    */
   public abstract predict(
     items: InferenceInput[],
     cancelToken: Token,
     loadCb?: LoadCB,
     options?: SegmenterOptionValues,
+    kindName?: string,
   ): SegmentationResults | Promise<SegmentationResults>;
 
   public async getSavedModelFiles() {

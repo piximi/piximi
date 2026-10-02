@@ -239,6 +239,7 @@ export const ZARR_V2_SEGMENTER = {
   Models: "models",
   ChannelSelection: "channel_selection",
   OptionValues: "option_values",
+  KindNames: "kind_names",
 } as const;
 
 export const ZARR_V2_MODEL_INFO = {

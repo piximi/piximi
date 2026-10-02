@@ -463,4 +463,13 @@ const COCO_CLASSES: {
   },
 };
 
+/*
+ * Output kind names, indexed by the 0-based class index the SSD graph emits.
+ * The map above is the full contiguous 1..90 COCO id space, so position `j`
+ * here is class id `j + 1` — matching upstream tfjs-models' `CLASSES[j + 1]`.
+ */
+export const COCO_KIND_NAMES: Array<string> = Object.values(COCO_CLASSES).map(
+  (cocoClass) => cocoClass.displayName,
+);
+
 export default COCO_CLASSES;

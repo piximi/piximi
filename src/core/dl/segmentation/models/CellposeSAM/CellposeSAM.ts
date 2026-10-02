@@ -12,6 +12,7 @@ import {
   toCellposeSegmentOptions,
 } from "./options";
 import { CHANNEL_MODE } from "../../optionUtils";
+import { OUTPUT_MODE } from "../consts";
 
 import type { SegmentInput } from "cellpose-js";
 import type { GraphModel } from "@tensorflow/tfjs";
@@ -24,8 +25,6 @@ import type {
   PredictedAnnotationObject,
   SegmenterOptionValues,
 } from "../../types";
-
-const KIND_NAME = "cellpose_cells";
 
 // URL prefix (same-origin) where ORT-web's WASM/JSEP sidecar files are served.
 // See scripts/copyOrtWasm.js, which copies them into public/ort/.
@@ -47,14 +46,15 @@ const MODEL_URL =
  * Safari >=17.4); `fromPretrained` throws `UnsupportedEnvironmentError` otherwise.
  */
 export class CellposeSAM extends Segmenter {
-  protected readonly segmentedKind = KIND_NAME;
-
   private _cp?: CellposeJs;
 
   constructor() {
     super({
       name: "Cellpose-SAM",
-      kind: KIND_NAME,
+      outputPolicy: {
+        mode: OUTPUT_MODE.SINGLE,
+        defaultKindName: "cellpose_cells",
+      },
       /*
        * Channel-agnostic: cellpose-js normalizes each source channel
        * independently and truncates to the first 3, so there is nothing to map
@@ -140,9 +140,13 @@ export class CellposeSAM extends Segmenter {
     cancelToken: CancelToken,
     loadCb: LoadCB,
     options?: SegmenterOptionValues,
+    kindName?: string,
   ) {
     if (!this._cp) {
       throw Error(`"${this.name}" Model not loaded`);
+    }
+    if (!kindName) {
+      throw Error(`"${this.name}" requires an output kind name`);
     }
 
     // Identical for every image; only `onTileProgress` varies per item.
@@ -162,19 +166,14 @@ export class CellposeSAM extends Segmenter {
           );
         }
         try {
-          const annotObj = await predictCellposeSAM(
-            this._cp,
-            input,
-            this.segmentedKind,
-            {
-              ...segmentOptions,
-              onTileProgress: (done, total) =>
-                loadCb?.(
-                  Math.round(((idx + done / total) / items.length) * 100),
-                  `Segmenting image ${idx + 1} of ${items.length} — tile ${done}/${total}`,
-                ),
-            },
-          );
+          const annotObj = await predictCellposeSAM(this._cp, input, kindName, {
+            ...segmentOptions,
+            onTileProgress: (done, total) =>
+              loadCb?.(
+                Math.round(((idx + done / total) / items.length) * 100),
+                `Segmenting image ${idx + 1} of ${items.length} — tile ${done}/${total}`,
+              ),
+          });
           annotations.push(annotObj);
         } catch (e) {
           console.error(e);
