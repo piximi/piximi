@@ -2,12 +2,13 @@ import { LayersModel, loadGraphModel } from "@tensorflow/tfjs";
 
 import { CancelSource, TaskCancelledError, type Token } from "core/dl/cancel";
 
-import COCO_CLASSES from "data/model-data/cocossd-classes";
+import { COCO_KIND_NAMES } from "data/model-data/cocossd-classes";
 
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
 import { CHANNEL_MODE } from "../../optionUtils";
+import { OUTPUT_MODE } from "../consts";
 
 import type { GraphModel } from "@tensorflow/tfjs";
 
@@ -39,12 +40,10 @@ import type { InferenceInput } from "../../../types";
  */
 
 export class CocoSSD extends Segmenter {
-  protected readonly segmentedKinds = Object.keys(COCO_CLASSES);
-
   constructor() {
     super({
       name: "COCO-SSD",
-      kind: Object.keys(COCO_CLASSES),
+      outputPolicy: { mode: OUTPUT_MODE.CLASSES, kindNames: COCO_KIND_NAMES },
       src: "https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v1/model.json",
       channelPolicy: { mode: CHANNEL_MODE.FIXED, count: 3 },
       cancellableLoad: true,
@@ -99,7 +98,7 @@ export class CocoSSD extends Segmenter {
           const annotObj = await predictCoco(
             graphModel,
             imTensor,
-            this.segmentedKinds,
+            COCO_KIND_NAMES,
           );
           annotations.push(annotObj);
         } catch {

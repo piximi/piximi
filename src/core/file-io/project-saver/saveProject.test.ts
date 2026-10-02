@@ -15,7 +15,7 @@ import { MODELS } from "core/dl/segmentation/types";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 
 import {
-  createModelConfigMap,
+  createBlankModelConfigMap,
   segmenterSlice,
 } from "store/segmenter/segmenterSlice";
 import { hydrateSegmenterState } from "store/segmenter/hydrate";
@@ -487,11 +487,12 @@ const buildFixture = () => {
   const segmenter: SegmenterSliceState = {
     loadedModel: undefined,
     configMap: {
-      ...createModelConfigMap(MODELS),
+      ...createBlankModelConfigMap(MODELS),
       "Cellpose-SAM": {
         model: "Cellpose-SAM",
         modelStatus: "idle",
         channelSelection: ["meta-3", "meta-1"],
+        kindName: "cellpose_cells",
         optionValues: {
           diameter: undefined,
           cellPropThreshold: 0.25,
@@ -709,6 +710,9 @@ describe("v2 project round trip", () => {
     expect(config.channelSelection).toEqual(["meta-3", "meta-1"]);
     expect(config.optionValues.niter).toBe(450);
     expect(config.optionValues.cellPropThreshold).toBe(0.25);
+    expect(config.kindName).toEqual(
+      fixture.segmenter.configMap["Cellpose-SAM"].kindName,
+    );
   });
 
   it("records no loaded model when none was loaded at save time", async () => {

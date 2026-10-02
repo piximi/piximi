@@ -160,20 +160,7 @@ const PretrainedModelDetails = ({
                   : { pl: 1 }
               }
             >
-              {typeof value === "string" ? (
-                value
-              ) : value.url ? (
-                <Link
-                  className="source_link"
-                  href={value.url!}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {value.name}
-                </Link>
-              ) : (
-                value.name
-              )}
+              {value}
             </Typography>
           )}
         </Fragment>

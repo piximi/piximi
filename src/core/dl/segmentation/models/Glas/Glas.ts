@@ -7,15 +7,18 @@ import { preprocessGlas } from "./preprocessGlas";
 import { predictGlas } from "./predictGlas";
 import { loadGlas } from "./loadGlas";
 import { CHANNEL_MODE } from "../../optionUtils";
+import { OUTPUT_MODE } from "../consts";
 
 import type { GraphModel } from "@tensorflow/tfjs";
 
 import type { LoadCB } from "utils/types";
 
-import type { PredictedAnnotationObject } from "../../types";
+import type {
+  PredictedAnnotationObject,
+  SegmenterOptionValues,
+} from "../../types";
 import type { InferenceInput } from "../../../types";
 
-const KIND_NAME = "glas_glands";
 /*
  * Gland Segmentation
  * Contest GitHub: http://github.com/twpkevin06222/Gland-Segmentation/tree/main
@@ -26,12 +29,10 @@ const KIND_NAME = "glas_glands";
  * Trained on images of Hematoxylin and Eosin (H&E) stained slides, consisting of a variety of histologic grades
  */
 export class Glas extends Segmenter {
-  protected readonly segmentedKind = KIND_NAME;
-
   constructor() {
     super({
       name: "GlandSegmentation",
-      kind: KIND_NAME,
+      outputPolicy: { mode: OUTPUT_MODE.SINGLE, defaultKindName: "Glands" },
       channelPolicy: { mode: CHANNEL_MODE.FIXED, count: 3 },
     });
   }
@@ -45,9 +46,14 @@ export class Glas extends Segmenter {
     items: InferenceInput[],
     cancelToken: Token,
     loadCb: LoadCB,
+    _options?: SegmenterOptionValues,
+    kindName?: string,
   ) {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
+    }
+    if (!kindName) {
+      throw Error(`"${this.name}" requires an output kind name`);
     }
 
     if (this._model instanceof LayersModel) {
@@ -77,7 +83,7 @@ export class Glas extends Segmenter {
           const annObj = await predictGlas(
             graphModel,
             imTensor,
-            this.segmentedKind,
+            kindName,
             inferenceDataDims![idx],
           );
           annotations.push(annObj);

@@ -53,7 +53,7 @@ export class SegmenterHandler implements ISegmenterApi {
     return {
       name: model.name,
       displayName: modelInfo[model.name].displayName,
-      kind: model.kind,
+      outputPolicy: model.outputPolicy,
       modelLoaded: model.modelLoaded,
       channelPolicy: model.channelPolicy,
       optionSchema: model.optionSchema,
@@ -137,6 +137,7 @@ export class SegmenterHandler implements ISegmenterApi {
     cancelToken: Token,
     loadCB?: LoadCB,
     options?: SegmenterOptionValues,
+    kindName?: string,
   ): Promise<ApiResult<SegmentationResults>> {
     const model = this.resolveModel(modelName);
     if (!model)
@@ -145,7 +146,13 @@ export class SegmenterHandler implements ISegmenterApi {
         `No model registered with name "${modelName}"`,
       );
     try {
-      const result = await model.predict(items, cancelToken, loadCB, options);
+      const result = await model.predict(
+        items,
+        cancelToken,
+        loadCB,
+        options,
+        kindName,
+      );
       return ok(result);
     } catch (e) {
       const error = e as Error;

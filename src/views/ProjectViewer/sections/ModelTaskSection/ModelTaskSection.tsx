@@ -37,11 +37,20 @@ export const ModelTaskSection = () => {
       <ToggleButtonGroup
         data-help={HelpItem.LearningTask}
         value={learningTask}
-        size="small"
         color="primary"
         exclusive
         onChange={handleToggleLearningTask}
-        sx={{ width: "95%" }}
+        size="small"
+        sx={{
+          width: "95%",
+          height: 25,
+          "& .MuiButtonBase-root": {
+            px: 0,
+            py: 0.5,
+            fontSize: "0.75rem",
+            lineHeight: 1,
+          },
+        }}
       >
         <ToggleButton value="Classification" sx={{ width: "50%" }}>
           Classification

@@ -77,6 +77,7 @@ class SegmenterApi implements ISegmenterApi {
     cancelToken: Token,
     loadCB?: LoadCB,
     options?: SegmenterOptionValues,
+    kindName?: string,
   ) {
     if (!loadCB) {
       loadCB = (loadPercent: number, loadMessage: string) =>
@@ -88,6 +89,7 @@ class SegmenterApi implements ISegmenterApi {
       Comlink.proxy(cancelToken),
       Comlink.proxy(loadCB),
       options,
+      kindName,
     );
   }
 

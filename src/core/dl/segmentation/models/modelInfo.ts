@@ -7,7 +7,6 @@ export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
     description:
       "Object detection / instance segmentation with star-convex shapes",
     use: "Segment individual cell nuclei from brightfield images with H&E staining",
-    output: { name: "stardist_nucleus" },
     sources: [
       {
         text: "Zenodo",
@@ -39,7 +38,6 @@ export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
     description:
       "Object detection / instance segmentation with star-convex shapes",
     use: "Segment individual cell nuclei from single channel fluorescence data (2018 DSB)",
-    output: { name: "stardist_nucleus" },
     sources: [
       {
         text: "Zenodo",
@@ -71,10 +69,7 @@ export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
     description:
       "Object detection model that aims to localize and identify multiple objects in a single image",
     use: "Detects objects defined in the COCO dataset, which is a large-scale object detection, segmentation, and captioning dataset",
-    output: {
-      name: "Output Classes",
-      url: "https://github.com/tensorflow/tfjs-models/blob/master/coco-ssd/src/classes.ts",
-    },
+
     sources: [
       {
         text: "Kaggle",
@@ -92,7 +87,7 @@ export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
     description:
       "Generalist instance segmentation for cells and nuclei, running fully in-browser on WebGPU (no server). Requires a WebGPU-capable browser (Chrome >=135 / Safari >=17.4). First load downloads a ~588 MB model (cached afterward).",
     use: "Segment general cells/nuclei locally without a network round-trip",
-    output: { name: "cellpose_cells" },
+
     sources: [
       {
         text: "Cellpose.js GitHub",
@@ -120,7 +115,7 @@ export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
     description:
       "Gland segmentation task with GlaS 2015 dataset using UNet model",
     use: "Trained on images of Hematoxylin and Eosin (H&E) stained slides, consisting of a variety of histologic grades",
-    output: { name: "glas_glands" },
+
     sources: [
       {
         text: "Kaggle",

@@ -6,6 +6,7 @@ import { selectChannelMetaEntities } from "store/data/selectors";
 import {
   selectLoadedSegmenter,
   selectSegmenterChannels,
+  selectSegmenterKindName,
   selectSegmenterOptions,
   selectSegmenterStatus,
   selectSegmentorError,
@@ -32,6 +33,7 @@ type SegmenterControls = {
   channelSelection: Array<string>;
   optionValues: SegmenterOptionValues;
   error?: ErrorContext;
+  kindName?: string;
   setLoadedModel: (model: SegmentationModelDetails) => void;
   setChannelSelection: (index: number, id: string) => void;
   removeChannelSelection: (index: number) => void;
@@ -51,6 +53,7 @@ export const useSegmenter = (): SegmenterControls => {
   const channelMetas = useSelector(selectChannelMetaEntities);
   const channelSelection = useSelector(selectSegmenterChannels);
   const optionValues = useSelector(selectSegmenterOptions);
+  const kindName = useSelector(selectSegmenterKindName);
   const error = useSelector(selectSegmentorError);
 
   const availableChannelIds = useMemo(
@@ -115,5 +118,6 @@ export const useSegmenter = (): SegmenterControls => {
     setModelStatus,
     error,
     schema,
+    kindName,
   };
 };

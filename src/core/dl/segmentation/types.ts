@@ -4,6 +4,7 @@ import type { HelpItem } from "help/HelpContent";
 
 import type { LoadCB } from "utils/types";
 
+import type { OUTPUT_MODE } from "./models/consts";
 import type { CHANNEL_MODE } from "./optionUtils";
 import type { Token } from "../cancel";
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
@@ -23,7 +24,6 @@ export type ModelDisplayInfo = {
   displayName: string;
   description: string;
   use: string;
-  output: { name: string; url?: string };
   sources: Array<{ text: string; url: string }>;
   cite?: Array<{ text: string; url: string }>;
   cloudWarning?: string;
@@ -42,6 +42,18 @@ export type ModelDisplayInfo = {
 export type ChannelPolicy =
   | { mode: typeof CHANNEL_MODE.FIXED; count: number }
   | { mode: typeof CHANNEL_MODE.PASSTHROUGH; maxChannels: number };
+
+/*
+ * How a model's annotations are kinded.
+ *
+ * - `single`: one kind for every annotation. `defaultKindName` seeds the
+ *   model's config, where the user may rename it.
+ * - `classes`: one kind per output class, chosen per detection by the model, so
+ *   `kindNames` is the full set it can emit and none of it is user-editable.
+ */
+export type OutputPolicy =
+  | { mode: typeof OUTPUT_MODE.SINGLE; defaultKindName: string }
+  | { mode: typeof OUTPUT_MODE.CLASSES; kindNames: Array<string> };
 
 /* Plain-data guard so a field can depend on another field's value. */
 type SegmenterOptionCondition = {
@@ -122,11 +134,16 @@ export type SegmenterOptionValues = Record<string, SegmenterOptionType>;
 
 export type SegmentationState = "idle" | "loading" | "predicting";
 
+/*
+ * Live state for one registered model. Declarative facts about a model that the
+ * UI needs before loading it live in `models/manifest.ts` instead, so they are
+ * readable without a worker round-trip.
+ */
 export type SegmentationModelDetails = {
   name: ModelName;
   displayName: string;
-  kind?: string | Array<string>;
   modelLoaded: boolean;
+  outputPolicy: OutputPolicy;
   channelPolicy: ChannelPolicy;
   /* Absent => the model exposes no inference knobs, and no panel is rendered. */
   optionSchema?: SegmenterOptionSchema;
@@ -162,12 +179,18 @@ export interface ISegmenterApi {
    * worker-side instead and this call trips it over Comlink.
    */
   cancelLoadModel(modelName: ModelName): Promise<ApiResult<void>>;
+  /*
+   * `kindName` names the kind every returned annotation lands in. Required by
+   * models whose OutputPolicy is `single`; ignored by `classes` models, which
+   * pick a kind per detection.
+   */
   predict(
     name: ModelName,
     items: InferenceInput[],
     cancelToken: Token,
     loadCB?: LoadCB,
     options?: SegmenterOptionValues,
+    kindName?: string,
   ): Promise<ApiResult<SegmentationResults>>;
 
   // model I/O

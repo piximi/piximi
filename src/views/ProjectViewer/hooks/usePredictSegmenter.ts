@@ -42,8 +42,15 @@ export const usePredictSegmenter = () => {
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
   const kinds = useSelector(selectAllKinds);
-  const { setModelStatus, loadedModel, channelSelection, optionValues, error } =
-    useSegmenter();
+
+  const {
+    setModelStatus,
+    loadedModel,
+    channelSelection,
+    optionValues,
+    error,
+    kindName,
+  } = useSegmenter();
   const segApi = useSegmenterApi();
   const measurementsApi = useMeasurementsApi();
   const Cancel = new CancelSource();
@@ -181,6 +188,7 @@ export const usePredictSegmenter = () => {
         Cancel.token,
         progressCb,
         sanitizeOptions(loadedModel.optionSchema, optionValues),
+        kindName,
       );
       if (predictionResult.success) {
         predictedAnnotations = predictionResult.data.annotations;
@@ -386,6 +394,7 @@ export const usePredictSegmenter = () => {
     kinds,
     channelSelection,
     optionValues,
+    kindName,
   ]);
 
   return predictSegmenter;
