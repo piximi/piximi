@@ -31,7 +31,7 @@ export const selectActiveViewerImage = (state: RootState) =>
   selectExtendedImageById(state, selectActiveImageId(state) ?? "");
 
 // Annotations
-export const selectAllImageViewerAnnotations = createSelector(
+const selectAllImageViewerAnnotations = createSelector(
   selectImageStackIds,
   selectAllExtendedAnnotations,
   (imageIds, annotations) => {

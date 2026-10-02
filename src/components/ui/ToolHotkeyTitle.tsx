@@ -1,6 +1,6 @@
-import { Box, Typography } from "@mui/material";
+import { Fragment } from "react/jsx-runtime";
 
-import { HotkeyTitle } from "components/ui/KeyboardKey";
+import { Box, Typography } from "@mui/material";
 
 type ToolHotkeyTitleProps = {
   toolName: string;
@@ -22,6 +22,37 @@ export const ToolHotkeyTitle = ({
         {toolName}
       </Typography>
       {hotkey && <HotkeyTitle hotkey={hotkey} />}
+    </Box>
+  );
+};
+
+export const HotkeyTitle = ({ hotkey }: { hotkey: string[] }) => {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", fontSize: "inherit" }}>
+      {hotkey.map((key, idx) =>
+        idx < hotkey.length - 1 ? (
+          <Fragment key={`${hotkey.join(",")}-${key}`}>
+            <Key hkey={key} /> <Box sx={{ py: 0, px: 0.5 }}>+</Box>
+          </Fragment>
+        ) : (
+          <Key key={`${hotkey.join(",")}-${key}`} hkey={key} />
+        ),
+      )}
+    </Box>
+  );
+};
+export const Key = ({ hkey }: { hkey: string }) => {
+  return (
+    <Box
+      sx={{
+        py: 0,
+        px: 0.5,
+        border: "1px solid var(--mui-palette-text-primary)",
+        borderRadius: 1,
+        textTransform: "capitalize",
+      }}
+    >
+      {hkey}
     </Box>
   );
 };

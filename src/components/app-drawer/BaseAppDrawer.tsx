@@ -1,8 +1,10 @@
-import { Box, Drawer, Stack } from "@mui/material";
+import { Box, Divider, Drawer, Stack } from "@mui/material";
 
 import { DIMENSIONS } from "utils/constants";
 
-import { ApplicationOptions } from "./ApplicationOptions";
+import { SettingsButton } from "./application-settings/SettingsButton";
+import { SendFeedbackButton } from "./SendFeedbackButton";
+import { HelpButton } from "./HelpButton";
 
 import type React from "react";
 
@@ -51,7 +53,22 @@ export const BaseAppDrawer = ({
           {children}
         </Box>
 
-        {!hideSettings && <ApplicationOptions />}
+        {!hideSettings && (
+          <Box>
+            <Divider />
+            <Stack
+              direction="row"
+              justifyContent="space-evenly"
+              sx={{ py: 0.5, px: 2 }}
+            >
+              <SettingsButton />
+
+              <SendFeedbackButton />
+
+              <HelpButton />
+            </Stack>
+          </Box>
+        )}
       </Stack>
     </Drawer>
   );

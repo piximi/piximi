@@ -36,7 +36,7 @@ export const selectSelectedImages = createSelector(
   },
 );
 
-export const selectSelectedImageIdSet = createSelector(
+const selectSelectedImageIdSet = createSelector(
   selectSelectedImageIds,
   (selectedIds) => new Set(selectedIds),
 );

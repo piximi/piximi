@@ -471,5 +471,3 @@ const COCO_CLASSES: {
 export const COCO_KIND_NAMES: Array<string> = Object.values(COCO_CLASSES).map(
   (cocoClass) => cocoClass.displayName,
 );
-
-export default COCO_CLASSES;

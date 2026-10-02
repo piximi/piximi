@@ -18,7 +18,7 @@ import type {
 } from "../types";
 
 // Numeric features for the persistent Feature-filter section: [min, max, step].
-export const FEATURES: FeatureParams = {
+const FEATURES: FeatureParams = {
   area: { label: "Area", unit: "px²", bounds: [0, 2000], step: 10 },
   sphericity: { label: "Sphericity", unit: "", bounds: [0.4, 1], step: 0.01 },
   radius: { label: "Radius", unit: "px", bounds: [0, 25], step: 0.5 },

@@ -18,7 +18,7 @@ export const selectLoadedSegmenter = ({
 }): SegmentationModelDetails | undefined => {
   return segmenter.loadedModel;
 };
-export const selectSegmenterConfig = ({
+const selectSegmenterConfig = ({
   segmenter,
 }: {
   segmenter: SegmenterSliceState;

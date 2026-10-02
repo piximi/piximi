@@ -1,18 +1,15 @@
 import { MODELS } from "core/dl/segmentation/types";
-import { defaultOptionValues } from "core/dl/segmentation/optionUtils";
-import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 
 import { createBlankModelConfigMap } from "./segmenterSlice";
 
 import type { SerializedSegmenterState } from "core/file-io/project-saver/types";
 import type {
   ModelName,
-  SegmentationModelDetails,
   SegmenterOptionType,
   SegmenterOptionValues,
 } from "core/dl/segmentation/types";
 
-import type { SegmenterModelConfig, SegmenterSliceState } from "./types";
+import type { SegmenterSliceState } from "./types";
 
 const isModelName = (name: string): name is ModelName =>
   (MODELS as readonly string[]).includes(name);
@@ -35,34 +32,6 @@ const validOptionValues = (
   Object.fromEntries(
     Object.entries(saved).filter(([, value]) => isOptionValue(value)),
   );
-
-export const getDefaultModelConfig = (
-  model: SegmentationModelDetails,
-): SegmenterModelConfig => {
-  return {
-    model: model.name,
-    modelStatus: "idle",
-    channelSelection: [],
-    kindName:
-      model.outputPolicy.mode === OUTPUT_MODE.SINGLE
-        ? model.outputPolicy.defaultKindName
-        : undefined,
-    optionValues: defaultOptionValues(model.optionSchema),
-  };
-};
-/*
- * A fresh config for each named model. Derived from the names rather than
- * written out key-by-key so a model added to `MODELS` cannot be forgotten here,
- * and so the project loader can build the same map before overlaying whatever
- * a saved project carried.
- */
-export const createDefaultModelConfigMap = (
-  modelNames: readonly ModelName[],
-  modelDetails: Record<ModelName, SegmentationModelDetails>,
-): Record<ModelName, SegmenterModelConfig> =>
-  Object.fromEntries(
-    modelNames.map((name) => [name, getDefaultModelConfig(modelDetails[name])]),
-  ) as Record<ModelName, SegmenterModelConfig>;
 
 /*
  * Turn what a project file carried into segmenter state.
