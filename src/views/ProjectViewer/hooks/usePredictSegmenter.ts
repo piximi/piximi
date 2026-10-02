@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { batch, useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector, useStore } from "react-redux";
 
 import { generateKind, generateUUID } from "core/entities";
 import { useSegmenterApi } from "core/dl/segmentation";
@@ -12,8 +12,14 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
-import { selectAllKinds, selectExtendedImages } from "store/data/selectors";
+import {
+  selectAllKinds,
+  selectAnnotationEntities,
+  selectAnnotationVolumeEntities,
+  selectExtendedImages,
+} from "store/data/selectors";
 
+import { createCachedDecoder, isDuplicate } from "utils/iouUtils";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 import { useMeasurementsApi } from "utils/measurements/hooks/useMeasurementsApi";
@@ -34,11 +40,13 @@ import type {
   SegmentationModelDetails,
 } from "core/dl/segmentation/types";
 
+import type { RootState } from "store/rootReducer";
+
 import type { AlertState, LoadCB } from "utils/types";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
-
+  const store = useStore<RootState>();
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
   const kinds = useSelector(selectAllKinds);
@@ -142,10 +150,9 @@ export const usePredictSegmenter = () => {
         );
       }
     }
-    const images = selectedImages.length > 0 ? selectedImages : allImages;
 
-    // TODO: determine how to go about resegmenting images and duplicating annotations
-    const inferenceImages = images;
+    const inferenceImages =
+      selectedImages.length > 0 ? selectedImages : allImages;
 
     if (inferenceImages.length === 0) {
       await handleError(
@@ -223,7 +230,8 @@ export const usePredictSegmenter = () => {
       taskCancelRegistry.unregister(taskId);
       return;
     }
-
+    let addedCount = 0;
+    let skippedCount = 0;
     try {
       const uniquePredictedKindNames = [
         ...new Set(
@@ -254,6 +262,10 @@ export const usePredictSegmenter = () => {
       });
 
       dispatch(dataSlice.actions.batchAddKind(addKindPayload));
+      // Snapshot after inference: the user may have edited annotations while it ran
+      const state = store.getState();
+      const annotationEntities = selectAnnotationEntities(state);
+      const volumeEntities = selectAnnotationVolumeEntities(state);
 
       const annVolumes: AnnotationVolume[] = [];
       const annotations: AnnotationObject[] = [];
@@ -279,6 +291,19 @@ export const usePredictSegmenter = () => {
       for await (const [i, _annotations] of predictedAnnotations.entries()) {
         const image = inferenceImages[i];
         const imageAnns: AnnotationObject[] = [];
+        const existingByKind: Record<string, AnnotationObject[]> = {};
+        for (const ann of Object.values(annotationEntities)) {
+          if (
+            !ann ||
+            ann.imageId !== image.id ||
+            ann.planeId !== image.activePlaneId
+          )
+            continue;
+          const kindId = volumeEntities[ann.volumeId]?.kindId;
+          if (!kindId) continue;
+          (existingByKind[kindId] ??= []).push(ann);
+        }
+        const decodeCached = createCachedDecoder();
 
         for (let j = 0; j < _annotations.length; j++) {
           const { kindName, ...predictedAnn } = _annotations[j];
@@ -301,6 +326,16 @@ export const usePredictSegmenter = () => {
 
           if (!annKind) {
             console.error("cannot find kind for annotation");
+            continue;
+          }
+          if (
+            isDuplicate(
+              predictedAnn,
+              existingByKind[annKind.id] ?? [],
+              decodeCached,
+            )
+          ) {
+            skippedCount++;
             continue;
           }
           const annVol: AnnotationVolume = {
@@ -363,6 +398,7 @@ export const usePredictSegmenter = () => {
         dispatch(dataSlice.actions.batchAddAnnotationVolume(annVolumes));
         dispatch(dataSlice.actions.batchAddAnnotation(annotations));
       });
+      addedCount = annotations.length;
     } catch (error) {
       await handleError(
         error as Error,
@@ -380,7 +416,10 @@ export const usePredictSegmenter = () => {
       dispatch(
         appTasksSlice.actions.taskCompleted({
           id: taskId,
-          label: "Segmentation finished",
+          label:
+            skippedCount > 0
+              ? `Segmentation finished: ${addedCount} added, ${skippedCount} skipped as duplicates`
+              : `Segmentation finished: ${addedCount} added`,
         }),
       );
     setModelStatus("idle");

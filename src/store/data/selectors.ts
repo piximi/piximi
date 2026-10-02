@@ -78,6 +78,9 @@ export const selectChannelMetaById = channelMetaSelectors.selectById;
 export const selectAnnotationEntities = annotationSelectors.selectEntities;
 export const selectTotalAnnotations = annotationSelectors.selectTotal;
 
+export const selectAnnotationVolumeEntities =
+  annotationVolumeSelectors.selectEntities;
+
 /*
  * ───────────────────────────────────────────────────────────────────────
  * ── Experiment selectors ───────────────────────────────────────────────
