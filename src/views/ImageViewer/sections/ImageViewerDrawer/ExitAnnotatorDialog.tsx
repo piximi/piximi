@@ -5,7 +5,6 @@ import { ConfirmationDialog } from "components/dialogs";
 
 import { dataSlice } from "store/data";
 
-import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { useSavedDataState } from "@ImageViewer/contexts/DataProvider";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
@@ -30,7 +29,6 @@ export const ExitAnnotatorDialog = ({
     navigate("/project");
     batch(() => {
       dispatch(imageViewerDataSlice.actions.resetState());
-      dispatch(imageViewerSlice.actions.resetImageViewer());
       dispatch(annotatorSlice.actions.resetAnnotator());
     });
   };

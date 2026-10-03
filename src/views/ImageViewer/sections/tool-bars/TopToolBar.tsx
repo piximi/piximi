@@ -1,5 +1,3 @@
-import { useDispatch, useSelector } from "react-redux";
-
 import {
   Box,
   Divider,
@@ -27,14 +25,16 @@ import { DIMENSIONS } from "utils/constants";
 import { CursorZoom, StageZoom } from "icons";
 
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
-import { selectZoomToolOptions } from "@ImageViewer/state/imageViewer/selectors";
-import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
 import { ImageViewerLogo } from "@ImageViewer/components";
 
 const ZoomTools = () => {
-  const dispatch = useDispatch();
-  const options = useSelector(selectZoomToolOptions);
-  const { fitToScreen, zoomToActualSize, resetPosition } = useThreeViewport();
+  const {
+    fitToScreen,
+    zoomToActualSize,
+    resetPosition,
+    automaticCentering,
+    setAutomaticCentering,
+  } = useThreeViewport();
   const theme = useTheme();
   const t = useTranslation();
 
@@ -43,27 +43,18 @@ const ZoomTools = () => {
     value: "stage" | "cursor",
   ) => {
     if (
-      (value === "stage" && options.automaticCentering) ||
-      (value === "cursor" && !options.automaticCentering)
+      (value === "stage" && automaticCentering) ||
+      (value === "cursor" && !automaticCentering)
     )
       return;
-    const payload = {
-      options: {
-        ...options,
-        automaticCentering: value === "stage",
-      },
-    };
-
-    dispatch(imageViewerSlice.actions.setZoomToolOptions(payload));
+    setAutomaticCentering(value === "stage");
   };
 
   return (
     <Stack data-help={HelpItem.ZoomAndPosition} direction="row">
       <Tooltip
         title={t(
-          `Toggle Zoom Center: ${
-            options.automaticCentering ? "Image" : "Cursor"
-          }`,
+          `Toggle Zoom Center: ${automaticCentering ? "Image" : "Cursor"}`,
         )}
       >
         <ToggleButtonGroup
@@ -86,7 +77,7 @@ const ZoomTools = () => {
               width="20px"
               height="20px"
               color={
-                options.automaticCentering
+                automaticCentering
                   ? theme.palette.primary.main
                   : theme.palette.action.active
               }
@@ -106,7 +97,7 @@ const ZoomTools = () => {
               width="20px"
               height="20px"
               color={
-                options.automaticCentering
+                automaticCentering
                   ? theme.palette.action.active
                   : theme.palette.primary.main
               }

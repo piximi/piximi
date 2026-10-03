@@ -1,8 +1,14 @@
-import { createContext, useCallback, useContext, useMemo, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
-import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
 import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 import { imageToScreenTransform } from "@ImageViewer/utils/coords";
 import { ZOOM_MAX, ZOOM_MIN } from "@ImageViewer/utils/consts";
@@ -19,6 +25,8 @@ type ThreeViewportValue = {
   cameraRef: React.MutableRefObject<THREE.OrthographicCamera | null>;
   rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
+  automaticCentering: boolean;
+  setAutomaticCentering: React.Dispatch<React.SetStateAction<boolean>>;
   /** Render the scene through the viewport camera (there is no rAF loop). */
   requestRender: () => void;
   /** Current viewport state from the live camera + dims, or null if not ready. */
@@ -61,8 +69,8 @@ const useThreeViewportValue = (args: {
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
 }): ThreeViewportValue => {
   const { cameraRef, rendererRef, sceneRef } = args;
-  const dispatch = useDispatch();
   const image = useSelector(selectActiveViewerImage);
+  const [automaticCentering, setAutomaticCentering] = useState(true);
 
   const subscribersRef = useRef<Set<() => void>>(new Set());
 
@@ -125,17 +133,7 @@ const useThreeViewportValue = (args: {
     camera.updateProjectionMatrix();
     requestRender();
     notifyCameraChanged();
-    dispatch(
-      imageViewerSlice.actions.setZoomToolOptions({
-        options: { scale: camera.zoom },
-      }),
-    );
-    dispatch(
-      imageViewerSlice.actions.setStagePosition({
-        stagePosition: { x: camera.position.x, y: camera.position.y },
-      }),
-    );
-  }, [cameraRef, requestRender, notifyCameraChanged, dispatch]);
+  }, [cameraRef, requestRender, notifyCameraChanged]);
 
   const fitToScreen = useCallback(() => {
     const camera = cameraRef.current;
@@ -171,6 +169,8 @@ const useThreeViewportValue = (args: {
       cameraRef,
       rendererRef,
       sceneRef,
+      automaticCentering,
+      setAutomaticCentering,
       requestRender,
       getViewportState,
       getImageToScreenTransform,
@@ -184,6 +184,8 @@ const useThreeViewportValue = (args: {
       cameraRef,
       rendererRef,
       sceneRef,
+      automaticCentering,
+      setAutomaticCentering,
       requestRender,
       getViewportState,
       getImageToScreenTransform,

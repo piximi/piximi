@@ -1,10 +1,8 @@
 import { useEffect, useRef } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
-import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
-import { selectZoomToolOptions } from "@ImageViewer/state/imageViewer/selectors";
 
 import { ZOOM_MAX, ZOOM_MIN, ZOOM_SPEED } from "../utils/consts";
 
@@ -12,10 +10,14 @@ export function useThreePanZoom(
   mountRef: React.RefObject<HTMLDivElement | null>,
 ) {
   const dispatch = useDispatch();
-  const { automaticCentering } = useSelector(selectZoomToolOptions);
 
-  const { cameraRef, rendererRef, sceneRef, notifyCameraChanged } =
-    useThreeViewport();
+  const {
+    cameraRef,
+    rendererRef,
+    sceneRef,
+    notifyCameraChanged,
+    automaticCentering,
+  } = useThreeViewport();
 
   const automaticCenteringRef = useRef(automaticCentering);
   const isPanningRef = useRef(false);
@@ -59,11 +61,6 @@ export function useThreePanZoom(
 
       render();
       notifyCameraChanged?.();
-      dispatch(
-        imageViewerSlice.actions.setZoomToolOptions({
-          options: { scale: newZoom },
-        }),
-      );
     }
 
     function onMouseDown(e: MouseEvent) {
@@ -87,11 +84,6 @@ export function useThreePanZoom(
     function onMouseUp() {
       if (!isPanningRef.current || !camera) return;
       isPanningRef.current = false;
-      dispatch(
-        imageViewerSlice.actions.setStagePosition({
-          stagePosition: { x: camera.position.x, y: camera.position.y },
-        }),
-      );
     }
 
     el.addEventListener("wheel", onWheel, { passive: false });

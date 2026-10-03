@@ -10,7 +10,6 @@ import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
 
-import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { selectHasUnsavedChanges } from "@ImageViewer/state/image-viewer-data/selectors";
 import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
@@ -33,7 +32,6 @@ export const ReturnToProjectButton = () => {
       navigate("/project");
       batch(() => {
         dispatch(imageViewerDataSlice.actions.resetState());
-        dispatch(imageViewerSlice.actions.resetImageViewer());
         dispatch(annotatorSlice.actions.resetAnnotator());
       });
       return;

@@ -4,7 +4,6 @@ import { logger } from "redux-logger";
 import { classifierSlice } from "store/classifier";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
 import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 import { measurementsSlice } from "views/MeasurementViewer/state";
@@ -37,7 +36,6 @@ const preloadedState: RootState = {
   classifier: classifierSlice.getInitialState(),
   annotator: annotatorSlice.getInitialState(),
   applicationSettings: applicationSettingsSlice.getInitialState(),
-  imageViewer: imageViewerSlice.getInitialState(),
   imageViewerData: imageViewerDataSlice.getInitialState(),
   measurements: measurementsSlice.getInitialState(),
   data: dataSlice.getInitialState(),
