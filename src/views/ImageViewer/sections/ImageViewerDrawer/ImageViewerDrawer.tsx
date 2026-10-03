@@ -1,11 +1,24 @@
+import { useMemo } from "react";
+
 import { Box, Drawer, Stack } from "@mui/material";
 
 import { DIMENSIONS } from "utils/constants";
 
-import { useDrawerViewComponent } from "@ImageViewer/contexts/DrawerActionProvider";
+import { useDrawerContext } from "@ImageViewer/contexts/DrawerActionProvider";
+
+import { ImageSection } from "./ImageSection";
+import { AnnotationSection } from "./AnnotationSection";
 
 export const ImageViewerDrawer = () => {
-  const drawViewComponent = useDrawerViewComponent();
+  const { drawerContext } = useDrawerContext();
+  const drawerViewComponent = useMemo(() => {
+    switch (drawerContext) {
+      case "images":
+        return <ImageSection />;
+      case "annotations":
+        return <AnnotationSection />;
+    }
+  }, [drawerContext]);
 
   return (
     <Box
@@ -45,7 +58,7 @@ export const ImageViewerDrawer = () => {
           }}
           justifyContent={"space-between"}
         >
-          {drawViewComponent}
+          {drawerViewComponent}
         </Stack>
       </Drawer>
     </Box>

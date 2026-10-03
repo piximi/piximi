@@ -1,16 +1,13 @@
-import { createContext, useContext, useMemo, useState } from "react";
-
-import { ImageSection } from "@ImageViewer/sections/ImageViewerDrawer/ImageSection";
-import { AnnotationSection } from "@ImageViewer/sections/ImageViewerDrawer/AnnotationSection";
+import { createContext, useContext, useState } from "react";
 
 import type { ReactNode } from "react";
 
 type DrawerContextType = "images" | "annotations";
 const DrawerActionContext = createContext<{
-  drawerViewComponent: JSX.Element;
+  drawerContext: DrawerContextType;
   setDrawerContext: React.Dispatch<React.SetStateAction<DrawerContextType>>;
 }>({
-  drawerViewComponent: <></>,
+  drawerContext: "annotations",
   setDrawerContext: (_value: React.SetStateAction<DrawerContextType>) => {},
 });
 
@@ -18,32 +15,15 @@ export const DrawerActionProvider = ({ children }: { children: ReactNode }) => {
   const [drawerContext, setDrawerContext] =
     useState<DrawerContextType>("annotations");
 
-  const drawerViewComponent = useMemo(() => {
-    switch (drawerContext) {
-      case "images":
-        return <ImageSection />;
-      case "annotations":
-        return <AnnotationSection />;
-    }
-  }, [drawerContext]);
-
   return (
-    <DrawerActionContext.Provider
-      value={{ drawerViewComponent, setDrawerContext }}
-    >
+    <DrawerActionContext.Provider value={{ drawerContext, setDrawerContext }}>
       {children}
     </DrawerActionContext.Provider>
   );
 };
 
-export const useSetDrawerView = () => {
+export const useDrawerContext = () => {
   const drawerContext = useContext(DrawerActionContext);
 
-  return drawerContext.setDrawerContext;
-};
-
-export const useDrawerViewComponent = () => {
-  const drawerContext = useContext(DrawerActionContext);
-
-  return drawerContext.drawerViewComponent;
+  return drawerContext;
 };

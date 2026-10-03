@@ -11,12 +11,12 @@ import { ToolButton } from "components/inputs";
 
 import { DIMENSIONS } from "utils/constants";
 
-import { useSetDrawerView } from "@ImageViewer/contexts/DrawerActionProvider";
+import { useDrawerContext } from "@ImageViewer/contexts/DrawerActionProvider";
 
 import { ReturnToProjectButton } from "./ReturnToProjectButton";
 
 export const DrawerActionTabSection = () => {
-  const setDrawerView = useSetDrawerView();
+  const { setDrawerContext } = useDrawerContext();
 
   return (
     <Stack
@@ -33,7 +33,7 @@ export const DrawerActionTabSection = () => {
         <ToolButton
           name="Images | Channels"
           onClick={() => {
-            setDrawerView("images");
+            setDrawerContext("images");
           }}
           icon={<ImageIcon />}
         />
@@ -41,7 +41,7 @@ export const DrawerActionTabSection = () => {
         <ToolButton
           name="Annotations"
           onClick={() => {
-            setDrawerView("annotations");
+            setDrawerContext("annotations");
           }}
           icon={<FormatShapesIcon />}
         />
