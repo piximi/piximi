@@ -16,8 +16,8 @@ import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType, HotkeyContext } from "utils/enums";
 
 import { ImageViewerDrawer, StageWrapper } from "./sections";
-import { SideToolBar, TopToolBar } from "./sections/tool-bars";
-import { MobileActionBar } from "./sections/tool-bars/MobileActionBar";
+import { SideToolBar, TopToolBar } from "./sections/toolbars";
+import { MobileActionBar } from "./sections/toolbars/MobileActionBar";
 import { DataProvider } from "./contexts/DataProvider";
 import { DrawerActionProvider } from "./contexts/DrawerActionProvider";
 import { DrawerActionTabSection } from "./sections/ImageViewerDrawer/DrawerActionTabSection";
