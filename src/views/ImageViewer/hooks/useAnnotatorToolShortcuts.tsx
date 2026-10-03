@@ -4,13 +4,14 @@ import { useHotkeys } from "hooks";
 
 import { HotkeyContext } from "utils/enums";
 
-import { annotatorSlice } from "@ImageViewer/state/annotator";
-import { ToolType } from "@ImageViewer/utils/enums";
 import {
   selectActiveImageId,
   selectImageStackIds,
-} from "@ImageViewer/state/image-viewer-data/selectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
+} from "views/ImageViewer/state/imageViewerData/selectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+
+import { annotatorSlice } from "@ImageViewer/state/annotator";
+import { ToolType } from "@ImageViewer/utils/enums";
 
 export const useAnnotatorToolShortcuts = () => {
   const dispatch = useDispatch();

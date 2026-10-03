@@ -2,6 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useSelector } from "react-redux";
 
+import { selectHasSelection } from "views/ImageViewer/state/imageViewerData/reselectors";
+
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import {
   selectAnnotationState,
@@ -14,7 +16,6 @@ import {
   selectPendingOperationBBox,
 } from "@ImageViewer/state/operations/reselectors";
 import { AnnotationState, ToolType } from "@ImageViewer/utils/enums";
-import { selectHasSelection } from "@ImageViewer/state/image-viewer-data/reselectors";
 
 import { MarchingAntsKeyframes } from "./marchingAnts";
 import {

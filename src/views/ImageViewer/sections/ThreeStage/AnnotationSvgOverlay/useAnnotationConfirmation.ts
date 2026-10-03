@@ -17,16 +17,17 @@ import { rleEncodeArray } from "utils/image";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 
-import { selectWorkingAnnotationEntity } from "@ImageViewer/state/annotator/selectors";
+import { selectActiveViewerImage } from "views/ImageViewer/state/imageViewerData/reselectors";
+import { selectSelectedCategory } from "views/ImageViewer/state/imageViewerData/selectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+
 import {
   selectOverlapCandidateIds,
   selectPendingOperation,
   selectSelectionOperandIds,
   selectSelectionOverlaps,
 } from "@ImageViewer/state/operations/reselectors";
-import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
-import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
+import { selectWorkingAnnotationEntity } from "@ImageViewer/state/annotator/selectors";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 
 import type { AnnotationObject, AnnotationVolume } from "core/entities";

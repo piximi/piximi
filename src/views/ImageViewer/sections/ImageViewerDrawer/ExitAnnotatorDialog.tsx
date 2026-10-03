@@ -5,9 +5,10 @@ import { ConfirmationDialog } from "components/dialogs";
 
 import { dataSlice } from "store/data";
 
+import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { useSavedDataState } from "@ImageViewer/contexts/DataProvider";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 
 type ExitAnnotatorDialogProps = {
   onClose: () => void;

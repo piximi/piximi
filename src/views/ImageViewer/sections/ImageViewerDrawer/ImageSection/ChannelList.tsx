@@ -6,7 +6,7 @@ import { useParameterizedSelector } from "store/hooks";
 import { selectActiveExtendedChannels } from "store/data/selectors";
 import { HelpItem } from "help/HelpContent";
 
-import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewerData/selectors";
 
 import { ChannelConfig } from "./ChannelConfig";
 

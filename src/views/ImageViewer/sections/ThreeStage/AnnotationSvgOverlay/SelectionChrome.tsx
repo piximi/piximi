@@ -27,11 +27,12 @@ import {
   SubtractAnnotationsIcon,
 } from "icons";
 
+import { selectVisibleAnnotations } from "views/ImageViewer/state/imageViewerData/reselectors";
+
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { selectAnnotationMode } from "@ImageViewer/state/annotator/selectors";
 import { AnnotationMode } from "@ImageViewer/utils/enums";
-import { selectVisibleAnnotations } from "@ImageViewer/state/image-viewer-data/reselectors";
 import {
   selectIsPickingTarget,
   selectOverlapCandidateIds,

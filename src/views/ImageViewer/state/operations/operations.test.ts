@@ -16,7 +16,7 @@ import {
   selectResolvedTargetIds,
   selectSelectionOperandIds,
 } from "./reselectors";
-import { emptySelectionLayer } from "../image-viewer-data/utils";
+import { emptySelectionLayer } from "../imageViewerData/utils";
 
 import type {
   AnnotationObject,

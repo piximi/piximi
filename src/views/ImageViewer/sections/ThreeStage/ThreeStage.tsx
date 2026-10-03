@@ -7,7 +7,8 @@ import { Box } from "@mui/material";
 import { selectExtendedImageById } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
-import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewerData/selectors";
+
 import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
 import {
   useThreeChannelRenderer,

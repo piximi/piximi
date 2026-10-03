@@ -4,7 +4,7 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data";
+import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
 import { measurementsSlice } from "views/MeasurementViewer/state";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 

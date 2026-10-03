@@ -4,6 +4,8 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { throttle } from "lodash";
 
+import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import {
@@ -15,7 +17,6 @@ import {
   AnnotationState,
   ToolType,
 } from "@ImageViewer/utils/enums";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 import { screenToImage } from "@ImageViewer//utils/coords";
 
 import { usePointerTool } from "./usePointerTool";

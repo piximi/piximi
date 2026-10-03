@@ -7,7 +7,8 @@ import * as THREE from "three";
 import { hexToRGBA, decodeRleArray } from "utils/image";
 import { logger } from "utils/logUtils";
 
-import { selectSelectedAnnotations } from "@ImageViewer/state/image-viewer-data/reselectors";
+import { selectSelectedAnnotations } from "views/ImageViewer/state/imageViewerData/reselectors";
+
 import { selectAnnotationsForRender } from "@ImageViewer/state/operations/reselectors";
 import annotationMaskFrag from "@ImageViewer/core/shaders/annotationMask.frag?raw";
 import compositeThreeVert from "@ImageViewer/core/shaders/composite-three.vert?raw";

@@ -5,8 +5,9 @@ import { useSelector } from "react-redux";
 import { hexToRGBA } from "utils/image";
 import { maskToDataURL } from "utils/image/imageHelper";
 
+import { selectSelectedCategory } from "views/ImageViewer/state/imageViewerData/selectors";
+
 import { selectFullWorkingAnnotation } from "@ImageViewer/state/annotator/reselectors";
-import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
 import { selectPendingOperation } from "@ImageViewer/state/operations/reselectors";
 
 /**

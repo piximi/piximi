@@ -4,7 +4,7 @@ import { logger } from "redux-logger";
 import { classifierSlice } from "store/classifier";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data";
+import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 import { measurementsSlice } from "views/MeasurementViewer/state";
 

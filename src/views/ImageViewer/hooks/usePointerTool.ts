@@ -4,14 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { getOverlappingAnnotations, getAnnotationsInBox } from "utils/image";
 
-import { annotatorSlice } from "@ImageViewer/state/annotator";
-import { ToolType } from "@ImageViewer/utils/enums";
 import {
   selectAllAnnotationsInPlane,
   selectSelectedAnnotations,
-} from "@ImageViewer/state/image-viewer-data/reselectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
-import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
+} from "views/ImageViewer/state/imageViewerData/reselectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+import { selectActiveImageId } from "views/ImageViewer/state/imageViewerData/selectors";
+
+import { ToolType } from "@ImageViewer/utils/enums";
+import { annotatorSlice } from "@ImageViewer/state/annotator";
 import {
   selectIsPickingTarget,
   selectOverlapCandidateIds,

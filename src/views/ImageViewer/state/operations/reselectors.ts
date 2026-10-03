@@ -12,8 +12,8 @@ import {
   selectPendingTargetIds,
 } from "../annotator/selectors";
 import { selectFullWorkingAnnotation } from "../annotator/reselectors";
-import { selectSelectionLayer } from "../image-viewer-data/selectors";
-import { selectVisibleAnnotations } from "../image-viewer-data/reselectors";
+import { selectSelectionLayer } from "../imageViewerData/selectors";
+import { selectVisibleAnnotations } from "../imageViewerData/reselectors";
 
 import type { BBox, ExtendedAnnotationObject } from "core/entities";
 

@@ -10,9 +10,10 @@ import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
 
+import { selectHasUnsavedChanges } from "views/ImageViewer/state/imageViewerData/selectors";
+import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+
 import { annotatorSlice } from "@ImageViewer/state/annotator";
-import { selectHasUnsavedChanges } from "@ImageViewer/state/image-viewer-data/selectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 
 import { ExitAnnotatorDialog } from "./ExitAnnotatorDialog";
 
