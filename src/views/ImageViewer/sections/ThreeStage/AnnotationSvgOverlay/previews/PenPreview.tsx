@@ -1,4 +1,4 @@
-import type { PenAnnotationTool } from "views/ImageViewer/utils/tools";
+import type { PenAnnotationTool } from "@ImageViewer/core/annotation-tools";
 
 /**
  * Live pen-stroke preview: the drawn path at the brush width. Unlike the

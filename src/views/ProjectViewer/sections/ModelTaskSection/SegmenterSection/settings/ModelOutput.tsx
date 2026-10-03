@@ -85,10 +85,10 @@ export const ModelOutput = () => {
               <Typography variant="caption">
                 {"Not Editable -- "}
                 <Link
-                  href="https://github.com/tensorflow/tfjs-models/blob/master/coco-ssd/src/classes.ts"
+                  href="https://github.com/tensorflow/tfjs-models/blob/e80d693bb43cb0ef234b808021c4def434ea816a/coco-ssd/src/classes.ts"
                   target="_blank"
                 >
-                  See objec classes here
+                  See object classes here
                 </Link>
               </Typography>
             }

@@ -27,6 +27,7 @@ import {
   SubtractAnnotationsIcon,
 } from "icons";
 
+import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { selectAnnotationMode } from "@ImageViewer/state/annotator/selectors";
 import { AnnotationMode } from "@ImageViewer/utils/enums";
@@ -37,10 +38,9 @@ import {
   selectResolvedTargetIds,
 } from "@ImageViewer/state/operations/reselectors";
 
-import { useThreeViewport } from "../ThreeViewportContext";
 import { useAnnotationConfirmation } from "./useAnnotationConfirmation";
 
-import type { AnnotationTool } from "@ImageViewer/utils/tools";
+import type { AnnotationTool } from "@ImageViewer/core/annotation-tools";
 
 type BoundingBox = [number, number, number, number];
 

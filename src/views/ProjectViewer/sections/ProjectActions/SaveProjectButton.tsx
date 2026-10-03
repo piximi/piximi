@@ -25,10 +25,12 @@ export const SaveProjectButton = () => {
         tooltipText="Save the current project"
         onClick={onSaveProjectDialogOpen}
       />
-      <SaveProjectDialog
-        onClose={onSaveProjectDialogClose}
-        open={openSaveProjectDialog}
-      />
+      {openSaveProjectDialog && (
+        <SaveProjectDialog
+          onClose={onSaveProjectDialogClose}
+          open={openSaveProjectDialog}
+        />
+      )}
     </>
   );
 };

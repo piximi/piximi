@@ -4,8 +4,8 @@ import { selectAnnotationEntities } from "store/data/selectors";
 
 import { decodeRleArray } from "utils/image";
 
-import { foldOperands, masksOverlap } from "views/ImageViewer/utils/maskOps";
-import { AnnotationMode } from "views/ImageViewer/utils/enums";
+import { foldOperands, masksOverlap } from "@ImageViewer/utils/maskOps";
+import { AnnotationMode } from "@ImageViewer/utils/enums";
 
 import {
   selectAnnotationMode,
@@ -17,7 +17,7 @@ import { selectVisibleAnnotations } from "../image-viewer-data/reselectors";
 
 import type { BBox, ExtendedAnnotationObject } from "core/entities";
 
-import type { MaskRegion, SetOperation } from "views/ImageViewer/utils/maskOps";
+import type { MaskRegion, SetOperation } from "@ImageViewer/utils/maskOps";
 
 const FOLD_OP: Partial<Record<AnnotationMode, SetOperation>> = {
   [AnnotationMode.Add]: "union",

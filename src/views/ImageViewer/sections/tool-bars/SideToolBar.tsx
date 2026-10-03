@@ -27,13 +27,12 @@ import {
   Selection,
 } from "icons";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
+import { annotatorSlice } from "@ImageViewer/state/annotator";
 import {
   selectInvertThresholdAnnotation,
   selectToolType,
-} from "views/ImageViewer/state/annotator/selectors";
-import { ToolType } from "views/ImageViewer/utils/enums";
-
+} from "@ImageViewer/state/annotator/selectors";
+import { ToolType } from "@ImageViewer/utils/enums";
 import { useAnnotatorToolShortcuts } from "@ImageViewer/hooks";
 
 import type { ReactElement } from "react";

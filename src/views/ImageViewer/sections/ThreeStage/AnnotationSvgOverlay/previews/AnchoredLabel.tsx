@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
-import { useThreeViewport } from "../../ThreeViewportContext";
+import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 
 const OFFSET_X = 6;
 const OFFSET_Y = 6;

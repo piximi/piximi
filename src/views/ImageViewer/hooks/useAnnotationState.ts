@@ -2,13 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-import { AnnotationState } from "views/ImageViewer/utils/enums";
-
+import { annotatorSlice } from "@ImageViewer/state/annotator";
+import { AnnotationState } from "@ImageViewer/utils/enums";
 import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 
-import type { AnnotationTool } from "views/ImageViewer/utils/tools";
-
+import type { AnnotationTool } from "@ImageViewer/core/annotation-tools";
 import type { WorkingAnnotation } from "@ImageViewer/utils/types";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {

@@ -1,4 +1,4 @@
-import { imageViewerDataSlice } from "./imageViewerDataSlice";
+import { imageViewerDataSlice } from ".";
 import { selectGlobalFeatureBounds } from "./reselectors";
 
 import type { TypedAppStartListening } from "store/types";

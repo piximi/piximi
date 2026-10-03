@@ -22,7 +22,7 @@ import { DataProvider } from "./contexts/DataProvider";
 import { DrawerActionProvider } from "./contexts/DrawerActionProvider";
 import { DrawerActionTabSection } from "./sections/ImageViewerDrawer/DrawerActionTabSection";
 import { ActiveImageProvider } from "./contexts/ActiveImageProvider";
-import { ThreeViewportProvider } from "./sections/ThreeStage/ThreeViewportContext";
+import { ThreeViewportProvider } from "./contexts/ThreeViewportProvider";
 
 export const ImageViewer = () => {
   const dispatch = useDispatch();

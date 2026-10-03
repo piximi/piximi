@@ -8,7 +8,7 @@ import type {
   RectangularAnnotationTool,
   SelectionTool,
   ThresholdAnnotationTool,
-} from "views/ImageViewer/utils/tools";
+} from "@ImageViewer/core/annotation-tools";
 
 /**
  * Live drag-rectangle preview, drawn in image coordinates inside the overlay

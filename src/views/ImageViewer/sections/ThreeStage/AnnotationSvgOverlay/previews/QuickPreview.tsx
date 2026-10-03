@@ -1,4 +1,4 @@
-import type { QuickAnnotationTool } from "views/ImageViewer/utils/tools";
+import type { QuickAnnotationTool } from "@ImageViewer/core/annotation-tools";
 
 /**
  * Live quick-annotation preview: the superpixel mask accumulated as the pointer

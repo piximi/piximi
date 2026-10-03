@@ -1,2 +1,2 @@
 export * from "./ImageViewerDrawer";
-export * from "./StageWrapper";
+export * from "./ThreeStage";

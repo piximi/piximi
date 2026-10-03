@@ -6,7 +6,7 @@ import { dataSlice } from "store/data";
 
 import { rleEncodeArray } from "utils/image";
 
-import { AnnotationMode } from "views/ImageViewer/utils/enums";
+import { AnnotationMode } from "@ImageViewer/utils/enums";
 
 import {
   selectAnnotationsForRender,
@@ -24,7 +24,7 @@ import type {
   ExtendedAnnotationObject,
 } from "core/entities";
 
-import type { WorkingAnnotation } from "views/ImageViewer/utils/types";
+import type { WorkingAnnotation } from "@ImageViewer/utils/types";
 
 import type { SelectionLayer } from "../types";
 

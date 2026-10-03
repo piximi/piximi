@@ -13,8 +13,8 @@ import { HelpItem } from "help/HelpContent";
 import {
   selectGlobalFeatureBounds,
   selectInViewFeatureBounds,
-} from "views/ImageViewer/state/image-viewer-data/reselectors";
-import { resolveRange } from "views/ImageViewer/state/image-viewer-data/utils";
+} from "@ImageViewer/state/image-viewer-data/reselectors";
+import { resolveRange } from "@ImageViewer/state/image-viewer-data/utils";
 
 import { useCriterionToggles } from "./useCriterionToggles";
 

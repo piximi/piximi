@@ -1,0 +1,211 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { batch, useDispatch, useSelector } from "react-redux";
+
+import { throttle } from "lodash";
+
+import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
+import { annotatorSlice } from "@ImageViewer/state/annotator";
+import {
+  selectAnnotationMode,
+  selectToolType,
+} from "@ImageViewer/state/annotator/selectors";
+import {
+  AnnotationMode,
+  AnnotationState,
+  ToolType,
+} from "@ImageViewer/utils/enums";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
+import { screenToImage } from "@ImageViewer//utils/coords";
+
+import { usePointerTool } from "./usePointerTool";
+
+import type { Point } from "utils/types";
+
+import type {
+  AnnotationTool,
+  ObjectAnnotationTool,
+} from "@ImageViewer/core/annotation-tools";
+
+/**
+ * Raw-DOM pointer pipeline that drives the active {@link AnnotationTool} on the
+ * ThreeStage. Replaces the Konva-typed `useStageHandlers`: no Konva event
+ * objects, no touch/zoom-tool branches (deferred). Left-drag draws; alt/middle
+ * drag is reserved for panning (handled by useThreePanZoom), so this bails while
+ * panning. Listeners attach once and read the latest state via a ref.
+ */
+export const useThreeAnnotationHandlers = ({
+  mountRef,
+  annotationTool,
+  isPanningRef,
+  onDrawTick,
+  onCursorChange,
+}: {
+  mountRef: React.RefObject<HTMLDivElement | null>;
+  annotationTool: AnnotationTool;
+  isPanningRef: React.RefObject<boolean>;
+  onDrawTick: () => void;
+  onCursorChange: (cursor: { point?: Point; oob: boolean }) => void;
+}) => {
+  const dispatch = useDispatch();
+  const toolType = useSelector(selectToolType);
+  const annotationMode = useSelector(selectAnnotationMode);
+  const { getViewportState } = useThreeViewport();
+
+  const [absolutePosition, setAbsolutePosition] = useState<Point | undefined>();
+  const [outOfBounds, setOutOfBounds] = useState(true);
+
+  const deselectAllAnnotations = useCallback(() => {
+    batch(() => {
+      // Clears the whole selection layer — criterion and manual overrides alike.
+      dispatch(imageViewerDataSlice.actions.clearSelectionLayer());
+      dispatch(annotatorSlice.actions.setWorkingAnnotation(undefined));
+      dispatch(
+        annotatorSlice.actions.setAnnotationState(AnnotationState.Blank),
+      );
+    });
+  }, [dispatch]);
+
+  const {
+    onPointerMouseDown,
+    handlePointerMouseMove,
+    handlePointerMouseUp,
+    isPickingTarget,
+    pickTargetAt,
+  } = usePointerTool(absolutePosition, deselectAllAnnotations, toolType);
+
+  // Latest-ref: DOM listeners are attached once but must call current values.
+  const latest = useRef({
+    toolType,
+    annotationMode,
+    annotationTool,
+    getViewportState,
+    onPointerMouseDown,
+    handlePointerMouseMove,
+    handlePointerMouseUp,
+    isPickingTarget,
+    pickTargetAt,
+    deselectAllAnnotations,
+    onDrawTick,
+    onCursorChange,
+  });
+  latest.current = {
+    toolType,
+    annotationMode,
+    annotationTool,
+    getViewportState,
+    onPointerMouseDown,
+    handlePointerMouseMove,
+    handlePointerMouseUp,
+    isPickingTarget,
+    pickTargetAt,
+    deselectAllAnnotations,
+    onDrawTick,
+    onCursorChange,
+  };
+
+  useEffect(() => {
+    const el = mountRef.current;
+    if (!el) return;
+
+    const applyCursor = (res: { point?: Point; oob: boolean }) => {
+      setAbsolutePosition(res.point);
+      setOutOfBounds(res.oob);
+      latest.current.onCursorChange?.(res);
+    };
+    const pointFromEvent = (
+      e: MouseEvent,
+    ): { point: Point; oob: boolean } | null => {
+      const vp = latest.current.getViewportState();
+      if (!vp) return null;
+      const rect = el.getBoundingClientRect();
+      return screenToImage(e.clientX - rect.left, e.clientY - rect.top, vp);
+    };
+
+    const skipTool = (t: ToolType) => t === ToolType.ColorAdjustment;
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0 || e.altKey || isPanningRef.current) return;
+      const L = latest.current;
+      if (skipTool(L.toolType)) return;
+      const res = pointFromEvent(e);
+      if (!res) return;
+      applyCursor(res);
+
+      // An outstanding target pick takes priority over drawing: the stroke that
+      // needs the target already exists, so starting a new one would discard it.
+      if (L.isPickingTarget) {
+        L.pickTargetAt(res.point);
+        return;
+      }
+      if (L.toolType === ToolType.Pointer) {
+        L.onPointerMouseDown(res.point);
+        L.annotationTool.onMouseDown(res.point);
+        L.onDrawTick();
+        return;
+      }
+
+      if (L.annotationTool.annotationState === AnnotationState.Annotated) {
+        L.annotationTool.deselect();
+        if (L.annotationMode === AnnotationMode.New) L.deselectAllAnnotations();
+      }
+      if (res.oob) return;
+      L.annotationTool.onMouseDown(res.point);
+      L.onDrawTick();
+    };
+
+    const onMouseMove = throttle((e: MouseEvent) => {
+      if (isPanningRef.current) return;
+      const L = latest.current;
+      const res = pointFromEvent(e);
+      if (!res) return;
+      applyCursor(res);
+      if (skipTool(L.toolType)) return;
+      if (L.toolType === ToolType.Pointer) {
+        L.annotationTool.onMouseMove(res.point);
+        L.onDrawTick();
+        L.handlePointerMouseMove(res.point);
+        return;
+      }
+      L.annotationTool.onMouseMove(res.point);
+      L.onDrawTick();
+    }, 5);
+
+    const onMouseUp = async (e: MouseEvent) => {
+      if (isPanningRef.current) return;
+      const L = latest.current;
+      if (skipTool(L.toolType)) return;
+      const res = pointFromEvent(e);
+      if (!res) return;
+      if (L.toolType === ToolType.Pointer) {
+        L.handlePointerMouseUp(res.point);
+        L.annotationTool.deselect();
+        L.onDrawTick();
+        return;
+      }
+      if (L.toolType === ToolType.ObjectAnnotation) {
+        await (L.annotationTool as ObjectAnnotationTool).onMouseUp(res.point);
+      } else {
+        L.annotationTool.onMouseUp(res.point);
+      }
+      L.onDrawTick();
+    };
+
+    el.addEventListener("mousedown", onMouseDown);
+    // Move only over the canvas (avoids re-rendering while the cursor is over
+    // other UI); release on window so drags that end off-canvas still finalize.
+    el.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      el.removeEventListener("mousedown", onMouseDown);
+      el.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      onMouseMove.cancel();
+    };
+  }, [mountRef, isPanningRef]);
+
+  return {
+    absolutePosition,
+    outOfBounds,
+  };
+};

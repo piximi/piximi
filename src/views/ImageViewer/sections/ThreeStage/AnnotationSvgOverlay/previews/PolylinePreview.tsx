@@ -8,7 +8,7 @@ import type {
   LassoAnnotationTool,
   MagneticAnnotationTool,
   PolygonalAnnotationTool,
-} from "views/ImageViewer/utils/tools";
+} from "@ImageViewer/core/annotation-tools";
 
 /**
  * Live polyline preview for the polygonal and lasso tools: the in-progress

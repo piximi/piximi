@@ -29,7 +29,7 @@ import {
   selectImageStackIds,
   selectActiveImageId,
 } from "@ImageViewer/state/image-viewer-data/selectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 
 import { ImageMenu } from "./ImageMenu";

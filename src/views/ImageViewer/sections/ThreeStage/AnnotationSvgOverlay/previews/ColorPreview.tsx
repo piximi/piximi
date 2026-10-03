@@ -1,6 +1,6 @@
 import { AnchoredLabel } from "./AnchoredLabel";
 
-import type { ColorAnnotationTool } from "views/ImageViewer/utils/tools";
+import type { ColorAnnotationTool } from "@ImageViewer/core/annotation-tools";
 
 export const ColorPreview = ({
   operator,

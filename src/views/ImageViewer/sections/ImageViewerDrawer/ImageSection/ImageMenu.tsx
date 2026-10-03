@@ -10,9 +10,9 @@ import { useTranslation } from "hooks";
 import { selectAnnotationsByImageId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 
-import { ExportAnnotationsMenu } from "../../../components";
+import { ExportAnnotationsMenu } from "./ExportAnnotationsMenu";
 
 import type { ExtendedImageObject } from "core/entities";
 

@@ -4,7 +4,7 @@ import {
   antsUnderlayStyle,
 } from "../marchingAnts";
 
-import type { EllipticalAnnotationTool } from "views/ImageViewer/utils/tools";
+import type { EllipticalAnnotationTool } from "@ImageViewer/core/annotation-tools";
 
 /** Live ellipse preview from the tool's center + radius (image coordinates). */
 export const EllipsePreview = ({

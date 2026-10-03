@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useSelector } from "react-redux";
 
+import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import {
   selectAnnotationState,
   selectPenSelectionBrushSize,
@@ -15,7 +16,6 @@ import {
 import { AnnotationState, ToolType } from "@ImageViewer/utils/enums";
 import { selectHasSelection } from "@ImageViewer/state/image-viewer-data/reselectors";
 
-import { useThreeViewport } from "../ThreeViewportContext";
 import { MarchingAntsKeyframes } from "./marchingAnts";
 import {
   RectanglePreview,
@@ -47,7 +47,7 @@ import type {
   PolygonalAnnotationTool,
   QuickAnnotationTool,
   RectangularAnnotationTool,
-} from "@ImageViewer/utils/tools";
+} from "@ImageViewer/core/annotation-tools";
 
 const LivePreview = ({
   operator,

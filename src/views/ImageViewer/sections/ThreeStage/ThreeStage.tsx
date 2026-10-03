@@ -9,12 +9,14 @@ import { useParameterizedSelector } from "store/hooks";
 
 import { selectActiveImageId } from "@ImageViewer/state/image-viewer-data/selectors";
 import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
+import {
+  useThreeChannelRenderer,
+  useThreePanZoom,
+  useThreeRenderer,
+} from "@ImageViewer/hooks";
 
-import { useThreeChannelRenderer } from "./useThreeChannelRenderer";
-import { useThreePanZoom } from "./useThreePanZoom";
 import { ActiveImageInfoStrip } from "./ActiveImageInfoStrip";
 import { ThreeAnnotationLayer } from "./ThreeAnnotationLayer";
-import { useThreeRenderer } from "./useThreeRenderer";
 
 import type { Point } from "utils/types";
 

@@ -3,13 +3,6 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import {
-  selectPenSelectionBrushSize,
-  selectQuickSelectionRegionSize,
-  selectToolType,
-  selectThresholdAnnotationValue,
-  selectInvertThresholdAnnotation,
-} from "views/ImageViewer/state/annotator/selectors";
-import {
   ColorAnnotationTool,
   EllipticalAnnotationTool,
   LassoAnnotationTool,
@@ -23,12 +16,19 @@ import {
   SelectionTool,
   BlankAnnotationTool,
   MeasureTool,
-} from "views/ImageViewer/utils/tools";
-import { ToolType } from "views/ImageViewer/utils/enums";
+} from "@ImageViewer/core/annotation-tools";
+import {
+  selectPenSelectionBrushSize,
+  selectQuickSelectionRegionSize,
+  selectToolType,
+  selectThresholdAnnotationValue,
+  selectInvertThresholdAnnotation,
+} from "@ImageViewer/state/annotator/selectors";
+import { ToolType } from "@ImageViewer/utils/enums";
 
 import type { Image as IJSImage } from "image-js-latest";
 
-import type { AnnotationTool } from "views/ImageViewer/utils/tools";
+import type { AnnotationTool } from "@ImageViewer/core/annotation-tools";
 
 export const useAnnotationTool = (ijsImage: IJSImage | null) => {
   const [operator, setOperator] = useState<AnnotationTool>(

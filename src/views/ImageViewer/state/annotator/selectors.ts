@@ -2,9 +2,8 @@ import type {
   AnnotationMode,
   AnnotationState,
   ToolType,
-} from "views/ImageViewer/utils/enums";
-
-import type { AnnotatorState } from "../../utils/types";
+} from "@ImageViewer/utils/enums";
+import type { AnnotatorState } from "@ImageViewer/utils/types";
 
 export const selectAnnotationState = ({
   annotator,

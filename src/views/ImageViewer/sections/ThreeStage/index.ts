@@ -1,1 +1,1 @@
-export { ThreeStage } from "./ThreeStage";
+export { StageWrapper } from "./StageWrapper";

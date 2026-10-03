@@ -1,10 +1,13 @@
 import { useCallback, useState } from "react";
 
-import { useAnnotationTool, useAnnotationState } from "views/ImageViewer/hooks";
+import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
+import {
+  useAnnotationTool,
+  useAnnotationState,
+  useThreeAnnotationHandlers,
+  useThreeAnnotationMeshes,
+} from "@ImageViewer/hooks";
 
-import { useThreeViewport } from "./ThreeViewportContext";
-import { useThreeAnnotationHandlers } from "./useThreeAnnotationHandlers";
-import { useThreeAnnotationMeshes } from "./useThreeAnnotationMeshes";
 import { AnnotationSvgOverlay } from "./AnnotationSvgOverlay";
 
 import type { Image as IJSImage } from "image-js-latest";

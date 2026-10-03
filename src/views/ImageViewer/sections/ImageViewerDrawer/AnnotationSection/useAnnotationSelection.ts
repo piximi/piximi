@@ -22,7 +22,7 @@ import {
   selectSelectedAnnotations,
   selectVisibleAnnotations,
 } from "@ImageViewer/state/image-viewer-data/reselectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 import {
   activeFeatureList,
   matchesLayer,

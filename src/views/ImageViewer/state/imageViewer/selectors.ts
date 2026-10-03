@@ -1,7 +1,7 @@
 import type {
   ZoomToolOptionsType,
   ImageViewerState,
-} from "views/ImageViewer/utils/types";
+} from "@ImageViewer/utils/types";
 
 export const selectZoomToolOptions = ({
   imageViewer,

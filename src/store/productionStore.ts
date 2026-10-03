@@ -5,8 +5,8 @@ import { classifierSlice } from "store/classifier";
 
 import { annotatorSlice } from "views/ImageViewer/state/annotator";
 import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
+import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data";
 import { projectSlice } from "views/ProjectViewer/state/projectSlice";
-import { imageViewerDataSlice } from "views/ImageViewer/state/image-viewer-data/imageViewerDataSlice";
 import { measurementsSlice } from "views/MeasurementViewer/state";
 
 import { appTasksSlice } from "./appTasks/appTasksSlice";

@@ -2,7 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { selectWorkingAnnotationEntity } from "./selectors";
 
-import type { WorkingAnnotation } from "views/ImageViewer/utils/types";
+import type { WorkingAnnotation } from "@ImageViewer/utils/types";
 
 export const selectFullWorkingAnnotation = createSelector(
   selectWorkingAnnotationEntity,

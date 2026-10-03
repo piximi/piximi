@@ -26,11 +26,10 @@ import { DIMENSIONS } from "utils/constants";
 
 import { CursorZoom, StageZoom } from "icons";
 
-import { selectZoomToolOptions } from "views/ImageViewer/state/imageViewer/selectors";
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-
+import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
+import { selectZoomToolOptions } from "@ImageViewer/state/imageViewer/selectors";
+import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
 import { ImageViewerLogo } from "@ImageViewer/components";
-import { useThreeViewport } from "@ImageViewer/sections/ThreeStage/ThreeViewportContext";
 
 const ZoomTools = () => {
   const dispatch = useDispatch();

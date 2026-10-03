@@ -36,7 +36,7 @@ import type { PopperProps } from "@mui/material";
 
 import type { HTMLDataAttributes } from "utils/types";
 
-import type { OperationType } from "views/ImageViewer/utils/types";
+import type { OperationType } from "@ImageViewer/utils/types";
 
 const imageTools: Record<string, OperationType> = {
   fileIO: {

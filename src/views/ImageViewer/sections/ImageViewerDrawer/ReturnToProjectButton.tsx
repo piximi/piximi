@@ -10,12 +10,12 @@ import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
 
-import { imageViewerSlice } from "views/ImageViewer/state/imageViewer";
-import { annotatorSlice } from "views/ImageViewer/state/annotator";
-
+import { imageViewerSlice } from "@ImageViewer/state/imageViewer";
+import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { selectHasUnsavedChanges } from "@ImageViewer/state/image-viewer-data/selectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
-import { ExitAnnotatorDialog } from "@ImageViewer/components/dialogs";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
+
+import { ExitAnnotatorDialog } from "./ExitAnnotatorDialog";
 
 export const ReturnToProjectButton = () => {
   const navigate = useNavigate();

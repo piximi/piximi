@@ -44,7 +44,7 @@ import { getCategoryIconStyle } from "utils/styleUtils";
 import { HotkeyContext } from "utils/enums";
 
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 
 import { TaxonomyDialog } from "./TaxonomyDialogForm";
 import { useCriterionToggles } from "./useCriterionToggles";

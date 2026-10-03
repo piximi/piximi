@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 
 import type { ObjectFeature } from "core/entities";
 

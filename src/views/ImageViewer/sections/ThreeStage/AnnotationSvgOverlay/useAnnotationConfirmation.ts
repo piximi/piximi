@@ -26,12 +26,12 @@ import {
 } from "@ImageViewer/state/operations/reselectors";
 import { selectActiveViewerImage } from "@ImageViewer/state/image-viewer-data/reselectors";
 import { selectSelectedCategory } from "@ImageViewer/state/image-viewer-data/selectors";
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 
 import type { AnnotationObject, AnnotationVolume } from "core/entities";
 
-import type { AnnotationTool } from "@ImageViewer/utils/tools";
+import type { AnnotationTool } from "@ImageViewer/core/annotation-tools";
 
 export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();

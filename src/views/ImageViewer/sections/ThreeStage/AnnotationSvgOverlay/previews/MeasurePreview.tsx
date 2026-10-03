@@ -1,6 +1,6 @@
 import { AnchoredLabel } from "./AnchoredLabel";
 
-import type { MeasureTool } from "views/ImageViewer/utils/tools";
+import type { MeasureTool } from "@ImageViewer/core/annotation-tools";
 
 export const MeasurePreview = ({ operator }: { operator: MeasureTool }) => {
   const { origin, toolTipPosition, distance } = operator;

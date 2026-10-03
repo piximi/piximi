@@ -8,10 +8,9 @@ import { addListener, isAnyOf } from "@reduxjs/toolkit";
 import { productionStore } from "store";
 import { dataSlice } from "store/data";
 
-import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/imageViewerDataSlice";
-
-import { annotatorSlice } from "../state/annotator";
-import { ToolType } from "../utils/enums";
+import { imageViewerDataSlice } from "@ImageViewer/state/image-viewer-data/";
+import { annotatorSlice } from "@ImageViewer/state/annotator";
+import { ToolType } from "@ImageViewer/utils/enums";
 
 import type { ReactNode } from "react";
 
