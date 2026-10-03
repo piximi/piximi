@@ -17,10 +17,9 @@ import { rleEncodeArray } from "utils/image";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 
-import { selectActiveViewerImage } from "views/ImageViewer/state/imageViewerData/reselectors";
-import { selectSelectedCategory } from "views/ImageViewer/state/imageViewerData/selectors";
-import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
-
+import { selectActiveViewerImage } from "@ImageViewer/state/imageViewerData/reselectors";
+import { selectSelectedCategory } from "@ImageViewer/state/imageViewerData/selectors";
+import { imageViewerDataSlice } from "@ImageViewer/state/imageViewerData";
 import {
   selectOverlapCandidateIds,
   selectPendingOperation,

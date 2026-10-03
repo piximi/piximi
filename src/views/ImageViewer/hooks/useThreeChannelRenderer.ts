@@ -8,8 +8,7 @@ import { Image as IJSImage } from "image-js-latest";
 import { selectActiveExtendedChannels } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewerData/selectors";
-
+import { selectActiveImageId } from "@ImageViewer/state/imageViewerData/selectors";
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import { useActiveImage } from "@ImageViewer/contexts/ActiveImageProvider";
 import compositeFrag from "@ImageViewer/core/shaders/composite.frag?raw";

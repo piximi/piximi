@@ -3,8 +3,7 @@ import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
-
-import { ZOOM_MAX, ZOOM_MIN, ZOOM_SPEED } from "../utils/consts";
+import { ZOOM_MAX, ZOOM_MIN, ZOOM_SPEED } from "@ImageViewer/utils/consts";
 
 export function useThreePanZoom(
   mountRef: React.RefObject<HTMLDivElement | null>,

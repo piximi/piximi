@@ -4,8 +4,7 @@ import { useSelector } from "react-redux";
 
 import * as THREE from "three";
 
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewerData/selectors";
-
+import { selectActiveImageId } from "@ImageViewer/state/imageViewerData/selectors";
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 
 /**

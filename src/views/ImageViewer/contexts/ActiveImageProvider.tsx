@@ -7,7 +7,7 @@ import { useRawImageData } from "hooks";
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveExtendedChannels } from "store/data/selectors";
 
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewerData/selectors";
+import { selectActiveImageId } from "@ImageViewer/state/imageViewerData/selectors";
 
 import type { ReactNode } from "react";
 

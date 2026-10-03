@@ -27,8 +27,7 @@ import {
   SubtractAnnotationsIcon,
 } from "icons";
 
-import { selectVisibleAnnotations } from "views/ImageViewer/state/imageViewerData/reselectors";
-
+import { selectVisibleAnnotations } from "@ImageViewer/state/imageViewerData/reselectors";
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { selectAnnotationMode } from "@ImageViewer/state/annotator/selectors";

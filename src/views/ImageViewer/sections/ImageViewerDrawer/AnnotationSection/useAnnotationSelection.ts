@@ -15,20 +15,20 @@ import {
   selectFilterLayer,
   selectPlaneScope,
   selectSelectionLayer,
-} from "views/ImageViewer/state/imageViewerData/selectors";
+} from "@ImageViewer/state/imageViewerData/selectors";
 import {
   selectActiveImageAnnotations,
   selectGlobalFeatureBounds,
   selectSelectedAnnotations,
   selectVisibleAnnotations,
-} from "views/ImageViewer/state/imageViewerData/reselectors";
-import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+} from "@ImageViewer/state/imageViewerData/reselectors";
+import { imageViewerDataSlice } from "@ImageViewer/state/imageViewerData";
 import {
   activeFeatureList,
   matchesLayer,
   mergeFeatureRanges,
   splitSelection,
-} from "views/ImageViewer/state/imageViewerData/utils";
+} from "@ImageViewer/state/imageViewerData/utils";
 
 import { useCriterionToggles } from "./useCriterionToggles";
 

@@ -43,8 +43,8 @@ import { HelpItem } from "help/HelpContent";
 import { getCategoryIconStyle } from "utils/styleUtils";
 import { HotkeyContext } from "utils/enums";
 
-import { selectSelectedCategory } from "views/ImageViewer/state/imageViewerData/selectors";
-import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+import { selectSelectedCategory } from "@ImageViewer/state/imageViewerData/selectors";
+import { imageViewerDataSlice } from "@ImageViewer/state/imageViewerData";
 
 import { TaxonomyDialog } from "./TaxonomyDialogForm";
 import { useCriterionToggles } from "./useCriterionToggles";

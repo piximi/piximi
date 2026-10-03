@@ -9,8 +9,7 @@ import {
 
 import { useSelector } from "react-redux";
 
-import { selectActiveViewerImage } from "views/ImageViewer/state/imageViewerData/reselectors";
-
+import { selectActiveViewerImage } from "@ImageViewer/state/imageViewerData/reselectors";
 import { imageToScreenTransform } from "@ImageViewer/utils/coords";
 import { ZOOM_MAX, ZOOM_MIN } from "@ImageViewer/utils/consts";
 

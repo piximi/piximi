@@ -10,7 +10,7 @@ import { useTranslation } from "hooks";
 import { selectAnnotationsByImageId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
-import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
+import { imageViewerDataSlice } from "@ImageViewer/state/imageViewerData";
 
 import { ExportAnnotationsMenu } from "./ExportAnnotationsMenu";
 

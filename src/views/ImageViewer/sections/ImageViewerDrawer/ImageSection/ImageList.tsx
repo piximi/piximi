@@ -28,9 +28,8 @@ import {
 import {
   selectImageStackIds,
   selectActiveImageId,
-} from "views/ImageViewer/state/imageViewerData/selectors";
-import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
-
+} from "@ImageViewer/state/imageViewerData/selectors";
+import { imageViewerDataSlice } from "@ImageViewer/state/imageViewerData";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 
 import { ImageMenu } from "./ImageMenu";

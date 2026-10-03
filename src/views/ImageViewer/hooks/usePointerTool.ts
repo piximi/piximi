@@ -7,10 +7,9 @@ import { getOverlappingAnnotations, getAnnotationsInBox } from "utils/image";
 import {
   selectAllAnnotationsInPlane,
   selectSelectedAnnotations,
-} from "views/ImageViewer/state/imageViewerData/reselectors";
-import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
-import { selectActiveImageId } from "views/ImageViewer/state/imageViewerData/selectors";
-
+} from "@ImageViewer/state/imageViewerData/reselectors";
+import { imageViewerDataSlice } from "@ImageViewer/state/imageViewerData";
+import { selectActiveImageId } from "@ImageViewer/state/imageViewerData/selectors";
 import { ToolType } from "@ImageViewer/utils/enums";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import {

@@ -2,8 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useSelector } from "react-redux";
 
-import { selectHasSelection } from "views/ImageViewer/state/imageViewerData/reselectors";
-
+import { selectHasSelection } from "@ImageViewer/state/imageViewerData/reselectors";
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import {
   selectAnnotationState,

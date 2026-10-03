@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import { selectActiveViewerImage } from "views/ImageViewer/state/imageViewerData/reselectors";
-
+import { selectActiveViewerImage } from "@ImageViewer/state/imageViewerData/reselectors";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import { AnnotationState } from "@ImageViewer/utils/enums";
 

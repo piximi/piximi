@@ -4,8 +4,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { throttle } from "lodash";
 
-import { imageViewerDataSlice } from "views/ImageViewer/state/imageViewerData";
-
+import { imageViewerDataSlice } from "@ImageViewer/state/imageViewerData";
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 import { annotatorSlice } from "@ImageViewer/state/annotator";
 import {
