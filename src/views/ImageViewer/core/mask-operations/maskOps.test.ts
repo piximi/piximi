@@ -6,11 +6,11 @@ import {
   intersection,
   masksOverlap,
   union,
-} from "../maskOps";
+} from "./maskOps";
 
 import type { BBox } from "core/entities";
 
-import type { MaskRegion } from "../maskOps";
+import type { MaskRegion } from "./maskOps";
 
 /** Build a region from an ASCII grid: '#' set, '.' clear. */
 const region = (x0: number, y0: number, rows: string[]): MaskRegion => ({

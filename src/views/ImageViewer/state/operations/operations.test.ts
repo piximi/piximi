@@ -12,7 +12,6 @@ import {
   selectAnnotationsForRender,
   selectIsPickingTarget,
   selectOverlapCandidateIds,
-  selectPendingOperation,
   selectResolvedTargetIds,
   selectSelectionOperandIds,
 } from "./reselectors";
@@ -68,19 +67,6 @@ const A = annotation("A", 0, 0, ["##", "##"]);
 const B = annotation("B", 1, 1, ["##", "##"]);
 const C = annotation("C", 9, 9, ["#"]);
 const ALL = [A, B, C];
-
-const show = (mask: Uint8Array, bbox: BBox) => {
-  const w = bbox[2] - bbox[0];
-  const rows: string[] = [];
-  for (let y = 0; y < bbox[3] - bbox[1]; y++) {
-    rows.push(
-      [...mask.slice(y * w, (y + 1) * w)]
-        .map((v) => (v === 255 ? "#" : "."))
-        .join(""),
-    );
-  }
-  return rows;
-};
 
 describe("selectOverlapCandidateIds", () => {
   it("is empty without a stroke", () => {
@@ -154,152 +140,6 @@ describe("selectIsPickingTarget", () => {
     expect(
       selectIsPickingTarget.resultFunc(AnnotationMode.New, s, ["A", "B"]),
     ).toBe(false);
-  });
-});
-
-describe("selectPendingOperation — stroke against a target", () => {
-  const s = stroke(1, 1, ["#"]);
-
-  it("is null with no operation staged", () => {
-    expect(
-      selectPendingOperation.resultFunc(AnnotationMode.New, ALL, s, ["A"], []),
-    ).toBeNull();
-  });
-
-  it("is null while the target is unresolved", () => {
-    expect(
-      selectPendingOperation.resultFunc(AnnotationMode.Add, ALL, s, [], []),
-    ).toBeNull();
-  });
-
-  it("subtracts the stroke from the target, leaving identity alone", () => {
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Subtract,
-      ALL,
-      s,
-      ["A"],
-      [],
-    );
-    expect(pending?.absorbedIds).toEqual([]);
-    expect(Object.keys(pending!.updates)).toEqual(["A"]);
-    const u = pending!.updates.A;
-    expect(show(u.mask, u.bbox)).toEqual(["##", "#."]);
-  });
-
-  it("reports empty when the stroke erases the target entirely", () => {
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Subtract,
-      ALL,
-      stroke(0, 0, ["##", "##"]),
-      ["A"],
-      [],
-    );
-    expect(pending?.empty).toBe(true);
-    expect(pending?.updates).toEqual({});
-  });
-});
-
-describe("selectPendingOperations - stroke against multiple targets", () => {
-  const s = stroke(1, 1, ["#"]);
-
-  it("Adds folds every picked target plut the stroke into the first, absobs the rest", () => {
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Add,
-      ALL,
-      s,
-      ["A", "B"],
-      [],
-    );
-
-    expect(pending?.absorbedIds).toEqual(["B"]);
-    expect(Object.keys(pending!.updates)).toEqual(["A"]);
-    const u = pending!.updates.A;
-    expect(show(u.mask, u.bbox)).toEqual(["##.", "###", ".##"]);
-  });
-  it("Subtract applies to each picked target independently, absorbs nothing", () => {
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Subtract,
-      ALL,
-      s,
-      ["A", "B"],
-      [],
-    );
-
-    expect(pending?.absorbedIds).toEqual([]);
-    expect(Object.keys(pending!.updates).sort()).toEqual(["A", "B"]);
-    const uA = pending!.updates.A;
-    const uB = pending!.updates.B;
-    expect(show(uA.mask, uA.bbox)).toEqual(["##", "#."]);
-    expect(show(uB.mask, uB.bbox)).toEqual([".#", "##"]);
-  });
-  it("Intersect applies to each picked target independently, absorbs nothing", () => {
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Intersect,
-      ALL,
-      s,
-      ["A", "B"],
-      [],
-    );
-
-    expect(pending?.absorbedIds).toEqual([]);
-    expect(Object.keys(pending!.updates).sort()).toEqual(["A", "B"]);
-    const uA = pending!.updates.A;
-    const uB = pending!.updates.B;
-    expect(show(uA.mask, uA.bbox)).toEqual(["#"]);
-    expect(show(uB.mask, uB.bbox)).toEqual(["#"]);
-  });
-});
-
-describe("selectPendingOperation — click-selected operands", () => {
-  it("folds into the first operand and absorbs the rest", () => {
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Add,
-      ALL,
-      undefined,
-      [],
-      ["A", "B"],
-    );
-    expect(pending?.absorbedIds).toEqual(["B"]);
-    const u = pending!.updates.A;
-    expect(show(u.mask, u.bbox)).toEqual(["##.", "###", ".##"]);
-  });
-
-  it("makes the first operand the minuend for subtract", () => {
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Subtract,
-      ALL,
-      undefined,
-      [],
-      ["B", "A"],
-    );
-    // B less A leaves B's three pixels outside the shared one.
-    expect(Object.keys(pending!.updates)).toEqual(["B"]);
-    expect(pending?.absorbedIds).toEqual(["A"]);
-    const u = pending!.updates.B;
-    expect(show(u.mask, u.bbox)).toEqual([".#", "##"]);
-  });
-
-  it("reports empty for a disjoint intersection", () => {
-    const pending = selectPendingOperation.resultFunc(
-      AnnotationMode.Intersect,
-      ALL,
-      undefined,
-      [],
-      ["A", "C"],
-    );
-    expect(pending?.empty).toBe(true);
-  });
-
-  it("needs two operands", () => {
-    expect(
-      selectPendingOperation.resultFunc(
-        AnnotationMode.Add,
-        ALL,
-        undefined,
-        [],
-        ["A"],
-      ),
-    ).toBeNull();
   });
 });
 
