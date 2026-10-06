@@ -1,0 +1,19 @@
+{
+  // Type-checks the docs screenshot tool only. It lives outside src/ so it is
+  // never bundled or shipped; the root tsconfig only includes src/.
+  //   pnpm tsc -p documentation/screenshots
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["./**/*.ts", "./**/*.mts"]
+}

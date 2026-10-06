@@ -10,7 +10,7 @@ export const SegmenterOptions = () => {
   const { loadedModel } = useSegmenter();
 
   return !loadedModel ? null : (
-    <Box sx={{ width: "100%" }}>
+    <Box data-doc="segmenter-settings" sx={{ width: "100%" }}>
       <SectionHeader title="Model Settings" />
 
       <Box

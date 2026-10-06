@@ -213,9 +213,13 @@ const AnnotationToolBar = () => {
 
   return (
     <Stack sx={{ height: "100%", bgcolor: "background.paper" }}>
-      <ToolList toolMap={utilityTools} />
+      <Box data-doc="utility-tools">
+        <ToolList toolMap={utilityTools} />
+      </Box>
       <Divider flexItem sx={{ my: 0.5 }} />
-      <ToolList toolMap={annotationTools} />
+      <Box data-doc="creation-tools">
+        <ToolList toolMap={annotationTools} />
+      </Box>
     </Stack>
   );
 };

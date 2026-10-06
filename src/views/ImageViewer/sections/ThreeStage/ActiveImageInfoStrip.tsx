@@ -101,6 +101,7 @@ export const ActiveImageInfoStrip = ({
 
   return (
     <Box
+      data-doc="image-info-strip"
       sx={(theme) => ({
         backgroundColor: theme.palette.background.paper,
         width: width + "px",

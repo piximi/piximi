@@ -103,6 +103,7 @@ export const AnnotationSection = () => {
           </Typography>
         </Box>
         <ToggleButtonGroup
+          data-doc="plane-scope"
           exclusive
           fullWidth
           size="small"

@@ -24,10 +24,11 @@ export const MeasurementPlot = ({ children }: { children: ReactNode }) => {
         bgcolor: theme.palette.background.paper.slice(0, -1) + ",0.7)",
       })}
     >
-      <Box width="100%" height="90%" ref={plotRef}>
+      <Box data-doc="plot-canvas" width="100%" height="90%" ref={plotRef}>
         {children}
       </Box>
       <Button
+        data-doc="save-plot"
         variant="text"
         sx={{ alignSelf: "flex-end", mr: 1 }}
         onClick={() => savePlot(plotRef, selectedPlot.name)}

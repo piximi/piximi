@@ -44,7 +44,7 @@ export const ProjectAppBar = () => {
       <Box sx={{ flexGrow: 1 }} />
 
       {!isMobile && (
-        <>
+        <Box data-doc="view-nav" sx={{ display: "flex", flexShrink: 1 }}>
           <ImageViewerButton mobileAlt={true} />
           <Divider
             orientation="vertical"
@@ -53,7 +53,7 @@ export const ProjectAppBar = () => {
             sx={{ mx: 1 }}
           />
           <MeasurementsButton mobileAlt={true} />
-        </>
+        </Box>
       )}
     </Stack>
   );

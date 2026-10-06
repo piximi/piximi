@@ -277,7 +277,7 @@ export const PivotConfigurator = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box data-doc="pivot-config" sx={{ p: 2 }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
         Configure Pivot Table
       </Typography>

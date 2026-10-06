@@ -80,6 +80,7 @@ export const SelectionFooter = ({
 
   return (
     <Box
+      data-doc="selection-footer"
       sx={{
         borderTop: 1,
         borderColor: "divider",

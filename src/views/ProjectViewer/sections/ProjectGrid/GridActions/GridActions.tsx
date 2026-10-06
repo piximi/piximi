@@ -61,7 +61,10 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
     [selectedFilteredItemIds],
   );
   return (
-    <Box sx={{ display: "flex", position: "absolute", right: 0 }}>
+    <Box
+      data-doc="grid-actions"
+      sx={{ display: "flex", position: "absolute", right: 0 }}
+    >
       {!isMobile && (
         <>
           <SortFilter />

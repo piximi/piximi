@@ -120,7 +120,13 @@ const ModelArchiitectureOptions = ({
   }, [userHasUpdated, restrictedClassifierNames, newModelArch]);
 
   return (
-    <Stack direction="row" spacing={2} py={1} justifyContent="space-evenly">
+    <Stack
+      data-doc="model-picker"
+      direction="row"
+      spacing={2}
+      py={1}
+      justifyContent="space-evenly"
+    >
       <WithLabel
         label="Model Architecture:"
         labelProps={{

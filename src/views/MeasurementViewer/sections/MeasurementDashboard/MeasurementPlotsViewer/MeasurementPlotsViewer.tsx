@@ -120,6 +120,7 @@ export const MeasurementPlotsViewer = () => {
           {/* Plot Option Configuration */}
           <Panel id="sidebar" defaultSize={20}>
             <Box
+              data-doc="plot-config"
               width={"100%"}
               height="100%"
               sx={{

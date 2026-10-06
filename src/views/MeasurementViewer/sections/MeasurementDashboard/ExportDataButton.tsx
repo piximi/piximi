@@ -41,6 +41,7 @@ export function ExportButton({
     <Box>
       <Tooltip title={view === "table" ? "Download as CSV" : "Save as PNG"}>
         <IconButton
+          data-doc="export-data"
           ref={exportMenuTriggerRef}
           size="small"
           onClick={() => setExportMenuOpen(true)}

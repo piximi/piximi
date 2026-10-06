@@ -28,6 +28,7 @@ export const ModelTaskSection = () => {
   };
   return (
     <Box
+      data-doc="model-task-section"
       width="100%"
       display="flex"
       flexDirection="column"

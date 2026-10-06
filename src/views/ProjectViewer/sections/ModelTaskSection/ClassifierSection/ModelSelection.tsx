@@ -123,7 +123,10 @@ export const ModelSelection = ({
       >
         Model I/O
       </Typography>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Box
+        data-doc="model-io"
+        sx={{ display: "flex", justifyContent: "space-between" }}
+      >
         <TooltipTextButton
           dataHelp={HelpItem.LoadClassificationModel}
           startIcon={<AddIcon />}
@@ -160,6 +163,7 @@ export const ModelSelection = ({
         Selected Model
       </Typography>
       <Box
+        data-doc="model-select"
         sx={{
           display: "flex",
           justifyContent: "space-between",

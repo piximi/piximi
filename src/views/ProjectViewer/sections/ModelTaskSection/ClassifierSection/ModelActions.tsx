@@ -47,6 +47,7 @@ export const ModelActions = () => {
   );
   return (
     <Box
+      data-doc="model-actions"
       sx={{ display: "flex", width: "100%", justifyContent: "space-between" }}
     >
       <FitClassifierButton modelStatus={modelStatus} />

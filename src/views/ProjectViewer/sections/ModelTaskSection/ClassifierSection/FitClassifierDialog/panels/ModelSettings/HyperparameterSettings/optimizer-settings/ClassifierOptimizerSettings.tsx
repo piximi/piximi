@@ -20,7 +20,7 @@ export const ClassifierOptimizerSettings = ({
   showAdvanced: boolean;
 }) => {
   return (
-    <Grid container spacing={2} padding={2}>
+    <Grid container spacing={2} padding={2} data-doc="optimizer-settings">
       <Grid size={12}>
         <Divider sx={{ mb: 1 }}>
           <Typography variant="body2">Training Strategy</Typography>

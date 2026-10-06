@@ -134,6 +134,7 @@ export const ImageList = () => {
   return (
     <>
       <Box
+        data-doc="image-list"
         sx={{
           position: "relative",
           display: "flex",
