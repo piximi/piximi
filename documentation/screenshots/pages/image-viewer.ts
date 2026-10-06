@@ -1,7 +1,9 @@
 // Image Viewer (the annotator). Reached from the project view by selecting
-// everything and pressing "Image Viewer"; `setup` also draws one annotation so
-// the Annotations drawer and canvas have something to show.
+// everything and pressing "Image Viewer". Needs a project that already has a
+// kind with annotations (the tutorial project does), so the Annotations drawer
+// and canvas have something to show and new shapes can be confirmed.
 
+import { DEFAULT_PROJECT_FILE } from "../config.ts";
 import {
   area,
   docId,
@@ -209,6 +211,7 @@ async function drawRectangle(
   to: { dx: number; dy: number },
 ) {
   await help(page, "rectangle-tool").click();
+  await markGridArea(page, "stage");
   const box = await area(page, "stage").boundingBox();
   if (!box) throw new Error("stage not found");
   const cx = box.x + box.width / 2;
@@ -222,26 +225,13 @@ async function drawRectangle(
 
 const confirmBar = (p: Page) => help(p, "object-manipulation-tools");
 
-// Leave one confirmed annotation (in a new "nucleus" kind) on the first image.
-async function createExampleAnnotation(page: Page) {
-  await iconButton(page, "FormatShapesIcon").click();
-  await drawRectangle(page, { dx: -150, dy: -120 }, { dx: -60, dy: -30 });
-  await page.getByText("Add Kind", { exact: true }).click();
-  const dialog = page.getByRole("dialog");
-  await dialog.getByRole("textbox").fill("nucleus");
-  await dialog.getByRole("button", { name: /confirm/i }).click();
-  await dialog.waitFor({ state: "hidden", timeout: 5000 });
-  await confirmBar(page).locator("button").first().click();
-  await page.waitForTimeout(500);
-}
-
-// project view -> image viewer, with one example annotation.
+// project view -> image viewer, with every image selected. The tutorial
+// project already has annotated images, so nothing is drawn here.
 async function enterImageViewer(page: Page) {
   await page.getByTestId("select-all-button").click();
   await help(page, "navigate-to-imageviewer").click();
   await page.waitForURL(/\/imageviewer/, { timeout: 15000 });
   await page.waitForTimeout(2000); // image + channels load
-  await createExampleAnnotation(page);
 }
 
 // --- Steps -----------------------------------------------------------------
@@ -335,11 +325,7 @@ async function icons({ page, icon }: ShotContext) {
 
 export const imageViewer: DocPage = {
   name: "image-viewer",
-  project: {
-    kind: "file",
-    path: new URL("../Piximi_Translocation_Tutorial-Docs.zip", import.meta.url)
-      .pathname,
-  },
+  project: { kind: "file", path: DEFAULT_PROJECT_FILE },
   setup: enterImageViewer,
   steps: [
     { name: "overview", run: overview },
