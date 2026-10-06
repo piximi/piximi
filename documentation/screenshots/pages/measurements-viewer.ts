@@ -212,7 +212,12 @@ async function plotTab(ctx: ShotContext) {
   const { page, out } = ctx;
   await showView(page, "plot");
   // Histogram is the default plot; give it an x-axis so there is something to see.
-  await page.getByRole("combobox", { name: /x-axis/i }).click();
+  // The select's accessible name is its current value (e.g. "Area" once one is
+  // chosen), so find it through its label's form control instead.
+  await help(page, "measurement-plot-x-axis")
+    .locator("xpath=..")
+    .getByRole("combobox")
+    .click();
   await page.getByRole("option").first().click();
   await page.waitForTimeout(1500);
   await park(page);
