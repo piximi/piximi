@@ -3,7 +3,6 @@
 // kind with annotations (the tutorial project does), so the Annotations drawer
 // and canvas have something to show and new shapes can be confirmed.
 
-import { DEFAULT_PROJECT_FILE } from "../config.ts";
 import {
   area,
   docId,
@@ -325,7 +324,7 @@ async function icons({ page, icon }: ShotContext) {
 
 export const imageViewer: DocPage = {
   name: "image-viewer",
-  project: { kind: "file", path: DEFAULT_PROJECT_FILE },
+  project: { kind: "example", name: "Translocation Tutorial" },
   setup: enterImageViewer,
   steps: [
     { name: "overview", run: overview },

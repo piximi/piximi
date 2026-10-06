@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { BASE_URL } from "../config.ts";
 
 import type { Page } from "playwright";
+
 import type { ProjectSource } from "./types.ts";
 
 async function waitForProjectLoad(page: Page) {
