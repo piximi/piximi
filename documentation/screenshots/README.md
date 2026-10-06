@@ -18,16 +18,17 @@ Without the package script:
 Images are written straight into the docs repo, which is expected to be a
 sibling checkout named `piximi-documentation` (override with `DOCS_IMG_DIR`).
 
-| Flag | Meaning |
-| --- | --- |
-| `--page <name>` | capture only this page (repeatable) |
-| `--only <step>` | run only this step (repeatable) |
-| `--theme dark\|light` | one theme instead of both |
-| `--project <zip>` | load this saved project instead of the page default |
-| `--list` | list pages and steps |
+| Flag                  | Meaning                                             |
+| --------------------- | --------------------------------------------------- |
+| `--page <name>`       | capture only this page (repeatable)                 |
+| `--only <step>`       | run only this step (repeatable)                     |
+| `--theme dark\|light` | one theme instead of both                           |
+| `--project <zip>`     | load this saved project instead of the page default |
+| `--list`              | list pages and steps                                |
 
 Env: `PIXIMI_URL`, `DOCS_IMG_DIR`, `DOCS_IMG_SCALE` (default 2),
-`DOCS_WEBP_QUALITY` (default 92), `NO_ANNOTATE=1` (no badges), .
+`DOCS_WEBP_QUALITY` (default 92), `NO_ANNOTATE=1` (no badges),
+`DOCS_SEGMENTER_MODEL` (regex choosing the segmenter page's model, e.g. `cellpose`; Cellpose-SAM needs WebGPU).
 
 Examples:
 
@@ -52,7 +53,15 @@ lib/             generic helpers (no knowledge of any one page)
 pages/           one file per docs page / view
   index.ts         registry
   project-viewer.ts
+  image-viewer.ts
+  measurements-viewer.ts
+  classifier.ts
+  segmenter.ts
 ```
+
+All pages load the saved tutorial project (`Piximi_Translocation_Tutorial-Docs.zip`),
+which has annotated objects (a `cellpose_cells` kind) and trained classifiers.
+A page can set `setup` to navigate into its view once before its steps run.
 
 ## Adding a page
 
@@ -66,7 +75,9 @@ leave the app usable, so any step can run alone with `--only`.
 
 ## Conventions
 
-- Find elements by `data-help` first (`help(root, "kind-tabs")`), then
+- Find elements by `data-help` first (`help(root, "kind-tabs")`), then a
+  `data-doc` attribute (`docId(root, "image-list")`) added to the app for
+  sections with no help item, then
   `data-testid`, then role/text. Values for `data-help` come from the
   `HelpItem` enum in `src/help/HelpContent.ts`.
 - Callout numbers must match the numbered lists in the markdown. The legend is

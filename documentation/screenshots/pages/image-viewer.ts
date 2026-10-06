@@ -306,7 +306,10 @@ async function icons({ page, icon }: ShotContext) {
   await park(page);
   const first = (l: Locator) => l.locator("svg").first();
   const tools: Array<[string, Locator]> = [
-    ["tool-selection", first(docId(page, "utility-tools").locator("button").nth(0))],
+    [
+      "tool-selection",
+      first(docId(page, "utility-tools").locator("button").nth(0)),
+    ],
     ["tool-measure", svgIcon(page, "StraightenIcon")],
     ["tool-rectangle", first(help(page, "rectangle-tool"))],
     ["tool-ellipse", first(help(page, "ellipse-tool"))],

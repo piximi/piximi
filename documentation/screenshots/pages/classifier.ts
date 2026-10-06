@@ -108,7 +108,9 @@ async function prepare(page: Page) {
   const current = (await select.textContent())?.trim();
   if (!current || current === "New Model") {
     await select.click();
-    const trained = page.getByRole("option").filter({ hasNotText: "New Model" });
+    const trained = page
+      .getByRole("option")
+      .filter({ hasNotText: "New Model" });
     if (await trained.count()) {
       await trained.first().click();
     } else {

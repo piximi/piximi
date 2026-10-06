@@ -140,10 +140,7 @@ async function enterMeasurements(page: Page) {
   // Tick every measurement group, then expand them so the names show.
   for (const item of ["object-measurements", "intensity-measurements"]) {
     const group = help(page, item);
-    await group
-      .locator("input[type=checkbox]")
-      .first()
-      .click({ force: true });
+    await group.locator("input[type=checkbox]").first().click({ force: true });
     await group
       .locator('svg[data-testid="TreeViewExpandIconIcon"]')
       .first()

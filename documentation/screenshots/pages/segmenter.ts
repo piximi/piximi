@@ -88,10 +88,7 @@ async function loadModel(ctx: ShotContext) {
   await park(page);
   await shootPadded(page, dialog(page), {}, out("load-model-selected"));
 
-  await dialog(page)
-    .getByRole("button", { name: /load/i })
-    .last()
-    .click();
+  await dialog(page).getByRole("button", { name: /load/i }).last().click();
   // Weights are fetched on first use; give the download time.
   await docId(page, "segmenter-settings")
     .waitFor({ state: "visible", timeout: 180000 })
