@@ -6,7 +6,7 @@ import { DEFAULT_PROJECT_FILE } from "../config.ts";
 import { area, docId, help, markGridArea } from "../lib/locators.ts";
 import { shootGridArea } from "../lib/output.ts";
 
-import type { Page } from "playwright";
+import type { Locator, Page } from "playwright";
 
 import type { CalloutSpec, DocPage, ShotContext } from "../lib/types.ts";
 
@@ -70,7 +70,7 @@ const TABLE_TAB: CalloutSpec = [
   {
     n: 5,
     label: "Data grid",
-    target: (p) => help(p, "measurements-data-table"),
+    target: (p) => docId(p, "data-grid"),
     cover: true,
     ...IN,
   },
@@ -169,26 +169,43 @@ async function tableTab(ctx: ShotContext) {
   await ctx.clearAnnotations();
 }
 
-// Drag a dimension into "Column Grouping" to show a pivoted table. dnd-kit
-// needs real pointer movement, so move in steps.
-async function pivot(ctx: ShotContext) {
-  const { page, out } = ctx;
-  await showView(page, "table");
-  const config = docId(page, "pivot-config");
-  const chip = config.getByText("Category", { exact: true }).first();
-  const zone = config.getByText(/drag dimensions here/i).first();
-  const [from, to] = [await chip.boundingBox(), await zone.boundingBox()];
-  if (!from || !to) {
-    console.warn("  ! pivot: chip or drop zone not found - skipped");
-    return;
-  }
+// Drag a chip from one pivot zone to another. dnd-kit needs real pointer
+// movement, so move in steps. Returns false if either end is missing.
+async function dragChip(page: Page, chip: Locator, zone: Locator) {
+  const from = await chip.boundingBox({ timeout: 3000 }).catch(() => null);
+  const to = await zone.boundingBox({ timeout: 3000 }).catch(() => null);
+  if (!from || !to) return false;
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
   await page.mouse.move(to.x + 20, to.y + 10, { steps: 15 });
   await page.mouse.up();
   await page.waitForTimeout(800);
+  return true;
+}
+
+// Drag a dimension into "Column Grouping" to show a pivoted table, then put it
+// back. The pivot config is kept in the store, so a previous run (or theme)
+// can leave "Category (all)" grouped; start from a clean state either way.
+async function pivot(ctx: ShotContext) {
+  const { page, out } = ctx;
+  await showView(page, "table");
+  const config = docId(page, "pivot-config");
+  const available = config.getByText("Available Dimensions", { exact: true });
+  const grouped = config.getByText("Category (all)", { exact: true }).first();
+
+  if (await grouped.count()) await dragChip(page, grouped, available);
+
+  const chip = config.getByText("Category", { exact: true }).first();
+  const zone = config.getByText(/drag dimensions here/i).first();
+  if (!(await dragChip(page, chip, zone))) {
+    console.warn("  ! pivot: chip or drop zone not found - skipped");
+    return;
+  }
   await park(page);
   await shootGridArea(page, "dashboard", out("table-pivot"));
+
+  await dragChip(page, grouped, available); // restore
+  await park(page);
 }
 
 async function plotTab(ctx: ShotContext) {

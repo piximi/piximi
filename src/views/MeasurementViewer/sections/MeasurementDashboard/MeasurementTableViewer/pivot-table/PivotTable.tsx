@@ -140,6 +140,7 @@ export const PivotTable = ({
   return (
     <Box
       data-id="pivotTable"
+      data-doc="data-grid"
       sx={{
         display: "flex",
         flexDirection: "column",
