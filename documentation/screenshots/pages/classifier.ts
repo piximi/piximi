@@ -2,7 +2,6 @@
 // dialogs (docs page: pages/detail/projectviewer-classification.md).
 // Needs a project with a trained classifier (the tutorial project has one).
 
-import { DEFAULT_PROJECT_FILE } from "../config.ts";
 import { docId, help } from "../lib/locators.ts";
 import { shootPadded } from "../lib/output.ts";
 
@@ -267,7 +266,7 @@ async function evaluate(ctx: ShotContext) {
 
 export const classifier: DocPage = {
   name: "classifier",
-  project: { kind: "file", path: DEFAULT_PROJECT_FILE },
+  project: { kind: "example", name: "MNIST example project" },
   steps: [
     { name: "section", run: section },
     { name: "load-model", run: loadModel },
