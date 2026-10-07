@@ -1,14 +1,9 @@
-//TODO: Remove after refactor
-//@ts-nocheck keep tsc uncluttered for now
 import { describe, expect, it } from "vitest";
 
 import { Partition } from "core/dl/enums";
-import { STORES } from "core/data-connector/types";
+import { DTYPES, STORES, UNKNOWN_IMAGE_CATEGORY_ID } from "core/entities";
 
-import { DTYPES } from "./types";
 import {
-  selectAllImageSeries,
-  selectImageSeriesById,
   selectAllImages,
   selectAllKinds,
   selectAllCategories,
@@ -26,18 +21,19 @@ import {
 } from "./selectors";
 import { dataSlice } from "./dataSlice";
 
-import type { RootState } from "store/rootReducer";
-
 import type {
-  ImageSeries,
-  ImageObject,
-  Kind,
-  Category,
-  AnnotationVolume,
+  AnnotationCategory,
   AnnotationObject,
-  Plane,
+  AnnotationVolume,
   Channel,
-} from "./types";
+  ChannelMeta,
+  ImageObject,
+  ImageSeries,
+  Kind,
+  Plane,
+} from "core/entities";
+
+import type { RootState } from "store/rootReducer";
 
 function makeState(): RootState {
   const data = dataSlice.reducer(undefined, { type: "" });
@@ -75,27 +71,6 @@ function makeImage(
 }
 
 describe("Tier 1 selectors", () => {
-  it("selectAllImageSeries returns empty array on initial state", () => {
-    expect(selectAllImageSeries(makeState())).toEqual([]);
-  });
-
-  it("selectImageSeriesById returns correct series", () => {
-    const series = makeSeries("s1");
-    let data = dataSlice.reducer(undefined, { type: "" });
-    data = dataSlice.reducer(
-      data,
-      dataSlice.actions.addImageSeries({
-        imageSeries: [series],
-        images: [],
-        planes: [],
-        channels: [],
-        channelMetas: [],
-      }),
-    );
-    const state = { data } as unknown as RootState;
-    expect(selectImageSeriesById(state, "s1")).toEqual(series);
-  });
-
   it("selectAllImages returns empty array on initial state", () => {
     expect(selectAllImages(makeState())).toEqual([]);
   });
@@ -166,7 +141,7 @@ describe("Tier 2 FK join selectors", () => {
       name: "K1",
       unknownCategoryId: "cat-k1-unk",
     };
-    const cat: Category = {
+    const category: AnnotationCategory = {
       id: "cat-k1-unk",
       name: "Unknown",
       type: "annotation",
@@ -174,8 +149,10 @@ describe("Tier 2 FK join selectors", () => {
       color: "#fff",
       isUnknown: true,
     };
-    data = dataSlice.reducer(data, dataSlice.actions.addKind(kind));
-    data = dataSlice.reducer(data, dataSlice.actions.addCategory(cat));
+    data = dataSlice.reducer(
+      data,
+      dataSlice.actions.addKind({ kind, category }),
+    );
     const state = { data } as unknown as RootState;
     const result = selectCategoriesByKindId(state, "k1");
     expect(result.some((c) => c.id === "cat-k1-unk")).toBe(true);
@@ -372,73 +349,97 @@ describe("Tier 2 active-entity selectors", () => {
 });
 
 describe("selectRepresentativeImages", () => {
-  it("returns all images for a non-time-series series", () => {
-    let data = dataSlice.reducer(undefined, { type: "" });
-    const series = makeSeries("s1"); // timeSeries: false
-    const img1 = makeImage("img1", "s1");
-    const img2 = makeImage("img2", "s1");
-    data = dataSlice.reducer(
+  // buildExtendedImage drops images without an active plane, an existing
+  // category, and at least one visible channel, so each image gets all three.
+  function addRenderableSeries(
+    data: RootState["data"],
+    series: ImageSeries,
+    imageIds: string[],
+  ): RootState["data"] {
+    const images = imageIds.map((id, timepoint) => ({
+      ...makeImage(id, series.id, UNKNOWN_IMAGE_CATEGORY_ID),
+      timepoint,
+    }));
+    const planes: Plane[] = imageIds.map((id) => ({
+      id: `${id}-plane`,
+      imageId: id,
+      zIndex: 0,
+    }));
+    const channelMeta: ChannelMeta = {
+      id: `${series.id}-cm`,
+      name: "C1",
+      bitDepth: 8,
+      colorMap: [255, 255, 255],
+      visible: true,
+      minValue: 0,
+      maxValue: 255,
+      rampMin: 0,
+      rampMax: 255,
+      rampMinLimit: 0,
+      rampMaxLimit: 255,
+    };
+    const channels: Channel[] = imageIds.map((id) => ({
+      id: `${id}-ch`,
+      planeId: `${id}-plane`,
+      channelMetaId: channelMeta.id,
+      name: "C1",
+      dtype: DTYPES.UINT8,
+      storageReference: {
+        storageId: `${id}-sid`,
+        storeName: STORES.CHANNEL_DATA,
+        width: 10,
+        height: 10,
+        dtype: DTYPES.UINT8,
+        byteSize: 100,
+      },
+      bitDepth: 8,
+      width: 10,
+      height: 10,
+      maxValue: 255,
+      minValue: 0,
+    }));
+    return dataSlice.reducer(
       data,
       dataSlice.actions.addImageSeries({
         imageSeries: [series],
-        images: [img1, img2],
-        planes: [],
-        channels: [],
-        channelMetas: [],
+        images,
+        planes,
+        channels,
+        channelMetas: [channelMeta],
       }),
     );
+  }
+
+  it("returns one image per series: each series' active image", () => {
+    let data = dataSlice.reducer(undefined, { type: "" });
+    data = addRenderableSeries(
+      data,
+      { ...makeSeries("s1"), activeImageId: "s1-b" },
+      ["s1-a", "s1-b", "s1-c"],
+    );
+    data = addRenderableSeries(
+      data,
+      { ...makeSeries("s2"), activeImageId: "s2-a" },
+      ["s2-a", "s2-b", "s2-c"],
+    );
     const state = { data } as unknown as RootState;
-    expect(selectRepresentativeImages(state)).toHaveLength(2);
+
+    const result = selectRepresentativeImages(state);
+    expect(result.map((im) => im.id)).toEqual(["s1-b", "s2-a"]);
   });
 
-  it("returns only timepoint=0 image for a time-series", () => {
+  it("returns the image referenced by the series' activeImageId", () => {
     let data = dataSlice.reducer(undefined, { type: "" });
-    const series: ImageSeries = {
-      ...makeSeries("ts1"),
-      timeSeries: true,
-      activeImageId: "ti0",
-    };
-    const ti0: ImageObject = { ...makeImage("ti0", "ts1"), timepoint: 0 };
-    const ti1: ImageObject = { ...makeImage("ti1", "ts1"), timepoint: 1 };
-    data = dataSlice.reducer(
+    // Active image is not timepoint 0, so this can't pass by picking the first.
+    data = addRenderableSeries(
       data,
-      dataSlice.actions.addImageSeries({
-        imageSeries: [series],
-        images: [ti0, ti1],
-        planes: [],
-        channels: [],
-        channelMetas: [],
-      }),
+      { ...makeSeries("ts1"), timeSeries: true, activeImageId: "ti1" },
+      ["ti0", "ti1"],
     );
     const state = { data } as unknown as RootState;
+
     const result = selectRepresentativeImages(state);
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("ti0");
-  });
-
-  it("mixes regular and time-series images correctly", () => {
-    let data = dataSlice.reducer(undefined, { type: "" });
-    const regular: ImageSeries = { ...makeSeries("s1"), timeSeries: false };
-    const ts: ImageSeries = {
-      ...makeSeries("ts1"),
-      timeSeries: true,
-      activeImageId: "ti0",
-    };
-    const img1 = makeImage("img1", "s1");
-    const ti0: ImageObject = { ...makeImage("ti0", "ts1"), timepoint: 0 };
-    const ti1: ImageObject = { ...makeImage("ti1", "ts1"), timepoint: 1 };
-    data = dataSlice.reducer(
-      data,
-      dataSlice.actions.addImageSeries({
-        imageSeries: [regular, ts],
-        images: [img1, ti0, ti1],
-        planes: [],
-        channels: [],
-        channelMetas: [],
-      }),
-    );
-    const state = { data } as unknown as RootState;
-    // 1 regular + 1 representative from time-series
-    expect(selectRepresentativeImages(state)).toHaveLength(2);
+    expect(result[0].id).toBe("ti1");
   });
 });

@@ -1,5 +1,3 @@
-//TODO: Remove after refactor
-//@ts-nocheck keep tsc uncluttered for now
 import { describe, expect, it } from "vitest";
 
 import { Partition } from "core/dl/enums";
@@ -7,17 +5,18 @@ import { Partition } from "core/dl/enums";
 import { dataSlice } from "./dataSlice";
 
 import type {
+  AnnotationCategory,
+  AnnotationObject,
+  AnnotationVolume,
+  Category,
+  Channel,
+  ChannelMeta,
   Experiment,
   ImageObject,
   ImageSeries,
   Kind,
-  Category,
-  AnnotationVolume,
-  AnnotationObject,
   Plane,
-  Channel,
-  ChannelMeta,
-} from "./types";
+} from "core/entities";
 
 const {
   clearState,
@@ -48,7 +47,7 @@ const {
   deleteKind,
   addCategory,
   batchAddCategory,
-  updateCategoryDisplayProps: updateCategoryName,
+  updateCategoryDisplayProps,
   deleteImageCategory,
   deleteAnnotationCategory,
   updateImageCategory,
@@ -83,7 +82,7 @@ function makeAnnotationCategory(
   id: string,
   kindId: string,
   isUnknown = false,
-): Category {
+): AnnotationCategory {
   return {
     id,
     name: isUnknown ? "Unknown" : "Cat",
@@ -91,6 +90,17 @@ function makeAnnotationCategory(
     kindId,
     color: "#ff0000",
     isUnknown,
+  };
+}
+
+// addKind/batchAddKind take a kind together with its unknown category.
+function makeKindPayload(
+  id: string,
+  unknownCategoryId: string,
+): { kind: Kind; category: AnnotationCategory } {
+  return {
+    kind: makeKind(id, unknownCategoryId),
+    category: makeAnnotationCategory(unknownCategoryId, id, true),
   };
 }
 
@@ -202,11 +212,7 @@ describe("clearState", () => {
   });
 
   it("retains the unknown kind and both unknown categories after clear", () => {
-    let s = dataSlice.reducer(undefined, addKind(makeKind("k1", "kc1")));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory("kc1", "k1", true)),
-    );
+    let s = dataSlice.reducer(undefined, addKind(makeKindPayload("k1", "kc1")));
     s = dataSlice.reducer(s, clearState());
 
     expect(s.kinds.ids).toHaveLength(1);
@@ -257,20 +263,11 @@ describe("setState", () => {
     expect(s1.experiment.id).toBe("exp-2");
   });
 
-  it("always preserves the unknown kind and categories regardless of payload", () => {
-    const s = dataSlice.reducer(
-      undefined,
-      setState({ ...basePayload, kinds: [], categories: [] }),
-    );
+  it("replaces kinds and categories with the payload, including the unknowns", () => {
+    const s = dataSlice.reducer(undefined, setState(basePayload));
 
-    const unknownKind = Object.values(s.kinds.entities).find(
-      (k) => k?.name === "Unknown",
-    );
-    expect(unknownKind).toBeDefined();
-
-    const catTypes = Object.values(s.categories.entities).map((c) => c?.type);
-    expect(catTypes).toContain("image");
-    expect(catTypes).toContain("annotation");
+    expect(s.kinds.ids).toEqual(["k1"]);
+    expect(s.categories.ids).toEqual(["kc1"]);
   });
 });
 
@@ -737,11 +734,7 @@ describe("deleteImageObject", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_ID, KIND_CAT_ID)));
     s = dataSlice.reducer(
       s,
       addAnnotationVolume(
@@ -816,11 +809,7 @@ describe("batchDeleteImageObject", () => {
     );
     const KIND_ID = "kind-b";
     const KIND_CAT_ID = "kind-cat-b";
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_ID, KIND_CAT_ID)));
     s = dataSlice.reducer(
       s,
       addAnnotationVolume(
@@ -877,7 +866,10 @@ describe("batchAddKind", () => {
   it("adds multiple kinds in one dispatch", () => {
     const s = dataSlice.reducer(
       undefined,
-      batchAddKind([makeKind("k1", "kc1"), makeKind("k2", "kc2")]),
+      batchAddKind([
+        makeKindPayload("k1", "kc1"),
+        makeKindPayload("k2", "kc2"),
+      ]),
     );
     expect(s.kinds.ids).toContain("k1");
     expect(s.kinds.ids).toContain("k2");
@@ -886,7 +878,10 @@ describe("batchAddKind", () => {
 
 describe("updateKindName", () => {
   it("updates the kind name", () => {
-    const s0 = dataSlice.reducer(undefined, addKind(makeKind("k1", "kc1")));
+    const s0 = dataSlice.reducer(
+      undefined,
+      addKind(makeKindPayload("k1", "kc1")),
+    );
     const s = dataSlice.reducer(
       s0,
       updateKindName({ kindId: "k1", name: "Renamed" }),
@@ -910,11 +905,7 @@ describe("deleteKind", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_ID, KIND_CAT_ID)));
     s = dataSlice.reducer(
       s,
       addAnnotationVolume(
@@ -971,7 +962,7 @@ describe("updateCategoryName", () => {
     );
     const s = dataSlice.reducer(
       s0,
-      updateCategoryName({ id: "ic1", name: "Renamed" }),
+      updateCategoryDisplayProps({ id: "ic1", changes: { name: "Renamed" } }),
     );
     expect(s.categories.entities["ic1"]?.name).toBe("Renamed");
   });
@@ -1044,10 +1035,9 @@ describe("deleteAnnotationCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, UNKNOWN_KIND_CAT_ID)));
     s = dataSlice.reducer(
       s,
-      addCategory(makeAnnotationCategory(UNKNOWN_KIND_CAT_ID, KIND_ID, true)),
+      addKind(makeKindPayload(KIND_ID, UNKNOWN_KIND_CAT_ID)),
     );
     s = dataSlice.reducer(
       s,
@@ -1108,11 +1098,7 @@ describe("updateAnnotationVolumeCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, OLD_CAT)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(OLD_CAT, KIND_ID, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_ID, OLD_CAT)));
     s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(NEW_CAT, KIND_ID)),
@@ -1178,11 +1164,7 @@ describe("batchUpdateAnnotationVolumeCategory", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, CAT_A)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(CAT_A, KIND_ID, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_ID, CAT_A)));
     s = dataSlice.reducer(
       s,
       addCategory(makeAnnotationCategory(CAT_B, KIND_ID)),
@@ -1260,15 +1242,13 @@ describe("updateAnnotationVolumeKind", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_A, KIND_A_UNKNOWN_CAT)));
     s = dataSlice.reducer(
       s,
-      addCategory(makeAnnotationCategory(KIND_A_UNKNOWN_CAT, KIND_A, true)),
+      addKind(makeKindPayload(KIND_A, KIND_A_UNKNOWN_CAT)),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_B, KIND_B_UNKNOWN_CAT)));
     s = dataSlice.reducer(
       s,
-      addCategory(makeAnnotationCategory(KIND_B_UNKNOWN_CAT, KIND_B, true)),
+      addKind(makeKindPayload(KIND_B, KIND_B_UNKNOWN_CAT)),
     );
     s = dataSlice.reducer(
       s,
@@ -1315,16 +1295,8 @@ describe("batchUpdateAnnotationVolumeKind", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_A, KIND_A_CAT)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(KIND_A_CAT, KIND_A, true)),
-    );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_B, KIND_B_CAT)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(KIND_B_CAT, KIND_B, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_A, KIND_A_CAT)));
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_B, KIND_B_CAT)));
     s = dataSlice.reducer(
       s,
       batchAddAnnotationVolume([
@@ -1391,11 +1363,7 @@ describe("deleteAnnotationVolume", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_ID, KIND_CAT_ID)));
     s = dataSlice.reducer(
       s,
       addAnnotationVolume(
@@ -1435,11 +1403,7 @@ describe("batchDeleteAnnotationVolume", () => {
         channelMetas: [],
       }),
     );
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_ID, KIND_CAT_ID)));
     s = dataSlice.reducer(
       s,
       addAnnotationVolume(
@@ -1526,11 +1490,7 @@ describe("deleteAnnotation", () => {
     );
     const KIND_ID = "kind-da";
     const KIND_CAT_ID = "kind-cat-da";
-    s = dataSlice.reducer(s, addKind(makeKind(KIND_ID, KIND_CAT_ID)));
-    s = dataSlice.reducer(
-      s,
-      addCategory(makeAnnotationCategory(KIND_CAT_ID, KIND_ID, true)),
-    );
+    s = dataSlice.reducer(s, addKind(makeKindPayload(KIND_ID, KIND_CAT_ID)));
     s = dataSlice.reducer(
       s,
       addAnnotationVolume(
