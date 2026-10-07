@@ -233,6 +233,7 @@ export const ProjectViewerCategories = () => {
       />
 
       <List
+        data-doc="categories-list"
         dense
         sx={{
           overflowY: "scroll",

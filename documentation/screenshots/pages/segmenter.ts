@@ -82,7 +82,14 @@ async function loadModel(ctx: ShotContext) {
   await shootPadded(page, dialog(page), {}, out("load-model"));
 
   await dialog(page).getByRole("combobox").click();
-  await page.getByRole("option").first().click();
+  // DOCS_SEGMENTER_MODEL (regex) picks the model; default is the first listed.
+  const wanted = process.env.DOCS_SEGMENTER_MODEL;
+  const options = page.getByRole("option");
+  await (
+    wanted
+      ? options.filter({ hasText: new RegExp(wanted, "i") }).first()
+      : options.first()
+  ).click();
   await page.waitForTimeout(500);
   await park(page);
   await shootPadded(page, dialog(page), {}, out("load-model-selected"));

@@ -130,7 +130,7 @@ async function trainQuickModel(page: Page) {
 }
 
 // Make sure the Classification task is showing with a trained model selected.
-async function prepare(page: Page) {
+export async function prepare(page: Page) {
   await page
     .getByRole("button", { name: "Classification", exact: true })
     .click();

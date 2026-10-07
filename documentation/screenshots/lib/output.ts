@@ -73,8 +73,21 @@ async function hideTooltips(page: Page) {
   });
 }
 
-export async function shootFullPage(page: Page, outPngPath: string) {
-  await hideTooltips(page);
+// `keepTooltips` is for the rare shot whose subject *is* a tooltip (the
+// Open > Project submenu is a MUI tooltip); the hiding style is added again by
+// the next normal capture.
+export async function shootFullPage(
+  page: Page,
+  outPngPath: string,
+  opts: { keepTooltips?: boolean } = {},
+) {
+  if (opts.keepTooltips) {
+    await page.evaluate(() =>
+      document.getElementById("__docs_hide_tooltips__")?.remove(),
+    );
+  } else {
+    await hideTooltips(page);
+  }
   ensureDir(path.dirname(outPngPath));
   await page.screenshot({ path: outPngPath });
   await finish(outPngPath);

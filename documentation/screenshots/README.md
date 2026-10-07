@@ -59,9 +59,31 @@ pages/           one file per docs page / view
   measurements-viewer.ts
   classifier.ts
   segmenter.ts
+  eukaryotic-classification.ts   tutorial pages (see below)
+  segmentation-tutorial.ts
+  translocation-tutorial.ts
+  creating-measurements.ts       how-to page, default project file (see below)
+  technical-faq.ts               save/open pictures for the Technical FAQ
 ```
 
-All pages load the saved tutorial project (`Piximi_Translocation_Tutorial-Docs.zip`),
+The three tutorial pages (`eukaryotic-classification`, `segmentation-tutorial`,
+`translocation-tutorial`) start from an example project instead, because the
+tutorial itself does, and their steps follow the tutorial text. The
+translocation tutorial's steps build on each other (segment, then classify, then
+fit), so run that page whole rather than with `--only`. The segmenting pages need
+WebGPU: `DOCS_BROWSER_CHANNEL=chromium pnpm docs:screenshots --page translocation-tutorial`.
+
+`creating-measurements` uses the default project file and measures its
+`cellpose_cells` kind (set `DOCS_MEASURE_KIND` to a regex to pick another).
+Its steps open the Measurements view and create the table on demand, so they
+can also be run alone.
+
+`technical-faq` uses the MNIST example project (like `classifier`) and never
+photographs the computer's own file picker: it shows the Open > Project submenu,
+and saves a model through the Save dialog and uploads it again to show the
+"Successfully uploaded" window.
+
+The other pages also load the saved tutorial project (`Piximi_Translocation_Tutorial-Docs.zip`),
 which has annotated objects (a `cellpose_cells` kind) and trained classifiers.
 A page can set `setup` to navigate into its view once before its steps run.
 
