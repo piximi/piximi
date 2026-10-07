@@ -1175,9 +1175,9 @@ export const dataSlice = createSlice({
       bubbleDeleteAnnotation(state, annotation);
     },
     batchDeleteAnnotation(state, action: PayloadAction<Array<string>>) {
-      const annotations = action.payload.map(
-        (annId) => state.annotations.entities[annId],
-      );
+      const annotations = action.payload
+        .map((annId) => state.annotations.entities[annId])
+        .filter(Boolean) as AnnotationObject[];
       batchBubbleDeleteAnnotation(state, annotations);
     },
     deleteAnnotationVolume(state, action: PayloadAction<string>) {
