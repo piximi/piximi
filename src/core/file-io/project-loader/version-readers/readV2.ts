@@ -688,10 +688,13 @@ const readSegmenter = async (
     segmenterGroup,
     ZARR_V2_SEGMENTER.OptionValues,
   )) as Array<Array<[string, unknown]>>;
-  const kindNames = (await getAttr(
-    segmenterGroup,
-    ZARR_V2_SEGMENTER.KindNames,
-  )) as Nullable<string>[];
+  // Absent from archives written before kind names were configurable; every
+  // config then falls back to its model's default output name.
+  const kindNames = (
+    ZARR_V2_SEGMENTER.KindNames in segmenterGroup.attrs
+      ? await getAttr(segmenterGroup, ZARR_V2_SEGMENTER.KindNames)
+      : []
+  ) as Nullable<string>[];
 
   const configs: SerializedSegmenterModelConfig[] = models.map((model, i) => ({
     model,
