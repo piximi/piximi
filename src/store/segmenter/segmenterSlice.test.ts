@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { MODELS } from "core/dl/segmentation/types";
+import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 
 import {
   createBlankModelConfigMap,
@@ -14,6 +15,7 @@ import type { SegmentationModelDetails } from "core/dl/segmentation/types";
 const model = {
   name: "Cellpose-SAM",
   displayName: "Model",
+  outputPolicy: { mode: OUTPUT_MODE.SINGLE, defaultKindName: "Cell" },
   channelPolicy: { mode: CHANNEL_MODE.FIXED, count: 2 },
   optionSchema: { groups: [] },
   cancellableLoad: true,
@@ -58,6 +60,15 @@ describe("segmenterSlice", () => {
 
     expect(state.loadedModel).toBe(model);
     expect(state.configMap[model.name].channelSelection).toEqual(["a", "b"]);
+  });
+
+  it("seeds the kind name from the output policy when a model loads", () => {
+    const state = reducer(
+      getInitialState(),
+      actions.modelLoaded({ model, availableChannelIds: ["a", "b", "c"] }),
+    );
+
+    expect(state.configMap[model.name].kindName).toEqual("Cell");
   });
 
   it("sets a single option value without disturbing the others", () => {
@@ -304,6 +315,28 @@ describe("segmenterSlice persistence support", () => {
     );
 
     expect(state.configMap[model.name].channelSelection).toEqual(["a", "b"]);
+  });
+
+  it("keeps a restored kind name when the model loads", () => {
+    const restored = reducer(
+      getInitialState(),
+      actions.setSegmenter({
+        segmenter: {
+          loadedModel: undefined,
+          configMap: {
+            ...createBlankModelConfigMap(MODELS),
+            "Cellpose-SAM": { ...CELLPOSE_INIT_CONFIG, kindName: "Nucleus" },
+          },
+        },
+      }),
+    );
+
+    const state = reducer(
+      restored,
+      actions.modelLoaded({ model, availableChannelIds: ["a", "b", "c"] }),
+    );
+
+    expect(state.configMap[model.name].kindName).toEqual("Nucleus");
   });
 
   it("replaces the whole slice on setSegmenter", () => {
