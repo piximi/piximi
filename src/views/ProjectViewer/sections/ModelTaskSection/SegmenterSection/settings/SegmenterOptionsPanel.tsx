@@ -46,7 +46,11 @@ export const SegmenterOptionsPanel = () => {
             <Box key={group.id} sx={{ pb: 1 }}>
               {!onlyAdvanced && (
                 <Divider sx={{ mb: 0.75 }}>
-                  <Typography variant="caption" color="text.disabled">
+                  <Typography
+                    variant="caption"
+                    color="text.disabled"
+                    data-doc="options-header"
+                  >
                     {group.label}
                   </Typography>
                 </Divider>

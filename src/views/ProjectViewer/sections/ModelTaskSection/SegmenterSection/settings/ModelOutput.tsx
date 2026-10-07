@@ -76,7 +76,9 @@ export const ModelOutput = () => {
               }}
             />
           ) : (
-            <Typography variant="caption">{initName}</Typography>
+            <Typography variant="caption" data-doc="output-kind-name">
+              {initName}
+            </Typography>
           )}
         </Box>
         {usesClasses ? (

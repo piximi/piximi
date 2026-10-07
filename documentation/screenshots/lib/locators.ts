@@ -48,3 +48,9 @@ export async function markSelector(page: Page, selector: string, name: string) {
     { selector, name },
   );
 }
+
+// The "Learning Task" divider heading above the model task section. It is a
+// sibling of the section in the DOM (not inside `model-task-section`), so crops
+// that should include it need this locator too.
+export const learningTaskHeader = (page: Page) =>
+  page.locator(".MuiDivider-root", { hasText: "Learning Task" });

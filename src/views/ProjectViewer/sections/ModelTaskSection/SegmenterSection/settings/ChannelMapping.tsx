@@ -121,7 +121,11 @@ export const ChannelMapping = () => {
   return (
     <Box sx={{ pb: 1.75 }}>
       <Divider sx={{ mb: 0.75 }}>
-        <Typography variant="caption" color="text.disabled">
+        <Typography
+          variant="caption"
+          color="text.disabled"
+          data-doc="channel-mapping-header"
+        >
           Channel Mapping
         </Typography>
       </Divider>

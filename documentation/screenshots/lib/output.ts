@@ -164,6 +164,48 @@ export async function shootPadded(
   await finish(outPngPath);
 }
 
+// One crop around several locators (the smallest box that holds them all),
+// for sections whose header is a sibling of the body in the DOM.
+export async function shootUnion(
+  page: Page,
+  targets: Locator[],
+  pad: { l?: number; t?: number; r?: number; b?: number },
+  outPngPath: string,
+) {
+  const boxes = [];
+  for (const target of targets) {
+    try {
+      await target.first().waitFor({ state: "visible", timeout: 3000 });
+      const box = await target.first().boundingBox();
+      if (box) boxes.push(box);
+    } catch {
+      // handled below
+    }
+  }
+  if (boxes.length !== targets.length) {
+    console.warn(`  ! region not found - skipping ${outPngPath}`);
+    return;
+  }
+  const vp = page.viewportSize()!;
+  const x = Math.max(0, Math.min(...boxes.map((b) => b.x)) - (pad.l ?? 0));
+  const y = Math.max(0, Math.min(...boxes.map((b) => b.y)) - (pad.t ?? 0));
+  const right = Math.min(
+    vp.width,
+    Math.max(...boxes.map((b) => b.x + b.width)) + (pad.r ?? 0),
+  );
+  const bottom = Math.min(
+    vp.height,
+    Math.max(...boxes.map((b) => b.y + b.height)) + (pad.b ?? 0),
+  );
+  await hideTooltips(page);
+  ensureDir(path.dirname(outPngPath));
+  await page.screenshot({
+    path: outPngPath,
+    clip: { x, y, width: right - x, height: bottom - y },
+  });
+  await finish(outPngPath);
+}
+
 // --- Icon crops ------------------------------------------------------------
 // Backgrounds are made transparent for the capture, so one image works on any
 // page background; the icon colour still follows the theme, hence separate

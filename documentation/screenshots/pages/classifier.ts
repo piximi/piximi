@@ -2,8 +2,8 @@
 // dialogs (docs page: pages/detail/projectviewer-classification.md).
 // Needs a project with a trained classifier (the tutorial project has one).
 
-import { docId, help } from "../lib/locators.ts";
-import { shootPadded } from "../lib/output.ts";
+import { docId, help, learningTaskHeader } from "../lib/locators.ts";
+import { shootPadded, shootUnion } from "../lib/output.ts";
 
 import type { Page } from "playwright";
 
@@ -14,15 +14,6 @@ const IN = { at: "tl", dx: 12, dy: 4 } as const;
 const SECTION: CalloutSpec = [
   {
     n: 1,
-    label: "Task selection",
-    target: (p) => help(p, "learning-task"),
-    cover: true,
-    at: "tl",
-    dx: 6,
-    dy: 2,
-  },
-  {
-    n: 2,
     label: "Model I/O",
     target: (p) => docId(p, "model-io"),
     cover: true,
@@ -31,7 +22,7 @@ const SECTION: CalloutSpec = [
     dy: 2,
   },
   {
-    n: 3,
+    n: 2,
     label: "Model selection",
     target: (p) => docId(p, "model-select"),
     cover: true,
@@ -40,7 +31,7 @@ const SECTION: CalloutSpec = [
     dy: 2,
   },
   {
-    n: 4,
+    n: 3,
     label: "Model operations (Fit | Predict | Evaluate)",
     target: (p) => docId(p, "model-actions"),
     cover: true,
@@ -185,9 +176,9 @@ async function section(ctx: ShotContext) {
   const { page, out } = ctx;
   await prepare(page);
   await ctx.annotate("classifier section", SECTION);
-  await shootPadded(
+  await shootUnion(
     page,
-    docId(page, "model-task-section"),
+    [learningTaskHeader(page), docId(page, "model-task-section")],
     { t: 4, b: 4, l: 4, r: 4 },
     out("section"),
   );
@@ -242,9 +233,9 @@ async function predict(ctx: ShotContext) {
   await clear.waitFor({ state: "visible", timeout: 60000 });
   await page.waitForTimeout(500);
   await park(page);
-  await shootPadded(
+  await shootUnion(
     page,
-    docId(page, "model-task-section"),
+    [learningTaskHeader(page), docId(page, "model-task-section")],
     { t: 4, b: 4, l: 4, r: 4 },
     out("predict-options"),
   );

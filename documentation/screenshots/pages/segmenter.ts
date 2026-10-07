@@ -2,8 +2,8 @@
 // (docs page: pages/detail/projectviewer-segmentation.md).
 
 import { DEFAULT_PROJECT_FILE } from "../config.ts";
-import { docId, help } from "../lib/locators.ts";
-import { shootPadded } from "../lib/output.ts";
+import { docId, help, learningTaskHeader } from "../lib/locators.ts";
+import { shootPadded, shootUnion } from "../lib/output.ts";
 
 import type { Page } from "playwright";
 
@@ -12,15 +12,6 @@ import type { CalloutSpec, DocPage, ShotContext } from "../lib/types.ts";
 const SECTION: CalloutSpec = [
   {
     n: 1,
-    label: "Task selection",
-    target: (p) => help(p, "learning-task"),
-    cover: true,
-    at: "tl",
-    dx: 6,
-    dy: 2,
-  },
-  {
-    n: 2,
     label: "Select model / run segmentation",
     target: (p) => docId(p, "segmenter-section"),
     cover: true,
@@ -30,24 +21,32 @@ const SECTION: CalloutSpec = [
   },
 ];
 
+// Badges sit beside their text rather than covering it. The headers are
+// centred dividers, so "left" lands on the rule just before the label.
 const SETTINGS: CalloutSpec = [
   {
     n: 1,
-    label: "Task selection",
-    target: (p) => help(p, "learning-task"),
-    cover: true,
-    at: "tl",
-    dx: 6,
-    dy: 2,
+    label: "Run Segmentation",
+    target: (p) => p.getByRole("button", { name: /run segmentation/i }),
+    at: "left",
   },
   {
     n: 2,
-    label: "Model settings",
-    target: (p) => docId(p, "segmenter-settings"),
-    cover: true,
-    at: "tl",
-    dx: 6,
-    dy: 2,
+    label: "Output kind name",
+    target: (p) => docId(p, "output-kind-name"),
+    at: "right",
+  },
+  {
+    n: 3,
+    label: "Channel mapping",
+    target: (p) => docId(p, "channel-mapping-header"),
+    at: "left",
+  },
+  {
+    n: 4,
+    label: "Additional settings",
+    target: (p) => docId(p, "options-header"),
+    at: "left",
   },
 ];
 
@@ -55,9 +54,7 @@ const dialog = (p: Page) => p.locator(".MuiDialog-paper").last();
 const park = (page: Page) => page.mouse.move(1150, 12);
 
 async function showSegmentation(page: Page) {
-  await page
-    .getByRole("button", { name: "Segmentation", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Segmentation", exact: true }).click();
   await park(page);
   await page.waitForTimeout(500);
 }
@@ -66,9 +63,9 @@ async function section(ctx: ShotContext) {
   const { page, out } = ctx;
   await showSegmentation(page);
   await ctx.annotate("segmenter section", SECTION);
-  await shootPadded(
+  await shootUnion(
     page,
-    docId(page, "model-task-section"),
+    [learningTaskHeader(page), docId(page, "model-task-section")],
     { t: 4, b: 4, l: 4, r: 4 },
     out("section"),
   );
@@ -98,9 +95,9 @@ async function loadModel(ctx: ShotContext) {
   await page.waitForTimeout(800);
   await park(page);
   await ctx.annotate("segmenter settings", SETTINGS);
-  await shootPadded(
+  await shootUnion(
     page,
-    docId(page, "model-task-section"),
+    [learningTaskHeader(page), docId(page, "model-task-section")],
     { t: 4, b: 4, l: 4, r: 4 },
     out("settings"),
   );
