@@ -101,10 +101,51 @@ const FIT: CalloutSpec = [
 
 const park = (page: Page) => page.mouse.move(1150, 12);
 
+// The tutorial project ships without trained models, so the first time through
+// we fit a short one on the labelled images. Models live in the page (not the
+// project file), so later steps and the second theme reuse it.
+const EPOCHS = process.env.DOCS_CLASSIFIER_EPOCHS ?? "3";
+const TRAIN_TIMEOUT_MS = 15 * 60 * 1000;
+
+async function trainQuickModel(page: Page) {
+  console.log(`  no trained classifier yet - fitting one (${EPOCHS} epochs)`);
+  await openDialog(page, "fit-model");
+  await dialog(page)
+    .getByRole("tab", { name: /hyperparameters/i })
+    .click();
+  const epochs = dialog(page)
+    .locator("#epochs")
+    .or(dialog(page).getByText("Epochs:").locator("..").locator("input"))
+    .first();
+  await epochs.fill(EPOCHS);
+  await epochs.blur(); // the field commits on blur
+  await page.waitForTimeout(300);
+
+  const fitButton = dialog(page).getByRole("button", {
+    name: /fit classifier/i,
+  });
+  await fitButton.click();
+  // Only shown when predictions exist; there are none in the tutorial project.
+  const lost = page
+    .getByRole("dialog")
+    .filter({ hasText: /predictions will be lost/i });
+  if (await lost.count()) {
+    await lost.getByRole("button", { name: /confirm|ok|yes/i }).click();
+  }
+  // The button is swapped for a progress bar while training and returns after.
+  await fitButton.waitFor({ state: "hidden", timeout: 30000 }).catch(() => {});
+  await fitButton.waitFor({ state: "visible", timeout: TRAIN_TIMEOUT_MS });
+  await page.waitForTimeout(3000); // automatic evaluation after the run
+  await closeDialog(page);
+}
+
 // Make sure the Classification task is showing with a trained model selected.
 async function prepare(page: Page) {
   await page.getByRole("button", { name: "Classification" }).click();
   const select = docId(page, "model-select").getByRole("combobox");
+  if ((await select.getAttribute("aria-disabled")) === "true") {
+    await trainQuickModel(page);
+  }
   const current = (await select.textContent())?.trim();
   if (!current || current === "New Model") {
     await select.click();
@@ -164,6 +205,10 @@ async function fit(ctx: ShotContext) {
   const { page, out } = ctx;
   await prepare(page);
   await openDialog(page, "fit-model");
+  await dialog(page)
+    .getByRole("tab", { name: /hyperparameters/i })
+    .click();
+  await page.waitForTimeout(400);
   await ctx.annotate("fit dialog", FIT);
   await shootPadded(page, dialog(page), {}, out("fit-hyperparameters"));
   await ctx.clearAnnotations();

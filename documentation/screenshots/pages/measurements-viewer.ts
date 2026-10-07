@@ -3,7 +3,7 @@
 // available measurement so the table and plots have data.
 
 import { DEFAULT_PROJECT_FILE } from "../config.ts";
-import { area, docId, help, markGridArea } from "../lib/locators.ts";
+import { docId, help, markGridArea } from "../lib/locators.ts";
 import { shootGridArea } from "../lib/output.ts";
 
 import type { Locator, Page } from "playwright";
