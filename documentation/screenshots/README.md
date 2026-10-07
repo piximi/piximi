@@ -30,6 +30,7 @@ Env: `PIXIMI_URL`, `DOCS_IMG_DIR`, `DOCS_IMG_SCALE` (default 2),
 `DOCS_WEBP_QUALITY` (default 92), `NO_ANNOTATE=1` (no badges),
 `DOCS_SEGMENTER_MODEL` (regex choosing the segmenter page's model, e.g. `cellpose`; Cellpose-SAM needs WebGPU).
 `DOCS_BROWSER_CHANNEL` (e.g. `chromium` for full Chromium in new headless mode, or `chrome` for your installed Chrome; needed for WebGPU) and `DOCS_HEADED=1` (show the browser window).
+`DOCS_CLIP_SCALE` (`2` records animated clips at full pixel density instead of CSS size; about 4x the bytes), `DOCS_CLIP_FPS` (default 12) and `DOCS_CLIP_QUALITY` (default 80) for the animated clips.
 `DOCS_CLASSIFIER_EPOCHS` (epochs for the quick model the classifier page fits, default 3; the tutorial project has no trained classifier, so the page trains one on the labelled images first, which takes a few minutes).
 
 Examples:
@@ -47,6 +48,7 @@ config.ts        URLs, paths, scale/quality, badge style
 lib/             generic helpers (no knowledge of any one page)
   annotate.ts      numbered callout badges + legend
   locators.ts      area / help / svgIcon helpers, grid-area tagging
+  clip.ts          animated clips: scripted pointer, stand-in cursor, frames -> animated WEBP
   output.ts        screenshot helpers (page, region, icon, popover), PNG -> WEBP
   popper.ts        open/close the toolbar poppers
   project.ts       open an example project or a saved .zip
@@ -64,6 +66,7 @@ pages/           one file per docs page / view
   translocation-tutorial.ts
   creating-measurements.ts       how-to page, default project file (see below)
   technical-faq.ts               save/open pictures for the Technical FAQ
+  annotation-tools.ts            animated clips of each annotation tool (see below)
 ```
 
 The three tutorial pages (`eukaryotic-classification`, `segmentation-tutorial`,
@@ -109,3 +112,12 @@ leave the app usable, so any step can run alone with `--only`.
 - Output names: `img/<page>/<page>-<dark|light>-<shot>.webp`, and inline icons
   as `img/icons/icon-<dark|light>-<name>.webp`.
 - Type-check with `pnpm tsc -p documentation/screenshots`.
+
+`annotation-tools` produces animated WEBP clips instead of stills (the old page
+used screen-recorded GIFs). Each clip records the canvas and tool strip while a
+scripted pointer draws on one nucleus of the Translocation Tutorial's first
+image; a stand-in cursor is painted into the frames because screenshots never
+show the real one. Steps are independent (each deletes all annotations first),
+so `--only rectangle` etc. works. If a clip's shape misses its nucleus, adjust
+that tool's entry in `NUCLEI` at the top of the file (offsets in px from the
+image centre with the image fitted to the canvas).

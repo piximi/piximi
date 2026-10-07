@@ -62,7 +62,7 @@ async function finish(outPngPath: string) {
 // MUI tooltips open on hover *and* focus, so a stray one can end up in a shot
 // (e.g. "Select all" after a toolbar click). Hide them for every capture; the
 // docs never want them. Idempotent.
-async function hideTooltips(page: Page) {
+export async function hideTooltips(page: Page) {
   await page.evaluate(() => {
     if (document.getElementById("__docs_hide_tooltips__")) return;
     (document.activeElement as HTMLElement | null)?.blur();

@@ -226,7 +226,7 @@ const confirmBar = (p: Page) => help(p, "object-manipulation-tools");
 
 // project view -> image viewer, with every image selected. The tutorial
 // project already has annotated images, so nothing is drawn here.
-async function enterImageViewer(page: Page) {
+export async function enterImageViewer(page: Page) {
   await page.getByTestId("select-all-button").click();
   await help(page, "navigate-to-imageviewer").click();
   await page.waitForURL(/\/imageviewer/, { timeout: 15000 });

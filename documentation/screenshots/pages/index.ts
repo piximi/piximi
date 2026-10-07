@@ -1,6 +1,7 @@
 // Registry of every page the tool can capture. To add a view: create
 // pages/<name>.ts exporting a DocPage and add it here.
 
+import { annotationTools } from "./annotation-tools.ts";
 import { classifier } from "./classifier.ts";
 import { creatingMeasurements } from "./creating-measurements.ts";
 import { eukaryoticClassification } from "./eukaryotic-classification.ts";
@@ -25,4 +26,5 @@ export const pages: DocPage[] = [
   translocationTutorial,
   creatingMeasurements,
   technicalFaq,
+  annotationTools,
 ];

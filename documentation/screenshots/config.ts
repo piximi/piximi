@@ -35,6 +35,13 @@ export const SCALE = Number(process.env.DOCS_IMG_SCALE) || 2;
 // icon strokes, is switched off in lib/output.ts.
 export const WEBP_QUALITY = Number(process.env.DOCS_WEBP_QUALITY) || 92;
 
+// Animated clips (pages/annotation-tools.ts, lib/clip.ts). Frames are taken at
+// CSS size by default (DOCS_CLIP_SCALE=2 for full pixel density, about 4x the
+// bytes), at most CLIP_FPS per second, as lossy animated WEBP.
+export const CLIP_SCALE = process.env.DOCS_CLIP_SCALE === "2" ? 2 : 1;
+export const CLIP_FPS = Number(process.env.DOCS_CLIP_FPS) || 12;
+export const CLIP_QUALITY = Number(process.env.DOCS_CLIP_QUALITY) || 80;
+
 // Numbered callout badges. NO_ANNOTATE=1 captures clean screenshots instead.
 export const ANNOTATE = !process.env.NO_ANNOTATE;
 export const BADGE = { size: 25, margin: 4 };
