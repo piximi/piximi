@@ -63,7 +63,9 @@ export class ThresholdAnnotationTool extends AnnotationTool {
   onMouseUp(_position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationState.Annotating) return;
 
-    if (!this.width || this.width < 2) {
+    // Treat clicks and degenerate (near zero-area) drags as a reset;
+    // width/height are negative when dragging left/up from the origin.
+    if (Math.abs(this.width ?? 0) < 2 || Math.abs(this.height ?? 0) < 2) {
       this.deselect();
       return;
     }

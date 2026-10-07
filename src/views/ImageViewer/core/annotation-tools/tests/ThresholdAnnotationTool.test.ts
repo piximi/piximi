@@ -75,9 +75,9 @@ test("onMouseUp-NoDrag", () => {
 
   operator.onMouseUp({ x: 0, y: 0 });
 
-  expect(operator.annotationState).toBe(AnnotationState.Annotated);
+  expect(operator.annotationState).toBe(AnnotationState.Blank);
 
-  expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
+  expect(operator.origin).toBe(undefined);
 
   expect(operator.width).toBe(undefined);
   expect(operator.height).toBe(undefined);
@@ -95,13 +95,57 @@ test("onMouseMove-NoDrag", () => {
   operator.onMouseUp({ x: 0, y: 0 });
   operator.onMouseMove({ x: 100, y: 100 });
 
-  expect(operator.annotationState).toBe(AnnotationState.Annotated);
+  expect(operator.annotationState).toBe(AnnotationState.Blank);
 
-  expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
+  expect(operator.origin).toBe(undefined);
 
+  expect(operator.width).toBe(undefined);
+  expect(operator.height).toBe(undefined);
   expect(operator.points).toStrictEqual([]);
   expect(operator.boundingBox).toBe(undefined);
   expect(operator.decodedMask).toBe(undefined);
+});
+
+test("onMouseUp-ZeroHeightDrag", () => {
+  const image = loadTestImage(src);
+
+  const operator = new ThresholdAnnotationTool(image);
+
+  operator.onMouseDown({ x: 0, y: 0 });
+  operator.onMouseMove({ x: 100, y: 0 });
+  operator.onMouseUp({ x: 100, y: 0 });
+
+  expect(operator.annotationState).toBe(AnnotationState.Blank);
+  expect(operator.origin).toBe(undefined);
+  expect(operator.decodedMask).toBe(undefined);
+});
+
+test("onMouseUp-ZeroWidthDrag", () => {
+  const image = loadTestImage(src);
+
+  const operator = new ThresholdAnnotationTool(image);
+
+  operator.onMouseDown({ x: 0, y: 0 });
+  operator.onMouseMove({ x: 0, y: 100 });
+  operator.onMouseUp({ x: 0, y: 100 });
+
+  expect(operator.annotationState).toBe(AnnotationState.Blank);
+  expect(operator.origin).toBe(undefined);
+  expect(operator.decodedMask).toBe(undefined);
+});
+
+test("onMouseUp-ReverseDrag", () => {
+  const image = loadTestImage(src);
+
+  const operator = new ThresholdAnnotationTool(image);
+
+  operator.onMouseDown({ x: 100, y: 100 });
+  operator.onMouseMove({ x: 0, y: 0 });
+  operator.onMouseUp({ x: 0, y: 0 });
+
+  expect(operator.annotationState).toBe(AnnotationState.Annotated);
+  expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.decodedMask).toBeDefined();
 });
 
 test("select", () => {
