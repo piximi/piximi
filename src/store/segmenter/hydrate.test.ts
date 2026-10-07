@@ -88,8 +88,8 @@ describe("hydrateSegmenterState", () => {
     ].optionValues;
 
     expect(options.diameter).toBe(30);
-    // Untouched knobs keep their defaults rather than vanishing.
-    expect(options.niter).toBe(200);
+    // Untouched knobs stay unset so the schema default applies.
+    expect("niter" in options).toBe(false);
   });
 
   it("preserves an option deliberately committed as undefined", () => {
@@ -130,9 +130,10 @@ describe("hydrateSegmenterState", () => {
     };
 
     expect(
-      hydrateSegmenterState(saved, available).configMap["Cellpose-SAM"]
-        .optionValues.niter,
-    ).toBe(200);
+      "niter" in
+        hydrateSegmenterState(saved, available).configMap["Cellpose-SAM"]
+          .optionValues,
+    ).toBe(false);
   });
 
   it("skips a config naming a model this build no longer has", () => {
