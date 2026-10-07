@@ -29,6 +29,7 @@ sibling checkout named `piximi-documentation` (override with `DOCS_IMG_DIR`).
 Env: `PIXIMI_URL`, `DOCS_IMG_DIR`, `DOCS_IMG_SCALE` (default 2),
 `DOCS_WEBP_QUALITY` (default 92), `NO_ANNOTATE=1` (no badges),
 `DOCS_SEGMENTER_MODEL` (regex choosing the segmenter page's model, e.g. `cellpose`; Cellpose-SAM needs WebGPU).
+`DOCS_BROWSER_CHANNEL` (e.g. `chromium` for full Chromium in new headless mode, or `chrome` for your installed Chrome; needed for WebGPU) and `DOCS_HEADED=1` (show the browser window).
 `DOCS_CLASSIFIER_EPOCHS` (epochs for the quick model the classifier page fits, default 3; the tutorial project has no trained classifier, so the page trains one on the labelled images first, which takes a few minutes).
 
 Examples:

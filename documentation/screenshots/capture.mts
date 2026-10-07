@@ -85,7 +85,14 @@ async function main() {
     }
   }
 
-  const browser = await chromium.launch();
+  // Playwright's default headless build has no GPU, so WebGPU models (the
+  // Cellpose-SAM segmenter) can't run. DOCS_BROWSER_CHANNEL=chromium switches
+  // to the full Chromium in new headless mode; DOCS_HEADED=1 shows the window.
+  const browser = await chromium.launch({
+    channel: process.env.DOCS_BROWSER_CHANNEL || undefined,
+    headless: !process.env.DOCS_HEADED,
+    args: ["--enable-unsafe-webgpu"],
+  });
   const context = await browser.newContext({
     viewport: VIEWPORT,
     deviceScaleFactor: SCALE,
