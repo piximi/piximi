@@ -140,7 +140,9 @@ async function trainQuickModel(page: Page) {
 
 // Make sure the Classification task is showing with a trained model selected.
 async function prepare(page: Page) {
-  await page.getByRole("button", { name: "Classification" }).click();
+  await page
+    .getByRole("button", { name: "Classification", exact: true })
+    .click();
   const select = docId(page, "model-select").getByRole("combobox");
   if ((await select.getAttribute("aria-disabled")) === "true") {
     await trainQuickModel(page);

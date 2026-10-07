@@ -55,7 +55,9 @@ const dialog = (p: Page) => p.locator(".MuiDialog-paper").last();
 const park = (page: Page) => page.mouse.move(1150, 12);
 
 async function showSegmentation(page: Page) {
-  await page.getByRole("button", { name: "Segmentation" }).click();
+  await page
+    .getByRole("button", { name: "Segmentation", exact: true })
+    .click();
   await park(page);
   await page.waitForTimeout(500);
 }
