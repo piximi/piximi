@@ -28,7 +28,13 @@ export const MeasurementsLogo = () => {
         </IconButton>
       </Tooltip>
       <LogoIcon width={24} height={24} />
-      <Typography variant="h5" color={"#02aec5"} fontSize="1.4rem">
+      <Typography
+        variant="h5"
+        sx={{
+          color: "#02aec5",
+          fontSize: "1.4rem",
+        }}
+      >
         Measurements
       </Typography>
     </Box>

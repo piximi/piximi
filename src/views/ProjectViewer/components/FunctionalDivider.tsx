@@ -15,7 +15,7 @@ export const FunctionalDivider = ({
   actions: ReactNode;
   containerStyle?: CSSProperties;
   typographyVariant?: TypographyProps["variant"];
-  textTransform?: TypographyProps["textTransform"];
+  textTransform?: CSSProperties["textTransform"];
 }) => {
   return (
     <Box
@@ -30,10 +30,12 @@ export const FunctionalDivider = ({
       />
       <Typography
         variant={typographyVariant ?? "body2"}
-        textTransform={textTransform ?? "capitalize"}
         sx={{
+          textTransform: textTransform ?? "capitalize",
+
           //reapply formatting of DividerHeader
           margin: 0,
+
           pl: "calc(8px* 1.2)",
           pr: "calc(8px* 1.2)",
           fontFamily: '"Roboto","Helvetica","Arial",sans-serif',

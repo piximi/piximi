@@ -110,10 +110,12 @@ export const MeasurementPlotsViewer = () => {
   return (
     <Box
       data-id="plotsContainer"
-      width="100%"
-      display="flex"
-      height="100%"
-      flexDirection="row"
+      sx={{
+        width: "100%",
+        display: "flex",
+        height: "100%",
+        flexDirection: "row",
+      }}
     >
       <PanelGroup direction="horizontal">
         <>
@@ -121,9 +123,9 @@ export const MeasurementPlotsViewer = () => {
           <Panel id="sidebar" defaultSize={20}>
             <Box
               data-doc="plot-config"
-              width={"100%"}
-              height="100%"
               sx={{
+                width: "100%",
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 border: `1px solid rgba(23, 23, 23, 1)`,
@@ -164,9 +166,9 @@ export const MeasurementPlotsViewer = () => {
         {/* Plot Switcher/Renderer */}
         <Panel id="plot" defaultSize={80}>
           <Box
-            height="100%"
-            width="100%"
             sx={{
+              height: "100%",
+              width: "100%",
               border: `1px solid rgba(23, 23, 23, 1)`,
               borderRadius: 1,
             }}

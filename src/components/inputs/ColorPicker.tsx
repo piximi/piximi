@@ -42,12 +42,12 @@ export const ColorPicker = ({ color, onColorChange }: ColorIconButtonProps) => {
   return (
     <Fragment>
       <Box
-        display="flex"
-        flexDirection={"row"}
-        alignItems={"center"}
         component={"div"}
         onClick={onOpenColorPicker}
         sx={(theme) => ({
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
           p: 1,
           gap: 2,
           borderRadius: 1,

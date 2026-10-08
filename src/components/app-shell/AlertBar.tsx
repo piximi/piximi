@@ -14,7 +14,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import {
   Close as CloseIcon,
-  ErrorOutline as ErrorOutlineIcon,
+  ErrorOutlined as ErrorOutlineIcon,
   WarningAmberOutlined as WarningAmberOutlinedIcon,
   InfoOutlined as InfoOutlinedIcon,
   KeyboardArrowRight as KeyboardArrowRightIcon,

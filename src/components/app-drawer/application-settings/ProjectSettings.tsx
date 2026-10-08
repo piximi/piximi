@@ -51,7 +51,11 @@ export const ProjectSettings = () => {
       >
         <SettingsItem
           title={
-            <Box display="flex">
+            <Box
+              sx={{
+                display: "flex",
+              }}
+            >
               <Typography>{"Prompt save when starting new project"}</Typography>
             </Box>
           }
@@ -65,7 +69,11 @@ export const ProjectSettings = () => {
         </SettingsItem>
         <SettingsItem
           title={
-            <Box display="flex">
+            <Box
+              sx={{
+                display: "flex",
+              }}
+            >
               <Typography>
                 {"Prompt save predictions when training model"}
               </Typography>

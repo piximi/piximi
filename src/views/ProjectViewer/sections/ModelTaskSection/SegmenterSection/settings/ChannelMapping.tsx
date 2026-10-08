@@ -123,8 +123,10 @@ export const ChannelMapping = () => {
       <Divider sx={{ mb: 0.75 }}>
         <Typography
           variant="caption"
-          color="text.disabled"
           data-doc="channel-mapping-header"
+          sx={{
+            color: "text.disabled",
+          }}
         >
           Channel Mapping
         </Typography>
@@ -149,18 +151,26 @@ export const ChannelMapping = () => {
         >
           <Typography
             variant="caption"
-            color="text.disabled"
-            sx={HEADER_SX}
             data-help={HelpItem.ModelInput}
+            sx={[
+              {
+                color: "text.disabled",
+              },
+              ...(Array.isArray(HEADER_SX) ? HEADER_SX : [HEADER_SX]),
+            ]}
           >
             {policy.mode === CHANNEL_MODE.FIXED ? "Model Input" : "Slot"}
           </Typography>
           <Box />
           <Typography
             variant="caption"
-            color="text.disabled"
-            sx={HEADER_SX}
             data-help={HelpItem.ImageSource}
+            sx={[
+              {
+                color: "text.disabled",
+              },
+              ...(Array.isArray(HEADER_SX) ? HEADER_SX : [HEADER_SX]),
+            ]}
           >
             Image Source
           </Typography>
@@ -173,7 +183,12 @@ export const ChannelMapping = () => {
               : explicitIds.length,
           ).map((idx) => (
             <Fragment key={idx}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {policy.mode === CHANNEL_MODE.FIXED
                   ? `Channel ${idx + 1}`
                   : `Slot ${idx + 1}`}
@@ -236,18 +251,26 @@ export const ChannelMapping = () => {
         >
           <Typography
             variant="caption"
-            color="text.disabled"
-            sx={HEADER_SX}
             data-help={HelpItem.ModelInput}
+            sx={[
+              {
+                color: "text.disabled",
+              },
+              ...(Array.isArray(HEADER_SX) ? HEADER_SX : [HEADER_SX]),
+            ]}
           >
             Model Input
           </Typography>
           <Box />
           <Typography
             variant="caption"
-            color="text.disabled"
-            sx={HEADER_SX}
             data-help={HelpItem.ImageSource}
+            sx={[
+              {
+                color: "text.disabled",
+              },
+              ...(Array.isArray(HEADER_SX) ? HEADER_SX : [HEADER_SX]),
+            ]}
           >
             Image Source
           </Typography>

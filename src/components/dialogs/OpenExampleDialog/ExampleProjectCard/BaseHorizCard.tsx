@@ -70,7 +70,12 @@ export const BaseHorizCard = ({
           >
             <Typography variant="h5">{title}</Typography>
             <Divider variant="middle" />
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               {description}
             </Typography>
           </CardContent>

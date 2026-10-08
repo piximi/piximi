@@ -28,7 +28,13 @@ export const HistogramBinLabelCheckbox = () => {
         />
       }
       label={
-        <Box display="flex" flexDirection="row" alignContent="center">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignContent: "center",
+          }}
+        >
           <Typography variant="body2">Show Bin Label</Typography>
         </Box>
       }

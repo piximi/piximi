@@ -29,11 +29,13 @@ export const ModelTaskSection = () => {
   return (
     <Box
       data-doc="model-task-section"
-      width="100%"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      gap={1}
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 1,
+      }}
     >
       <ToggleButtonGroup
         data-help={HelpItem.LearningTask}

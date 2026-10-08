@@ -77,7 +77,11 @@ const ThemeSetting = () => {
   return (
     <SettingsItem
       title={
-        <Box display="flex">
+        <Box
+          sx={{
+            display: "flex",
+          }}
+        >
           <Typography>{"Theme Mode"}</Typography>
         </Box>
       }
@@ -153,8 +157,18 @@ const BorderWidthSetting = () => {
   return (
     <SettingsItem
       title={
-        <Box display="flex">
-          <Typography display="inline">{"Selection Border Width: "}</Typography>
+        <Box
+          sx={{
+            display: "flex",
+          }}
+        >
+          <Typography
+            sx={{
+              display: "inline",
+            }}
+          >
+            {"Selection Border Width: "}
+          </Typography>
           <Box
             sx={(theme) => ({
               display: "inline-block",
@@ -218,8 +232,18 @@ const BorderColorSetting = () => {
   return (
     <SettingsItem
       title={
-        <Box display="flex">
-          <Typography display="inline">{"Selection Border Color: "}</Typography>
+        <Box
+          sx={{
+            display: "flex",
+          }}
+        >
+          <Typography
+            sx={{
+              display: "inline",
+            }}
+          >
+            {"Selection Border Color: "}
+          </Typography>
           <Box
             sx={() => ({
               display: "inline-block",
@@ -286,8 +310,18 @@ const SoundSetting = () => {
   return (
     <SettingsItem
       title={
-        <Box display="flex">
-          <Typography display="inline">{"Sound Effects"}</Typography>
+        <Box
+          sx={{
+            display: "flex",
+          }}
+        >
+          <Typography
+            sx={{
+              display: "inline",
+            }}
+          >
+            {"Sound Effects"}
+          </Typography>
         </Box>
       }
     >
@@ -351,8 +385,16 @@ const TextOnScrollSetting = () => {
   return (
     <SettingsItem
       title={
-        <Box display="flex">
-          <Typography display="inline">
+        <Box
+          sx={{
+            display: "flex",
+          }}
+        >
+          <Typography
+            sx={{
+              display: "inline",
+            }}
+          >
             {"Hide Image/Show Text on Scroll"}
           </Typography>
         </Box>

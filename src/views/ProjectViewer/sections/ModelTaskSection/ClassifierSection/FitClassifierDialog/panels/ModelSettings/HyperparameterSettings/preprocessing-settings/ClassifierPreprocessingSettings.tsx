@@ -14,7 +14,14 @@ export const ClassifierPreprocessingSettings = ({
   showAdvanced: boolean;
 }) => {
   return (
-    <Grid container spacing={2} padding={2} data-doc="preprocessing-settings">
+    <Grid
+      container
+      spacing={2}
+      data-doc="preprocessing-settings"
+      sx={{
+        padding: 2,
+      }}
+    >
       <Grid size={12}>
         <Divider sx={{ mb: 1 }}>
           <Typography variant="body2">Image Augmentation</Typography>

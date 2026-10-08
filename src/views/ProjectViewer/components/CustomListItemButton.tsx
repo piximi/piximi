@@ -13,8 +13,8 @@ import type { ReactElement, MouseEventHandler } from "react";
 
 import type {
   ListItemButtonProps,
+  ListItemTextSlotsAndSlotProps,
   TooltipProps,
-  TypographyProps,
 } from "@mui/material";
 
 type TooltipType = Omit<TooltipProps, "children" | "title">;
@@ -30,7 +30,9 @@ type CustomListItemButtonProps = Pick<
   | "disableRipple"
   | "sx"
 > & {
-  primaryTypographyProps?: TypographyProps;
+  primaryTypographyProps?: NonNullable<
+    ListItemTextSlotsAndSlotProps["slotProps"]
+  >["primary"];
   primaryText: string | ReactElement;
   onClick: MouseEventHandler<HTMLDivElement> | undefined;
   icon?: ReactElement;
@@ -91,7 +93,7 @@ export const CustomListItemButton = ({
 
             <ListItemText
               primary={primaryText}
-              slotProps={{ primary: primaryTypographyProps }}
+              slotProps={{ primary: primaryTypographyProps ?? {} }}
             />
             {additionalComponent}
           </ListItemButton>

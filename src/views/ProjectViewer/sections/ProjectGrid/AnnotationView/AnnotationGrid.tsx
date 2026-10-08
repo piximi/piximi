@@ -96,7 +96,13 @@ export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
           px: 4,
         }}
       >
-        <Typography variant="body2" color="text.secondary" align="center">
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           Select images in the image grid to see their annotations.
         </Typography>
       </Box>

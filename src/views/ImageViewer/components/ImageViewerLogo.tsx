@@ -15,7 +15,12 @@ export const ImageViewerLogo = () => {
       }}
     >
       <LogoIcon width={30} height={20} />
-      <Typography variant="h6" color={"#02aec5"}>
+      <Typography
+        variant="h6"
+        sx={{
+          color: "#02aec5",
+        }}
+      >
         Image Viewer
       </Typography>
     </Box>

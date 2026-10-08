@@ -59,9 +59,13 @@ const Row = ({
     >
       <Typography
         variant="caption"
-        color="text.secondary"
-        sx={layout === "grid" ? undefined : LABEL_SX}
         data-help={layout === "grid" ? help : undefined}
+        sx={[
+          {
+            color: "text.secondary",
+          },
+          layout === "grid" ? {} : LABEL_SX,
+        ]}
       >
         {label}
       </Typography>
@@ -236,8 +240,11 @@ export const SegmenterOptionInput = ({
               />
               <Typography
                 variant="caption"
-                color="text.secondary"
-                sx={{ minWidth: "2.5rem", textAlign: "right" }}
+                sx={{
+                  color: "text.secondary",
+                  minWidth: "2.5rem",
+                  textAlign: "right",
+                }}
               >
                 {current.toFixed(field.precision ?? 0)}
               </Typography>

@@ -123,8 +123,10 @@ export const ClassMapDialog = ({
               <Stack
                 key={`model-class-${idx}`}
                 direction="row"
-                justifyContent="space-between"
-                px={2}
+                sx={{
+                  justifyContent: "space-between",
+                  px: 2,
+                }}
               >
                 <Typography variant="body2">{idx}</Typography>
                 <StyledSelect
@@ -152,14 +154,21 @@ export const ClassMapDialog = ({
           ) : (
             <Typography
               variant="body2"
-              sx={{ width: "100%" }}
-              textAlign="center"
+              sx={{
+                textAlign: "center",
+                width: "100%",
+              }}
             >
               No categories to map
             </Typography>
           )}
         </Stack>
-        <Stack direction="row" justifyContent="center">
+        <Stack
+          direction="row"
+          sx={{
+            justifyContent: "center",
+          }}
+        >
           <FormControl size="small">
             <FormControlLabel
               sx={(theme) => ({
