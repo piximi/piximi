@@ -15,7 +15,7 @@ jobs:
         uses: pnpm/setup@v1
         with:
           version: 11.2.2
-          runtime: node@24
+          runtime: node@22
           cache: true
 
       - name: Install Packages
@@ -28,6 +28,6 @@ jobs:
           pnpm run lint
 
       - name: Run Tests
-        run: pnpm test --exclude e2e/ --silent
+        run: pnpm test  --silent
         env:
           CI: true
