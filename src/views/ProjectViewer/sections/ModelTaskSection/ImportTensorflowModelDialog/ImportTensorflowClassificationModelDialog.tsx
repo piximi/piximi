@@ -271,7 +271,12 @@ export const ImportTensorflowClassificationModelDialog = ({
                 {modelDetailFields.map((field) => (
                   <Fragment key={`model-detail-${field}`}>
                     <Box>
-                      <Typography variant="body2" textTransform="capitalize">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          textTransform: "capitalize",
+                        }}
+                      >
                         {field}
                       </Typography>
                     </Box>
@@ -344,7 +349,12 @@ export const ImportTensorflowClassificationModelDialog = ({
         <ToolTipTab label="Fetch Remote" value="2" placement="top" />
       </Tabs>
       <DialogContent sx={{ pb: 0 }}>
-        <Box hidden={tabVal !== "1" && tabVal !== "2"} pb={2}>
+        <Box
+          hidden={tabVal !== "1" && tabVal !== "2"}
+          sx={{
+            pb: 2,
+          }}
+        >
           <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
         </Box>
 

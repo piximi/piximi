@@ -131,7 +131,7 @@ export const InputShape = () => {
           >
             Input Shape:
           </FormLabel>
-          <Stack direction="row" gap={2}>
+          <Stack direction="row" sx={{ gap: 2 }}>
             <ModelSettingsTextField
               id="shape-cols"
               size="small"

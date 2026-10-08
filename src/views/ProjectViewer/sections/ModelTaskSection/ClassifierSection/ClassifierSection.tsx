@@ -24,12 +24,14 @@ export const ClassifierSection = () => {
   return (
     <>
       <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        width="100%"
-        px={1}
-        gap={1}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+          px: 1,
+          gap: 1,
+        }}
       >
         <ModelSelection selectedModelConfig={modelConfig} />
         <Divider flexItem />

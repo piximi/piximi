@@ -14,14 +14,27 @@ export const ClassifierOptimizerSettings = ({
   showAdvanced: boolean;
 }) => {
   return (
-    <Grid container spacing={2} padding={2} data-doc="optimizer-settings">
+    <Grid
+      container
+      spacing={2}
+      data-doc="optimizer-settings"
+      sx={{
+        padding: 2,
+      }}
+    >
       <Grid size={12}>
         <Divider sx={{ mb: 1 }}>
           <Typography variant="body2">Training Strategy</Typography>
         </Divider>
 
         <Stack sx={{ pl: 2 }}>
-          <Stack direction="row" gap={2} sx={{ pt: 1 }}>
+          <Stack
+            direction="row"
+            sx={{
+              gap: 2,
+              pt: 1,
+            }}
+          >
             <Epochs />
             <Collapse in={showAdvanced}>
               <BatchSize />

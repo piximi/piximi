@@ -14,7 +14,7 @@ import {
   LinearProgress,
   Typography,
 } from "@mui/material";
-import { PlayCircleOutline, Stop, ErrorOutline } from "@mui/icons-material";
+import { PlayCircleOutlined, Stop, ErrorOutlined } from "@mui/icons-material";
 
 import { useClassifierApi } from "core/dl/classification";
 
@@ -58,7 +58,12 @@ const FitClassifierProgressBar = ({
             <LinearProgress />
           </Box>
           <Box sx={{ minWidth: 50 }}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               {" "}
               {"Setting up training..."}{" "}
             </Typography>
@@ -72,7 +77,9 @@ const FitClassifierProgressBar = ({
           <Box sx={{ minWidth: 50 }}>
             <Typography
               variant="body2"
-              color="text.secondary"
+              sx={{
+                color: "text.secondary",
+              }}
             >{`Epoch ${currentEpoch} of ${epochs}`}</Typography>
           </Box>
         </div>
@@ -157,7 +164,7 @@ export const FitClassifierDialogActions = () => {
           title={error.message}
         >
           <Icon>
-            <ErrorOutline color="warning" />
+            <ErrorOutlined color="warning" />
           </Icon>
         </Tooltip>
       )}
@@ -183,7 +190,7 @@ export const FitClassifierDialogActions = () => {
           variant="outlined"
           onClick={handleFit}
           disabled={!isReady}
-          startIcon={<PlayCircleOutline />}
+          startIcon={<PlayCircleOutlined />}
           sx={{ mx: 1 }}
         >
           Fit Classifier

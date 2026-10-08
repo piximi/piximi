@@ -11,11 +11,13 @@ export const SettingsItem = ({
 }) => {
   return (
     <Box
-      display="flex"
-      flexDirection="row"
-      justifyContent="space-between"
-      alignItems="flex-end"
-      height="40px"
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "flex-end",
+        height: "40px",
+      }}
     >
       {typeof title === "string" ? <Typography>{title}</Typography> : title}
 

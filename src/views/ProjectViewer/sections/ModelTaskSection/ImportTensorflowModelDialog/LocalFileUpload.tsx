@@ -43,7 +43,13 @@ const FileInfoContainer = ({
       })}
       onClick={setExpanded}
     >
-      <Typography fontSize="small">{label}</Typography>
+      <Typography
+        sx={{
+          fontSize: "small",
+        }}
+      >
+        {label}
+      </Typography>
       <ExpandIcon expanded={expanded} sx={{ fontSize: "1.25rem" }} />
     </Box>
     <Collapse in={expanded}>

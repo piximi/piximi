@@ -52,8 +52,8 @@ export const SortFilter = () => {
             })}
           >
             <Box
-              width={"100%"}
               sx={(theme) => ({
+                width: "100%",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",

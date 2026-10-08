@@ -349,7 +349,12 @@ export const PivotConfigurator = () => {
       {/* Debug output */}
       {pivotItems.length > 0 && (
         <Box sx={{ mt: 2, p: 1, bgcolor: "action.hover", borderRadius: 1 }}>
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+            }}
+          >
             Pivot order:{" "}
             {pivotItems
               .map((item) =>

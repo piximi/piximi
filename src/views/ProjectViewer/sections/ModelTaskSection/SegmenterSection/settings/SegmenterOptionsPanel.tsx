@@ -48,8 +48,10 @@ export const SegmenterOptionsPanel = () => {
                 <Divider sx={{ mb: 0.75 }}>
                   <Typography
                     variant="caption"
-                    color="text.disabled"
                     data-doc="options-header"
+                    sx={{
+                      color: "text.disabled",
+                    }}
                   >
                     {group.label}
                   </Typography>
@@ -64,7 +66,12 @@ export const SegmenterOptionsPanel = () => {
                 <>
                   {onlyAdvanced && (
                     <Divider sx={{ mb: 0.75 }}>
-                      <Typography variant="caption" color="text.disabled">
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: "text.disabled",
+                        }}
+                      >
                         {group.label}
                       </Typography>
                     </Divider>

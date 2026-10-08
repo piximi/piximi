@@ -156,7 +156,13 @@ export const AnnotationView = () => {
           ))}
         </Box>
         <Divider orientation="vertical" />
-        <Box display="flex" flexShrink={1} justifySelf="flex-end">
+        <Box
+          sx={{
+            display: "flex",
+            flexShrink: 1,
+            justifySelf: "flex-end",
+          }}
+        >
           <IconButton
             data-help={HelpItem.AddKindTab}
             onClick={handleOpenAddKindMenu}

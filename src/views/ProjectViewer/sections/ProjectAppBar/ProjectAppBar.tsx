@@ -15,9 +15,9 @@ export const ProjectAppBar = () => {
   return (
     <Stack
       direction="row"
-      justifyContent="space-between"
-      alignItems="center"
       sx={(theme) => ({
+        justifyContent: "space-between",
+        alignItems: "center",
         backgroundColor: theme.palette.background.paper,
         position: "relative",
         gridArea: "top-tools",

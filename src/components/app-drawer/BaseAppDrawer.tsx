@@ -37,8 +37,12 @@ export const BaseAppDrawer = ({
       variant="persistent"
     >
       <Stack
-        sx={{ position: "relative", height: "100%", minHeight: 0 }}
-        justifyContent={"space-between"}
+        sx={{
+          justifyContent: "space-between",
+          position: "relative",
+          height: "100%",
+          minHeight: 0,
+        }}
       >
         <Box
           sx={{
@@ -58,8 +62,11 @@ export const BaseAppDrawer = ({
             <Divider />
             <Stack
               direction="row"
-              justifyContent="space-evenly"
-              sx={{ py: 0.5, px: 2 }}
+              sx={{
+                justifyContent: "space-evenly",
+                py: 0.5,
+                px: 2,
+              }}
             >
               <SettingsButton />
 

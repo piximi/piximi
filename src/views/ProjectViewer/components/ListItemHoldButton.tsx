@@ -10,7 +10,7 @@ import {
 
 import type { ReactElement } from "react";
 
-import type { ListItemTextProps, TypographyProps } from "@mui/material";
+import type { ListItemTextSlotsAndSlotProps } from "@mui/material";
 
 export const ListItemHoldButton = ({
   onHoldComplete,
@@ -23,8 +23,10 @@ export const ListItemHoldButton = ({
   holdDuration: number;
   primaryText: string | ReactElement;
   icon?: ReactElement;
-  primaryTypographyProps?: TypographyProps;
-} & Pick<ListItemTextProps, "primaryTypographyProps">) => {
+  primaryTypographyProps?: NonNullable<
+    ListItemTextSlotsAndSlotProps["slotProps"]
+  >["primary"];
+}) => {
   const [holdElapsed, setHoldElapsed] = useState<number>(0);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
   const [loadPercent, setLoadPercent] = useState<number>(0);

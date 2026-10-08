@@ -97,8 +97,8 @@ export const IncrementalSlider = ({
   };
   return (
     <Box
-      display="flex"
       sx={(theme) => ({
+        display: "flex",
         backgroundColor: theme.palette.background.paper,
         borderRadius: "8px",
         ...containerStyle,

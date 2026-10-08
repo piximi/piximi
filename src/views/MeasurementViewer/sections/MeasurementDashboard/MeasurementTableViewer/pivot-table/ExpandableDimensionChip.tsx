@@ -147,8 +147,12 @@ export const ExpandableDimensionChip = ({
         >
           <Typography
             variant="caption"
-            color="text.secondary"
-            sx={{ px: 1, display: "block", mb: 1 }}
+            sx={{
+              color: "text.secondary",
+              px: 1,
+              display: "block",
+              mb: 1,
+            }}
           >
             Drag individual values to Pivot By
           </Typography>

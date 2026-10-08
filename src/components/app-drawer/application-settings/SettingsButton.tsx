@@ -39,7 +39,11 @@ const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
       <DialogTitleBar title="Settings" closeDialog={onClose} />
 
       <DialogContent sx={{ px: 0, pb: 2.5, pt: 1 }}>
-        <Stack gap={2}>
+        <Stack
+          sx={{
+            gap: 2,
+          }}
+        >
           <UISettings />
           <ProjectSettings />
         </Stack>

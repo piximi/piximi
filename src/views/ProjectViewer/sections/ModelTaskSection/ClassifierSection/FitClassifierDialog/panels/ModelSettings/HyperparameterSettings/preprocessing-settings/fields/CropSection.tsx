@@ -73,7 +73,12 @@ export const CropSection = () => {
       title={lockReason("cropOptions", isTraining)}
       disableHoverListener={!disabled}
     >
-      <Stack direction="row" gap={2}>
+      <Stack
+        direction="row"
+        sx={{
+          gap: 2,
+        }}
+      >
         <WithLabel
           data-help={HelpItem.CropOptions}
           label="Crop Type:"

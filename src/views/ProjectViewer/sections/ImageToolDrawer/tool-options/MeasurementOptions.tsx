@@ -4,7 +4,12 @@ import { MeasurementsButton } from "@ProjectViewer/components";
 
 export const MeasurementOptions = () => {
   return (
-    <Box display="flex" justifyContent="center">
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
       <MeasurementsButton />
     </Box>
   );

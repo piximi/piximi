@@ -15,7 +15,11 @@ export const ItemFilters = () => {
   const activeView = useSelector(selectActiveView);
 
   return (
-    <Stack maxWidth="100%">
+    <Stack
+      sx={{
+        maxWidth: "100%",
+      }}
+    >
       <SortSelect />
       <CategoryFilterList />
       <PartitionFilterList />

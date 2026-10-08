@@ -110,16 +110,24 @@ export const TaskProgressToast = ({ task }: { task: AppTask }) => {
       >
         <Typography
           variant="body2"
-          fontWeight={500}
-          lineHeight={1.3}
-          color="text.primary"
+          sx={{
+            fontWeight: 500,
+            lineHeight: 1.3,
+            color: "text.primary",
+          }}
         >
           {taskTypeDisplayLookup[task.type]}
         </Typography>
         <ActionButton dismissTask={dismissTask} />
       </Box>
       <Box>
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography
+          variant="caption"
+          sx={{
+            color: "text.secondary",
+            display: "block",
+          }}
+        >
           {task.label}
         </Typography>
       </Box>
@@ -209,8 +217,11 @@ const ErrorText = ({ error }: { error: string }) => {
     <Box sx={{ overflowWrap: "break-word" }}>
       <Typography
         variant="caption"
-        color="inherit"
-        sx={{ display: "inline", mr: 0.5 }}
+        sx={{
+          color: "inherit",
+          display: "inline",
+          mr: 0.5,
+        }}
       >
         {error}
       </Typography>
@@ -223,9 +234,11 @@ const ErrorText = ({ error }: { error: string }) => {
       <Typography
         ref={textRef}
         variant="caption"
-        color="inherit"
         noWrap
-        sx={{ minWidth: 0 }}
+        sx={{
+          color: "inherit",
+          minWidth: 0,
+        }}
       >
         {error}
       </Typography>

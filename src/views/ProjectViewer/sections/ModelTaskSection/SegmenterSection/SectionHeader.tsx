@@ -18,7 +18,6 @@ export const SectionHeader = ({
     >
       <Typography
         variant="overline"
-        color="text.secondary"
         sx={{
           color: "text.disabled",
           display: "block",

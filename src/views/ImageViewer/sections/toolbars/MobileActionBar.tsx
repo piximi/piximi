@@ -245,8 +245,8 @@ const ContentPopper = ({
         })}
       >
         <Box
-          width={"100%"}
           sx={(theme) => ({
+            width: "100%",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",

@@ -15,9 +15,11 @@ export const ToolHotkeyTitle = ({
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
       <Typography
-        fontWeight={bold ? "fontWeightBold" : ""}
-        fontSize={"0.7rem"}
-        sx={{ mr: hotkey ? 1 : 0 }}
+        sx={{
+          fontWeight: bold ? "fontWeightBold" : "",
+          fontSize: "0.7rem",
+          mr: hotkey ? 1 : 0,
+        }}
       >
         {toolName}
       </Typography>

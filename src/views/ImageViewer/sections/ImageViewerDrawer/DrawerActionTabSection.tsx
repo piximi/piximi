@@ -50,9 +50,12 @@ export const DrawerActionTabSection = () => {
       </Stack>
 
       <Stack
-        sx={{ position: "relative", bottom: 0 }}
         direction="column"
-        justifyContent="space-evenly"
+        sx={{
+          justifyContent: "space-evenly",
+          position: "relative",
+          bottom: 0,
+        }}
       >
         <SettingsButton />
 

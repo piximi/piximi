@@ -1,5 +1,7 @@
 import { Divider, Typography } from "@mui/material";
 
+import type { CSSProperties } from "react";
+
 import type { DividerProps, TypographyProps } from "@mui/material";
 
 import type { HTMLDataAttributes } from "utils/types";
@@ -7,7 +9,7 @@ import type { HTMLDataAttributes } from "utils/types";
 type DividerHeaderProps = HTMLDataAttributes &
   Pick<DividerProps, "sx" | "textAlign" | "variant" | "children"> & {
     typographyVariant: TypographyProps["variant"];
-    textTransform?: TypographyProps["textTransform"];
+    textTransform?: CSSProperties["textTransform"];
   };
 
 export const DividerHeader = (props: DividerHeaderProps) => {
@@ -20,7 +22,11 @@ export const DividerHeader = (props: DividerHeaderProps) => {
     >
       <Typography
         variant={props.typographyVariant}
-        textTransform={props.textTransform ? props.textTransform : "capitalize"}
+        sx={{
+          textTransform: props.textTransform
+            ? props.textTransform
+            : "capitalize",
+        }}
       >
         {props.children}
       </Typography>

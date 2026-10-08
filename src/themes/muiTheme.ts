@@ -94,16 +94,6 @@ export const darkTheme = createTheme({
   cssVariables: true,
   components: {
     ...sharedComponentThemes,
-    MuiDrawer: {
-      styleOverrides: {
-        paperAnchorDockedLeft: {
-          borderRight: "1px solid rgba(16, 16, 16)",
-        },
-        paperAnchorDockedRight: {
-          borderLeft: "1px solid rgba(16, 16, 16)",
-        },
-      },
-    },
     MuiListItem: {
       styleOverrides: {
         root: {

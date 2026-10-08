@@ -127,7 +127,7 @@ export const ExportAnnotationsMenu = ({
               key={`exportType_${option.type}`}
             >
               <ListItemText
-                primaryTypographyProps={{ variant: "body2" }}
+                slotProps={{ primary: { variant: "body2" } }}
                 primary={option.title}
               />
             </MenuItem>

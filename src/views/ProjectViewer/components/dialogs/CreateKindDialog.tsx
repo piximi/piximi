@@ -79,11 +79,13 @@ export const CreateKindDialog = ({
       title={"Create Kind"}
       content={
         <Box
-          display="flex"
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems={"center"}
-          gap={2}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 2,
+          }}
         >
           <TextField
             data-testid="create-kind-name-input"
