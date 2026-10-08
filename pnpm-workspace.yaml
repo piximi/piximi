@@ -6,3 +6,11 @@ allowBuilds:
   protobufjs: true
   skia-canvas: true
   unrs-resolver: true
+
+overrides:
+  "@react-spring/web": "^10.1.2"
+  "@react-spring/core": "^10.1.2"
+  "@react-spring/animated": "^10.1.2"
+  "@react-spring/shared": "^10.1.2"
+  "@react-spring/types": "^10.1.2"
+  "@react-spring/rafz": "^10.1.2"
