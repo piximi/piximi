@@ -51,7 +51,8 @@ export const CategoryItem = ({
   const activeFilters = useSelector(selectActiveFilters);
 
   const isFiltered = useCallback(
-    (category) => activeFilters.categoryId.includes(category.id),
+    (category: { id: string }) =>
+      activeFilters.categoryId.includes(category.id),
     [activeFilters.categoryId, category],
   );
 

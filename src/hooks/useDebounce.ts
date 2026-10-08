@@ -8,7 +8,7 @@ export function useDebounce<Func extends PassedFunc>(
   delay: number,
 ) {
   // State and setters for debounced value
-  const timer = useRef<Timer>();
+  const timer = useRef<Timer | null>(null);
 
   useEffect(() => {
     return () => {
@@ -21,7 +21,7 @@ export function useDebounce<Func extends PassedFunc>(
     const newTimer = setTimeout(() => {
       func(...args);
     }, delay);
-    clearTimeout(timer.current);
+    timer.current && clearTimeout(timer.current);
     timer.current = newTimer;
   }) as Func;
 

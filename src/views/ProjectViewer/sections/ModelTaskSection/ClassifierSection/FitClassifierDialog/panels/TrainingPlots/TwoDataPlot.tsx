@@ -7,6 +7,8 @@ import { Container, Typography, useTheme } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
 
+import type { LineCustomSvgLayerProps } from "@nivo/line";
+
 import type { Theme } from "@mui/material";
 
 import type { Point } from "utils/types";
@@ -24,6 +26,7 @@ type TwoDataPlotProps = {
   dynamicYRange?: boolean;
   runDrifts: RunDrift[];
 };
+type TrainingSeries = { id: string; color: string; data: Point[] };
 
 const DRIFT_TEXT_HEIGHT = 16;
 const DRIFT_TEXT_PADDING = 4;
@@ -216,9 +219,10 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
     }, 0);
     return Math.max(y1Max, y2Max) + 0.1;
   }, [dynamicYRange, yData1, yData2]);
-
   const driftMarkersLayer = useCallback(
-    (props) => <DriftMarkers {...props} runDrifts={runDrifts} theme={theme} />,
+    (props: LineCustomSvgLayerProps<TrainingSeries>) => (
+      <DriftMarkers {...props} runDrifts={runDrifts} theme={theme} />
+    ),
     [runDrifts, theme],
   );
 

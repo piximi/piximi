@@ -197,7 +197,7 @@ const HyperParameterInfoTable = ({
             </SubRow>
             <SubRow>
               <TableCell>Loss Function</TableCell>
-              <TableCell>{hypParams.optimizer.lossFunction}</TableCell>
+              <TableCell>{String(hypParams.optimizer.lossFunction)}</TableCell>
             </SubRow>
             <SubRow>
               <TableCell>Metrics</TableCell>
