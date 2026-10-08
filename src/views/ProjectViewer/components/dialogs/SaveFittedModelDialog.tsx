@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 import { saveAs } from "file-saver";
 
-import { Grid2 as Grid, TextField } from "@mui/material";
+import { Grid, TextField } from "@mui/material";
 
 import { useClassifierApi } from "core/dl/classification";
 import { buildClassifierZip } from "core/file-io/export/exportFittedModel";

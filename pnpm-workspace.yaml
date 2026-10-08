@@ -14,3 +14,4 @@ overrides:
   "@react-spring/shared": "^10.1.2"
   "@react-spring/types": "^10.1.2"
   "@react-spring/rafz": "^10.1.2"
+  "react-is": "^17.0.2"

@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { SystemStyleObject } from "@mui/system";
 
 export const getIconPosition = (
   height: number | undefined,
@@ -11,7 +11,7 @@ export const getIconPosition = (
   return { top: offsetY + "%", left: offsetX + "%" };
 };
 
-export const imageStyle: CSSProperties = {
+export const imageStyle: SystemStyleObject = {
   width: "100%",
   height: "100%",
   objectFit: "contain",
@@ -20,7 +20,7 @@ export const imageStyle: CSSProperties = {
 };
 
 const ALT_TEXT_PADDING = 16;
-export const altTextStyle: CSSProperties = {
+export const altTextStyle: SystemStyleObject = {
   width: `calc(100% - ${ALT_TEXT_PADDING}px)`,
   overflow: "hidden",
   whiteSpace: "nowrap",

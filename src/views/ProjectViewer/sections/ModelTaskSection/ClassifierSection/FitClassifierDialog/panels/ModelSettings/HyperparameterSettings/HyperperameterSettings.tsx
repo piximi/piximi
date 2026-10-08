@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Button, Grid2 as Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 
 import { ClassifierPreprocessingSettings } from "./preprocessing-settings";
 import { ClassifierOptimizerSettings } from "./optimizer-settings";
