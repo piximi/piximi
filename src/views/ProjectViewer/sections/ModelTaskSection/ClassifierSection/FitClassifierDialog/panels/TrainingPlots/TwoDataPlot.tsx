@@ -283,11 +283,11 @@ export const TwoDataPlot = (props: TwoDataPlotProps) => {
                 <div
                   key={point.id}
                   style={{
-                    color: point.serieColor,
+                    color: point.seriesColor,
                     padding: "3px 0",
                   }}
                 >
-                  <strong>{point.serieId}</strong> {point.data.yFormatted}
+                  <strong>{point.seriesId}</strong> {point.data.yFormatted}
                 </div>
               ))}
             </div>
