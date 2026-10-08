@@ -41,13 +41,13 @@ export const ModelFormatSelection = ({
           value="Graph"
           control={<Radio size="small" sx={{ py: 0, px: 1 }} />}
           label="Graph Model"
-          componentsProps={{ typography: { variant: "body2" } }}
+          slotProps={{ typography: { variant: "body2" } }}
         />
         <FormControlLabel
           value="Layers"
           control={<Radio size="small" sx={{ py: 0, px: 1 }} />}
           label="Layers Model"
-          componentsProps={{ typography: { variant: "body2" } }}
+          slotProps={{ typography: { variant: "body2" } }}
         />
       </RadioGroup>
     </FormControl>

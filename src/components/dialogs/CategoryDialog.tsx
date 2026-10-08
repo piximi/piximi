@@ -67,11 +67,13 @@ export const CategoryDialog = (
       title={formatString(`${action} Category`, " ", "every-word")}
       content={
         <Box
-          display="flex"
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems={"center"}
-          gap={2}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 2,
+          }}
         >
           <ColorPicker color={color} onColorChange={handleColorChange} />
           <TextField

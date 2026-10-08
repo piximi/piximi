@@ -8,8 +8,8 @@ export const MeasurementsTopBar = () => {
   return (
     <Stack
       direction="row"
-      justifyContent="flex-start"
       sx={(theme) => ({
+        justifyContent: "flex-start",
         backgroundColor: theme.palette.background.paper,
         position: "relative",
         gridArea: "top-bar",

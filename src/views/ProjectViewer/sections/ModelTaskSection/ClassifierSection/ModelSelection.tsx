@@ -118,8 +118,11 @@ export const ModelSelection = ({
     >
       <Typography
         variant="overline"
-        color="text.secondary"
-        sx={{ display: "block", lineHeight: 1.6 }}
+        sx={{
+          color: "text.secondary",
+          display: "block",
+          lineHeight: 1.6,
+        }}
       >
         Model I/O
       </Typography>
@@ -157,8 +160,11 @@ export const ModelSelection = ({
       </Box>
       <Typography
         variant="overline"
-        color="text.secondary"
-        sx={{ display: "block", lineHeight: 1.6 }}
+        sx={{
+          color: "text.secondary",
+          display: "block",
+          lineHeight: 1.6,
+        }}
       >
         Selected Model
       </Typography>

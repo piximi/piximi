@@ -26,8 +26,7 @@ export const PredictionListItems = () => {
             />
           }
           primaryTypographyProps={{
-            variant: "caption",
-            textTransform: "uppercase",
+            variant: "overline",
           }}
           sx={{ borderRadius: 0 }}
         />
@@ -41,8 +40,7 @@ export const PredictionListItems = () => {
           }
           holdDuration={100}
           primaryTypographyProps={{
-            variant: "caption",
-            textTransform: "uppercase",
+            variant: "overline",
           }}
         />
       </List>

@@ -149,7 +149,7 @@ export const ActiveImageInfoStrip = ({
         </Typography>
         <WithLabel
           label="Image Category:"
-          labelProps={{ variant: "body2", pr: 1 }}
+          labelProps={{ variant: "body2", sx: { pr: 1 } }}
         >
           <StyledSelect
             value={image.categoryId}

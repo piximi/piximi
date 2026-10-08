@@ -16,8 +16,8 @@ export function BasicTabPanel(props: CommonTabPanelProps) {
     >
       {value === index && (
         <Box
-          display="flex"
-          sx={() => ({
+          sx={{
+            display: "flex",
             minWidth: "100%",
             maxHeight: "calc(100vh - 60px)",
             height: "100%",
@@ -29,7 +29,7 @@ export function BasicTabPanel(props: CommonTabPanelProps) {
               height: "100%",
               minHeight: "100%",
             },
-          })}
+          }}
         >
           {children}
         </Box>
@@ -52,20 +52,24 @@ export function ControlledTabPanel(
       style={{ height: "calc(100% - 49px)" }}
     >
       <Box
-        display="flex"
-        sx={() => ({
-          minWidth: "100%",
-          maxHeight: "calc(100vh - 60px)",
-          height: "100%",
-          minHeight: "100%",
-
-          ["& > ." + childClassName]: {
+        sx={[
+          {
+            display: "flex",
+          },
+          () => ({
             minWidth: "100%",
-            maxWidth: "100%",
+            maxHeight: "calc(100vh - 60px)",
             height: "100%",
             minHeight: "100%",
-          },
-        })}
+
+            ["& > ." + childClassName]: {
+              minWidth: "100%",
+              maxWidth: "100%",
+              height: "100%",
+              minHeight: "100%",
+            },
+          }),
+        ]}
       >
         {children}
       </Box>

@@ -68,11 +68,13 @@ const TaxonomyDialogForm = ({
       confirmDisabled={isInvalidName}
       content={
         <Box
-          display="flex"
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems="center"
-          gap={2}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 2,
+          }}
         >
           {request.type === "cat" && (
             <ColorPicker

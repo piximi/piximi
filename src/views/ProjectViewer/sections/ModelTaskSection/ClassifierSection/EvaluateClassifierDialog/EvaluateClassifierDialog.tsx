@@ -114,7 +114,13 @@ export const EvaluateClassifierDialog = ({
       >
         <Typography variant="body2">{modelName}</Typography>
 
-        <Box display="flex" flexDirection="row" alignItems="center">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           {!!validationWarning && (
             <Tooltip title={validationWarning}>
               <WarningAmberRoundedIcon
@@ -141,10 +147,12 @@ export const EvaluateClassifierDialog = ({
       </Box>
       <DialogContent>
         <Box
-          display="flex"
-          flexDirection="row"
-          justifyContent="space-evenly"
-          alignItems="flex-start"
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            alignItems: "flex-start",
+          }}
         >
           <ConfusionMatrix
             classNames={categories.map((c: Category) => c.name)}

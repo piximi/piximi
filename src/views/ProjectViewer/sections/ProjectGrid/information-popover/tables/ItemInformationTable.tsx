@@ -12,7 +12,11 @@ export const ItemInformationTable = ({
   data: Array<Array<string | number | ReactElement>>;
 }) => {
   return (
-    <Box maxWidth="100%">
+    <Box
+      sx={{
+        maxWidth: "100%",
+      }}
+    >
       <TableContainer sx={{ borderRadius: "0 0 4px 4px" }} component={Paper}>
         <Table>
           <TableBody>

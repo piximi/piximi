@@ -131,8 +131,8 @@ export const TopToolBar = () => {
   return (
     <Stack
       direction="row"
-      justifyContent="space-between"
       sx={(theme) => ({
+        justifyContent: "space-between",
         backgroundColor: theme.palette.background.paper,
         position: "relative",
         gridArea: "top-tools",
@@ -160,9 +160,9 @@ export const TopToolBar = () => {
           <ZoomTools />
           <Typography
             variant="caption"
-            color="text.secondary"
             noWrap
             sx={{
+              color: "text.secondary",
               opacity: 0.6,
               position: "absolute",
               left: "100%",

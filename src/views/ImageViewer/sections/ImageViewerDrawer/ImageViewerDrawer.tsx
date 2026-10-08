@@ -51,12 +51,12 @@ export const ImageViewerDrawer = () => {
       >
         <Stack
           sx={{
+            justifyContent: "space-between",
             position: "relative",
             height: "100%",
             minHeight: 0,
             overflow: "hidden",
           }}
-          justifyContent={"space-between"}
         >
           {drawerViewComponent}
         </Stack>

@@ -169,7 +169,12 @@ export const WelcomeScreen = () => {
               Open Example Project
             </Button>
           </Stack>
-          <Stack justifyContent={"center"} alignItems="center">
+          <Stack
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Button
               data-help={HelpItem.Documentation}
               component="a"

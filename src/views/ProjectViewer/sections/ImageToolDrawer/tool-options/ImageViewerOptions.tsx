@@ -9,7 +9,12 @@ export const ImageViewerOptions = () => {
   const selectedThingIds = useSelector(selectActiveSelectedIds);
 
   return (
-    <Stack justifyContent="center" alignItems="center">
+    <Stack
+      sx={{
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       {selectedThingIds.length === 0 ? (
         <Typography variant="body2">
           Select images or objects to view.

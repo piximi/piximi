@@ -48,7 +48,11 @@ export const ModelPicker = () => {
 
   if (!kindClassifierInfo) return null;
   return (
-    <Box py={2}>
+    <Box
+      sx={{
+        py: 2,
+      }}
+    >
       <Typography gutterBottom align="left">
         {activeModel
           ? "Continue training, clone, or delete the selected model"
@@ -124,8 +128,10 @@ const ModelArchiitectureOptions = ({
       data-doc="model-picker"
       direction="row"
       spacing={2}
-      py={1}
-      justifyContent="space-evenly"
+      sx={{
+        py: 1,
+        justifyContent: "space-evenly",
+      }}
     >
       <WithLabel
         label="Model Architecture:"
@@ -225,11 +231,13 @@ const PretrainedModelOptions = ({
     <Stack
       direction="row"
       spacing={2}
-      py={1}
-      px={1}
-      justifyContent="space-between"
-      alignContent="center"
-      alignItems="center"
+      sx={{
+        py: 1,
+        px: 1,
+        justifyContent: "space-between",
+        alignContent: "center",
+        alignItems: "center",
+      }}
     >
       <Typography variant="body2" noWrap>
         {`Selected Model:  ${activeModel!.name}`}

@@ -16,15 +16,22 @@ export const MeasurementPlot = ({ children }: { children: ReactNode }) => {
 
   return (
     <Box
-      display="flex"
-      flexDirection="column"
-      width="100%"
-      height="100%"
       sx={(theme) => ({
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
         bgcolor: theme.palette.background.paper.slice(0, -1) + ",0.7)",
       })}
     >
-      <Box data-doc="plot-canvas" width="100%" height="90%" ref={plotRef}>
+      <Box
+        data-doc="plot-canvas"
+        ref={plotRef}
+        sx={{
+          width: "100%",
+          height: "90%",
+        }}
+      >
         {children}
       </Box>
       <Button

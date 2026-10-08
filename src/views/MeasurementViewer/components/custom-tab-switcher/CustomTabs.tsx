@@ -114,14 +114,16 @@ export function CustomTabs(
     (label: string) => {
       return (
         <Box
-          width={"100%"}
-          display="flex"
-          flexDirection="row"
-          justifyContent="center"
           sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+
             "& .MuiSvgIcon-root": {
               visibility: "hidden",
             },
+
             ":hover": {
               "& .MuiSvgIcon-root": {
                 visibility: "visible",
@@ -152,11 +154,13 @@ export function CustomTabs(
 
           {(editable || extendable) && (
             <Box
-              display="flex"
-              flexDirection="row"
-              flexShrink={1}
-              position="absolute"
-              right="10px"
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                flexShrink: 1,
+                position: "absolute",
+                right: "10px",
+              }}
             >
               {editable && (
                 <EditIcon
@@ -222,9 +226,12 @@ export function CustomTabs(
         })}
       >
         <Box
-          display="flex"
-          flexDirection="row"
-          sx={{ borderBottom: 1, borderColor: "divider" }}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
         >
           <Tabs
             data-help={props.tabHelp?.tabBar}
@@ -249,7 +256,13 @@ export function CustomTabs(
           {handleNew && (
             <>
               <Divider orientation="vertical" />
-              <Box display="flex" flexShrink={1} justifySelf="flex-end">
+              <Box
+                sx={{
+                  display: "flex",
+                  flexShrink: 1,
+                  justifySelf: "flex-end",
+                }}
+              >
                 <IconButton
                   data-help={props.tabHelp?.create}
                   onClick={handleNew}

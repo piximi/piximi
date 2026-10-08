@@ -160,8 +160,10 @@ export const TiffConfigurator = ({
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography
             component="em"
-            fontWeight="medium"
             color={inputError ? "error" : "inherit"}
+            sx={{
+              fontWeight: "medium",
+            }}
           >
             {tiffAnalysis.fileName}
           </Typography>
@@ -169,11 +171,18 @@ export const TiffConfigurator = ({
         <AccordionDetails sx={{ py: 1.5, px: 3 }}>
           <Stack
             direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={1}
+            sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 1,
+            }}
           >
-            <Typography variant="body2" mb={2}>
+            <Typography
+              variant="body2"
+              sx={{
+                mb: 2,
+              }}
+            >
               Detected <strong>{tiffInfo?.frameCount ?? 0} frames</strong>
             </Typography>
 
@@ -191,9 +200,20 @@ export const TiffConfigurator = ({
 
           <Divider sx={{ mb: 2 }} />
 
-          <Stack spacing={2} mb={2}>
+          <Stack
+            spacing={2}
+            sx={{
+              mb: 2,
+            }}
+          >
             {/* Dimension Order */}
-            <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: "center",
+              }}
+            >
               <Typography variant="body2">Dimension Order:</Typography>
               <FormControl size="small">
                 <Select
@@ -219,7 +239,13 @@ export const TiffConfigurator = ({
 
             {/* C / Z / T inputs */}
             <Stack direction="row" spacing={2}>
-              <Stack direction="row" alignItems="center" spacing={1}>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  alignItems: "center",
+                }}
+              >
                 <Typography variant="body2">Channels:</Typography>
                 <TextField
                   size="small"
@@ -233,7 +259,13 @@ export const TiffConfigurator = ({
                 />
               </Stack>
 
-              <Stack direction="row" alignItems="center" spacing={1}>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  alignItems: "center",
+                }}
+              >
                 <Typography variant="body2">Slices:</Typography>
                 <TextField
                   size="small"
@@ -247,7 +279,13 @@ export const TiffConfigurator = ({
                 />
               </Stack>
 
-              <Stack direction="row" alignItems="center" spacing={1}>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  alignItems: "center",
+                }}
+              >
                 <Typography variant="body2">Timepoints:</Typography>
                 <TextField
                   size="small"
