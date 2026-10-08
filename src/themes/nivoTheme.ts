@@ -1,13 +1,13 @@
 import { lightTheme, darkTheme } from "./muiTheme";
 import { ThemeMode } from "./enums";
 
-import type { Theme } from "@nivo/core";
+import type { PartialTheme } from "@nivo/theming";
 import type { ColorSchemeId } from "@nivo/colors";
 
 export const getNivoTheme = (themeMode: ThemeMode) => {
   const theme = themeMode === ThemeMode.Light ? lightTheme : darkTheme;
 
-  const nivoTheme: Theme = {
+  const nivoTheme: PartialTheme = {
     text: { fontSize: 14 },
     background: theme.palette.background.default,
     axis: {
