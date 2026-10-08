@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import { Grid2 as Grid, TextField } from "@mui/material";
+import { Grid, TextField } from "@mui/material";
 
 import { useProjectSaver } from "hooks";
 
