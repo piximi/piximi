@@ -7,7 +7,7 @@ export interface CommonTabPanelProps {
   childClassName: string;
 }
 export type CommonTabsProps = {
-  children: JSX.Element[] | JSX.Element;
+  children: React.JSX.Element[] | React.JSX.Element;
   renderLabel?: (label: string) => string;
   childClassName: string;
   labels: string[];

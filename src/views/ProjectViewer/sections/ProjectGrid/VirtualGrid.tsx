@@ -9,7 +9,7 @@ import { GRID_GAP } from "utils/constants";
 import type { GridCellData } from "./gridUtils";
 
 type VirtualGridProps<T> = {
-  gridRef: RefObject<HTMLDivElement>;
+  gridRef: RefObject<HTMLDivElement | null>;
   gridWidth: number;
   gridHeight: number;
   columnWidth: number;

@@ -178,8 +178,9 @@ export const Histogram = ({
   );
 
   const yAxisRef = useCallback(
-    (el: SVGGElement) =>
-      d3.select(el).call(d3.axisLeft(yScale).ticks(HISTOGRAM_NUM_TICKS)),
+    (el: SVGGElement) => {
+      d3.select(el).call(d3.axisLeft(yScale).ticks(HISTOGRAM_NUM_TICKS));
+    },
     [yScale],
   );
 

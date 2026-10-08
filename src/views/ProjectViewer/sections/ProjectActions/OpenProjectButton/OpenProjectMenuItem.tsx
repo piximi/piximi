@@ -76,7 +76,7 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
   };
 
   const handleOpenFilePicker = async (
-    ref: React.RefObject<HTMLInputElement>,
+    ref: React.RefObject<HTMLInputElement | null>,
   ) => {
     const confirmation = await getConfirmation({});
     if (confirmation && ref.current) ref.current.click();

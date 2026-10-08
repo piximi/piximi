@@ -68,7 +68,9 @@ export const WelcomeScreen = () => {
 
     event.target.value = "";
   };
-  const handleOpenFilePicker = (ref: React.RefObject<HTMLInputElement>) => {
+  const handleOpenFilePicker = (
+    ref: React.RefObject<HTMLInputElement | null>,
+  ) => {
     setUploadMenuAnchor(null);
     ref.current?.click();
   };

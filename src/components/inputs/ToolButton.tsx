@@ -87,7 +87,7 @@ export const PopperToolButton = ({
   popperPlacement?: PopperProps["placement"];
   clickAway?: boolean;
 }) => {
-  const popperAnchorRef = useRef<HTMLElement | null>();
+  const popperAnchorRef = useRef<HTMLElement | null>(null);
   const [popperAnchor, setPopperAnchor] = useState<HTMLElement | null>(null);
   const handleTogglePopper = () => {
     setPopperAnchor((el) => (el ? null : popperAnchorRef.current!));

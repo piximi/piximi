@@ -48,7 +48,7 @@ export const AlertBar = ({
   const [colorTheme, setColorTheme] = useState<PaletteColor>(
     theme.palette.primary,
   );
-  const [errorStateIcon, setErrorStateIcon] = useState<JSX.Element>();
+  const [errorStateIcon, setErrorStateIcon] = useState<React.JSX.Element>();
   const [issueDescription, setIssueDescription] = useState("");
 
   useEffect(() => {
