@@ -6,13 +6,13 @@ import {
   selectTextOnScroll,
 } from "store/applicationSettings/selectors";
 
-import type { CSSProperties } from "react";
+import type { SystemStyleObject } from "@mui/system";
 
 export const useGridItemStyle = (selected: boolean) => {
   const imageSelectionColor = useSelector(selectImageSelectionColor);
   const selectedImageBorderWidth = useSelector(selectSelectedImageBorderWidth);
   const textOnScroll = useSelector(selectTextOnScroll);
-  const containerStyle: CSSProperties = {
+  const containerStyle: SystemStyleObject = {
     position: "relative",
     boxSizing: "content-box",
     border: `solid ${selectedImageBorderWidth}px ${

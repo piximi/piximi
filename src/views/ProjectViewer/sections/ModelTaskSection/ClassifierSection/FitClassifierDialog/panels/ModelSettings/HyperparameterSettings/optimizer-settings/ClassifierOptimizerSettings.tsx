@@ -1,10 +1,4 @@
-import {
-  Collapse,
-  Divider,
-  Grid2 as Grid,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Collapse, Divider, Grid, Stack, Typography } from "@mui/material";
 
 import {
   BatchSize,

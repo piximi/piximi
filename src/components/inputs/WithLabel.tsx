@@ -1,7 +1,8 @@
 import { Typography, Stack, FormControl } from "@mui/material";
 
-import type { CSSProperties, ReactChild } from "react";
+import type { ReactChild } from "react";
 
+import type { SystemStyleObject } from "@mui/system";
 import type { TypographyProps } from "@mui/material";
 
 import type { HTMLDataAttributes } from "utils/types";
@@ -18,7 +19,7 @@ export const WithLabel = ({
   labelProps: Omit<TypographyProps, "children">;
   children: ReactChild;
   fullWidth?: boolean;
-  sx?: CSSProperties;
+  sx?: SystemStyleObject;
 }) => {
   return (
     <Stack

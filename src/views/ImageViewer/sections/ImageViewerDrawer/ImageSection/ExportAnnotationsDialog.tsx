@@ -35,7 +35,7 @@ export const ExportAnnotationsDialog = ({
       title="Export Annotations"
       content={
         <Grid container spacing={1}>
-          <Grid item xs={10}>
+          <Grid size={10}>
             <TextField
               autoFocus
               fullWidth
