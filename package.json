@@ -169,12 +169,5 @@
       "last 1 safari version"
     ]
   },
-  "devEngines": {
-    "runtime": {
-      "name": "node",
-      "version": "20.x",
-      "onFail": "download"
-    }
-  },
   "private": true
 }
