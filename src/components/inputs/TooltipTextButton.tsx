@@ -4,7 +4,7 @@ import { Button, Tooltip } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import type { ButtonProps } from "@mui/material";
+import type { ButtonProps, SvgIconProps } from "@mui/material";
 
 import type { HelpItem } from "help/HelpContent";
 
@@ -12,8 +12,8 @@ type TooltipTextButtonProps = Omit<
   ButtonProps,
   "onClick" | "startIcon" | "endIcon"
 > & {
-  startIcon?: ReactElement;
-  endIcon?: ReactElement;
+  startIcon?: ReactElement<SvgIconProps>;
+  endIcon?: ReactElement<SvgIconProps>;
   label: string;
   tooltipText: string;
   dataHelp?: HelpItem;
@@ -46,13 +46,11 @@ export const TooltipTextButton = ({
         >
           {startIcon &&
             cloneElement(startIcon, {
-              size: ICON_SIZE,
               sx: { fontSize: ICON_SIZE, mr: 0.5 },
             })}
           {t(label)}
           {endIcon &&
             cloneElement(endIcon, {
-              size: ICON_SIZE,
               sx: { fontSize: ICON_SIZE, ml: 0.5 },
             })}
         </Button>

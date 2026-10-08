@@ -1,6 +1,6 @@
 import { Typography, Stack, FormControl } from "@mui/material";
 
-import type { ReactChild } from "react";
+import type { ReactElement } from "react";
 
 import type { SystemStyleObject } from "@mui/system";
 import type { TypographyProps } from "@mui/material";
@@ -17,7 +17,7 @@ export const WithLabel = ({
 }: HTMLDataAttributes & {
   label: string;
   labelProps: Omit<TypographyProps, "children">;
-  children: ReactChild;
+  children: ReactElement | string | number;
   fullWidth?: boolean;
   sx?: SystemStyleObject;
 }) => {

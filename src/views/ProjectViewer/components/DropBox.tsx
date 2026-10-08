@@ -22,7 +22,9 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
   return (
     <>
       <Box
-        ref={dropTarget}
+        ref={(el: HTMLElement | null) => {
+          dropTarget(el);
+        }}
         sx={(theme) => ({
           transition: theme.transitions.create("margin", {
             duration: theme.transitions.duration.enteringScreen,

@@ -30,23 +30,23 @@ import type {
 
 const TabContext = createContext<number>(0);
 
-export function CustomTabs(props: CommonTabsProps): JSX.Element;
+export function CustomTabs(props: CommonTabsProps): React.JSX.Element;
 export function CustomTabs(
   props: CommonTabsProps & ExtendableTabsProps,
-): JSX.Element;
+): React.JSX.Element;
 
 export function CustomTabs(
   props: CommonTabsProps & EditableTabsProps,
-): JSX.Element;
+): React.JSX.Element;
 export function CustomTabs(
   props: CommonTabsProps & EditableTabsProps & ExtendableTabsProps,
-): JSX.Element;
+): React.JSX.Element;
 
 export function CustomTabs(
   props: CommonTabsProps &
     Partial<ExtendableTabsProps> &
     Partial<EditableTabsProps>,
-): JSX.Element {
+): React.JSX.Element {
   const {
     children,
     childClassName = "custom-tabs",
@@ -276,7 +276,7 @@ export function CustomTabs(
         </Box>
 
         {transition === "basic" &&
-          (children as JSX.Element[]).map((child, idx) => (
+          (children as React.JSX.Element[]).map((child, idx) => (
             <BasicTabPanel
               key={`${childClassName}-${idx}`}
               value={tabIndex}

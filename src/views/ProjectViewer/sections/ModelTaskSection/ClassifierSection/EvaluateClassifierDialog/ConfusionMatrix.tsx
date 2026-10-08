@@ -81,7 +81,7 @@ export const ConfusionMatrix = ({
         }}
         animate={false}
         emptyColor="#555555"
-        tooltip={(_x, _y) => <div></div>}
+        tooltip={(_loc) => <></>}
       />
     </div>
   );
