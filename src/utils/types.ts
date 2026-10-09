@@ -100,15 +100,14 @@ export type HotkeyHandlerItem = {
 };
 
 export type HotkeyOptions = {
-  enabled?: boolean; // Main setting that determines if the hotkey is enabled or not. (Default: true)
-  filter?: Function; // A filter function returning whether the callback should get triggered or not. (Default: undefined)
-  filterPreventDefault?: boolean; // Prevent default browser behavior if the filter function returns false. (Default: true)
-  enableOnTags?: HotkeyAvailableTags[]; // Enable hotkeys on a list of tags. (Default: [])
-  enableOnContentEditable?: boolean; // Enable hotkeys on tags with contentEditable props. (Default: false)
-  splitKey?: string; // Character to split keys in hotkeys combinations. (Default +)
-  scope?: string; // Scope. Currently not doing anything.
-  keyup?: boolean; // Trigger on keyup event? (Default: undefined)
-  keydown?: boolean; // Trigger on keydown event? (Default: true)
+  enabled?: boolean; // Bind the hotkey at all. (Default: true)
+  filter?: (event: KeyboardEvent) => boolean; // Return false to skip the callback. (Default: undefined)
+  filterPreventDefault?: boolean; // Prevent default browser behavior if the filter returns false. (Default: true)
+  enableOnTags?: HotkeyAvailableTags[]; // Enable hotkeys on these tags. (Default: [])
+  enableOnContentEditable?: boolean; // Enable hotkeys on contentEditable elements. (Default: false)
+  splitKey?: string; // Character to split keys in combinations. (Default: +)
+  keyup?: boolean; // Trigger on keyup. (Default: false)
+  keydown?: boolean; // Trigger on keydown. (Default: true, or false when keyup is set)
 };
 
 /*

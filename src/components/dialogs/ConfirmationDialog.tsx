@@ -61,7 +61,6 @@ export const ConfirmationDialog = ({
       enabled: isOpen,
       filterPreventDefault: false,
     },
-    [handleConfirm, confirmDisabled],
   );
 
   return (

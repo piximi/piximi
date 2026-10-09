@@ -96,14 +96,12 @@ export const useGridActions = () => {
       selectedFilteredItemIds.length > 0 && handleDeselectAll();
     },
     HotkeyContext.ProjectView,
-    [handleDeselectAll, selectedFilteredItemIds],
   );
 
   useHotkeys(
     "control+a",
     () => !allSelected && handleSelectAll(),
     HotkeyContext.ProjectView,
-    [handleSelectAll],
   );
 
   return {

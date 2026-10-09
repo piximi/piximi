@@ -39,6 +39,5 @@ export const useEscapeHotkey = (annotationTool: AnnotationTool) => {
       }
     },
     HotkeyContext.AnnotatorView,
-    [annotationTool, cancel, hasUpdates, hasSelection, dispatch],
   );
 };

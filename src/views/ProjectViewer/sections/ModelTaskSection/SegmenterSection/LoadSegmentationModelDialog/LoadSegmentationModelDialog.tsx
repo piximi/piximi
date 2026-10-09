@@ -155,8 +155,6 @@ export const LoadSegmentationModelDialog = ({
       selectedModel && handleLoadModel();
     },
     HotkeyContext.ConfirmationDialog,
-
-    [handleLoadModel, selectedModel],
   );
 
   useEffect(() => {
