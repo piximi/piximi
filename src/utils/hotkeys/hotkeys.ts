@@ -251,7 +251,7 @@ type Option = {
   capture: boolean;
   splitKey: string;
 };
-function hotkeys(hotkeys: string, option: Option, method: Function) {
+function hotkeys(hotkeys: string, option: Partial<Option>, method: Function) {
   _downKeys = [];
   const keyList = getKeys(hotkeys); // Determine if element has bound events
   let mods: number[] = [];

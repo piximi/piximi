@@ -58,7 +58,6 @@ export const GridActions = ({ viewState }: { viewState: ViewState }) => {
       selectedFilteredItemIds.length > 0 && onOpenDeleteImagesDialog();
     },
     HotkeyContext.ProjectView,
-    [selectedFilteredItemIds],
   );
   return (
     <Box

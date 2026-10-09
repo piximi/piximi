@@ -202,7 +202,6 @@ export const SelectionButtons = ({
       }
     },
     HotkeyContext.AnnotatorView,
-    [canConfirm, confirm],
   );
 
   return (
