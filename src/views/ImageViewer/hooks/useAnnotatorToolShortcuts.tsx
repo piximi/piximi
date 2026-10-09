@@ -94,21 +94,17 @@ export const useAnnotatorToolShortcuts = () => {
       if (!activeImageId) {
         return;
       }
-
       const activeImageIdx = images.findIndex(
         (imageId) => imageId === activeImageId,
       );
       if (activeImageIdx < 1) {
         return;
       }
-
       const newActiveImageId = images[activeImageIdx - 1];
       dispatch(imageViewerDataSlice.actions.setActiveImageId(newActiveImageId));
     },
     HotkeyContext.AnnotatorView,
-    [images, activeImageId],
   );
-
   useHotkeys(
     "down",
     () => {
@@ -127,6 +123,5 @@ export const useAnnotatorToolShortcuts = () => {
       dispatch(imageViewerDataSlice.actions.setActiveImageId(newActiveImageId));
     },
     HotkeyContext.AnnotatorView,
-    [images, activeImageId],
   );
 };

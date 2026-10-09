@@ -123,8 +123,6 @@ export const ProjectViewerCategories = () => {
       }
     },
     [HotkeyContext.ProjectView],
-
-    [],
   );
 
   useHotkeys(
@@ -137,7 +135,6 @@ export const ProjectViewerCategories = () => {
       }
     },
     [HotkeyContext.ProjectView],
-    [],
   );
 
   useHotkeys(
@@ -166,7 +163,6 @@ export const ProjectViewerCategories = () => {
     },
     [HotkeyContext.ProjectView],
     { keyup: true, enabled: true },
-    [dispatch, selectedEntityIds],
   );
 
   useHotkeys(
@@ -176,7 +172,6 @@ export const ProjectViewerCategories = () => {
     },
     [HotkeyContext.ProjectView],
     { enabled: true },
-    [dispatch, selectedEntityIds],
   );
 
   useEffect(() => {

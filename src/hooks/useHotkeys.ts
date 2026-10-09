@@ -1,5 +1,4 @@
-//@ts-nocheck TODO
-import { useCallback, useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -38,46 +37,22 @@ export function useHotkeys(
   keys: string,
   callback: HotkeyKeyHandler,
   hotkeyContext: HotkeyContext | Array<HotkeyContext>,
-  options?: HotkeyOptions,
-): void;
-export function useHotkeys(
-  keys: string,
-  callback: HotkeyKeyHandler,
-  hotkeyContext: HotkeyContext | Array<HotkeyContext>,
-  deps?: any[],
-): void;
-export function useHotkeys(
-  keys: string,
-  callback: HotkeyKeyHandler,
-  hotkeycontext: HotkeyContext | Array<HotkeyContext>,
-  options?: HotkeyOptions,
-  deps?: any[],
-): void;
-export function useHotkeys(
-  keys: string,
-  callback: () => void,
-  hotkeyContext: HotkeyContext | Array<HotkeyContext>,
-  options?: any[] | HotkeyOptions,
-  deps?: any[],
+  options: HotkeyOptions = {},
 ): void {
-  if (options instanceof Array) {
-    deps = options;
-    options = undefined;
-  }
-
   const {
     enableOnTags,
     filter,
-    keyup,
-    keydown,
     filterPreventDefault = true,
     enabled = true,
     enableOnContentEditable = false,
-  } = (options as HotkeyOptions) || {};
+    keyup,
+    keydown,
+    splitKey,
+  } = options;
   const currentHotkeyContext = useSelector(selectHotkeyContext);
   // The return value of this callback determines if the browsers default behavior is prevented.
 
-  const memoisedCallback = useCallback(
+  const onKey = useEffectEvent(
     (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => {
       if (filter && !filter(keyboardEvent)) {
         return !filterPreventDefault;
@@ -105,27 +80,19 @@ export function useHotkeys(
 
       return false;
     },
-    deps
-      ? [hotkeyContext, currentHotkeyContext, enableOnTags, filter, ...deps]
-      : [hotkeyContext, currentHotkeyContext, enableOnTags, filter],
   );
 
   useEffect(() => {
-    if (!enabled) {
-      hotkeys.unbind(keys, memoisedCallback);
+    if (!enabled) return;
 
-      return;
-    }
+    const handler = (e: KeyboardEvent, he: HotkeysEvent) => onKey(e, he);
+    // hotkeys defaults keydown to true, so a keyup-only binding must opt out explicitly.
+    hotkeys(
+      keys,
+      { keyup, keydown: keyup && keydown !== true ? false : keydown, splitKey },
+      handler,
+    );
 
-    // In this case keydown is likely undefined, so we set it to false,
-    // since hotkeys sets `keydown` to true in absense of explicit setting.
-    if (keyup && keydown !== true) {
-      (options as HotkeyOptions).keydown = false;
-    }
-    hotkeys(keys, (options as HotkeyOptions) || {}, memoisedCallback);
-
-    return () => {
-      hotkeys.unbind(keys, memoisedCallback);
-    };
-  }, [keyup, keydown, options, memoisedCallback, keys, enabled]);
+    return () => hotkeys.unbind(keys, handler);
+  }, [keys, enabled, keyup, keydown, splitKey]);
 }
