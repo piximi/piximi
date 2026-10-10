@@ -24,7 +24,6 @@ export const StyledSelect = (props: StyledSelectProps) => {
       MenuProps={{
         sx: {
           py: 0,
-          "& .MuiList-root-MuiMenu-list": { py: 0 },
           "& li": {
             minHeight: "1rem",
             borderRadius: 0,
@@ -38,7 +37,6 @@ export const StyledSelect = (props: StyledSelectProps) => {
             dense: true,
             sx: {
               py: 0,
-              display: "none",
             },
           },
           paper: {
