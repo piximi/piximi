@@ -19,7 +19,7 @@ export const rgbToHex = (rgb: [number, number, number]) => {
 
 export const getRandomHex = () => {
   const hexArr = Array.from({ length: 3 }, () =>
-    getRandomInt(0, 255).toString(16),
+    getRandomInt(0, 255).toString(16).padStart(2, "0"),
   );
   return "#" + hexArr.join("");
 };
