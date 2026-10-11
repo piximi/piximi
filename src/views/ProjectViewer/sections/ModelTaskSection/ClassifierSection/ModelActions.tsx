@@ -117,6 +117,7 @@ const PredictClassifierButton = ({
     selectModelIsTrained,
     modelTarget,
   );
+
   const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
   const predictClassifier = usePredictClassifier();
   const handlePredict = async () => {
@@ -155,8 +156,8 @@ const PredictClassifierButton = ({
       onClick={handlePredict}
       disabled={predictionDisabled}
       startIcon={
-        modelStatus === "predicting" ? (
-          <CircularProgress disableShrink />
+        modelStatus === "idle" ? (
+          <CircularProgress disableShrink size={"1.15em"} />
         ) : (
           <LabelImportantIcon />
         )
