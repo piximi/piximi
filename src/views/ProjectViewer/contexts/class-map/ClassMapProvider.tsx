@@ -13,6 +13,7 @@ export const ClassMapDialogProvider = ({
 }: {
   children: ReactElement;
 }) => {
+  const [session, setSession] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogConfig, setDialogConfig] = useState<{
     projectCategories: Category[];
@@ -29,6 +30,7 @@ export const ClassMapDialogProvider = ({
     modelClasses: string[];
     actionCallback: any;
   }) => {
+    setSession((n) => n + 1);
     setDialogOpen(true);
     setDialogConfig({ projectCategories, modelClasses, actionCallback });
   };
@@ -55,6 +57,7 @@ export const ClassMapDialogProvider = ({
   return (
     <ClassMapDialogContext.Provider value={{ openDialog }}>
       <ClassMapDialog
+        key={session}
         open={dialogOpen}
         projectCategories={dialogConfig.projectCategories}
         modelClasses={dialogConfig.modelClasses}
