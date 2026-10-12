@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import {
+  Box,
   Button,
   Checkbox,
   Dialog,
@@ -11,12 +12,13 @@ import {
   DialogContentText,
   FormControl,
   FormControlLabel,
+  Grid,
   MenuItem,
   Stack,
   Typography,
 } from "@mui/material";
 
-import { generateCategory, CATEGORY_COLORS } from "core/entities";
+import { generateCategory } from "core/entities";
 
 import { StyledSelect } from "components/inputs";
 import { DialogTitleBar } from "components/ui/DialogTitleBar";
@@ -24,11 +26,9 @@ import { DialogTitleBar } from "components/ui/DialogTitleBar";
 import { dataSlice } from "store/data";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
-import { getRandomInt } from "utils/dataUtils";
-import { isObjectEmpty } from "utils/objectUtils";
+import { getRestrictedRandomHex } from "utils/colorUtils";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { selectAvaliableCategoryColors } from "@ProjectViewer/state/reselectors";
 
 import type { SelectChangeEvent } from "@mui/material";
 
@@ -49,25 +49,24 @@ export const ClassMapDialog = ({
   onDismiss: () => void;
 }) => {
   const dispatch = useDispatch();
-  const [catMap, setCatMap] = useState<ModelClassMap>({});
-  const [assignedClasses, setAssignedClasses] = useState<string[]>([]);
+  const [catMap, setCatMap] = useState<ModelClassMap>(() =>
+    Object.fromEntries(modelClasses.map((_, idx) => [idx, ""])),
+  );
+  const assignedCategoryIds = new Set(Object.values(catMap).filter(Boolean));
   const [shouldCreateCategories, setShouldCreateCategories] = useState<boolean>(
     projectCategories.length === 0,
   );
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const availableCategoryColors = useSelector(selectAvaliableCategoryColors);
 
   const handleConfirmation = () => {
     if (shouldCreateCategories) {
       const newCategories: Category[] = [];
       const confirmedCatMap: ModelClassMap = {};
+      const existingColors: string[] = [];
       modelClasses.forEach((className, idx) => {
-        let color = availableCategoryColors.pop();
-        if (!color) {
-          const choices = Object.values(CATEGORY_COLORS);
-          color = choices[getRandomInt(0, choices.length)] as string;
-        }
         let cat: Category;
+        const color = getRestrictedRandomHex(existingColors);
+        existingColors.push(color);
         if (modelTarget === IMAGE_CLASSIFIER_ID) {
           cat = generateCategory(className, color, { type: "image" });
         } else {
@@ -92,20 +91,7 @@ export const ClassMapDialog = ({
   ) => {
     const catId = event.target.value as string;
     setCatMap((catMap) => ({ ...catMap, [modelClassIndex]: catId }));
-    setAssignedClasses((classes) => {
-      classes.push(catId);
-      return classes;
-    });
   };
-
-  useEffect(() => {
-    setCatMap(
-      modelClasses.reduce((map: ModelClassMap, className, idx) => {
-        map[idx] = "";
-        return map;
-      }, {}),
-    );
-  }, [projectCategories]);
 
   return (
     <Dialog open={open} onClose={onDismiss}>
@@ -114,55 +100,79 @@ export const ClassMapDialog = ({
         closeDialog={onDismiss}
       />
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText sx={{ mb: 2 }}>
           {"Map project categories to the model's pretrained classes"}
         </DialogContentText>
-        <Stack sx={{ maxHeight: "400px", overflowY: "scroll", px: 2, py: 2 }}>
-          {modelClasses.length > 0 ? (
-            Object.values(modelClasses).map((idx) => (
-              <Stack
-                key={`model-class-${idx}`}
-                direction="row"
-                sx={{
-                  justifyContent: "space-between",
-                  px: 2,
-                }}
-              >
-                <Typography variant="body2">{idx}</Typography>
-                <StyledSelect
-                  value={catMap[+idx]}
-                  onChange={(event) => handleSelectChange(event, +idx)}
-                  disabled={shouldCreateCategories}
-                >
-                  {projectCategories.map((category) => (
-                    <MenuItem
-                      key={category.id}
-                      dense
-                      value={category.id}
-                      disabled={assignedClasses.includes(category.id)}
-                      sx={{
-                        borderRadius: 0,
-                        minHeight: "1rem",
-                      }}
-                    >
-                      {category.name}
-                    </MenuItem>
-                  ))}
-                </StyledSelect>
-              </Stack>
-            ))
-          ) : (
-            <Typography
-              variant="body2"
+
+        {modelClasses.length > 0 ? (
+          <Box sx={{ width: "60%", mx: "auto", mb: 2 }}>
+            <Grid
+              container
+              rowSpacing={1}
               sx={{
-                textAlign: "center",
-                width: "100%",
+                borderBottom: "1px solid var(--mui-palette-text-primary)",
+                mb: 1,
               }}
             >
-              No categories to map
-            </Typography>
-          )}
-        </Stack>
+              <Grid size={6}>
+                <Typography variant="body2">Model Classes</Typography>
+              </Grid>
+              <Grid size={6} sx={{ justifyContent: "flex-end" }}>
+                <Typography variant="body2" sx={{ textAlign: "right" }}>
+                  Project Categories
+                </Typography>
+              </Grid>
+            </Grid>
+            <Box sx={{ px: 2, maxHeight: "300px", overflowY: "scroll" }}>
+              <Grid container rowSpacing={1}>
+                {modelClasses.map((className, idx) => (
+                  <Fragment key={`model-class-${idx}`}>
+                    <Grid size={6}>
+                      <Typography variant="body2">{className}</Typography>
+                    </Grid>
+                    <Grid
+                      size={6}
+                      sx={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <StyledSelect
+                        value={catMap[idx]}
+                        variant="standard"
+                        onChange={(event) => handleSelectChange(event, idx)}
+                        disabled={shouldCreateCategories}
+                      >
+                        {projectCategories.map((category) => (
+                          <MenuItem
+                            key={category.id}
+                            dense
+                            value={category.id}
+                            disabled={assignedCategoryIds.has(category.id)}
+                            sx={{
+                              borderRadius: 0,
+                              minHeight: "1rem",
+                            }}
+                          >
+                            {category.name}
+                          </MenuItem>
+                        ))}
+                      </StyledSelect>
+                    </Grid>
+                  </Fragment>
+                ))}
+              </Grid>
+            </Box>
+          </Box>
+        ) : (
+          <Typography
+            variant="body2"
+            sx={{
+              textAlign: "center",
+              width: "100%",
+            }}
+          >
+            No categories to map
+          </Typography>
+        )}
+
         <Stack
           direction="row"
           sx={{
@@ -196,7 +206,10 @@ export const ClassMapDialog = ({
           color="primary"
           variant="contained"
           onClick={handleConfirmation}
-          disabled={!shouldCreateCategories && isObjectEmpty(catMap)}
+          disabled={
+            (!shouldCreateCategories && Object.values(catMap).includes("")) ||
+            modelClasses.length === 0
+          }
         >
           Confirm
         </Button>
