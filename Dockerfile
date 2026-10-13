@@ -1,20 +1,13 @@
-FROM ghcr.io/pnpm/pnpm:11.2.2 AS base
+# syntax=docker/dockerfile:1
+FROM ghcr.io/pnpm/pnpm:11.2.2 AS build
 RUN pnpm runtime set node 20 -g
 WORKDIR /piximi
 COPY . .
-
-FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/var/cache/pnpm \
-    pnpm install --store-dir /var/cache/pnpm --no-frozen-lockfile --dangerously-allow-all-builds
-
-FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/var/cache/pnpm \
-    pnpm install --store-dir /var/cache/pnpm --no-frozen-lockfile --dangerously-allow-all-builds
+    pnpm install --store-dir /var/cache/pnpm --frozen-lockfile --dangerously-allow-all-builds
 RUN pnpm run build
 
-FROM base
-COPY --from=prod-deps /piximi/node_modules /piximi/node_modules
-COPY --from=build /piximi/dist /piximi/dist
-COPY --from=build /piximi/src /piximi/src
+FROM nginx:alpine
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /piximi/dist /usr/share/nginx/html
 EXPOSE 3000
-CMD ["pnpm", "start", "--host"]
