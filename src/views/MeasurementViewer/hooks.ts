@@ -9,8 +9,6 @@ import { INTENSITY_MEASUREMENTS } from "core/entities";
 import { useDialogHotkey } from "hooks";
 
 import {
-  selectAllExtendedAnnotations,
-  selectAllImages,
   selectCategoryEntities,
   selectExtendedImageEntities,
 } from "store/data/selectors";
@@ -101,8 +99,6 @@ export const useTableExport = () => {
 };
 
 export const useCreateMeasurementTable = () => {
-  const images = useSelector(selectAllImages);
-  const annotations = useSelector(selectAllExtendedAnnotations);
   const dispatch = useDispatch();
 
   const {
@@ -117,15 +113,11 @@ export const useCreateMeasurementTable = () => {
         ? {
             groupType: "images" as const,
             displayName: "Images",
-            itemIds: images.map((i) => i.id),
           }
         : {
             groupType: "objects" as const,
             kindId,
             displayName: name,
-            itemIds: annotations
-              .filter((a) => a.kindId === kindId)
-              .map((a) => a.id),
           };
     dispatch(measurementsSlice.actions.createGroup(groupParams));
   };
