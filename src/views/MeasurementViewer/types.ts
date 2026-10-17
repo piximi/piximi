@@ -102,7 +102,6 @@ export type BaseMeasurementGroup = {
     timepoint?: string[];
   };
   pivotItems?: PivotItem[];
-  entityIds: string[];
   plots: Record<string, PlotDetail>;
   selectedPlotId: string | undefined;
 };

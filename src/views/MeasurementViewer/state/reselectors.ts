@@ -2,8 +2,9 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import {
   INTENSITY_MEASUREMENTS,
-  type AnnotationObject,
   type Category,
+  type ExtendedAnnotationObject,
+  type ExtendedImageObject,
   type ImageObject,
 } from "core/entities";
 
@@ -26,31 +27,12 @@ import type {
   ParsedMeasurementData,
 } from "../types";
 
-export const selectActiveMeasuredEntities = createSelector(
-  selectActiveMeasurementGroup,
-  selectExtendedImageEntities,
-  selectExtendedAnnotationEntities,
-  (activeGroup, images, annotations) => {
-    if (!activeGroup) return {};
-    if ("kind" in activeGroup)
-      return activeGroup.entityIds.reduce(
-        (entityDict: Record<string, AnnotationObject>, id) => {
-          entityDict[id] = annotations[id];
-          return entityDict;
-        },
-        {},
-      );
-    else
-      return activeGroup.entityIds.reduce(
-        (entityDict: Record<string, ImageObject>, id) => {
-          entityDict[id] = images[id];
-          return entityDict;
-        },
-        {},
-      );
-  },
-);
-
+/**
+ * Group membership is derived rather than stored: an object group holds every
+ * annotation of its kind and an image group holds every image. Deriving it
+ * keeps the tables in step with additions, deletions and kind changes, and
+ * means a group can never reference an entity that no longer exists.
+ */
 export const selectActiveMeasuredEntitiesGroup = createSelector(
   selectActiveMeasurementGroup,
   selectExtendedImageEntities,
@@ -64,13 +46,29 @@ export const selectActiveMeasuredEntitiesGroup = createSelector(
     if ("kind" in activeGroup)
       return {
         ...activeGroup,
-        entities: activeGroup.entityIds.map((id) => annotations[id]),
+        entities: Object.values(annotations).filter(
+          (annotation) => annotation.kindId === activeGroup.kind,
+        ),
       };
     else
       return {
         ...activeGroup,
-        entities: activeGroup.entityIds.map((id) => images[id]),
+        entities: Object.values(images),
       };
+  },
+);
+
+export const selectActiveMeasuredEntities = createSelector(
+  selectActiveMeasuredEntitiesGroup,
+  (activeGroup) => {
+    const entityDict: Record<
+      string,
+      ExtendedAnnotationObject | ExtendedImageObject
+    > = {};
+    for (const entity of activeGroup?.entities ?? []) {
+      entityDict[entity.id] = entity;
+    }
+    return entityDict;
   },
 );
 
