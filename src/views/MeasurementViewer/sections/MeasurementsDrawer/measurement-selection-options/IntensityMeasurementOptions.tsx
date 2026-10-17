@@ -14,6 +14,7 @@ import { getDifferences } from "utils/arrayUtils";
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
 import { measurementsSlice } from "@MeasurementViewer/state";
 import {
+  INTENSE_MEAS_LABELS,
   INTENSE_MEAS_LOOKUP,
   toChannelMeasurementLabel,
 } from "@MeasurementViewer/utils";
@@ -46,7 +47,7 @@ export const IntensityMeasurementOptions = ({
 
           children: INTENSITY_MEASUREMENTS.map((key) => ({
             id: key,
-            label: capitalize(key),
+            label: INTENSE_MEAS_LABELS[key],
             children: channelMetas.map((cm) => ({
               id: toChannelMeasurementLabel(cm.name, key),
               label: capitalize(cm.name),
