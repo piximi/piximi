@@ -109,11 +109,10 @@ const PredictClassifierButton = ({
   modelStatus: ModelLifecycleStatus;
 }) => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const { error } = useClassifierStatus();
-  const activeRuns = useParameterizedSelector(
-    selectRunsForActiveModel,
-    modelTarget,
-  );
+  // Read the channel gate directly rather than through `error`: that is only
+  // the most severe error, so a severity-1 one (e.g. an inference-only model)
+  // would hide a channel mismatch and leave Predict enabled.
+  const { precheck, activeErrors } = useClassifierStatus();
   const modelIsTrained = useParameterizedSelector(
     selectModelIsTrained,
     modelTarget,
@@ -123,25 +122,32 @@ const PredictClassifierButton = ({
   const handlePredict = async () => {
     await predictClassifier();
   };
-  const helperText = useMemo(() => {
-    switch (modelStatus) {
-      case "idle":
-        return activeRuns.length > 0 ? "Predict Model" : "No Trained Model";
-      case "predicting":
-        return "...Predicting";
-      default:
-        return "...Pending";
-    }
-  }, [modelStatus, activeRuns]);
 
-  const predictionDisabled = useMemo(
-    () =>
-      !modelIsTrained ||
-      modelStatus !== "idle" ||
-      totalUnlabeledItems === 0 ||
-      error?.reason === ErrorReason.ChannelMismatch,
-    [modelIsTrained, modelStatus, totalUnlabeledItems, error],
-  );
+  // Ordered so the tooltip names the reason the button is disabled.
+  const helperText = useMemo(() => {
+    if (modelStatus === "predicting") return "...Predicting";
+    if (modelStatus !== "idle") return "...Pending";
+    if (!modelIsTrained) return "No Trained Model";
+    if (!precheck.channelsValid)
+      return (
+        activeErrors.find((e) => e.reason === ErrorReason.ChannelMismatch)
+          ?.message ?? "Model input channels do not match the visible channels"
+      );
+    if (totalUnlabeledItems === 0) return "No unlabeled items to predict";
+    return "Predict Model";
+  }, [
+    modelStatus,
+    modelIsTrained,
+    precheck.channelsValid,
+    activeErrors,
+    totalUnlabeledItems,
+  ]);
+
+  const predictionDisabled =
+    !modelIsTrained ||
+    modelStatus !== "idle" ||
+    totalUnlabeledItems === 0 ||
+    !precheck.channelsValid;
 
   return (
     <TooltipTextButton

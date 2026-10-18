@@ -26,7 +26,7 @@ import {
 import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
-import { selectExperimentChannels } from "store/data/selectors";
+import { selectVisibleChannelCount } from "store/data/selectors";
 
 import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
 import {
@@ -118,7 +118,7 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
 
 const useModelParams = () => {
   const dispatch = useDispatch();
-  const experimentChannels = useSelector(selectExperimentChannels);
+  const visibleChannels = useSelector(selectVisibleChannelCount);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const modelPreprocessingSettings = useParameterizedSelector(
     selectModelPreprocessSettings,
@@ -132,7 +132,7 @@ const useModelParams = () => {
   const [userDefinedSeed, setUserDefinedSeed] = useState<number | undefined>();
 
   const [newModelParams, updateNewModelParams] = useImmer(
-    getDefaultModelParams(experimentChannels),
+    getDefaultModelParams(visibleChannels || undefined),
   );
   const modelParams = useMemo(() => {
     if (modelPreprocessingSettings && modelOptimizerSettings)
@@ -202,8 +202,8 @@ const useModelParams = () => {
       });
       return;
     }
-    handleSetModelParams(getDefaultModelParams(experimentChannels));
-  }, [modelOptimizerSettings, modelPreprocessingSettings, experimentChannels]);
+    handleSetModelParams(getDefaultModelParams(visibleChannels || undefined));
+  }, [modelOptimizerSettings, modelPreprocessingSettings, visibleChannels]);
   return {
     modelParams,
     newModelName,
@@ -241,7 +241,7 @@ export const ClassifierStatusProvider = ({
     modelTarget,
   );
   const activeLabeledItems = useSelector(selectActiveLabeledItems);
-  const experimentChannels = useSelector(selectExperimentChannels);
+  const visibleChannels = useSelector(selectVisibleChannelCount);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
@@ -277,8 +277,8 @@ export const ClassifierStatusProvider = ({
         representsUnknown(item.categoryId),
       ),
       channelsValid:
-        modelChannels && experimentChannels
-          ? experimentChannels === modelChannels
+        modelChannels && visibleChannels
+          ? visibleChannels === modelChannels
           : true,
       modelNameValid:
         !!modelConfig ||
@@ -287,7 +287,7 @@ export const ClassifierStatusProvider = ({
     }),
     [
       modelConfig,
-      experimentChannels,
+      visibleChannels,
       newModelName,
       restrictedClassifierNames,
       modelIsValid,
@@ -327,7 +327,7 @@ export const ClassifierStatusProvider = ({
     if (!precheck.channelsValid) {
       newErrors.push({
         reason: ErrorReason.ChannelMismatch,
-        message: `The number of model input channels (${modelChannels}) must match the images in the project (${experimentChannels})`,
+        message: `The model expects ${modelChannels} input channels, but ${visibleChannels} ${visibleChannels === 1 ? "channel is" : "channels are"} visible. Only visible channels are used: show or hide channels to match, or change the input shape.`,
         severity: 2,
       });
     }
@@ -348,7 +348,7 @@ export const ClassifierStatusProvider = ({
     }
 
     return newErrors;
-  }, [precheck, experimentChannels, newModelName, modelChannels]);
+  }, [precheck, visibleChannels, newModelName, modelChannels]);
 
   const error = useMemo(
     () =>
