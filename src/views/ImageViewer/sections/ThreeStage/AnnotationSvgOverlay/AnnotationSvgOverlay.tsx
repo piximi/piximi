@@ -33,6 +33,7 @@ import {
   SelectionButtons,
 } from "./SelectionChrome";
 import { BrushCursor } from "./BrushCursor";
+import { useEscapeHotkey } from "./useEscapeHotkey";
 
 import type { Point } from "utils/types";
 
@@ -119,6 +120,8 @@ export const AnnotationSvgOverlay = ({
   // operation may have no stroke at all when its operands came from clicks.
   const chromeBoundingBox =
     pendingBoundingBox ?? workingAnnotation?.boundingBox;
+
+  useEscapeHotkey(annotationTool);
 
   const { onCameraChange, getImageToScreenTransform } = useThreeViewport();
   const gRef = useRef<SVGGElement>(null);

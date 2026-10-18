@@ -204,16 +204,6 @@ export const SelectionButtons = ({
     HotkeyContext.AnnotatorView,
     [canConfirm, confirm],
   );
-  useHotkeys(
-    "esc",
-    (event) => {
-      if (!event.repeat) {
-        cancel();
-      }
-    },
-    HotkeyContext.AnnotatorView,
-    [canConfirm, cancel],
-  );
 
   return (
     <foreignObject
