@@ -32,6 +32,7 @@ import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationMo
 import {
   selectActiveLabeledItems,
   selectActiveItemsByPartition,
+  selectActiveKnownCategories,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
@@ -49,6 +50,8 @@ import type { RecursivePartial } from "utils/types";
 export enum ErrorReason {
   NotTrainable,
   NoLabeledImages,
+  TooFewCategories,
+  TooFewLabeledCategories,
   ExistingPredictions,
   ChannelMismatch,
   DuplicateModelName,
@@ -59,6 +62,8 @@ type Precheck = {
   modelTrainable: boolean; // success -> true
   modelValid: boolean; // success -> true
   labeledImages: boolean; // success -> true
+  multipleCategories: boolean; // success -> true
+  multipleLabeledCategories: boolean; // success -> true
   noPendingPredictions: boolean; // success -> true
   channelsValid: boolean; // success -> true
   modelNameValid: boolean; // success -> true
@@ -97,6 +102,8 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
     modelTrainable: false,
     modelValid: false,
     labeledImages: false,
+    multipleCategories: false,
+    multipleLabeledCategories: false,
     noPendingPredictions: false,
     channelsValid: false,
     modelNameValid: false,
@@ -241,6 +248,18 @@ export const ClassifierStatusProvider = ({
     modelTarget,
   );
   const activeLabeledItems = useSelector(selectActiveLabeledItems);
+  const knownCategories = useSelector(selectActiveKnownCategories);
+  // Categories that will actually reach training. Labeled items in the
+  // inference partition are predictions, which `partitionTrainingData` drops.
+  const labeledCategoryCount = useMemo(
+    () =>
+      new Set(
+        activeLabeledItems
+          .filter((item) => item.partition !== Partition.Inference)
+          .map((item) => item.categoryId),
+      ).size,
+    [activeLabeledItems],
+  );
   const visibleChannels = useSelector(selectVisibleChannelCount);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
@@ -273,6 +292,9 @@ export const ClassifierStatusProvider = ({
       modelTrainable: !modelConfig || modelConfig.trainable,
       modelValid: modelIsValid === undefined ? true : modelIsValid,
       labeledImages: activeLabeledItems.length > 0,
+      // A classifier needs at least two output classes to learn anything.
+      multipleCategories: knownCategories.length >= 2,
+      multipleLabeledCategories: labeledCategoryCount >= 2,
       noPendingPredictions: inferenceItems.every((item) =>
         representsUnknown(item.categoryId),
       ),
@@ -292,6 +314,8 @@ export const ClassifierStatusProvider = ({
       restrictedClassifierNames,
       modelIsValid,
       activeLabeledItems,
+      knownCategories,
+      labeledCategoryCount,
       isFitting,
       inferenceItems,
       modelChannels,
@@ -321,6 +345,20 @@ export const ClassifierStatusProvider = ({
       newErrors.push({
         reason: ErrorReason.NoLabeledImages,
         message: "Please label images to train a model.",
+        severity: 3,
+      });
+    }
+    if (!precheck.multipleCategories) {
+      newErrors.push({
+        reason: ErrorReason.TooFewCategories,
+        message: "Create at least two categories to train a classifier.",
+        severity: 2,
+      });
+    } else if (precheck.labeledImages && !precheck.multipleLabeledCategories) {
+      newErrors.push({
+        reason: ErrorReason.TooFewLabeledCategories,
+        message:
+          "Label items in at least two categories to train a classifier.",
         severity: 3,
       });
     }
