@@ -110,7 +110,7 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
               <ListItemText primary="Upload .zarr" />
             </MenuItem>
             <MenuItem onClick={() => handleOpenFilePicker(zipInputRef)} dense>
-              <ListItemText primary="Upload .zip" />
+              <ListItemText primary="Upload .zip or .piximi" />
             </MenuItem>
             <MenuItem onClick={handleConfirmedOpenExampleProjectDialog} dense>
               Load Example
@@ -151,12 +151,14 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
         id="open-project-zarr"
         onChange={handleInputChange}
         type="file"
-        // @ts-ignore: need it for some reason
+        // @ts-expect-error -- `webkitdirectory` makes the picker select a folder
+        // (a `.zarr` project is a directory, not a single file). Browsers support it,
+        // but @types/react@17 doesn't declare it on InputHTMLAttributes.
         webkitdirectory=""
       />
       <input
         ref={zipInputRef}
-        accept="application/zip"
+        accept=".piximi, application/zip"
         hidden
         id="open-project-zip"
         onChange={handleInputChange}

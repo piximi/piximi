@@ -162,7 +162,11 @@ async function detectVersion(
 async function openStore(
   files: File[],
 ): Promise<{ store: CustomStore; modelFiles: ExtractedModelFileMap }> {
-  if (files.length === 1 && files[0].type === "application/zip") {
+  const f = files[0];
+  if (
+    files.length === 1 &&
+    (f.type === "application/zip" || f.name.toLowerCase().endsWith(".piximi"))
+  ) {
     return createStoreFromZip(files[0]);
   }
   return createStoreFromFileList(files);

@@ -142,7 +142,7 @@ export const WelcomeScreen = () => {
               ref={fileInputRef}
               type="file"
               hidden
-              accept=" application/zip"
+              accept=".piximi, application/zip"
               onChange={handleOpenProject}
               data-testid="upload-project-file"
             />
