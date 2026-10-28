@@ -44,10 +44,9 @@ export const measurementsSlice = createSlice({
         groupType: "images" | "objects";
         kindId?: string;
         displayName?: string;
-        itemIds: string[];
       }>,
     ) {
-      const { kindId, itemIds, groupType } = action.payload;
+      const { kindId, groupType } = action.payload;
       const displayName = action.payload.displayName ?? kindId ?? "Images";
       const groupId = generateUUID();
 
@@ -63,12 +62,9 @@ export const measurementsSlice = createSlice({
         name: uniqueName,
         intensityMeasurements: [],
         featureMeasurements: [],
-        existingMeasurements: [],
         splits: {},
         plots: { [initialPlot.id]: initialPlot },
         selectedPlotId: initialPlot.id,
-        entityIds: itemIds,
-        upToDate: true,
       };
 
       if (groupType === "images") {

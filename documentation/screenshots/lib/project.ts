@@ -34,16 +34,13 @@ async function openExampleProject(
   await waitForProjectLoad(page);
 }
 
-// Load a saved project (.zip) via the Welcome screen's hidden file input.
+// Load a saved project (.piximi / .zip) via the Welcome screen's hidden file input.
 async function openProjectFile(page: Page, filePath: string) {
   if (!fs.existsSync(filePath)) {
     throw new Error(`Project file not found: ${filePath}`);
   }
   await page.goto(BASE_URL);
-  await page
-    .getByTestId("upload-project")
-    .locator('input[type="file"]')
-    .setInputFiles(filePath);
+  await page.getByTestId("upload-project-file").setInputFiles(filePath);
   await waitForProjectLoad(page);
 }
 

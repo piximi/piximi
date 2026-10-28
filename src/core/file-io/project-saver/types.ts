@@ -79,8 +79,9 @@ export type ChannelDataAccessor = (
 /**
  * Public contract for the project saver.
  *
- * Serializes the current project into a `.zip` containing a `.zarr` tree plus
- * the TF.js files for every trained model, ready to hand to `saveAs`.
+ * Serializes the current project into a zip archive with the ".piximi" extension
+ * containing a `.zarr` tree plus the TF.js files for every trained model, ready
+ * to hand to `saveAs`.
  */
 export interface IProjectSaver {
   saveProject(input: SaveProjectInput): Promise<SaveProjectResult>;

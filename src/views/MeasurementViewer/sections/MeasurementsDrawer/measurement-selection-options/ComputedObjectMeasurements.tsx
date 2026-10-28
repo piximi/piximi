@@ -9,12 +9,11 @@ import { OBJECT_FEATURES } from "core/entities";
 import { HelpItem } from "help/HelpContent";
 
 import { getDifferences } from "utils/arrayUtils";
-import { formatString } from "utils/stringUtils";
 
 import { measurementsSlice } from "@MeasurementViewer/state";
 import { StyledRichTreeView } from "@MeasurementViewer/components/StyledRichTreeView";
 import { getCustomTreeItem } from "@MeasurementViewer/components/CustomTreeItem";
-import { OBJ_MEAS_LOOKUP } from "@MeasurementViewer/utils";
+import { OBJ_MEAS_LABELS, OBJ_MEAS_LOOKUP } from "@MeasurementViewer/utils";
 
 import type React from "react";
 
@@ -23,15 +22,14 @@ import type { ObjectFeature } from "core/entities";
 import type { CustomTreeViewBaseItem } from "@MeasurementViewer/components/CustomTreeItem";
 import type { ObjectMeasurementGroup } from "@MeasurementViewer/types";
 
-const featureMeasurementItems: CustomTreeViewBaseItem[] = [
+const shapeMeasurementItems: CustomTreeViewBaseItem[] = [
   {
-    id: "feature",
-    label: "Feature",
+    id: "shape",
+    label: "Shape",
 
     children: OBJECT_FEATURES.map((key) => ({
       id: key,
-      label: formatString(key, undefined, "every-word"),
-      displayName: "abba",
+      label: OBJ_MEAS_LABELS[key],
     })),
   },
 ];
@@ -54,8 +52,8 @@ export const ComputedObjectMeasurementOptions = ({
     if (newSelectedItems === null) newSelectedItems = [];
     else if (!Array.isArray(newSelectedItems))
       newSelectedItems = [newSelectedItems];
-    // Omit top level category "feature"
-    const onlyMeasurements = newSelectedItems.filter((id) => id !== "feature");
+    // Omit top level category "shape"
+    const onlyMeasurements = newSelectedItems.filter((id) => id !== "shape");
     // Process newSelectedItems array to determine newly added and removed
     const changes = getDifferences(selectedItems, onlyMeasurements);
 
@@ -80,7 +78,7 @@ export const ComputedObjectMeasurementOptions = ({
   return (
     <Box data-help={HelpItem.ObjectMeasurements}>
       <StyledRichTreeView
-        items={featureMeasurementItems}
+        items={shapeMeasurementItems}
         multiSelect
         checkboxSelection
         selectedItems={selectedItems}

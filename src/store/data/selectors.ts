@@ -609,6 +609,11 @@ export const selectChannelMetaByChannelId = createSelector(
   },
 );
 
+export const selectVisibleChannelCount = createSelector(
+  channelMetaSelectors.selectAll,
+  (channelMetas) => channelMetas.filter((meta) => meta.visible).length,
+);
+
 /*
  * ───────────────────────────────────────────────────────────────────────
  * ── Categories ─────────────────────────────────────────────────────────
