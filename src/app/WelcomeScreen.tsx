@@ -1,6 +1,15 @@
+import { useRef, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
-import { Box, Button, Stack, styled } from "@mui/material";
+import {
+  Box,
+  Button,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+} from "@mui/material";
 
 import {
   useDialogHotkey,
@@ -16,20 +25,13 @@ import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
 
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
-
 export const WelcomeScreen = () => {
   const navigate = useNavigate();
+  const [uploadMenuAnchor, setUploadMenuAnchor] = useState<HTMLElement | null>(
+    null,
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
   const {
     onClose: handleCloseCloseExampleProjectDialog,
     onOpen: handleOpenExampleProjectDialog,
@@ -58,12 +60,17 @@ export const WelcomeScreen = () => {
   ) => {
     event.persist();
     navigate("/project", { state: { init: true } });
+
     if (!event.currentTarget.files) return;
     const files = event.currentTarget.files;
 
     await loadProject(files);
 
     event.target.value = "";
+  };
+  const handleOpenFilePicker = (ref: React.RefObject<HTMLInputElement>) => {
+    setUploadMenuAnchor(null);
+    ref.current?.click();
   };
 
   return (
@@ -98,21 +105,58 @@ export const WelcomeScreen = () => {
               Start New Project
             </Button>
             <Button
-              component="label"
-              role={undefined}
               variant="outlined"
-              tabIndex={-1}
               sx={{ width: "210px" }}
               data-testid="upload-project"
+              onClick={(event) => setUploadMenuAnchor(event.currentTarget)}
             >
               Upload Project
-              <VisuallyHiddenInput
-                type="file"
-                accept=".zarr, application/zip"
-                onChange={handleOpenProject}
-                multiple
-              />
             </Button>
+            <Menu
+              anchorEl={uploadMenuAnchor}
+              open={Boolean(uploadMenuAnchor)}
+              onClose={() => setUploadMenuAnchor(null)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              transformOrigin={{ vertical: "top", horizontal: "center" }}
+              slotProps={{ paper: { sx: { width: "210px" } } }}
+            >
+              <MenuItem
+                dense
+                onClick={() => handleOpenFilePicker(folderInputRef)}
+              >
+                <ListItemText>
+                  From <code>.zarr</code>
+                </ListItemText>
+              </MenuItem>
+              <MenuItem
+                dense
+                onClick={() => handleOpenFilePicker(fileInputRef)}
+              >
+                <ListItemText>
+                  From <code>.zip</code> or <code>.piximi</code>
+                </ListItemText>
+              </MenuItem>
+            </Menu>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              hidden
+              accept=" application/zip"
+              onChange={handleOpenProject}
+              data-testid="upload-project-file"
+            />
+            <input
+              ref={folderInputRef}
+              type="file"
+              hidden
+              onChange={handleOpenProject}
+              data-testid="upload-project-folder"
+              // @ts-expect-error -- `webkitdirectory` makes the picker select a folder
+              // (a `.zarr` project is a directory, not a single file). Browsers support it,
+              // but @types/react@17 doesn't declare it on InputHTMLAttributes.
+              webkitdirectory=""
+            />
 
             <Button
               data-help={HelpItem.OpenProject}
