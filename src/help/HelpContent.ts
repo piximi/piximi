@@ -121,11 +121,11 @@ If the desired category does not exist, click "Create category" to make a new ca
 Adjust the size of the displayed imaages`,
   [HelpItem.OpenProject]: `
 To open a saved project click 'Open project' in the Open menu on the left toolbar.
-Select a .zip or .zarr file that was downloaded when saving an earlier project.
+Select a .zip, .piximi, or .zarr file that was downloaded when saving an earlier project.
 `,
   [HelpItem.SaveProject]: `
 Save all images and assigned categories by clicking on "Save project file" in the Save menu on the left toolbar.
-This will download a .json file that encodes the image data.
+This will download a .piximi file which includes the project data and trained classifiers.
 `,
   [HelpItem.CreateCategory]: `
 Create a new category belonging to the active *Kind* by clicking on the "Create Category" button.
