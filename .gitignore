@@ -43,3 +43,6 @@ node_modules/
 
 # ONNX
 public/ort/
+
+# Docs screenshot output
+/documentation/screenshots/img/
