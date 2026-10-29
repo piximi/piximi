@@ -15,8 +15,8 @@ Without the package script:
 `node --experimental-strip-types documentation/screenshots/capture.mts`
 (Node 22.18+ / 23.6+ can drop the flag.)
 
-Images are written straight into the docs repo, which is expected to be a
-sibling checkout named `piximi-documentation` (override with `DOCS_IMG_DIR`).
+Images are written to `documentation/screenshots/img/` (gitignored). Set
+`DOCS_IMG_DIR` to write them somewhere else, e.g. the docs repo's `img/` folder.
 
 | Flag                  | Meaning                                             |
 | --------------------- | --------------------------------------------------- |
