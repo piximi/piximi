@@ -1,10 +1,22 @@
 import { useMemo } from "react";
 
-import { Tooltip, FormControl, FormLabel, Stack } from "@mui/material";
+import { useSelector } from "react-redux";
+
+import {
+  Tooltip,
+  FormControl,
+  FormLabel,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 import { useNumberField } from "hooks";
 
 import { HelpItem } from "help/HelpContent";
+import {
+  selectAllChannelMetas,
+  selectVisibleChannelCount,
+} from "store/data/selectors";
 
 import { useClassificationModel } from "@ProjectViewer/hooks";
 import { useClassifierStatus } from "@ProjectViewer/contexts/ClassifierStatusProvider";
@@ -21,6 +33,9 @@ export const InputShape = () => {
     modelParams,
     classifierStatus,
   } = useClassifierStatus();
+  const totalChannels = useSelector(selectAllChannelMetas).length;
+  const visibleChannels = useSelector(selectVisibleChannelCount);
+  const hasHiddenChannels = visibleChannels < totalChannels;
 
   const isTraining = classifierStatus === "training";
 
@@ -96,55 +111,70 @@ export const InputShape = () => {
   };
 
   return (
-    <Tooltip
-      title={lockReason("inputShape", isTraining)}
-      disableHoverListener={!disabled}
-    >
-      <FormControl
-        size="small"
-        sx={{ flexDirection: "row", alignItems: "center", pt: 1 }}
-        fullWidth
+    <Stack>
+      <Tooltip
+        title={lockReason("inputShape", isTraining)}
+        disableHoverListener={!disabled}
       >
-        <FormLabel
-          data-help={HelpItem.InputShape}
-          sx={(theme) => ({
-            fontSize: theme.typography.body2.fontSize,
-            mr: "1rem",
-            whiteSpace: "nowrap",
-          })}
+        <FormControl
+          size="small"
+          sx={{ flexDirection: "row", alignItems: "center", pt: 1 }}
+          fullWidth
         >
-          Input Shape:
-        </FormLabel>
-        <Stack direction="row" gap={2}>
-          <ModelSettingsTextField
-            id="shape-cols"
-            size="small"
-            label="Col"
-            onChange={handleInputColsChange}
-            value={inputColsDisplay}
-            onBlur={handleBlurDispatch}
-            disabled={disabled}
-          />
-          <ModelSettingsTextField
-            id="shape-rows"
-            size="small"
-            label="Row"
-            onChange={handleInputRowsChange}
-            value={inputRowsDisplay}
-            onBlur={handleBlurDispatch}
-            disabled={disabled}
-          />
-          <ModelSettingsTextField
-            id="shape-channels"
-            size="small"
-            label="Ch."
-            onChange={handleInputChannelsChange}
-            value={inputChannelsDisplay}
-            onBlur={handleBlurDispatch}
-            disabled={disabled || fixedChannels}
-          />
-        </Stack>
-      </FormControl>
-    </Tooltip>
+          <FormLabel
+            data-help={HelpItem.InputShape}
+            sx={(theme) => ({
+              fontSize: theme.typography.body2.fontSize,
+              mr: "1rem",
+              whiteSpace: "nowrap",
+            })}
+          >
+            Input Shape:
+          </FormLabel>
+          <Stack direction="row" gap={2}>
+            <ModelSettingsTextField
+              id="shape-cols"
+              size="small"
+              label="Col"
+              onChange={handleInputColsChange}
+              value={inputColsDisplay}
+              onBlur={handleBlurDispatch}
+              disabled={disabled}
+            />
+            <ModelSettingsTextField
+              id="shape-rows"
+              size="small"
+              label="Row"
+              onChange={handleInputRowsChange}
+              value={inputRowsDisplay}
+              onBlur={handleBlurDispatch}
+              disabled={disabled}
+            />
+            <ModelSettingsTextField
+              id="shape-channels"
+              size="small"
+              label="Ch."
+              onChange={handleInputChannelsChange}
+              value={inputChannelsDisplay}
+              onBlur={handleBlurDispatch}
+              disabled={disabled || fixedChannels}
+            />
+          </Stack>
+        </FormControl>
+      </Tooltip>
+      {hasHiddenChannels && (
+        <Typography
+          variant="caption"
+          sx={{
+            mt: 1,
+            color: "var(--mui-palette-warning-main)",
+            whiteSpace: "nowrap",
+            alignSelf: "center",
+          }}
+        >
+          Training on visible channels only
+        </Typography>
+      )}
+    </Stack>
   );
 };
