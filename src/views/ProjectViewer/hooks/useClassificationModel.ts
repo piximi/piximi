@@ -24,29 +24,31 @@ export const useClassificationModel = () => {
     selectModelLifecycleStatus,
     modelTarget,
   );
-  const [modelInfo, setModelInfo] = useState<ModelInfoDTO>();
 
   const cfApi = useClassifierApi();
+
+  const [result, setResult] = useState<{
+    name: string;
+    info: ModelInfoDTO;
+  } | null>(null);
+
   useEffect(() => {
-    if (!activeModelName) {
-      setModelInfo(undefined);
-      return;
-    }
+    if (!activeModelName) return;
     let cancelled = false;
-    cfApi.getModelInfo(activeModelName).then((result) => {
+    cfApi.getModelInfo(activeModelName).then((r) => {
       if (cancelled) return;
-      if (result.success) {
-        setModelInfo(result.data);
-      } else {
+      if (r.success) setResult({ name: activeModelName, info: r.data });
+      else
         console.error(
-          `[useClassificationModel] ${result.reason.code}: ${result.reason.message}`,
-          result.reason.cause,
+          `[useClassificationModel] ${r.reason.code}: ${r.reason.message}`,
+          r.reason.cause,
         );
-      }
     });
     return () => {
       cancelled = true;
     };
-  }, [activeModelName, modelStatus]);
-  return modelInfo;
+    // modelStatus is a deliberate refetch trigger: training changes the summary.
+  }, [activeModelName, modelStatus, cfApi]);
+
+  return result && result?.name === activeModelName ? result.info : undefined;
 };
