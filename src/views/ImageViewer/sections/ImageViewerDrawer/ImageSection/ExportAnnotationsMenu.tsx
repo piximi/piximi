@@ -50,7 +50,7 @@ export const ExportAnnotationsMenu = ({
 
   const {
     onClose: handleCloseExportAnnotationsDialog,
-    onOpen: handleOpenExportAnnotationsDialog,
+
     open: exportAnnotationsDialogOpen,
   } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
 
@@ -93,14 +93,7 @@ export const ExportAnnotationsMenu = ({
         onClose();
       });
     },
-    [
-      setOnProjectName,
-      handleOpenExportAnnotationsDialog,
-      onClose,
-      images,
-      annotations,
-      selectedImage,
-    ],
+    [onClose, images, annotations, kinds],
   );
 
   return (

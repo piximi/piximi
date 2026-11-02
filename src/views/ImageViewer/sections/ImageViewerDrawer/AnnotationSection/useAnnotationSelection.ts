@@ -102,7 +102,7 @@ export const useAnnotationSelection = () => {
       });
     });
     return { list, hidden };
-  }, [kinds, view, selCats]);
+  }, [kinds, view, selCats, annotations]);
 
   // Current selection criterion (categories + active feature ranges).
   const activeFeats = useMemo(
