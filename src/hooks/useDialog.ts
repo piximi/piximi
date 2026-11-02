@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -9,10 +9,7 @@ import { AlertType } from "utils/enums";
 
 import type { HotkeyContext } from "utils/enums";
 
-export const useDialog = (
-  closeOnError: boolean = true,
-  onForceClose?: () => void,
-) => {
+export const useDialog = (closeOnError: boolean = true) => {
   const alertState = useSelector(selectAlertState);
   const [open, setOpen] = useState(false);
 
@@ -24,7 +21,6 @@ export const useDialog = (
       alertState.visible &&
       alertState.alertType === AlertType.Error
     ) {
-      onForceClose && onForceClose();
       setOpen(false);
     }
   }
@@ -45,38 +41,23 @@ export const useDialogHotkey = (
   closeOnError: boolean = true,
 ) => {
   const dispatch = useDispatch();
-  const {
-    onClose: onDialogClose,
-    onOpen: onDialogOpen,
-    open: dialogOpen,
-  } = useDialog(closeOnError, () => {
-    view &&
+  const { onClose, onOpen, open } = useDialog(closeOnError);
+
+  // Keep the hotkey context registered exactly while the dialog is open, so
+  // closing by any path (onClose, an error alert, unmount) unregisters it.
+  useEffect(() => {
+    if (!open || !view) return;
+    dispatch(
+      applicationSettingsSlice.actions.registerHotkeyContext({ context: view }),
+    );
+    return () => {
       dispatch(
         applicationSettingsSlice.actions.unregisterHotkeyContext({
           context: view,
         }),
       );
-  });
+    };
+  }, [open, view, dispatch]);
 
-  const onOpen = () => {
-    view &&
-      dispatch(
-        applicationSettingsSlice.actions.registerHotkeyContext({
-          context: view,
-        }),
-      );
-    onDialogOpen();
-  };
-
-  const onClose = () => {
-    view &&
-      dispatch(
-        applicationSettingsSlice.actions.unregisterHotkeyContext({
-          context: view,
-        }),
-      );
-    onDialogClose();
-  };
-
-  return { onClose, onOpen, open: dialogOpen };
+  return { onClose, onOpen, open };
 };
