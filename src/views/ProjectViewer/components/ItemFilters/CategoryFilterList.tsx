@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -27,60 +27,48 @@ export const CategoryFilterList = () => {
       (c) => c.type === "annotation" && c.kindId === activeView.id,
     );
   }, [categories, activeView]);
-  const filteredCategories = useMemo(
-    () => activeView.filters.categoryId,
-    [activeView.filters.categoryId],
-  );
+  const filteredCategories = activeView.filters.categoryId;
 
-  const dispatchOps = useMemo(
-    () =>
-      activeView.view === "images"
-        ? {
-            add: (cats: string[]) =>
-              dispatch(projectSlice.actions.addImageCategoryFilters(cats)),
-            rem: (cats: string[]) =>
-              dispatch(projectSlice.actions.removeImageCategoryFilters(cats)),
-          }
-        : {
-            add: (cats: string[]) =>
-              dispatch(
-                projectSlice.actions.addAnnotationCategoryFilters({
-                  kindId: activeView.id,
-                  ids: cats,
-                }),
-              ),
-            rem: (cats: string[]) =>
-              dispatch(
-                projectSlice.actions.removeAnnotationCategoryFilters({
-                  kindId: activeView.id,
-                  ids: cats,
-                }),
-              ),
-          },
-    [activeView],
-  );
+  const dispatchOps =
+    activeView.view === "images"
+      ? {
+          add: (cats: string[]) =>
+            dispatch(projectSlice.actions.addImageCategoryFilters(cats)),
+          rem: (cats: string[]) =>
+            dispatch(projectSlice.actions.removeImageCategoryFilters(cats)),
+        }
+      : {
+          add: (cats: string[]) =>
+            dispatch(
+              projectSlice.actions.addAnnotationCategoryFilters({
+                kindId: activeView.id,
+                ids: cats,
+              }),
+            ),
+          rem: (cats: string[]) =>
+            dispatch(
+              projectSlice.actions.removeAnnotationCategoryFilters({
+                kindId: activeView.id,
+                ids: cats,
+              }),
+            ),
+        };
 
-  const toggleCategoryFilter = useCallback(
-    (category: Category) => {
-      if (activeView.filters.categoryId.includes(category.id)) {
-        dispatchOps.rem([category.id]);
-      } else {
-        dispatchOps.add([category.id]);
-      }
-    },
-    [dispatchOps, activeView.filters.categoryId],
-  );
+  const toggleCategoryFilter = (category: Category) => {
+    if (activeView.filters.categoryId.includes(category.id)) {
+      dispatchOps.rem([category.id]);
+    } else {
+      dispatchOps.add([category.id]);
+    }
+  };
 
-  const toggleAllCategoryFilter = useCallback(
-    (filtered: boolean) => {
-      if (filtered) {
-        dispatchOps.add(activeCategories.map((category) => category.id));
-      } else {
-        dispatchOps.rem(activeCategories.map((category) => category.id));
-      }
-    },
-    [dispatch, filteredCategories, activeCategories],
-  );
+  const toggleAllCategoryFilter = (filtered: boolean) => {
+    if (filtered) {
+      dispatchOps.add(activeCategories.map((category) => category.id));
+    } else {
+      dispatchOps.rem(activeCategories.map((category) => category.id));
+    }
+  };
 
   const isItemFiltered = (category: Category) => {
     return filteredCategories.includes(category.id);

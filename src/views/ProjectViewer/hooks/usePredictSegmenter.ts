@@ -61,7 +61,6 @@ export const usePredictSegmenter = () => {
   } = useSegmenter();
   const segApi = useSegmenterApi();
   const measurementsApi = useMeasurementsApi();
-  const Cancel = new CancelSource();
 
   const handleError = useCallback(
     async (error: Error, name: string, taskId: string) => {
@@ -93,11 +92,12 @@ export const usePredictSegmenter = () => {
       );
       setModelStatus("idle");
     },
-    [dispatch],
+    [dispatch, setModelStatus],
   );
 
-  const predictSegmenter = useCallback(async () => {
+  const predictSegmenter = async () => {
     if (!loadedModel || error) return;
+    const Cancel = new CancelSource();
     Cancel.reset();
     const taskId = generateUUID();
     dispatch(
@@ -425,16 +425,6 @@ export const usePredictSegmenter = () => {
     setModelStatus("idle");
 
     taskCancelRegistry.unregister(taskId);
-  }, [
-    handleError,
-    allImages,
-    loadedModel,
-    selectedImages,
-    kinds,
-    channelSelection,
-    optionValues,
-    kindName,
-  ]);
-
+  };
   return predictSegmenter;
 };

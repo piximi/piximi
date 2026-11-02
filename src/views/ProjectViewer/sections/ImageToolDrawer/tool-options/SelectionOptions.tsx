@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   Box,
@@ -29,15 +29,17 @@ export const SelectionOptions = () => {
   } = useGridActions();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-
+  const selectionCount = selectedFilteredItemIds.length;
+  const [prevCount, setPrevCount] = useState(selectionCount);
+  if (selectionCount !== prevCount) {
+    setPrevCount(selectionCount);
+    setSelectedCategory("");
+  }
   const handleCategoryChange = (e: SelectChangeEvent<unknown>) => {
     const catId = e.target.value as string;
     setSelectedCategory(catId);
     handleCategorize(catId);
   };
-  useEffect(() => {
-    setSelectedCategory("");
-  }, [selectedFilteredItemIds.length]);
 
   return (
     <Box

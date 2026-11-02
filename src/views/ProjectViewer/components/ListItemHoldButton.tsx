@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 
 import {
   alpha,
@@ -27,51 +27,36 @@ export const ListItemHoldButton = ({
     ListItemTextSlotsAndSlotProps["slotProps"]
   >["primary"];
 }) => {
-  const [holdElapsed, setHoldElapsed] = useState<number>(0);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout>();
-  const [loadPercent, setLoadPercent] = useState<number>(0);
-
-  const handleMouseDown = () => {
-    const intervalId = setInterval(() => {
-      setHoldElapsed((t) => t + 1);
-    }, 10);
-    setIntervalId(intervalId);
-  };
-
-  const handleMouseUp = () => {
-    if (intervalId) clearInterval(intervalId);
-
-    setHoldElapsed(0);
-  };
+  const [holding, setHolding] = useState(false);
+  const holdMs = holdDuration * 10;
+  const complete = useEffectEvent(() => onHoldComplete());
 
   useEffect(() => {
-    setLoadPercent((holdElapsed / holdDuration) * 100);
-
-    if (holdElapsed >= holdDuration) {
-      clearInterval(intervalId);
-      setHoldElapsed(0);
-      onHoldComplete();
-    }
-  }, [holdElapsed, intervalId, holdDuration, onHoldComplete]);
+    if (!holding) return;
+    const timer = setTimeout(() => {
+      setHolding(false);
+      complete();
+    }, holdMs);
+    return () => clearTimeout(timer);
+  }, [holding, holdMs]);
 
   return (
     <ListItem disablePadding>
       <ListItemButton
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleMouseDown}
-        onTouchEnd={handleMouseUp}
-        sx={(theme) => ({
-          borderRadius: 0,
-          backgroundImage:
-            loadPercent > 0
-              ? `linear-gradient(to right, ${alpha(
-                  theme.palette.primary.main,
-                  0.3,
-                )} ${loadPercent}%, rgba(255,255,255,0) 1%)`
-              : "inherit",
-        })}
+        onPointerDown={() => setHolding(true)}
+        onPointerUp={() => setHolding(false)}
+        onPointerLeave={() => setHolding(false)}
+        onPointerCancel={() => setHolding(false)}
+        sx={(theme) => {
+          const fill = alpha(theme.palette.primary.main, 0.3);
+          return {
+            borderRadius: 0,
+            backgroundImage: `linear-gradient(${fill}, ${fill})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: holding ? "100% 100%" : "0% 100%",
+            transition: holding ? `background-size ${holdMs}ms linear` : "none",
+          };
+        }}
       >
         {icon && <ListItemIcon>{icon}</ListItemIcon>}
 

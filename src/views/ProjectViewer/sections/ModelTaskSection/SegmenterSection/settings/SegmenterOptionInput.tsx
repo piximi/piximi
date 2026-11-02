@@ -127,36 +127,24 @@ export const SegmenterOptionInput = ({
   const value = optionValues[field.key];
 
   /* Numbers are edited as text so an in-progress "-" or "0." isn't clobbered. */
-  const [draft, setDraft] = useState<string>(
-    value === undefined ? "" : String(value),
-  );
-  useEffect(() => {
-    setDraft(value === undefined ? "" : String(value));
-  }, [value]);
+  const committedText = value === undefined ? "" : String(value);
+  const [draft, setDraft] = useState<string | null>(null);
 
   const handleTextFieldBlur = () => {
+    if (draft === null) return;
+    setDraft(null); // after blur, always show store value
     const trimmed = draft.trim();
     if (trimmed === "") {
-      // Empty is only meaningful for an optional field, where it means
-      // "omit the key and let the library default apply".
-      if (field.type === "number" && field.optional) {
+      if (field.type === "number" && field.optional)
         setOptionValue(field.key, undefined);
-      } else {
-        setDraft(value === undefined ? "" : String(value));
-      }
       return;
     }
     const parsed = Number(trimmed);
-    if (field.type !== "number" || !Number.isFinite(parsed)) {
-      setDraft(value === undefined ? "" : String(value));
-      return;
-    }
-    const clamped = Math.min(
-      field.max ?? Number.POSITIVE_INFINITY,
-      Math.max(field.min ?? Number.NEGATIVE_INFINITY, parsed),
+    if (field.type !== "number" || !Number.isFinite(parsed)) return;
+    setOptionValue(
+      field.key,
+      Math.min(field.max ?? Infinity, Math.max(field.min ?? -Infinity, parsed)),
     );
-    setOptionValue(field.key, clamped);
-    setDraft(String(clamped));
   };
 
   switch (field.type) {
@@ -263,7 +251,7 @@ export const SegmenterOptionInput = ({
             onChange={(event) => setDraft(event.target.value)}
             onBlur={handleTextFieldBlur}
             placeholder={field.emptyLabel}
-            value={draft}
+            value={draft ?? committedText}
             size="small"
             variant="standard"
             sx={{

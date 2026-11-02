@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -52,27 +52,24 @@ export const ConfidenceFilter = () => {
   );
   const [sliderValue, setSliderValue] = useState<[number, number]>(confidence);
 
-  const dispatchOps = useCallback(
-    (sliderValue: [number, number]) => {
-      activeView.view === "images"
-        ? dispatch(
-            projectSlice.actions.setImageConfidenceFilter({
+  const dispatchOps = (sliderValue: [number, number]) => {
+    activeView.view === "images"
+      ? dispatch(
+          projectSlice.actions.setImageConfidenceFilter({
+            min: sliderValue[0],
+            max: sliderValue[1],
+          }),
+        )
+      : dispatch(
+          projectSlice.actions.setAnnotationConfidenceFilter({
+            kindId: activeView.id,
+            predictionConfidence: {
               min: sliderValue[0],
               max: sliderValue[1],
-            }),
-          )
-        : dispatch(
-            projectSlice.actions.setAnnotationConfidenceFilter({
-              kindId: activeView.id,
-              predictionConfidence: {
-                min: sliderValue[0],
-                max: sliderValue[1],
-              },
-            }),
-          );
-    },
-    [activeView],
-  );
+            },
+          }),
+        );
+  };
   const debouncedDispatch = useDebounce(dispatchOps, 100);
   const handleSliderValueChange = (v: number | number[]) => {
     if (!Array.isArray(v) || v.length !== 2) return;
