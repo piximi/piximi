@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
-import { useTheme } from "@mui/material";
-
 import { TextFieldWithBlur } from "components/inputs";
 
 import { useParameterizedSelector } from "store/hooks";
@@ -44,7 +42,7 @@ export const ImagePopoverContent = ({
 
 const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
   const dispatch = useDispatch();
-  const theme = useTheme();
+
   const volumes = useParameterizedSelector(
     selectAnnotationVolumesByImageId,
     image.id,
@@ -111,7 +109,7 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
       "Name",
       <TextFieldWithBlur
         hiddenLabel
-        value={image.name}
+        value={newImageName}
         onChange={handleNameChange}
         onBlur={handleDispatchNameChange}
         size="small"
@@ -120,7 +118,7 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
           htmlInput: {
             style: {
               textAlign: "right",
-              fontSize: theme.typography.body2.fontSize,
+              font: "var(--mui-font-body2)",
             },
           },
         }}
@@ -164,7 +162,17 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
     ]);
 
     return data;
-  }, [image, handleCategorySelect, handleNameChange, handlePartitionSelect]);
+  }, [
+    image,
+    handleCategorySelect,
+    handleNameChange,
+    handlePartitionSelect,
+    handleDispatchNameChange,
+    handlePlaneSelect,
+    planes,
+    volumes.length,
+    newImageName,
+  ]);
 
   return <ItemInformationTable title={image.name} data={tableData} />;
 };

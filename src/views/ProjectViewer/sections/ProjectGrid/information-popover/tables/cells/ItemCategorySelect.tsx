@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import { useSelector } from "react-redux";
 
 import { MenuItem } from "@mui/material";
@@ -20,24 +18,17 @@ export const ItemCategorySelect = ({
   callback: (categoryId: string) => void;
 }) => {
   const categories = useSelector(selectActiveCategories);
-  const [selectedCategory, setSelectedCategory] =
-    useState<string>(currentCategory);
 
   const handleChange = (event: SelectChangeEvent<unknown>) => {
     const newCategory = event.target.value as string;
-    setSelectedCategory(newCategory);
-    if (currentCategory !== newCategory) {
-      callback(newCategory);
-    }
+
+    if (currentCategory === newCategory) return;
+    callback(newCategory);
   };
-  useEffect(() => {
-    setSelectedCategory(currentCategory);
-  }, [currentCategory]);
 
   return (
     <StyledSelect
-      defaultValue={currentCategory}
-      value={selectedCategory}
+      value={currentCategory}
       onChange={(event) => handleChange(event)}
       {...SELECT_PROPS}
     >

@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import { MenuItem } from "@mui/material";
 
 import { StyledSelect } from "components/inputs";
@@ -17,24 +15,16 @@ export const ImagePlaneSelect = ({
   indexOptions: number[];
   callback: (index: number) => void;
 }) => {
-  const [selectedIndex, setSelectedIndex] = useState<number>(currentIndex);
-
   const handleChange = (event: SelectChangeEvent<unknown>) => {
     const newIndex = event.target.value as number;
-    setSelectedIndex(newIndex);
-    if (currentIndex !== newIndex) {
-      callback(newIndex);
-    }
-  };
 
-  useEffect(() => {
-    setSelectedIndex(currentIndex);
-  }, [currentIndex]);
+    if (currentIndex === newIndex) return;
+    callback(newIndex);
+  };
 
   return (
     <StyledSelect
-      defaultValue={currentIndex}
-      value={selectedIndex}
+      value={currentIndex}
       onChange={(event) => handleChange(event)}
       {...SELECT_PROPS}
     >
