@@ -53,7 +53,7 @@ export const CategoryItem = ({
   const isFiltered = useCallback(
     (category: { id: string }) =>
       activeFilters.categoryId.includes(category.id),
-    [activeFilters.categoryId, category],
+    [activeFilters.categoryId],
   );
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {

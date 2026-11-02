@@ -2,7 +2,10 @@ import { useSelector } from "react-redux";
 
 import { Stack } from "@mui/material";
 
-import { selectActiveView } from "@ProjectViewer/state/selectors";
+import {
+  selectActiveKindId,
+  selectActiveView,
+} from "@ProjectViewer/state/selectors";
 
 import { AnnotationStatusFilter } from "./AnnotationStatusFilter";
 import { CategoryFilterList } from "./CategoryFilterList";
@@ -13,6 +16,7 @@ import { SortSelect } from "./SortSelect";
 
 export const ItemFilters = () => {
   const activeView = useSelector(selectActiveView);
+  const activeKindId = useSelector(selectActiveKindId);
 
   return (
     <Stack
@@ -23,7 +27,9 @@ export const ItemFilters = () => {
       <SortSelect />
       <CategoryFilterList />
       <PartitionFilterList />
-      <ConfidenceFilter />
+      <ConfidenceFilter
+        key={activeView === "images" ? "images" : activeKindId}
+      />
       {activeView === "images" ? (
         <AnnotationStatusFilter />
       ) : (

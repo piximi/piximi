@@ -165,7 +165,7 @@ export const LoadSegmentationModelDialog = ({
         setPretrainedModels(availableModels);
       }
     })();
-  }, []);
+  }, [segApi]);
 
   return (
     <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>

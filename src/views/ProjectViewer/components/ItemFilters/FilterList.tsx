@@ -35,7 +35,7 @@ const useObservedHeight = (ref: RefObject<HTMLElement | null>) => {
     });
     ro.observe(node);
     return () => ro.disconnect();
-  }, []);
+  }, [ref]);
   return height;
 };
 
