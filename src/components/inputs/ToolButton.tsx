@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import {
   Box,
@@ -161,17 +161,15 @@ export const InteractivePopoverToolButton = ({
   PopoverComponent: ReactElement;
 }) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
-
+  const [prevSelected, setPrevSelected] = useState(selected);
+  if (selected !== prevSelected) {
+    setPrevSelected(selected);
+    if (!selected) setOptionsOpen(false);
+  }
   const description = useMemo(
     () => <ToolHotkeyTitle toolName={name} hotkey={hotkey} />,
     [name, hotkey],
   );
-
-  useEffect(() => {
-    if (!selected) {
-      setOptionsOpen(false);
-    }
-  }, [selected]);
 
   return (
     <Box
