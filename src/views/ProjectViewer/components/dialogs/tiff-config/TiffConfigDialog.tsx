@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -15,7 +15,7 @@ import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { selectExperimentChannels } from "store/data/selectors";
 
-import { TiffConfigurator } from "./TiffConfigurator";
+import { TiffConfigurator, validateTiffConfig } from "./TiffConfigurator";
 
 import type {
   TiffAnalysisResult,
@@ -30,6 +30,18 @@ type TiffConfigDialogProps = {
   onCancel: () => void;
 };
 
+const configFromAnalysis = (
+  analysis: TiffAnalysisResult,
+  requiredChannels: number | undefined,
+) => {
+  return {
+    channels: analysis?.OMEDims?.sizec ?? requiredChannels ?? 1,
+    frames: analysis?.OMEDims?.sizet ?? 1,
+    slices: analysis?.OMEDims?.sizez ?? 1,
+    dimensionOrder: analysis?.OMEDims?.dimensionorder ?? "xyczt",
+  };
+};
+
 export const TiffConfigDialog = ({
   open,
   analysisResult,
@@ -37,23 +49,26 @@ export const TiffConfigDialog = ({
   onCancel,
 }: TiffConfigDialogProps) => {
   const expChannels = useSelector(selectExperimentChannels);
-  const [requiredChannels, setRequiredChannels] = useState<number | undefined>(
-    expChannels,
-  );
   const canConfigureChannels = !expChannels;
-  const [configs, setConfigs] = useState<TiffDialogCallbackResult>({});
-  const [errors, setErrors] = useState<Record<string, boolean>>(
-    analysisResult.reduce((errors: Record<string, boolean>, analysis) => {
-      errors[analysis.fileName] = false;
-      return errors;
-    }, {}),
+  const [configs, setConfigs] = useState<TiffDialogCallbackResult>(() =>
+    Object.fromEntries(
+      analysisResult.map((a) => [
+        a.fileName,
+        configFromAnalysis(a, expChannels),
+      ]),
+    ),
   );
-
-  const inputError = useMemo(
-    () => Object.values(errors).some((error) => error),
-    [errors],
+  const requiredChannels =
+    expChannels ?? configs[analysisResult[0]?.fileName]?.channels;
+  const hasErrors = analysisResult.some(
+    (a) =>
+      validateTiffConfig(
+        a,
+        configs[a.fileName],
+        canConfigureChannels,
+        requiredChannels,
+      ) !== undefined,
   );
-
   const updateTiffConfig = <K extends keyof TiffImportConfig>(
     fileName: string,
     key: K,
@@ -75,7 +90,6 @@ export const TiffConfigDialog = ({
         {},
       ),
     );
-    setRequiredChannels(config.channels);
   };
 
   const resetConfig = (fileName: string) => {
@@ -83,44 +97,19 @@ export const TiffConfigDialog = ({
       const analysis = analysisResult.find((an) => an.fileName === fileName);
       if (analysis && analysis.OMEDims) {
         const newConfigs = { ...configs };
-        newConfigs[analysis.fileName] = {
-          channels: analysis?.OMEDims?.sizec ?? requiredChannels ?? 1,
-          frames: analysis?.OMEDims?.sizet ?? 1,
-          slices: analysis?.OMEDims?.sizez ?? 1,
-          dimensionOrder: analysis?.OMEDims?.dimensionorder ?? "xyczt",
-        };
+        newConfigs[analysis.fileName] = configFromAnalysis(
+          analysis,
+          expChannels,
+        );
         return newConfigs;
       }
       return configs;
     });
   };
 
-  const updateTiffConfigErrors = (fileName: string) => {
-    return (error: boolean) => {
-      setErrors((errors) => ({ ...errors, [fileName]: error }));
-    };
-  };
-
   const handleConfirm = () => {
     onConfirm(configs);
   };
-
-  useEffect(() => {
-    const configs = analysisResult.reduce(
-      (newConfig: TiffDialogCallbackResult, analysis) => {
-        const config: TiffImportConfig = {
-          channels: analysis?.OMEDims?.sizec ?? requiredChannels ?? 1,
-          frames: analysis?.OMEDims?.sizet ?? 1,
-          slices: analysis?.OMEDims?.sizez ?? 1,
-          dimensionOrder: analysis?.OMEDims?.dimensionorder ?? "xyczt",
-        };
-        newConfig[analysis.fileName] = config;
-        return newConfig;
-      },
-      {},
-    );
-    setConfigs(configs);
-  }, [analysisResult]);
 
   return (
     <Dialog open={open} onClose={onCancel} maxWidth="md" fullWidth>
@@ -139,16 +128,14 @@ export const TiffConfigDialog = ({
         >
           {analysisResult.map((analysis, idx) => (
             <TiffConfigurator
-              key={`config-${idx}`}
+              key={`${analysis.fileName}-config`}
               tiffAnalysis={analysis}
               config={configs[analysis.fileName]}
               updateConfigs={updateTiffConfig}
               resetConfig={resetConfig}
               updateAll={updateAllConfigs}
-              updateError={updateTiffConfigErrors(analysis.fileName)}
               requiredChannels={requiredChannels}
               canConfigureChannels={canConfigureChannels}
-              setRequiredChannels={setRequiredChannels}
               index={idx}
             />
           ))}
@@ -161,7 +148,7 @@ export const TiffConfigDialog = ({
         </Button>
         <Button
           onClick={handleConfirm}
-          disabled={inputError}
+          disabled={hasErrors}
           variant="contained"
         >
           Import

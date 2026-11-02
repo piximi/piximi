@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 import {
   Accordion,
@@ -11,7 +11,6 @@ import {
   FormControl,
   FormControlLabel,
   MenuItem,
-  Select,
   Stack,
   TextField,
   Typography,
@@ -20,15 +19,53 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { DimensionOrder } from "core/file-io/file-loader/types";
 
+import { StyledSelect } from "components/inputs";
+
 import type { ChangeEvent } from "react";
 
 import type { SelectChangeEvent } from "@mui/material";
 
 import type {
+  DimensionConfig,
   TiffAnalysisResult,
   TiffImportConfig,
 } from "core/file-io/file-loader/types";
 
+const getDimInputStyle = (fromFile: boolean) => ({
+  "& .MuiInputBase-input": {
+    px: 1,
+    py: 0,
+  },
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: fromFile ? "var(--mui-palette-warning-dark)" : undefined,
+  },
+  "& .Mui-disabled .MuiOutlinedInput-notchedOutline": {
+    borderColor: fromFile
+      ? "var(--mui-palette-warning-dark) !important"
+      : undefined,
+    borderStyle: "dashed",
+  },
+});
+export const validateTiffConfig = (
+  tiffInfo: TiffAnalysisResult,
+  config: TiffImportConfig,
+  canConfigureChannels: boolean,
+  requiredChannels?: number,
+) => {
+  if (tiffInfo.frameCount) {
+    if (
+      config.channels * config.slices * config.frames !==
+      tiffInfo.frameCount
+    ) {
+      return `C \u00D7 Z \u00D7 T must equal ${tiffInfo.frameCount} frames
+          (currently ${config.channels} \u00D7 ${config.slices} \u00D7 ${config.frames} =
+           ${config.channels * config.slices * config.frames})`;
+    } else if (requiredChannels && config.channels !== requiredChannels) {
+      return `All images in this project must have ${requiredChannels} channels (set by ${canConfigureChannels ? "image 1" : "existing images"}) `;
+    }
+  }
+  return undefined;
+};
 export const TiffConfigurator = ({
   tiffAnalysis,
   config,
@@ -36,9 +73,7 @@ export const TiffConfigurator = ({
   resetConfig,
   updateAll,
   requiredChannels,
-  setRequiredChannels,
   canConfigureChannels,
-  updateError,
   index,
 }: {
   tiffAnalysis: TiffAnalysisResult;
@@ -51,93 +86,38 @@ export const TiffConfigurator = ({
   resetConfig: (fileName: string) => void;
   updateAll: (config: TiffImportConfig) => void;
   requiredChannels?: number;
-  setRequiredChannels: (v: number) => void;
   canConfigureChannels: boolean;
-  updateError: (error: boolean) => void;
   index: number;
 }) => {
   const tiffInfo = tiffAnalysis;
 
   const [overrideTiff, setOverrideTiff] = useState(false);
 
-  const [inputError, setInputError] = useState<string>();
-
-  const containsTiffValues = useMemo(
-    () =>
-      !!tiffInfo?.OMEDims?.sizec ||
-      !!tiffInfo?.OMEDims?.sizet ||
-      !!tiffInfo?.OMEDims?.sizez,
-    [tiffInfo],
+  const inputError = validateTiffConfig(
+    tiffAnalysis,
+    config,
+    canConfigureChannels,
+    requiredChannels,
   );
 
-  const handleChangeDimensionOrder = (event: SelectChangeEvent) => {
-    const value = event.target.value as TiffImportConfig["dimensionOrder"];
-    updateConfigs(tiffAnalysis.fileName, "dimensionOrder", value);
-  };
-  const handleChangeChannels = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const value = Number(event.target.value);
-    if (!Number.isNaN(Number(value))) {
-      if (index === 0 && canConfigureChannels) setRequiredChannels(value);
-      updateConfigs(tiffAnalysis.fileName, "channels", value);
-    }
-  };
-  const handleChangeFrames = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const value = Number(event.target.value);
-    if (!Number.isNaN(Number(value)))
-      updateConfigs(tiffAnalysis.fileName, "frames", value);
-  };
-  const handleChangeSlices = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const value = Number(event.target.value);
-    if (!Number.isNaN(Number(value)))
-      updateConfigs(tiffAnalysis.fileName, "slices", value);
-  };
+  const dims = tiffInfo.OMEDims;
+  const containsTiffValues = !!dims?.sizec || !!dims?.sizet || !!dims?.sizez;
+  const deviatesFromFile =
+    (dims?.sizec !== undefined && config.channels !== dims.sizec) ||
+    (dims?.sizez !== undefined && config.slices !== dims.sizez) ||
+    (dims?.sizet !== undefined && config.frames !== dims.sizet);
+  const override = overrideTiff || deviatesFromFile;
 
-  useEffect(() => {
-    if (tiffInfo?.frameCount) {
-      if (
-        config.channels * config.slices * config.frames !==
-        tiffInfo.frameCount
-      ) {
-        setInputError(
-          `C \u00D7 Z \u00D7 T must equal ${tiffInfo.frameCount} frames
-          (currently ${config.channels} \u00D7 ${config.slices} \u00D7 ${config.frames} =
-           ${config.channels * config.slices * config.frames})`,
-        );
-        updateError(true);
-      } else if (requiredChannels && config.channels !== requiredChannels) {
-        setInputError(
-          `All images in this project must have ${requiredChannels} channels (set by ${canConfigureChannels ? "image 1" : "existing images"}) `,
-        );
-        updateError(true);
-      } else {
-        setInputError(undefined);
-        updateError(false);
-      }
-    }
-  }, [config, requiredChannels]);
-
-  useEffect(() => {
-    // Note: Can only happen when configs change through use of "Apply All"
-    // from another image.
-
-    // If there are dims from the file and the set configs deviate from
-    // the file dims, signify override.
-    if (
-      containsTiffValues &&
-      !overrideTiff &&
-      (config.channels !== tiffInfo?.OMEDims?.sizec ||
-        config.slices !== tiffInfo?.OMEDims?.sizez ||
-        (!!tiffInfo?.OMEDims?.sizet &&
-          config.frames !== tiffInfo?.OMEDims?.sizet))
-    )
-      setOverrideTiff(true);
-  }, [config, containsTiffValues, overrideTiff]);
+  const handleChangeDimensions =
+    (dim: keyof DimensionConfig) =>
+    (
+      event:
+        | SelectChangeEvent
+        | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+      const value = event.target.value as TiffImportConfig[typeof dim];
+      updateConfigs(tiffAnalysis.fileName, dim, value);
+    };
 
   return (
     <Box
@@ -150,7 +130,6 @@ export const TiffConfigurator = ({
       <Accordion
         defaultExpanded={index === 0}
         sx={{
-          bgcolor: "rgba(0,0,0,0.25)",
           boxShadow: "none",
           borderRadius: 2,
           "&:last-of-type": { borderRadius: 2 },
@@ -188,11 +167,13 @@ export const TiffConfigurator = ({
 
             <OverrideOption
               disabled={!containsTiffValues}
-              canOverride={overrideTiff}
+              canOverride={override}
               onChange={() => {
-                setOverrideTiff((override) => !override);
-                if (overrideTiff) {
+                if (override) {
+                  setOverrideTiff(false);
                   resetConfig(tiffAnalysis.fileName);
+                } else {
+                  setOverrideTiff(true);
                 }
               }}
             />
@@ -216,12 +197,11 @@ export const TiffConfigurator = ({
             >
               <Typography variant="body2">Dimension Order:</Typography>
               <FormControl size="small">
-                <Select
+                <StyledSelect
                   value={config.dimensionOrder}
-                  onChange={handleChangeDimensionOrder}
-                  disabled={
-                    !!tiffInfo?.OMEDims?.dimensionorder && !overrideTiff
-                  }
+                  // @ts-ignore StyledSelect has a narrower prop type, but this works fine
+                  onChange={handleChangeDimensions("dimensionOrder")}
+                  disabled={!!dims?.dimensionorder && !override}
                 >
                   {DimensionOrder.map(
                     (order: (typeof DimensionOrder)[number]) => (
@@ -233,7 +213,7 @@ export const TiffConfigurator = ({
                       </MenuItem>
                     ),
                   )}
-                </Select>
+                </StyledSelect>
               </FormControl>
             </Stack>
 
@@ -250,12 +230,13 @@ export const TiffConfigurator = ({
                 <TextField
                   size="small"
                   value={config.channels}
-                  disabled={
-                    tiffInfo?.OMEDims?.sizec !== undefined && !overrideTiff
-                  }
+                  disabled={dims?.sizec !== undefined && !override}
                   error={!!inputError}
-                  onChange={handleChangeChannels}
-                  slotProps={{ input: { style: { width: "7ch" } } }}
+                  onChange={handleChangeDimensions("channels")}
+                  slotProps={{
+                    input: { style: { paddingBlock: 0, width: "7ch" } },
+                  }}
+                  sx={getDimInputStyle(!!dims?.sizec)}
                 />
               </Stack>
 
@@ -270,12 +251,11 @@ export const TiffConfigurator = ({
                 <TextField
                   size="small"
                   value={config.slices}
-                  disabled={
-                    tiffInfo?.OMEDims?.sizez !== undefined && !overrideTiff
-                  }
+                  disabled={dims?.sizez !== undefined && !override}
                   error={!!inputError}
-                  onChange={handleChangeSlices}
+                  onChange={handleChangeDimensions("slices")}
                   slotProps={{ input: { style: { width: "7ch" } } }}
+                  sx={getDimInputStyle(!!dims?.sizez)}
                 />
               </Stack>
 
@@ -286,16 +266,15 @@ export const TiffConfigurator = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body2">Timepoints:</Typography>
+                <Typography variant="body2">{"Timepoints:"}</Typography>
                 <TextField
                   size="small"
                   value={config.frames}
-                  disabled={
-                    tiffInfo?.OMEDims?.sizet !== undefined && !overrideTiff
-                  }
+                  disabled={dims?.sizet !== undefined && !override}
                   error={!!inputError}
-                  onChange={handleChangeFrames}
+                  onChange={handleChangeDimensions("frames")}
                   slotProps={{ input: { style: { width: "7ch" } } }}
+                  sx={getDimInputStyle(!!dims?.sizet)}
                 />
               </Stack>
             </Stack>
@@ -340,7 +319,13 @@ const OverrideOption = ({
   return (
     <FormControlLabel
       label={
-        <Typography variant="body2">Override tiff defined values?</Typography>
+        <Typography variant="body2">
+          Override{" "}
+          <span style={{ color: "var(--mui-palette-warning-dark)" }}>
+            tiff defined values
+          </span>
+          ?
+        </Typography>
       }
       disabled={disabled}
       control={
