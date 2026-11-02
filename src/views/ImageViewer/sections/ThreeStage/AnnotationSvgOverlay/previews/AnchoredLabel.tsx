@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useRef } from "react";
 
 import { useThreeViewport } from "@ImageViewer/contexts/ThreeViewportProvider";
 
@@ -25,25 +25,23 @@ export const AnchoredLabel = ({
   const { onCameraChange, getImageToScreenTransform } = useThreeViewport();
   const gRef = useRef<SVGGElement>(null);
 
-  // Latest-ref so the subscribed callback is stable across the per-mousemove
-  // re-renders that drawTick drives.
-  const anchorRef = useRef({ x, y });
-  anchorRef.current = { x, y };
-
-  const applyTransform = useCallback(() => {
+  const applyTransform = useEffectEvent(() => {
     const g = gRef.current;
     const t = getImageToScreenTransform();
     if (!g || !t) return;
-    const { x, y } = anchorRef.current;
+
     g.setAttribute("transform", `translate(${x} ${y}) scale(${1 / t.scale})`);
-  }, [getImageToScreenTransform]);
+  });
 
   useLayoutEffect(() => {
     applyTransform();
   });
   useEffect(
-    () => onCameraChange(applyTransform),
-    [onCameraChange, applyTransform],
+    () =>
+      onCameraChange(() => {
+        applyTransform();
+      }),
+    [onCameraChange],
   );
 
   return (
