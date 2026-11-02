@@ -178,6 +178,8 @@ export const usePredictClassifier = () => {
     activeCategories,
     kindClassifier,
     getClassMap,
+    cfApi,
+    modelTarget,
   ]);
 
   return predictClassifier;

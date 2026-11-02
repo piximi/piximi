@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -439,7 +439,7 @@ export const useFitClassifier = () => {
     };
   };
 
-  const fitClassifier = useCallback(async () => {
+  const fitClassifier = async () => {
     if (!kindClassifier) return;
     const startedAt = new Date().toISOString();
     const modelName = kindClassifier.activeModel;
@@ -583,15 +583,7 @@ export const useFitClassifier = () => {
       );
       handleError(error as Error, "Training Error");
     }
-  }, [
-    kindClassifier,
-    newModelName,
-    activeItems,
-    knownCategories,
-    handleError,
-    dispatch,
-    modelParams,
-  ]);
+  };
 
   return fitClassifier;
 };
