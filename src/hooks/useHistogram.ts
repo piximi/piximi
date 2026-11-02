@@ -5,10 +5,8 @@ import { DataConnector } from "core/data-connector";
 import type { ExtendedChannel } from "core/entities";
 
 /**
- * Returns the rendered preview src for an entity.
- *
- * - Legacy path: returns entity.src directly
- * - New pipeline: loads renderedSrc from IndexedDB StoredTensorData
+ * Returns the channels histogram data and number fo pixels
+
  */
 export function useHistogram(
   channel: ExtendedChannel,
@@ -17,21 +15,22 @@ export function useHistogram(
     { histogram: ArrayBuffer; numPixels: number } | undefined
   >();
 
-  useEffect(() => {
-    const load = async (channel: ExtendedChannel) => {
-      const storage = DataConnector.getInstance();
+  const id = channel.id;
+  const storeName = channel.storageReference.storeName;
 
-      const result = await storage.retrieve(
-        channel.id,
-        channel.storageReference.storeName,
-      );
-      if (result.success) {
+  useEffect(() => {
+    let cancelled = false;
+    DataConnector.getInstance()
+      .retrieve(id, storeName)
+      .then((result) => {
+        if (cancelled || !result.success) return;
         const { histogram, width, height } = result.data;
         setChannelHistogram({ histogram, numPixels: width * height });
-      }
+      });
+    return () => {
+      cancelled = true;
     };
-    load(channel);
-  }, [channel.id]);
+  }, [id, storeName]);
 
   return channelHistogram;
 }

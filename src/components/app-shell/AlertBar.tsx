@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
@@ -6,7 +6,6 @@ import {
   Box,
   Collapse,
   IconButton,
-  styled,
   Toolbar,
   Tooltip,
   Typography,
@@ -27,8 +26,6 @@ import { applicationSettingsSlice } from "store/applicationSettings";
 import { createGitHubIssue } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 
-import type { PaletteColor } from "@mui/material";
-
 import type { AlertState } from "utils/types";
 
 type AlertBarProps = {
@@ -44,51 +41,51 @@ export const AlertBar = ({
   const theme = useTheme();
 
   const [expanded, setExpanded] = useState(false);
-  const [showCreateGitHubIssue, setShowCreateGitHubIssue] = useState(false);
-  const [colorTheme, setColorTheme] = useState<PaletteColor>(
-    theme.palette.primary,
-  );
-  const [errorStateIcon, setErrorStateIcon] = useState<React.JSX.Element>();
-  const [issueDescription, setIssueDescription] = useState("");
 
-  useEffect(() => {
+  const {
+    errorStateIcon,
+    colorTheme,
+    issueDescription,
+    showCreateGitHubIssue,
+  } = useMemo(() => {
     switch (alertState.alertType) {
       case AlertType.Error:
-        setErrorStateIcon(<ErrorOutlineIcon />);
-        setColorTheme(theme.palette.error);
-        setShowCreateGitHubIssue(true);
-        setIssueDescription(
-          alertState.description +
+        return {
+          errorStateIcon: <ErrorOutlineIcon />,
+          colorTheme: theme.palette.error,
+          issueDescription:
+            alertState.description +
             "\n\n**Steps to reproduce:**\n" +
             "\n\n**Stacktrace:**\n" +
             alertState.stackTrace,
-        );
-        break;
+          showCreateGitHubIssue: true,
+        };
+
       case AlertType.Warning:
-        setErrorStateIcon(<WarningAmberOutlinedIcon />);
-        setColorTheme(theme.palette.warning);
-        setShowCreateGitHubIssue(true);
-        setIssueDescription(alertState.description);
-        break;
+        return {
+          errorStateIcon: <WarningAmberOutlinedIcon />,
+          colorTheme: theme.palette.warning,
+          issueDescription: alertState.description,
+          showCreateGitHubIssue: true,
+        };
+
       case AlertType.Info:
-        setErrorStateIcon(<InfoOutlinedIcon />);
-        setColorTheme(theme.palette.info);
-        break;
+        return {
+          errorStateIcon: <InfoOutlinedIcon />,
+          colorTheme: theme.palette.info,
+          issueDescription: "",
+          showCreateGitHubIssue: false,
+        };
+
       default:
-        setErrorStateIcon(<InfoOutlinedIcon />);
+        return {
+          errorStateIcon: <InfoOutlinedIcon />,
+          colorTheme: theme.palette.primary,
+          issueDescription: "",
+          showCreateGitHubIssue: false,
+        };
     }
   }, [alertState, theme]);
-
-  const StyledToolbar = styled(Toolbar)(() => ({
-    backgroundColor: colorTheme?.light,
-    color: colorTheme?.contrastText,
-    zIndex: 5000,
-    position: "relative",
-    width: "100%",
-    "@media all": {
-      minHeight: "10px",
-    },
-  }));
 
   const closeAlertBar = () => {
     if (setShowAlertBar) {
@@ -100,7 +97,18 @@ export const AlertBar = ({
 
   return (
     <div style={{ position: "absolute", width: "100%", top: 0, zIndex: 5000 }}>
-      <StyledToolbar>
+      <Toolbar
+        sx={{
+          backgroundColor: colorTheme?.light,
+          color: colorTheme?.contrastText,
+          zIndex: 5000,
+          position: "relative",
+          width: "100%",
+          "@media all": {
+            minHeight: "10px",
+          },
+        }}
+      >
         {errorStateIcon}
 
         <Typography variant="subtitle1" component="div" sx={{ pl: 1 }}>
@@ -149,7 +157,7 @@ export const AlertBar = ({
             <CloseIcon />
           </IconButton>
         </Tooltip>
-      </StyledToolbar>
+      </Toolbar>
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Box

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -33,11 +33,10 @@ export function useCategoryValidation({
     });
     return { existingNames, existingColors };
   }, [categories, options]);
-  const [color, setColor] = useState(initColor ?? "");
+  const [color, setColor] = useState(
+    () => initColor || getRestrictedRandomHex(existingColors),
+  );
   const [name, setName] = useState(initName ?? "");
-  const [errorHelperText, setErrorHelperText] = useState(" "); // leave space for rendering
-
-  const [isInvalidName, setIsInvalidName] = useState<boolean>(false);
 
   const handleColorChange = (color: ColorResult) => {
     setColor(color.hex);
@@ -47,35 +46,24 @@ export function useCategoryValidation({
     setName(event.target.value);
   };
 
-  const validateInput = useCallback(
-    (categoryName: string) => {
-      let invalidInput = false;
-      let helperText = " ";
+  const validateInput = (categoryName: string) => {
+    let invalidInput = false;
+    let helperText = " ";
 
-      if (categoryName === "") {
-        helperText = "Please type a category name.";
-        invalidInput = true;
-      } else if (
-        categoryName !== initName &&
-        existingNames.includes(categoryName)
-      ) {
-        helperText = "A category with this name already exits.";
-        invalidInput = true;
-      }
-      return { isInvalid: invalidInput, helperText };
-    },
-    [initName, existingNames],
-  );
-
-  useEffect(() => {
-    const { isInvalid, helperText } = validateInput(name);
-    setErrorHelperText(helperText);
-    setIsInvalidName(isInvalid);
-  }, [name, validateInput]);
-
-  useEffect(() => {
-    if (!initColor) setColor(getRestrictedRandomHex(existingColors));
-  }, [existingColors, initColor]);
+    if (categoryName === "") {
+      helperText = "Please type a category name.";
+      invalidInput = true;
+    } else if (
+      categoryName !== initName &&
+      existingNames.includes(categoryName)
+    ) {
+      helperText = "A category with this name already exits.";
+      invalidInput = true;
+    }
+    return { isInvalid: invalidInput, helperText };
+  };
+  const { isInvalid: isInvalidName, helperText: errorHelperText } =
+    validateInput(name);
 
   return {
     name,
