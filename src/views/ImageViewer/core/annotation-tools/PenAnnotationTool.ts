@@ -13,6 +13,9 @@ export class PenAnnotationTool extends AnnotationTool {
   buffer: Array<Point> = [];
   points: Array<Point> = [];
 
+  setBrushSize(size: number) {
+    this.brushSize = size;
+  }
   deselect() {
     this.buffer = [];
     this.points = [];

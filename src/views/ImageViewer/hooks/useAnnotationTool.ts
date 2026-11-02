@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -28,13 +28,7 @@ import { ToolType } from "@ImageViewer/utils/enums";
 
 import type { Image as IJSImage } from "image-js-latest";
 
-import type { AnnotationTool } from "@ImageViewer/core/annotation-tools";
-
 export const useAnnotationTool = (ijsImage: IJSImage | null) => {
-  const [operator, setOperator] = useState<AnnotationTool>(
-    new BlankAnnotationTool(),
-  );
-
   const operation = useSelector(selectToolType);
 
   const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
@@ -42,68 +36,71 @@ export const useAnnotationTool = (ijsImage: IJSImage | null) => {
   const threshold = useSelector(selectThresholdAnnotationValue);
   const invertThreshold = useSelector(selectInvertThresholdAnnotation);
 
-  useEffect(() => {
-    if (!ijsImage) return;
+  const syncTool = useMemo(() => {
+    if (!ijsImage) {
+      return new BlankAnnotationTool();
+    }
 
     switch (operation) {
       case ToolType.ColorAnnotation:
-        setOperator(new ColorAnnotationTool(ijsImage));
+        return new ColorAnnotationTool(ijsImage);
 
-        return;
       case ToolType.EllipticalAnnotation:
-        setOperator(new EllipticalAnnotationTool(ijsImage));
+        return new EllipticalAnnotationTool(ijsImage);
 
-        return;
       case ToolType.LassoAnnotation:
-        setOperator(new LassoAnnotationTool(ijsImage));
+        return new LassoAnnotationTool(ijsImage);
 
-        return;
       case ToolType.MagneticAnnotation:
-        setOperator(new MagneticAnnotationTool(ijsImage, 0.5));
+        return new MagneticAnnotationTool(ijsImage, 0.5);
 
-        return;
       case ToolType.ObjectAnnotation:
-        ObjectAnnotationTool.compile(ijsImage).then(
-          (operator: ObjectAnnotationTool) => {
-            setOperator(operator);
-          },
-        );
+        return null;
 
-        return;
       case ToolType.PenAnnotation:
-        setOperator(new PenAnnotationTool(ijsImage));
+        return new PenAnnotationTool(ijsImage);
 
-        return;
       case ToolType.PolygonalAnnotation:
-        setOperator(new PolygonalAnnotationTool(ijsImage));
+        return new PolygonalAnnotationTool(ijsImage);
 
-        return;
       case ToolType.QuickAnnotation:
-        setOperator(new QuickAnnotationTool(ijsImage));
+        return new QuickAnnotationTool(ijsImage);
 
-        return;
       case ToolType.ThresholdAnnotation:
-        setOperator(new ThresholdAnnotationTool(ijsImage));
+        return new ThresholdAnnotationTool(ijsImage);
 
-        return;
       case ToolType.RectangularAnnotation:
-        setOperator(new RectangularAnnotationTool(ijsImage));
+        return new RectangularAnnotationTool(ijsImage);
 
-        return;
       case ToolType.Pointer:
-        setOperator(new SelectionTool(ijsImage));
+        return new SelectionTool(ijsImage);
 
-        return;
       case ToolType.Measure:
-        setOperator(new MeasureTool(ijsImage));
+        return new MeasureTool(ijsImage);
 
-        return;
       default:
-        setOperator(new BlankAnnotationTool(ijsImage));
-
-        return;
+        return new BlankAnnotationTool(ijsImage);
     }
+  }, [ijsImage, operation]);
+
+  const [objectTool, setObjectTool] = useState<{
+    image: IJSImage;
+    tool: ObjectAnnotationTool;
+  } | null>(null);
+  useEffect(() => {
+    if (operation !== ToolType.ObjectAnnotation || !ijsImage) return;
+    let cancelled = false;
+    ObjectAnnotationTool.compile(ijsImage).then((tool) => {
+      if (!cancelled) setObjectTool({ image: ijsImage, tool });
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [operation, ijsImage]);
+  const placeHolder = useMemo(() => new BlankAnnotationTool(), []);
+  const operator =
+    syncTool ??
+    (objectTool?.image === ijsImage ? objectTool.tool : placeHolder);
 
   useEffect(() => {
     if (operator instanceof ThresholdAnnotationTool) {
@@ -117,7 +114,7 @@ export const useAnnotationTool = (ijsImage: IJSImage | null) => {
       operator.initializeSuperpixels(regionSize);
     } else if (operator instanceof PenAnnotationTool) {
       const brushSize = penSelectionBrushSize;
-      operator.brushSize = Math.round(brushSize);
+      operator.setBrushSize(Math.round(brushSize));
     }
   }, [operator, quickSelectionRegionSize, penSelectionBrushSize]);
 
