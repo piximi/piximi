@@ -4,8 +4,8 @@ import type { BitDepth } from "core/entities";
 
 const componentToHex = (c: number) => {
   c = c > 1 ? c : c * 255;
-  const hex = c.toString(16);
-  return hex.length === 1 ? "0" + hex : hex;
+  const hex = c.toString(16).padStart(2, "0");
+  return hex;
 };
 
 export const rgbToHex = (rgb: [number, number, number]) => {
