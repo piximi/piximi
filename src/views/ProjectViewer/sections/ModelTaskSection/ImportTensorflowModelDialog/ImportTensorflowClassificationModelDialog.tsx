@@ -31,6 +31,8 @@ import { classifierSlice } from "store/classifier";
 
 import { parseError } from "utils/logUtils";
 
+import { selectActiveKnownCategories } from "views/ProjectViewer/state/reselectors";
+
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import { ToolTipTab } from "@ProjectViewer/components";
 
@@ -74,6 +76,12 @@ export const ImportTensorflowClassificationModelDialog = ({
   const dispatch = useDispatch();
 
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const activeCategories = useSelector(selectActiveKnownCategories);
+  const kindCategoryIds = useMemo(
+    () => new Set(activeCategories.map((cat) => cat.id)),
+    [activeCategories],
+  );
+
   const [uploadResult, setUploadResult] = useState<
     | {
         success: true;
@@ -138,6 +146,14 @@ export const ImportTensorflowClassificationModelDialog = ({
       }
 
       const modelInfo = modelInfoDTOToModelInfo(modelDetails, runs);
+      const lastRunMap = runs.at(-1)?.classMap;
+      const reusableClassMap =
+        lastRunMap &&
+        Object.keys(lastRunMap).length === modelDetails.classes.length &&
+        Object.values(lastRunMap).every((id) => kindCategoryIds.has(id))
+          ? lastRunMap
+          : undefined;
+      modelInfo.classMap = reusableClassMap;
       setUploadResult({ success: true, modelDetails, runs });
       batch(() => {
         dispatch(
