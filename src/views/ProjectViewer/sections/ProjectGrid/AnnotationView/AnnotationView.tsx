@@ -84,7 +84,7 @@ export const AnnotationView = () => {
         }),
       );
     },
-    [dispatch, gridState.activeKindId],
+    [dispatch, gridState.activeKindId, visibleKinds],
   );
 
   const handleTabChange = (id: string) => {
@@ -187,7 +187,7 @@ export const AnnotationView = () => {
 
       {visibleKinds.map((kind) => (
         <Box
-          key={`annotation-grid-${kind.name}`}
+          key={`annotation-grid-${kind.id}`}
           sx={{
             width: "100%",
             flexGrow: 1,
