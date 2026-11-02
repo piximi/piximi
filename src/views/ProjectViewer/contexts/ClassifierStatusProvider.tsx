@@ -2,7 +2,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -16,17 +15,22 @@ import { getDefaultModelParams } from "core/dl/classification/utils";
 import { representsUnknown, type Shape } from "core/entities";
 
 import {
+  selectActiveModelName,
   selectAllCreatedModelNames,
   selectIsModelTrained,
   selectModelIsValid,
   selectModelLifecycleStatus,
   selectModelOptimizerSettings,
   selectModelPreprocessSettings,
+  selectModelTargetName,
+  selectNewModelArch,
 } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
 import { selectVisibleChannelCount } from "store/data/selectors";
+
+import { getUniqueName } from "utils/stringUtils";
 
 import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
 import {
@@ -84,14 +88,13 @@ type ClassifierStateContextProp = {
   error?: ErrorContext;
   activeErrors: ErrorContext[];
   newModelName: string;
-  setNewModelName: React.Dispatch<React.SetStateAction<string>>;
+  setNewModelName: (name: string | null) => void;
   modelParams: ClassifierModelParams;
   handleUpdateOptimizerSettings: (settings: Partial<OptimizerSettings>) => void;
   handleUpdatePreprocessSettings: (
     settings: RecursivePartial<PreprocessSettings>,
   ) => void;
   handleUpdateInputShape: (settings: Partial<Shape>) => void;
-  handleSetModelParams: (params: ClassifierModelParams) => void;
   userDefinedSeed: number | undefined;
   setUserDefinedSeed: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
@@ -112,13 +115,12 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
   modelIsTrained: false,
   classifierStatus: "idle",
   newModelName: "",
-  setNewModelName: (_value: React.SetStateAction<string>) => {},
+  setNewModelName: () => {},
   activeErrors: [],
   modelParams: getDefaultModelParams(),
   handleUpdateOptimizerSettings: () => {},
   handleUpdatePreprocessSettings: () => {},
   handleUpdateInputShape: () => {},
-  handleSetModelParams: () => {},
   userDefinedSeed: undefined,
   setUserDefinedSeed: (_value: React.SetStateAction<number | undefined>) => {},
 });
@@ -127,6 +129,20 @@ const useModelParams = () => {
   const dispatch = useDispatch();
   const visibleChannels = useSelector(selectVisibleChannelCount);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
+  const activeModelName = useParameterizedSelector(
+    selectActiveModelName,
+    modelTarget,
+  );
+  const modelTargetName = useParameterizedSelector(
+    selectModelTargetName,
+    modelTarget,
+  );
+  const newModelArch = useParameterizedSelector(
+    selectNewModelArch,
+    modelTarget,
+  );
+
   const modelPreprocessingSettings = useParameterizedSelector(
     selectModelPreprocessSettings,
     modelTarget,
@@ -135,12 +151,43 @@ const useModelParams = () => {
     selectModelOptimizerSettings,
     modelTarget,
   );
-  const [newModelName, setNewModelName] = useState("");
+
   const [userDefinedSeed, setUserDefinedSeed] = useState<number | undefined>();
+  const suggestedModelName = useMemo(
+    () =>
+      getUniqueName(
+        `${modelTargetName}_${newModelArch === 0 ? "Simple-CNN" : "Mobilenet"}`,
+        restrictedClassifierNames,
+        (base, n) => `${base}${n}`,
+      ),
+    [modelTargetName, newModelArch, restrictedClassifierNames],
+  );
+
+  const [userModelName, setUserModelName] = useState<string | null>(null);
+  // Forget a custom name once a model is created or selected, as today's remount does.
+  const [prevActive, setPrevActive] = useState(activeModelName);
+  if (activeModelName !== prevActive) {
+    setPrevActive(activeModelName);
+    setUserModelName(null);
+  }
+  const newModelName = userModelName ?? suggestedModelName;
 
   const [newModelParams, updateNewModelParams] = useImmer(
     getDefaultModelParams(visibleChannels || undefined),
   );
+  const hasModelSettings =
+    !!modelPreprocessingSettings && !!modelOptimizerSettings;
+  const [paramsKey, setParamsKey] = useState({
+    hasModelSettings,
+    visibleChannels,
+  });
+  if (
+    paramsKey.hasModelSettings !== hasModelSettings ||
+    paramsKey.visibleChannels !== visibleChannels
+  ) {
+    setParamsKey({ hasModelSettings, visibleChannels });
+    updateNewModelParams(() => getDefaultModelParams(visibleChannels));
+  }
   const modelParams = useMemo(() => {
     if (modelPreprocessingSettings && modelOptimizerSettings)
       return {
@@ -164,7 +211,7 @@ const useModelParams = () => {
           Object.assign(draft.optimizerSettings, settings);
         });
     },
-    [modelOptimizerSettings, modelTarget],
+    [modelOptimizerSettings, modelTarget, dispatch, updateNewModelParams],
   );
   const handleUpdatePreprocessSettings = useCallback(
     (settings: RecursivePartial<PreprocessSettings>) => {
@@ -180,7 +227,7 @@ const useModelParams = () => {
           Object.assign(draft.preprocessSettings, settings);
         });
     },
-    [modelPreprocessingSettings, modelTarget],
+    [modelPreprocessingSettings, modelTarget, dispatch, updateNewModelParams],
   );
   const handleUpdateInputShape = useCallback(
     (inputShape: Partial<Shape>) => {
@@ -196,31 +243,18 @@ const useModelParams = () => {
           Object.assign(draft.preprocessSettings.inputShape, inputShape);
         });
     },
-    [modelPreprocessingSettings, modelTarget],
+    [modelPreprocessingSettings, modelTarget, dispatch, updateNewModelParams],
   );
-  const handleSetModelParams = useCallback((params: ClassifierModelParams) => {
-    updateNewModelParams(() => params);
-  }, []);
-  useEffect(() => {
-    if (modelPreprocessingSettings && modelOptimizerSettings) {
-      handleSetModelParams({
-        preprocessSettings: modelPreprocessingSettings,
-        optimizerSettings: modelOptimizerSettings,
-      });
-      return;
-    }
-    handleSetModelParams(getDefaultModelParams(visibleChannels || undefined));
-  }, [modelOptimizerSettings, modelPreprocessingSettings, visibleChannels]);
   return {
     modelParams,
     newModelName,
-    setNewModelName,
+    setNewModelName: setUserModelName,
     userDefinedSeed,
     setUserDefinedSeed,
     handleUpdateOptimizerSettings,
     handleUpdatePreprocessSettings,
     handleUpdateInputShape,
-    handleSetModelParams,
+    restrictedClassifierNames,
   };
 };
 
@@ -264,7 +298,6 @@ export const ClassifierStatusProvider = ({
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
-  const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
 
   const {
     modelParams,
@@ -275,7 +308,7 @@ export const ClassifierStatusProvider = ({
     handleUpdateOptimizerSettings,
     handleUpdatePreprocessSettings,
     handleUpdateInputShape,
-    handleSetModelParams,
+    restrictedClassifierNames,
   } = useModelParams();
 
   const isFitting =
@@ -413,7 +446,6 @@ export const ClassifierStatusProvider = ({
       handleUpdateOptimizerSettings,
       handleUpdatePreprocessSettings,
       handleUpdateInputShape,
-      handleSetModelParams,
       userDefinedSeed,
       setUserDefinedSeed,
     }),
@@ -429,9 +461,10 @@ export const ClassifierStatusProvider = ({
       handleUpdateOptimizerSettings,
       handleUpdatePreprocessSettings,
       handleUpdateInputShape,
-      handleSetModelParams,
       userDefinedSeed,
       setUserDefinedSeed,
+      classifierStatus,
+      modelIsTrained,
     ],
   );
 
