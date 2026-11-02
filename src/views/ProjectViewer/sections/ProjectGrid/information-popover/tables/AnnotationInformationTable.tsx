@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Box,
@@ -114,7 +114,7 @@ const AnnotationInfoTable = ({
       setTargetKindId(kindId);
       handleKindDialogOpen();
     },
-    [dispatch, handleKindDialogOpen],
+    [handleKindDialogOpen],
   );
 
   const tableData = useMemo(() => {
@@ -231,42 +231,34 @@ const KindChangeDialog = ({
     setDecision(decision as KindChangeDecision);
   };
 
-  const dispatchAnnotationKindChange = useMemo(() => {
-    switch (decision) {
-      case "copy":
-        const copiedCategory = generateCategory(
-          targetAnn.category.name,
-          targetAnn.category.color,
-          { type: "annotation", kindId: targetKind.id },
-        );
-        return () =>
-          batch(() => {
-            dispatch(dataSlice.actions.addCategory(copiedCategory));
-            dispatch(
-              dataSlice.actions.bubbleUpdateAnnotationKind({
-                id: targetAnn.id,
-                kindId: targetKind.id,
-                categoryId: copiedCategory.id,
-              }),
-            );
-          });
-
-      case "map":
-        return () => {
-          dispatch(
-            dataSlice.actions.bubbleUpdateAnnotationKind({
-              id: targetAnn.id,
-              kindId: targetKind.id,
-              categoryId: selectedCategoryId,
-            }),
-          );
-        };
-    }
-  }, [decision, selectedCategoryId]);
-
   const handleConfirm = () => {
     onClose();
-    dispatchAnnotationKindChange();
+
+    if (decision === "copy") {
+      const copiedCategory = generateCategory(
+        targetAnn.category.name,
+        targetAnn.category.color,
+        { type: "annotation", kindId: targetKind.id },
+      );
+
+      dispatch(dataSlice.actions.addCategory(copiedCategory));
+      dispatch(
+        dataSlice.actions.bubbleUpdateAnnotationKind({
+          id: targetAnn.id,
+          kindId: targetKind.id,
+          categoryId: copiedCategory.id,
+        }),
+      );
+    } else {
+      dispatch(
+        dataSlice.actions.bubbleUpdateAnnotationKind({
+          id: targetAnn.id,
+          kindId: targetKind.id,
+          categoryId: selectedCategoryId,
+        }),
+      );
+    }
+
     closePopover();
   };
 

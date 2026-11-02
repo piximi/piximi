@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import { MenuItem } from "@mui/material";
 
 import { Partition } from "core/dl/enums";
@@ -17,25 +15,16 @@ export const ItemPartitionSelect = ({
   currentPartition: Partition;
   callback: (partition: Partition) => void;
 }) => {
-  const [selectedPartition, setSelectedPartition] =
-    useState<Partition>(currentPartition);
-
   const handleChange = (event: SelectChangeEvent<unknown>) => {
     const newPartition = event.target.value as Partition;
-    setSelectedPartition(newPartition);
-    if (currentPartition !== newPartition) {
-      callback(newPartition);
-    }
-  };
 
-  useEffect(() => {
-    setSelectedPartition(currentPartition);
-  }, [currentPartition]);
+    if (currentPartition === newPartition) return;
+    callback(newPartition);
+  };
 
   return (
     <StyledSelect
-      defaultValue={currentPartition}
-      value={selectedPartition}
+      value={currentPartition}
       onChange={(event) => handleChange(event)}
       {...SELECT_PROPS}
     >
