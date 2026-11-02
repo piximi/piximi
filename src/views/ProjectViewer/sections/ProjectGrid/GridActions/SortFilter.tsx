@@ -36,6 +36,7 @@ export const SortFilter = () => {
             <FilterIcon />
           </Badge>
         }
+        popperPlacement="bottom"
         popperContent={
           <Box
             sx={(theme) => ({
