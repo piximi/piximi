@@ -213,20 +213,3 @@ export const maskToDataURL = (
   ctx.putImageData(new ImageData(rgba, w, h), 0, 0);
   return canvas.toDataURL();
 };
-
-/*
- * from https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
- * */
-export const hexToRGBA = (color: string, alpha?: number) => {
-  const r = parseInt(color.slice(1, 3), 16);
-  const g = parseInt(color.slice(3, 5), 16);
-  const b = parseInt(color.slice(5, 7), 16);
-  const a = alpha
-    ? alpha
-    : color.length === 9
-      ? parseInt(color.slice(7, 9), 16)
-      : undefined;
-
-  return a ? [r, g, b, a] : [r, g, b];
-  // return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};

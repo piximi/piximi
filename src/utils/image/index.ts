@@ -17,7 +17,6 @@ export {
   connectPoints,
   getOverlappingAnnotations,
   getAnnotationsInBox,
-  hexToRGBA,
   getIdx,
   drawRectangle,
 } from "./imageHelper";
