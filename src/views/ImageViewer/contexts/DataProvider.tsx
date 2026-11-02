@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-import { batch, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 import { addListener, isAnyOf } from "@reduxjs/toolkit";
@@ -20,18 +20,17 @@ import type { RootState } from "store/rootReducer";
 import type { DataStateV2 } from "store/data/types";
 
 const DataContext = createContext<{
-  savedData: DataStateV2 | undefined;
-}>({ savedData: undefined });
+  initialDataSnapshot: DataStateV2 | undefined;
+}>({ initialDataSnapshot: undefined });
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
   const routerLocation = useLocation();
-  const [savedData, setSavedData] = useState<DataStateV2>();
+  const [initialDataSnapshot] = useState<DataStateV2>(
+    () => productionStore.getState().data,
+  );
 
   useEffect(() => {
-    const initialDataState = productionStore.getState().data;
-
-    setSavedData(initialDataState);
     const unsubscribe = dispatch(
       addListener({
         matcher: isAnyOf(...Object.values(dataSlice.actions)),
@@ -46,7 +45,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       }),
     );
     return unsubscribe as unknown as UnsubscribeListener;
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const initialImageIds: string[] =
@@ -72,34 +71,33 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         )
       )
         isAnnotated = true;
-    batch(() => {
-      dispatch(imageViewerDataSlice.actions.setImageStack(initialImageIds));
-      dispatch(imageViewerDataSlice.actions.setActiveImageId(activeImageId));
 
-      // If the images have annotations, set the annotation tool to pointer
-      if (isAnnotated)
-        dispatch(annotatorSlice.actions.setToolType(ToolType.Pointer));
-      // Annotations hand-picked in the ProjectViewer match no category or
-      // feature criterion, so they seed the sticky include set.
-      if (initialAnnotationIds.length) {
-        dispatch(
-          imageViewerDataSlice.actions.toggleAnnotationSelection({
-            ids: initialAnnotationIds,
-            on: true,
-          }),
-        );
-      }
-    });
-  }, [routerLocation.state]);
+    dispatch(imageViewerDataSlice.actions.setImageStack(initialImageIds));
+    dispatch(imageViewerDataSlice.actions.setActiveImageId(activeImageId));
+
+    // If the images have annotations, set the annotation tool to pointer
+    if (isAnnotated)
+      dispatch(annotatorSlice.actions.setToolType(ToolType.Pointer));
+    // Annotations hand-picked in the ProjectViewer match no category or
+    // feature criterion, so they seed the sticky include set.
+    if (initialAnnotationIds.length) {
+      dispatch(
+        imageViewerDataSlice.actions.toggleAnnotationSelection({
+          ids: initialAnnotationIds,
+          on: true,
+        }),
+      );
+    }
+  }, [routerLocation.state, dispatch]);
   return (
-    <DataContext.Provider value={{ savedData }}>
+    <DataContext.Provider value={{ initialDataSnapshot }}>
       {children}
     </DataContext.Provider>
   );
 };
 
-export const useSavedDataState = () => {
-  const savedDataState = useContext(DataContext);
+export const useInitialDataSnapshot = () => {
+  const snapshot = useContext(DataContext);
 
-  return savedDataState;
+  return snapshot;
 };
