@@ -54,7 +54,7 @@ export const IncrementalSlider = ({
           width: DIMENSIONS.toolDrawerWidth,
           ...outerStyle,
         };
-  }, [orientation]);
+  }, [orientation, outerStyle]);
   const sliderStyle: CSSProperties = useMemo(() => {
     return orientation === "horizontal"
       ? {

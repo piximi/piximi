@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 
 import { MuiMarkdown, getOverrides } from "mui-markdown";
 
@@ -52,75 +52,78 @@ const HelpOverlay = () => {
   const muiTheme = useTheme();
   const { helpMode, setHelpMode } = useHelp();
   const [helpText, setHelpText] = useState<string | null>(null);
-  const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
   const [helpItem, setHelpItem] = useState<HelpItem | null>(null);
   const [priorityHelp, setPriorityHelp] = useState<HelpItem | null>(null);
+  const lastTargetRef = useRef<HTMLElement | null>(null);
 
-  const helpToggle = (event: KeyboardEvent) => {
-    if (event.key === "H" && event.shiftKey) {
-      setHelpMode((helpMode) => {
-        logger(helpMode ? "Help mode off" : "Help mode on");
-        return !helpMode;
-      });
-    }
-  };
   useEffect(() => {
+    const helpToggle = (event: KeyboardEvent) => {
+      if (event.key === "H" && event.shiftKey) {
+        setHelpMode((helpMode) => {
+          logger(helpMode ? "Help mode off" : "Help mode on");
+          return !helpMode;
+        });
+      }
+    };
     document.addEventListener("keydown", helpToggle);
 
     return () => {
       document.removeEventListener("keydown", helpToggle);
     };
-  }, []);
-  useEffect(() => {
-    if (!helpMode) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (priorityHelp) return;
-      const { target: currentTarget, helpItem } = findHelpTarget(
-        e.target as HTMLElement,
-      );
-      if (currentTarget === lastTarget) return;
-      setLastTarget(currentTarget);
-      if (helpItem) {
-        const helpText = helpContent[helpItem as HelpItem] ?? null;
-        setHelpText(helpText);
-        setHelpItem(helpItem as HelpItem);
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest(DISABLED_HELP_SELECTOR)) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-
-      if (!e.shiftKey) return;
-
+  }, [setHelpMode]);
+  const onMouseMove = useEffectEvent((e: MouseEvent) => {
+    if (priorityHelp) return;
+    const { target: currentTarget, helpItem } = findHelpTarget(
+      e.target as HTMLElement,
+    );
+    if (currentTarget === lastTargetRef.current) return;
+    lastTargetRef.current = currentTarget;
+    if (helpItem) {
+      setHelpText(helpContent[helpItem as HelpItem] ?? null);
+      setHelpItem(helpItem as HelpItem);
       e.preventDefault();
       e.stopPropagation();
+    }
+  });
 
-      const { helpItem: _helpItem } = findHelpTarget(target);
-      if (priorityHelp === _helpItem) {
-        setPriorityHelp(null);
-        return;
-      }
-      setPriorityHelp(_helpItem as HelpItem);
+  const onClick = useEffectEvent((e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest(DISABLED_HELP_SELECTOR)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
-      if (_helpItem && _helpItem !== helpItem) {
-        const helpText = helpContent[_helpItem as HelpItem] ?? null;
-        setHelpText(helpText);
-        setHelpItem(_helpItem as HelpItem);
-      }
-    };
+    if (!e.shiftKey) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const { helpItem: _helpItem } = findHelpTarget(target);
+    if (priorityHelp === _helpItem) {
+      setPriorityHelp(null);
+      return;
+    }
+    setPriorityHelp(_helpItem as HelpItem);
+
+    if (_helpItem && _helpItem !== helpItem) {
+      const helpText = helpContent[_helpItem as HelpItem] ?? null;
+      setHelpText(helpText);
+      setHelpItem(_helpItem as HelpItem);
+    }
+  });
+
+  useEffect(() => {
+    if (!helpMode) return;
+    const handleMouseMove = (e: MouseEvent) => onMouseMove(e);
+    const handleClick = (e: MouseEvent) => onClick(e);
     document.addEventListener("mousemove", handleMouseMove, true);
     document.addEventListener("click", handleClick, true);
     return () => {
       document.removeEventListener("mousemove", handleMouseMove, true);
       document.removeEventListener("click", handleClick, true);
+      lastTargetRef.current = null;
     };
-  }, [helpMode, lastTarget, priorityHelp]);
+  }, [helpMode]);
 
   const globalStyles = useMemo(
     () => (
