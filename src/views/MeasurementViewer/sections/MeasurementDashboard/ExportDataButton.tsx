@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -16,6 +16,8 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { useTableExport } from "@MeasurementViewer/hooks";
 import { selectActiveMeasurementGroup } from "@MeasurementViewer/state/selectors";
 
+import type { RefObject } from "react";
+
 import type { GridApiCommunity } from "@mui/x-data-grid/internals";
 
 const CustomMenuItem = styled(MenuItem)(() => ({
@@ -28,32 +30,28 @@ export function ExportButton({
   gridApiRef,
 }: {
   view: "table" | "plots";
-  gridApiRef: React.MutableRefObject<GridApiCommunity | null>;
+  gridApiRef: RefObject<GridApiCommunity | null>;
 }) {
-  const [exportMenuOpen, setExportMenuOpen] = useState(false);
-  const exportMenuTriggerRef = useRef<HTMLButtonElement>(null);
   const activeMeasurementGroup = useSelector(selectActiveMeasurementGroup);
-  useEffect(() => {
-    setExportMenuOpen(false);
-  }, [view]);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const handleClose = () => setAnchorEl(null);
   const handleExportTable = useTableExport();
   return (
     <Box>
       <Tooltip title={view === "table" ? "Download as CSV" : "Save as PNG"}>
         <IconButton
           data-doc="export-data"
-          ref={exportMenuTriggerRef}
           size="small"
-          onClick={() => setExportMenuOpen(true)}
+          onClick={(e) => setAnchorEl(e.currentTarget)}
         >
           <FileDownloadIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       {view === "table" ? (
         <Menu
-          anchorEl={exportMenuTriggerRef.current}
-          open={exportMenuOpen}
-          onClose={() => setExportMenuOpen(false)}
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "right" }}
           slotProps={{
@@ -94,9 +92,9 @@ export function ExportButton({
         </Menu>
       ) : (
         <Menu
-          anchorEl={exportMenuTriggerRef.current}
-          open={exportMenuOpen}
-          onClose={() => setExportMenuOpen(false)}
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "right" }}
           slotProps={{

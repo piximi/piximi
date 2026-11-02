@@ -68,7 +68,7 @@ export const PivotConfigurator = () => {
       initialPivotDimensions.filter(
         (item) => !pivotItems.map((pItem) => pItem.id).includes(item.id),
       ),
-    [pivotItems],
+    [pivotItems, initialPivotDimensions],
   );
 
   // Configure sensors
