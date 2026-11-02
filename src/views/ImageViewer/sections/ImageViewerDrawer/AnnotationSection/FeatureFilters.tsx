@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -48,16 +48,14 @@ function FeatureRow({
   onCommit,
 }: FeatureRowProps) {
   const [lo, hi] = resolveRange(f, cfg.bounds);
-  const [live, setLive] = useState<[number, number]>([lo, hi]);
+  const [drag, setDrag] = useState<[number, number] | null>(null);
+  const live = drag ?? [lo, hi];
   const [showSlider, setShowSlider] = useState(f.active);
 
   const marks = useMemo(
     () => [{ value: localBounds[0] }, { value: localBounds[1] }],
     [localBounds],
   );
-  useEffect(() => {
-    setLive([lo, hi]);
-  }, [lo, hi]);
 
   return (
     <Box
@@ -109,8 +107,11 @@ function FeatureRow({
             step={cfg.step}
             disabled={!f.active}
             onClick={(e) => e.stopPropagation()}
-            onChange={(_, v) => setLive(v as [number, number])}
-            onChangeCommitted={(_, v) => onCommit(v as [number, number])}
+            onChange={(_, v) => setDrag(v as [number, number])}
+            onChangeCommitted={(_, v) => {
+              onCommit(v as [number, number]);
+              setDrag(null);
+            }}
             sx={{
               "& .MuiSlider-mark": {
                 height: "10px",

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { ChromePicker } from "react-color";
 import { useDispatch } from "react-redux";
@@ -21,23 +21,31 @@ const ColorPicker = ({
   colorMap: ColorMap;
   updateColorMap: (color: ColorMap) => void;
 }) => {
-  const channelColorRef = useRef<HTMLDivElement | null>(null);
+  const [channelColorRef, setChannelColorRef] = useState<HTMLDivElement | null>(
+    null,
+  );
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [selectedColor, setSelectedColor] = useState(rgbToHex(colorMap));
+  const colorHex = rgbToHex(colorMap);
+  const [draftColorMap, setDraftColorMap] = useState(colorHex);
+  const [prevColorMap, setPrevColorMap] = useState(colorHex);
+  if (colorHex !== prevColorMap) {
+    setDraftColorMap(colorHex);
+    setPrevColorMap(colorHex);
+  }
   const handleOpenColorPicker = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
-    channelColorRef.current = event.currentTarget;
+    setChannelColorRef(event.currentTarget);
     setShowColorPicker(true);
   };
   const handleCloseColorPicker = () => {
-    channelColorRef.current = null;
+    setChannelColorRef(null);
     setShowColorPicker(false);
   };
 
   const handleColorChange = (color: ColorResult) => {
-    if (channelColorRef.current) {
-      setSelectedColor(color.hex);
+    if (channelColorRef) {
+      setDraftColorMap(color.hex);
     }
   };
 
@@ -46,10 +54,6 @@ const ColorPicker = ({
 
     updateColorMap([r / 255, g / 255, b / 255]);
   };
-
-  useEffect(() => {
-    setSelectedColor(rgbToHex(colorMap));
-  }, [colorMap]);
 
   return (
     <>
@@ -64,14 +68,14 @@ const ColorPicker = ({
           mr: 2,
         }}
       />
-      {showColorPicker && channelColorRef.current && (
+      {showColorPicker && channelColorRef && (
         <Popover
-          anchorEl={channelColorRef.current}
-          open={showColorPicker && !!channelColorRef.current}
+          anchorEl={channelColorRef}
+          open={showColorPicker}
           onClose={handleCloseColorPicker}
         >
           <ChromePicker
-            color={selectedColor}
+            color={draftColorMap}
             onChange={handleColorChange}
             onChangeComplete={handleCommitColorChange}
             disableAlpha

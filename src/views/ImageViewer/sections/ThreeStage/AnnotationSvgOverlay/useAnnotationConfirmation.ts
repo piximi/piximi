@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { useSound } from "use-sound";
 
@@ -46,12 +46,12 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
   const soundEnabled = useSelector(selectSoundEnabled);
   const [playCreate] = useSound(createAnnotationSoundEffect);
   const [playDelete] = useSound(deleteAnnotationSoundEffect);
+
   const clearAnnotation = useCallback(() => {
     annotationTool.deselect();
-    batch(() => {
-      dispatch(annotatorSlice.actions.setWorkingAnnotation(undefined));
-      dispatch(annotatorSlice.actions.clearPendingOperation());
-    });
+
+    dispatch(annotatorSlice.actions.setWorkingAnnotation(undefined));
+    dispatch(annotatorSlice.actions.clearPendingOperation());
   }, [annotationTool, dispatch]);
 
   /**
@@ -62,61 +62,54 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
    * go stale and corrupt feature-range filtering.
    */
   const applyOperation = useCallback(async () => {
-    if (!pendingOperation || pendingOperation.empty) return;
+    if (!pendingOperation || pendingOperation.empty || !activeImage) return;
     const entries = Object.entries(pendingOperation.updates);
     if (entries.length === 0) return;
 
-    batch(async () => {
-      for (const [id, region] of entries) {
-        const features = computeObjectFeatures([
-          {
-            id,
-            boundingBox: region.bbox,
-            decodedMask: region.mask,
-            encodedMask: [],
-            features: undefined,
-          },
-        ]);
-        const channelMeasurements = await computeObjectIntensityMeasurements([
-          {
-            channelRefs: activeImage!.channelsRef,
-            objs: [
-              {
-                id,
-                boundingBox: region.bbox,
-                decodedMask: region.mask,
-                encodedMask: [],
-              },
-            ],
-          },
-        ]);
-        dispatch(
-          dataSlice.actions.updateAnnotationMask({
-            id,
-            boundingBox: region.bbox,
-            encodedMask: rleEncodeArray(region.mask),
-            features: features[id],
-            intensityMeasurements: channelMeasurements,
-          }),
-        );
-      }
-      if (pendingOperation.absorbedIds.length) {
-        dispatch(
-          dataSlice.actions.batchDeleteAnnotation(pendingOperation.absorbedIds),
-        );
-        // The absorbed ids are gone from the store; drop them from the manual
-        // selection sets so they do not linger there.
-        dispatch(
-          imageViewerDataSlice.actions.forgetAnnotationIds(
-            pendingOperation.absorbedIds,
-          ),
-        );
-      }
-    });
-    if (soundEnabled) playCreate();
+    const objs = entries.map(([id, region]) => ({
+      id,
+      boundingBox: region.bbox,
+      decodedMask: region.mask,
+      encodedMask: [],
+    }));
+    const features = computeObjectFeatures(
+      objs.map((o) => ({ ...o, features: undefined })),
+    );
+    const intensities = await computeObjectIntensityMeasurements([
+      { channelRefs: activeImage.channelsRef, objs },
+    ]);
 
+    for (const [id, region] of entries) {
+      dispatch(
+        dataSlice.actions.updateAnnotationMask({
+          id,
+          boundingBox: region.bbox,
+          encodedMask: rleEncodeArray(region.mask),
+          features: features[id],
+          intensityMeasurements: intensities[id],
+        }),
+      );
+    }
+    if (pendingOperation.absorbedIds.length) {
+      dispatch(
+        dataSlice.actions.batchDeleteAnnotation(pendingOperation.absorbedIds),
+      );
+      dispatch(
+        imageViewerDataSlice.actions.forgetAnnotationIds(
+          pendingOperation.absorbedIds,
+        ),
+      );
+    }
+    if (soundEnabled) playCreate();
     clearAnnotation();
-  }, [pendingOperation, dispatch, clearAnnotation, soundEnabled, playCreate]);
+  }, [
+    pendingOperation,
+    dispatch,
+    clearAnnotation,
+    soundEnabled,
+    playCreate,
+    activeImage,
+  ]);
 
   const confirmAnnotation = useCallback(async () => {
     if (!activeImage || !workingAnnotation.saved || !selectedCategory) return;
@@ -155,10 +148,10 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
     ]);
     annotation.features = features[annotation.id];
     annotation.intensityMeasurements = channelMeasurements[annotation.id];
-    batch(() => {
-      dispatch(dataSlice.actions.addAnnotationVolume(volume));
-      dispatch(dataSlice.actions.addAnnotation(annotation));
-    });
+
+    dispatch(dataSlice.actions.addAnnotationVolume(volume));
+    dispatch(dataSlice.actions.addAnnotation(annotation));
+
     if (soundEnabled) playCreate();
 
     clearAnnotation();
