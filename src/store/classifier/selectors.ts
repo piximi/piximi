@@ -107,6 +107,14 @@ export const selectModelOptimizerSettings = createSelector(
   selectModelInfo,
   (info) => info?.optimizerSettings,
 );
+export const selectModelTargetName = createSelector(
+  selectKindClassifier,
+  (kc) => kc.modelTargetName,
+);
+export const selectNewModelArch = createSelector(
+  selectKindClassifier,
+  (kc) => kc.newModelArch,
+);
 
 /*
  * Active Runs
