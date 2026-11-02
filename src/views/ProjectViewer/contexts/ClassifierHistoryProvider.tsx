@@ -111,7 +111,7 @@ export const ClassifierHistoryProvider = ({
     // the `Run` object changes, only when a run is appended.
     // this is ok since we only care about `hyperparameters.optimizer`
     // and then never changes after the `Run` is added
-  }, [previousRuns.length]);
+  }, [previousRuns]);
 
   const currentEpoch = modelHistory.val_categoricalAccuracy.length;
 
