@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 import { CSS } from "@dnd-kit/utilities";
 import {
@@ -32,7 +32,7 @@ export const ExpandableDimensionChip = ({
   isExpanded,
   onExpandToggle,
 }: ExpandableDimensionChipProps) => {
-  const chipRef = useRef<HTMLDivElement>(null);
+  const [chipEl, setChipEl] = useState<HTMLDivElement | null>(null);
 
   const {
     attributes,
@@ -68,7 +68,7 @@ export const ExpandableDimensionChip = ({
   // Combine refs for both sortable and the anchor element
   const combinedRef = (node: HTMLDivElement | null) => {
     setNodeRef(node);
-    (chipRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    setChipEl(node);
   };
 
   return (
@@ -115,7 +115,7 @@ export const ExpandableDimensionChip = ({
 
       <Popover
         open={isExpanded}
-        anchorEl={chipRef.current}
+        anchorEl={chipEl}
         onClose={handlePopoverClose}
         disablePortal // Keep in DOM hierarchy for dnd-kit
         anchorOrigin={{

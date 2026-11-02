@@ -8,11 +8,6 @@ import { INTENSITY_MEASUREMENTS } from "core/entities";
 
 import { useDialogHotkey } from "hooks";
 
-import {
-  selectCategoryEntities,
-  selectExtendedImageEntities,
-} from "store/data/selectors";
-
 import { HotkeyContext } from "utils/enums";
 import { isObjectEmpty } from "utils/objectUtils";
 import { formatString } from "utils/stringUtils";
@@ -66,8 +61,6 @@ const buildImageMeasurementData = (
 export const useTableExport = () => {
   const activeGroup = useSelector(selectActiveMeasurementGroup);
   const activeMeasuredEntities = useSelector(selectActiveMeasuredEntities);
-  const images = useSelector(selectExtendedImageEntities);
-  const categories = useSelector(selectCategoryEntities);
 
   const handleExportTable = useCallback(() => {
     if (!activeGroup) return;
@@ -93,7 +86,7 @@ export const useTableExport = () => {
     const objUrl = URL.createObjectURL(blob);
     saveAs(objUrl, `${activeGroup.name.replaceAll(" ", "-")}.csv`);
     URL.revokeObjectURL(objUrl);
-  }, [activeGroup, activeMeasuredEntities, categories, images]);
+  }, [activeGroup, activeMeasuredEntities]);
 
   return handleExportTable;
 };

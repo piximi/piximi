@@ -1,18 +1,17 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { Box, Checkbox, FormControlLabel, Typography } from "@mui/material";
 
 import { measurementsSlice } from "@MeasurementViewer/state";
-import { selectActiveSelectedPlot } from "@MeasurementViewer/state/selectors";
 
-export const HistogramBinLabelCheckbox = () => {
-  const selectedPlot = useSelector(selectActiveSelectedPlot);
-  if (!selectedPlot) return null;
+import type { PlotDetail } from "@MeasurementViewer/types";
+
+export const HistogramBinLabelCheckbox = ({ plot }: { plot: PlotDetail }) => {
   const dispatch = useDispatch();
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(
       measurementsSlice.actions.updateActiveSelectedPlot({
-        plotId: selectedPlot.id,
+        plotId: plot.id,
         newConfig: { binLabel: event.target.checked },
       }),
     );
@@ -23,7 +22,7 @@ export const HistogramBinLabelCheckbox = () => {
       control={
         <Checkbox
           size="small"
-          checked={!!selectedPlot.chartConfig.binLabel}
+          checked={!!plot.chartConfig.binLabel}
           onChange={handleChange}
         />
       }

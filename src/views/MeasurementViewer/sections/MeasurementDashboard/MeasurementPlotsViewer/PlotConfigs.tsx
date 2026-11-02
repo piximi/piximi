@@ -8,42 +8,44 @@ import {
   SwarmStatisticsCheckbox,
 } from "./config-inputs";
 
-export const HistogramConfig = () => {
+import type { PlotDetail } from "@MeasurementViewer/types";
+
+export const HistogramConfig = ({ plot }: { plot: PlotDetail }) => {
   return (
     <>
-      <MeasurementSelect type="x-axis" />
-      <HistogramBinTextField />
-      <HistogramBinLabelCheckbox />
+      <MeasurementSelect type="x-axis" plot={plot} />
+      <HistogramBinTextField key={plot.id} plot={plot} />
+      <HistogramBinLabelCheckbox plot={plot} />
     </>
   );
 };
-export const ScatterConfig = () => {
+export const ScatterConfig = ({ plot }: { plot: PlotDetail }) => {
   return (
     <>
-      <MeasurementSelect type="x-axis" />
-      <MeasurementSelect type="y-axis" />
-      <MeasurementSelect type="size" nullable={true} />
-      <SplitSelect type="color" nullable={true} />
+      <MeasurementSelect type="x-axis" plot={plot} />
+      <MeasurementSelect type="y-axis" plot={plot} />
+      <MeasurementSelect type="size" nullable={true} plot={plot} />
+      <SplitSelect type="color" nullable={true} plot={plot} />
     </>
   );
 };
 
-export const SwarmConfig = () => {
+export const SwarmConfig = ({ plot }: { plot: PlotDetail }) => {
   return (
     <>
-      <MeasurementSelect type="y-axis" />
-      <SplitSelect type="swarmGroup" />
-      <MeasurementSelect type="size" nullable={true} />
-      <SwarmStatisticsCheckbox />
+      <MeasurementSelect type="y-axis" plot={plot} />
+      <SplitSelect type="swarmGroup" plot={plot} />
+      <MeasurementSelect type="size" nullable={true} plot={plot} />
+      <SwarmStatisticsCheckbox plot={plot} />
     </>
   );
 };
 
-export const BaseConfig = () => {
+export const BaseConfig = ({ plot }: { plot: PlotDetail }) => {
   return (
     <>
-      <PlotSelect />
-      <ColorThemeSelect />
+      <PlotSelect plot={plot} />
+      <ColorThemeSelect plot={plot} />
     </>
   );
 };

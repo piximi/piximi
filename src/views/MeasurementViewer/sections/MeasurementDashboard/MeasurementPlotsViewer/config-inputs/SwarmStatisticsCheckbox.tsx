@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import {
   Box,
@@ -13,16 +13,15 @@ import {
 import { HelpOutlineOutlined as HelpOutlineOutlinedIcon } from "@mui/icons-material";
 
 import { measurementsSlice } from "@MeasurementViewer/state";
-import { selectActiveSelectedPlot } from "@MeasurementViewer/state/selectors";
 
-export const SwarmStatisticsCheckbox = () => {
-  const selectedPlot = useSelector(selectActiveSelectedPlot);
-  if (!selectedPlot) return null;
+import type { PlotDetail } from "@MeasurementViewer/types";
+
+export const SwarmStatisticsCheckbox = ({ plot }: { plot: PlotDetail }) => {
   const dispatch = useDispatch();
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(
       measurementsSlice.actions.updateActiveSelectedPlot({
-        plotId: selectedPlot.id,
+        plotId: plot.id,
         newConfig: { swarmStatistics: event.target.checked },
       }),
     );
@@ -33,7 +32,7 @@ export const SwarmStatisticsCheckbox = () => {
       control={
         <Checkbox
           size="small"
-          checked={selectedPlot.chartConfig.swarmStatistics}
+          checked={plot.chartConfig.swarmStatistics}
           onChange={handleChange}
         />
       }
