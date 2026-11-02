@@ -5,6 +5,7 @@ import pluginReact from "eslint-plugin-react";
 import disableAutofix from "eslint-plugin-disable-autofix";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import { importX } from "eslint-plugin-import-x";
+import reactHooks from "eslint-plugin-react-hooks";
 
 import type { Linter } from "eslint";
 
@@ -12,6 +13,7 @@ export default tseslint.config(
   js.configs.recommended,
 
   ...tseslint.configs.recommended,
+  reactHooks.configs.flat.recommended,
 
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat["jsx-runtime"],
@@ -25,6 +27,7 @@ export default tseslint.config(
       "disable-autofix/prefer-const": "warn",
     },
   },
+
   {
     files: ["**/*.{js,mjs,jsx,ts,mts,tsx}"],
     extends: [
@@ -32,7 +35,7 @@ export default tseslint.config(
       importX.flatConfigs.typescript as Linter.Config,
     ],
     settings: {
-      react: { version: "17.0.2" },
+      react: { version: "19.3" },
       "import-x/resolver": {
         typescript: {
           project: "./tsconfig.json",
@@ -51,6 +54,13 @@ export default tseslint.config(
       // REACT
       "react/display-name": "off",
       "react/prop-types": "off",
+      "react-hooks/use-memo": "warn",
+      "react-hooks/static-components": "warn",
+      "react-hooks/immutability": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/exhaustive-deps": "warn", // already "warn" in the preset; listed for visibility
+      // rules-of-hooks stays "error": those are real crash bugs
       //TYPESCRIPT
       "@typescript-eslint/no-unsafe-function-type": "off",
       "@typescript-eslint/no-unused-vars": [
