@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -21,17 +21,13 @@ const ActiveImageContext = createContext<{
     data: Uint8Array<ArrayBuffer> | Uint16Array<ArrayBuffer>;
   }>;
   channelsLoading: boolean;
-  ijsImageRef: React.MutableRefObject<IJSImage | null> | undefined;
-  ijsImageVersion: number;
-  onIjsImageReady: (img: IJSImage) => void;
-  onRawDataRendered: () => void;
+  ijsImage: IJSImage | null;
+  setIjsImage: (v: IJSImage | null) => void;
 }>({
   channelData: [],
   channelsLoading: false,
-  ijsImageRef: undefined,
-  ijsImageVersion: 0,
-  onIjsImageReady: (_img) => {},
-  onRawDataRendered: () => {},
+  ijsImage: null,
+  setIjsImage: () => {},
 });
 
 export const ActiveImageProvider = ({ children }: { children: ReactNode }) => {
@@ -40,8 +36,7 @@ export const ActiveImageProvider = ({ children }: { children: ReactNode }) => {
     selectActiveExtendedChannels,
     activeImageId ?? "",
   );
-  const ijsImageRef = useRef<IJSImage | null>(null);
-  const [ijsImageVersion, setIjsImageVersion] = useState(0);
+  const [ijsImage, setIjsImage] = useState<IJSImage | null>(null);
 
   const { channelData, loading: channelsLoading } =
     useRawImageData(activeChannels);
@@ -50,16 +45,10 @@ export const ActiveImageProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       channelData,
       channelsLoading,
-      ijsImageRef,
-      ijsImageVersion,
-      // Callback ThreeStage calls after each render to update the ref
-      onIjsImageReady: (img: IJSImage) => {
-        ijsImageRef.current = img;
-      },
-      // Callback ThreeStage calls when raw data changes (triggers tool rebuild)
-      onRawDataRendered: () => setIjsImageVersion((v) => v + 1),
+      ijsImage,
+      setIjsImage,
     }),
-    [channelData, channelsLoading, ijsImageVersion],
+    [channelData, channelsLoading, ijsImage],
   );
 
   return (

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -42,11 +42,7 @@ export const ThreeStage = ({ stageWidth, stageHeight }: ThreeStageProps) => {
   const { mountRef, ready } = useThreeRenderer(stageWidth, stageHeight);
 
   // Composited IJSImage (from GPU readback) that the annotation tools operate on.
-  const { ijsImageRef, ijsImageVersion } = useActiveImage();
-  const ijsImage = useMemo(
-    () => ijsImageRef?.current ?? null,
-    [ijsImageRef, ijsImageVersion],
-  );
+  const { ijsImage } = useActiveImage();
 
   // --- Channel rendering (uniforms + DataArrayTexture) ---
   useThreeChannelRenderer(imageWidth, imageHeight);
