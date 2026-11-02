@@ -1,64 +1,57 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { DEFAULT_GRID_ITEM_WIDTH, GRID_GAP } from "utils/constants";
 
+const computeGridLayout = (
+  gridWidth: number,
+  numItems: number,
+  scaleFactor: number,
+) => {
+  let calculatedColumnWidth = DEFAULT_GRID_ITEM_WIDTH * scaleFactor + GRID_GAP;
+  if (calculatedColumnWidth > gridWidth) {
+    calculatedColumnWidth = gridWidth;
+  }
+
+  const maxNumColumns = Math.floor(gridWidth / calculatedColumnWidth);
+
+  const numColumns = numItems > maxNumColumns ? maxNumColumns : numItems;
+
+  const columnWidth = numColumns > 0 ? gridWidth / numColumns : 0;
+
+  const rowHeight = numColumns > 0 ? calculatedColumnWidth : 0;
+
+  const numVirtualRows = numColumns > 0 ? Math.ceil(numItems / numColumns) : 0;
+
+  return {
+    columnWidth,
+    rowHeight,
+    numColumns,
+    numRows: numVirtualRows,
+  };
+};
 export const useReactWindow = (
   numItems: number,
   gridRef: React.MutableRefObject<HTMLDivElement | null>,
   scaleFactor: number,
 ) => {
-  const [gridLayout, setGridLayout] = useState({
-    gridWidth: 0,
-    gridHeight: 0,
-    columnWidth: 0,
-    numColumns: 0,
-    rowHeight: 0,
-    numRows: 0,
-  });
+  const [size, setSize] = useState({ gridWidth: 0, gridHeight: 0 });
+
   useEffect(() => {
-    const observer = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      setGridLayout((prev) => ({
-        ...prev,
-        gridWidth: width,
-        gridHeight: height,
-      }));
-    });
-
-    if (gridRef.current) observer.observe(gridRef.current);
-    return () => observer.disconnect();
-  }, []);
-  useLayoutEffect(() => {
-    let calculatedColumnWidth =
-      DEFAULT_GRID_ITEM_WIDTH * scaleFactor + GRID_GAP;
-    if (calculatedColumnWidth > gridLayout.gridWidth) {
-      calculatedColumnWidth = gridLayout.gridWidth;
-    }
-
-    const maxNumColumns = Math.floor(
-      gridLayout.gridWidth / calculatedColumnWidth,
+    const node = gridRef.current;
+    if (!node) return;
+    const observer = new ResizeObserver(([entry]) =>
+      setSize({
+        gridWidth: entry.contentRect.width,
+        gridHeight: entry.contentRect.height,
+      }),
     );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [gridRef]);
 
-    const numColumns = numItems > maxNumColumns ? maxNumColumns : numItems;
-
-    const columnWidth = numColumns > 0 ? gridLayout.gridWidth / numColumns : 0;
-
-    const rowHeight = numColumns > 0 ? calculatedColumnWidth : 0;
-
-    const numVirtualRows =
-      numColumns > 0 ? Math.ceil(numItems / numColumns) : 0;
-    gridRef.current &&
-      gridRef.current?.style.setProperty(
-        "--item-size",
-        `${DEFAULT_GRID_ITEM_WIDTH * scaleFactor}px`,
-      );
-    setGridLayout((prev) => ({
-      ...prev,
-      columnWidth,
-      rowHeight,
-      numColumns,
-      numRows: numVirtualRows,
-    }));
-  }, [gridLayout.gridWidth, scaleFactor, numItems]);
-  return gridLayout;
+  const layout = useMemo(
+    () => computeGridLayout(size.gridWidth, numItems, scaleFactor),
+    [size.gridWidth, numItems, scaleFactor],
+  );
+  return { ...size, ...layout };
 };
