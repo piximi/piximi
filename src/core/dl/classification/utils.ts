@@ -22,7 +22,6 @@ import type {
   ModelLayerData,
   OptimizerSettings,
   PreprocessSettings,
-  ModelClassMap,
   ModelInfoDTO,
   Run,
 } from "./types";
@@ -343,11 +342,6 @@ export function modelInfoDTOToModelInfo(
     );
   }
 
-  const classMap: ModelClassMap = dto.classes.reduce((map, cls, idx) => {
-    map[idx] = cls;
-    return map;
-  }, {} as ModelClassMap);
-
   const preprocessSettings: PreprocessSettings = {
     shuffle: dto.preprocessingSettings.shuffle,
     inputShape: {
@@ -366,12 +360,11 @@ export function modelInfoDTOToModelInfo(
   };
 
   return {
-    classMap,
     preprocessSettings,
     optimizerSettings: dto.optimizerSettings,
     confidenceThreshold: DEFAULT_CONFIDENCE_THRESHOLD,
     runs,
     valid: dto.modelLoaded,
-    trained: dto.currentFitHistory.length > 0,
+    trained: dto.pretrained,
   };
 }
