@@ -25,18 +25,18 @@ export const useThreeRenderer = (stageWidth: number, stageHeight: number) => {
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
-
+    const { clientWidth: w, clientHeight: h } = mount;
     const renderer = new THREE.WebGLRenderer({ antialias: false });
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(stageWidth, stageHeight);
+    renderer.setSize(w, h);
     mount.appendChild(renderer.domElement);
 
     // Viewport camera — driven by pan/zoom interactions
     const camera = new THREE.OrthographicCamera(
-      -stageWidth / 2,
-      stageWidth / 2,
-      stageHeight / 2,
-      -stageHeight / 2,
+      -w / 2,
+      w / 2,
+      h / 2,
+      -h / 2,
       0.1,
       10,
     );
@@ -58,10 +58,7 @@ export const useThreeRenderer = (stageWidth: number, stageHeight: number) => {
       cameraRef.current = null;
       sceneRef.current = null;
     };
-    // Runs once for the life of the stage. The three refs come from the provider
-    // and are stable; listing them would make this effect's identity depend on
-    // the provider's memoization, and a miss there would thrash the GL context.
-  }, []);
+  }, [cameraRef, rendererRef, sceneRef]);
 
   // --- Keep the frustum equal to the stage size ---
   useEffect(() => {
@@ -77,7 +74,15 @@ export const useThreeRenderer = (stageWidth: number, stageHeight: number) => {
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);
     notifyCameraChanged();
-  }, [stageWidth, stageHeight, ready, notifyCameraChanged]);
+  }, [
+    stageWidth,
+    stageHeight,
+    ready,
+    notifyCameraChanged,
+    rendererRef,
+    sceneRef,
+    cameraRef,
+  ]);
 
   // --- Reset the viewport camera when the active image changes ---
   useEffect(() => {
@@ -90,7 +95,14 @@ export const useThreeRenderer = (stageWidth: number, stageHeight: number) => {
     camera.updateProjectionMatrix();
     if (renderer && scene) renderer.render(scene, camera);
     notifyCameraChanged();
-  }, [activeImageId, ready, notifyCameraChanged]);
+  }, [
+    activeImageId,
+    ready,
+    notifyCameraChanged,
+    rendererRef,
+    sceneRef,
+    cameraRef,
+  ]);
 
   return { mountRef, ready };
 };
