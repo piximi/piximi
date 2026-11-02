@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 
@@ -7,6 +7,7 @@ import { useTheme } from "@mui/material";
 import { usePreferredNivoTheme } from "hooks";
 
 import { formatString } from "utils/stringUtils";
+import { adjustHexLightness } from "utils/colorUtils";
 
 import type {
   ChartConfig,
@@ -28,8 +29,6 @@ type ScatterGroup = {
   data: ScatterPoint[];
 };
 
-type ScatterData = ScatterGroup[];
-
 export const ResponsiveScatter = ({
   chartConfig,
   measurementData,
@@ -39,9 +38,6 @@ export const ResponsiveScatter = ({
   measurementData: ParsedMeasurementData;
   thingIds: string[];
 }) => {
-  const [formattedData, setFormattedData] = useState<ScatterData>([]);
-  const [minSize, setMinSize] = useState<number>();
-  const [maxSize, setMaxSize] = useState<number>();
   const containerRef = useRef<HTMLDivElement>(null);
   const muiTheme = useTheme();
   const activeSerieRef = useRef<string | number | null>(null);
@@ -61,9 +57,10 @@ export const ResponsiveScatter = ({
   };
 
   const theme = usePreferredNivoTheme();
-  useEffect(() => {
+  const { minSize, maxSize, formattedData } = useMemo(() => {
     const { "x-axis": xAxis, "y-axis": yAxis, size, color } = chartConfig;
-    if (!xAxis || !yAxis) return;
+    if (!xAxis || !yAxis)
+      return { minSize: undefined, maxSize: undefined, formattedData: [] };
     const scatterGroups: Record<string, ScatterGroup> = {};
     let minSize = Infinity;
     let maxSize = 0;
@@ -105,14 +102,18 @@ export const ResponsiveScatter = ({
           });
         }
       });
-    setMinSize(minSize);
-    setMaxSize(maxSize);
-    setFormattedData(Object.values(scatterGroups));
+
+    return {
+      minSize,
+      maxSize,
+      formattedData: Object.values(scatterGroups),
+    };
   }, [chartConfig, measurementData, thingIds]);
 
   return chartConfig["x-axis"] && chartConfig["y-axis"] ? (
     <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
       <ResponsiveScatterPlot<ScatterPoint>
+        animate={false}
         theme={theme}
         colors={{ scheme: chartConfig.colorTheme }}
         data={formattedData}
@@ -188,6 +189,7 @@ export const ResponsiveScatter = ({
             cy={node.y}
             r={node.size / 2}
             fill={node.color}
+            stroke={adjustHexLightness(node.color, 50)}
             style={{
               mixBlendMode: blendMode,
 

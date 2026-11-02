@@ -9,6 +9,7 @@ import type { IntensityMeasurement, ObjectFeature } from "core/entities";
 
 import type { ChartConfig } from "./types";
 
+export const DEFAULT_HISTOGRAM_BINS = 10;
 /**
  * Adaptively formats a number based on its magnitude.
  *

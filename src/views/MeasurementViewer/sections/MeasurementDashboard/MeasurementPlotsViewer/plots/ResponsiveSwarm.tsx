@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { ResponsiveSwarmPlot } from "@nivo/swarmplot";
 
@@ -7,8 +7,9 @@ import { alpha, darken } from "@mui/material";
 import { usePreferredNivoTheme } from "hooks";
 
 import { computeMean, computeStatistics } from "utils/measurements/statistics";
+import { adjustHexLightness } from "utils/colorUtils";
 
-import type { SwarmPlotCustomLayerProps } from "@nivo/swarmplot";
+import type { ComputedDatum, SwarmPlotCustomLayerProps } from "@nivo/swarmplot";
 import type { ScaleLinear } from "@nivo/scales";
 
 import type {
@@ -19,12 +20,13 @@ import type {
   SwarmDatum,
 } from "@MeasurementViewer/types";
 
+const getBorderColor = (node: ComputedDatum<SwarmDatum>) =>
+  adjustHexLightness(node.color, 50);
+
 const StatLayer = ({
   nodes,
 }: SwarmPlotCustomLayerProps<SwarmDatum, ScaleLinear<number>>) => {
-  const [nodesByGroup, setNodesByGroup] = useState<NodeGroupRecord>();
-
-  useEffect(() => {
+  const nodesByGroup = useMemo(() => {
     type NewType = NodeGroupRecord;
 
     const nodesByGroup = nodes.reduce<NewType>((acc, node) => {
@@ -58,7 +60,7 @@ const StatLayer = ({
       nodesByGroup[group].x = groupMeanX;
     });
 
-    setNodesByGroup(nodesByGroup);
+    return nodesByGroup;
   }, [nodes]);
   return !nodesByGroup ? (
     <></>
@@ -126,16 +128,18 @@ export const ResponsiveSwarm = ({
   measurementData: ParsedMeasurementData;
   thingIds: string[];
 }) => {
-  const [groupNames, setGroupNames] = useState<string[]>([]);
-  const [minSize, setMinSize] = useState<number>();
-  const [maxSize, setMaxSize] = useState<number>();
   const theme = usePreferredNivoTheme();
-  const [formattedData, setFormattedData] = useState<SwarmData>([]);
 
-  useEffect(() => {
+  const { minSize, maxSize, groupNames, formattedData } = useMemo(() => {
     const { "y-axis": yAxis, size } = chartConfig;
     const swarmGroup = chartConfig.swarmGroup;
-    if (!yAxis || !swarmGroup) return;
+    if (!yAxis || !swarmGroup)
+      return {
+        minSize: undefined,
+        maxSize: undefined,
+        groupNames: [],
+        formattedData: [],
+      };
     const formattedData: SwarmData = [];
     const rawData: number[] = [];
     const groupNames = new Set<string>();
@@ -168,11 +172,12 @@ export const ResponsiveSwarm = ({
           z: nodeSize,
         });
       });
-
-    setMinSize(minSize);
-    setMaxSize(maxSize);
-    setGroupNames([...groupNames]);
-    setFormattedData(formattedData);
+    return {
+      minSize,
+      maxSize,
+      groupNames: [...groupNames],
+      formattedData,
+    };
   }, [chartConfig, measurementData, thingIds]);
 
   const swarmLayers = useMemo(() => {
@@ -202,13 +207,8 @@ export const ResponsiveSwarm = ({
       }
       forceStrength={4}
       simulationIterations={100}
-      borderColor={{
-        from: "color",
-        modifiers: [
-          ["darker", 0.6],
-          ["opacity", 0.5],
-        ],
-      }}
+      borderWidth={1}
+      borderColor={getBorderColor}
       margin={{ top: 80, right: 100, bottom: 80, left: 100 }}
       axisRight={{
         tickSize: 10,

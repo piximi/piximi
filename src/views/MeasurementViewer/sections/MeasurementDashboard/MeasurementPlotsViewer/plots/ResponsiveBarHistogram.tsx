@@ -6,7 +6,7 @@ import { useTheme } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
 
-import { format } from "@MeasurementViewer/utils";
+import { DEFAULT_HISTOGRAM_BINS, format } from "@MeasurementViewer/utils";
 
 import type {
   ChartConfig,
@@ -83,7 +83,10 @@ export const ResponsiveBarHistogram = ({
       }
     }
 
-    const histogram = computeHistogramBins(rawData, chartConfig.numBins ?? 10);
+    const histogram = computeHistogramBins(
+      rawData,
+      chartConfig.numBins ?? DEFAULT_HISTOGRAM_BINS,
+    );
 
     if (!histogram) return [];
 

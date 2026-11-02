@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { Box, Divider, IconButton, Tab, Tabs, Typography } from "@mui/material";
 import {
@@ -13,8 +7,6 @@ import {
   Edit as EditIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
-
-import { useMobileView } from "hooks";
 
 import { TextFieldWithBlur } from "components/inputs";
 
@@ -27,8 +19,6 @@ import type {
   EditableTabsProps,
   ExtendableTabsProps,
 } from "./props";
-
-const TabContext = createContext<number>(0);
 
 export function CustomTabs(props: CommonTabsProps): React.JSX.Element;
 export function CustomTabs(
@@ -63,10 +53,15 @@ export function CustomTabs(
     renderLabel,
     handleTabMin,
     persistentTabs,
+    tabHelp,
   } = props;
   const [tabIndex, setTabIndex] = useState(0);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const isMobile = useMobileView();
+
+  const controlled = activeLabel !== undefined;
+  const activeIndex = controlled
+    ? Math.max(0, labels.indexOf(activeLabel))
+    : tabIndex;
 
   const handleTabChange = (
     event: React.SyntheticEvent<Element, Event>,
@@ -87,7 +82,7 @@ export function CustomTabs(
 
         const labelIndex = labels.findIndex((el) => el === label);
 
-        if (labelIndex === tabIndex) {
+        if (labelIndex === activeIndex) {
           if (labelIndex === labels.length - 1) {
             setTabIndex(labelIndex - 1);
             action === "hide" && handleTabMin
@@ -99,15 +94,15 @@ export function CustomTabs(
               : handleTabClose(label, labels[labelIndex + 1]);
           }
         } else {
-          if (labelIndex < tabIndex) {
-            setTabIndex(tabIndex - 1);
+          if (labelIndex < activeIndex) {
+            setTabIndex(activeIndex - 1);
           }
           action === "hide" && handleTabMin
             ? handleTabMin(label)
             : handleTabClose(label);
         }
       },
-    [handleTabClose, labels, tabIndex, handleTabMin],
+    [handleTabClose, labels, activeIndex, handleTabMin],
   );
 
   const renderTabLabel = useCallback(
@@ -133,7 +128,7 @@ export function CustomTabs(
         >
           {editable &&
           isEditing &&
-          labels.findIndex((l) => l === label) === tabIndex ? (
+          labels.findIndex((l) => l === label) === activeIndex ? (
             <TextFieldWithBlur
               value={renderLabel ? renderLabel(label) : label}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +159,7 @@ export function CustomTabs(
             >
               {editable && (
                 <EditIcon
-                  data-help={props.tabHelp?.edit}
+                  data-help={tabHelp?.edit}
                   fontSize="small"
                   sx={{ p: 0 }}
                   onClick={() => setIsEditing(true)}
@@ -172,7 +167,7 @@ export function CustomTabs(
               )}
               {handleTabMin && (
                 <MinimizeIcon
-                  data-help={props.tabHelp?.minimize}
+                  data-help={tabHelp?.minimize}
                   fontSize="small"
                   sx={{ p: 0 }}
                   onClick={(event) => handleTabDeletion(event, label, "hide")}
@@ -180,7 +175,7 @@ export function CustomTabs(
               )}
               {!(persistentTabs && persistentTabs.includes(label)) && (
                 <DeleteIcon
-                  data-help={props.tabHelp?.delete}
+                  data-help={tabHelp?.delete}
                   fontSize="small"
                   sx={{ p: 0 }}
                   onClick={(event) => handleTabDeletion(event, label, "delete")}
@@ -198,100 +193,88 @@ export function CustomTabs(
       handleTabEdit,
       isEditing,
       labels,
-      tabIndex,
+      activeIndex,
       renderLabel,
       handleTabMin,
       persistentTabs,
+      tabHelp,
     ],
   );
 
-  useEffect(() => {
-    if (activeLabel) {
-      setTabIndex(labels.findIndex((label) => label === activeLabel));
-    }
-  }, [labels, activeLabel]);
-  useEffect(() => {
-    if (isMobile) {
-      setTabIndex(0);
-    }
-  }, [isMobile]);
-
   return (
-    <TabContext.Provider value={tabIndex}>
+    <Box
+      sx={() => ({
+        width: "100%",
+        flexGrow: 1,
+        height: "100%",
+      })}
+    >
       <Box
-        sx={() => ({
-          width: "100%",
-          flexGrow: 1,
-          height: "100%",
-        })}
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            borderBottom: 1,
-            borderColor: "divider",
-          }}
+        <Tabs
+          data-help={props.tabHelp?.tabBar}
+          value={activeIndex}
+          onChange={handleTabChange}
+          aria-label="tabbed-view"
+          variant="fullWidth"
+          sx={{ flexGrow: 1 }}
         >
-          <Tabs
-            data-help={props.tabHelp?.tabBar}
-            value={tabIndex}
-            onChange={handleTabChange}
-            aria-label="tabbed-view"
-            variant="fullWidth"
-            sx={{ flexGrow: 1 }}
-          >
-            {labels?.map((label, idx) => {
-              return typeof label === "string" ? (
-                <Tab
-                  key={`Tab-${childClassName}-tab-${idx}`}
-                  label={renderTabLabel(label)}
-                  disabled={disabledTabs && disabledTabs.includes(idx)}
-                />
-              ) : (
-                label
-              );
-            })}
-          </Tabs>
-          {handleNew && (
-            <>
-              <Divider orientation="vertical" />
-              <Box
-                sx={{
-                  display: "flex",
-                  flexShrink: 1,
-                  justifySelf: "flex-end",
-                }}
-              >
-                <IconButton
-                  data-help={props.tabHelp?.create}
-                  onClick={handleNew}
-                  disableRipple
-                >
-                  <AddIcon />
-                </IconButton>
-              </Box>
-            </>
-          )}
-        </Box>
-
-        {transition === "basic" &&
-          (children as React.JSX.Element[]).map((child, idx) => (
-            <BasicTabPanel
-              key={`${childClassName}-${idx}`}
-              value={tabIndex}
-              index={idx}
-              childClassName={childClassName}
+          {labels?.map((label, idx) => {
+            return typeof label === "string" ? (
+              <Tab
+                key={`Tab-${childClassName}-tab-${idx}`}
+                label={renderTabLabel(label)}
+                disabled={disabledTabs && disabledTabs.includes(idx)}
+              />
+            ) : (
+              label
+            );
+          })}
+        </Tabs>
+        {handleNew && (
+          <>
+            <Divider orientation="vertical" />
+            <Box
+              sx={{
+                display: "flex",
+                flexShrink: 1,
+                justifySelf: "flex-end",
+              }}
             >
-              {child}
-            </BasicTabPanel>
-          ))}
-        {transition === "controlled" && (
-          <ControlledTabPanel childClassName={childClassName}>
-            <div className={childClassName}>{children}</div>
-          </ControlledTabPanel>
+              <IconButton
+                data-help={props.tabHelp?.create}
+                onClick={handleNew}
+                disableRipple
+              >
+                <AddIcon />
+              </IconButton>
+            </Box>
+          </>
         )}
       </Box>
-    </TabContext.Provider>
+
+      {transition === "basic" &&
+        (children as React.JSX.Element[]).map((child, idx) => (
+          <BasicTabPanel
+            key={`${childClassName}-${idx}`}
+            value={activeIndex}
+            index={idx}
+            childClassName={childClassName}
+          >
+            {child}
+          </BasicTabPanel>
+        ))}
+      {transition === "controlled" && (
+        <ControlledTabPanel childClassName={childClassName}>
+          <div className={childClassName}>{children}</div>
+        </ControlledTabPanel>
+      )}
+    </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -7,10 +7,7 @@ import { MenuItem } from "@mui/material";
 import { HelpItem } from "help/HelpContent";
 
 import { measurementsSlice } from "@MeasurementViewer/state";
-import {
-  selectActiveMeasurements,
-  selectActiveSelectedPlot,
-} from "@MeasurementViewer/state/selectors";
+import { selectActiveMeasurements } from "@MeasurementViewer/state/selectors";
 
 import { ChartConfigSelect } from "./ChartConfigSelect";
 
@@ -18,26 +15,34 @@ import type { SelectChangeEvent } from "@mui/material";
 
 import type { KeysWithValuesOfType } from "utils/types";
 
-import type { ChartConfig } from "@MeasurementViewer/types";
+import type { ChartConfig, PlotDetail } from "@MeasurementViewer/types";
+
+const renderDefaultValue = (defaultValue: string) => (value: string) => {
+  if (value === "") {
+    return defaultValue;
+  } else {
+    return value;
+  }
+};
 
 export const MeasurementSelect = ({
+  plot,
   type,
   nullable,
   timeSeries,
 }: {
+  plot: PlotDetail;
   type: KeysWithValuesOfType<ChartConfig, string>;
   nullable?: boolean;
   timeSeries?: boolean;
 }) => {
-  const selectedPlot = useSelector(selectActiveSelectedPlot);
-  if (!selectedPlot) return null;
   const activeMeasurements = useSelector(selectActiveMeasurements);
   const dispatch = useDispatch();
 
   const handleChange = (event: SelectChangeEvent<string>) => {
     dispatch(
       measurementsSlice.actions.updateActiveSelectedPlot({
-        plotId: selectedPlot.id,
+        plotId: plot.id,
         newConfig: {
           [type]:
             event.target.value === "None" ? undefined : event.target.value,
@@ -84,21 +89,8 @@ export const MeasurementSelect = ({
     [nullable, type],
   );
 
-  const inputValue = useMemo(
-    () => selectedPlot.chartConfig[type] ?? "",
-    [type, selectedPlot.chartConfig],
-  );
+  const inputValue = useMemo(() => plot.chartConfig[type] ?? "", [type, plot]);
 
-  const renderValue = useCallback(
-    (value: string) => {
-      if (value === "") {
-        return defaultValue;
-      } else {
-        return value;
-      }
-    },
-    [defaultValue],
-  );
   return (
     <ChartConfigSelect
       data-help={helpType}
@@ -107,7 +99,7 @@ export const MeasurementSelect = ({
       defaultValue={defaultValue}
       inputValue={inputValue}
       handleChange={handleChange}
-      renderValue={renderValue}
+      renderValue={renderDefaultValue(defaultValue)}
       selectOptions={selectOptions}
     />
   );

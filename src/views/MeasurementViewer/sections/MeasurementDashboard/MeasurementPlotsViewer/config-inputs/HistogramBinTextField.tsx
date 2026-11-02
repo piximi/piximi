@@ -1,15 +1,15 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { useNumberField } from "hooks";
 
 import { TextFieldWithBlur } from "components/inputs";
 
 import { measurementsSlice } from "@MeasurementViewer/state";
-import { selectActiveSelectedPlot } from "@MeasurementViewer/state/selectors";
+import { DEFAULT_HISTOGRAM_BINS } from "@MeasurementViewer/utils";
 
-export const HistogramBinTextField = () => {
-  const selectedPlot = useSelector(selectActiveSelectedPlot);
-  if (!selectedPlot) return null;
+import type { PlotDetail } from "@MeasurementViewer/types";
+
+export const HistogramBinTextField = ({ plot }: { plot: PlotDetail }) => {
   const dispatch = useDispatch();
 
   const {
@@ -19,18 +19,18 @@ export const HistogramBinTextField = () => {
     resetInputValue: resetNumBins,
     handleOnChangeValidation: handleNumBinsChange,
     error: numBinsError,
-  } = useNumberField(selectedPlot.chartConfig.numBins!);
+  } = useNumberField(plot.chartConfig.numBins ?? DEFAULT_HISTOGRAM_BINS);
 
   const handleSubmit = (numBins: number) => {
     if (numBinsError.error) {
       resetNumBins();
       return;
     }
-    if (numBins === selectedPlot.chartConfig.numBins) return;
+    if (numBins === plot.chartConfig.numBins) return;
     setLastValidNumBins(numBins);
     dispatch(
       measurementsSlice.actions.updateActiveSelectedPlot({
-        plotId: selectedPlot.id,
+        plotId: plot.id,
         newConfig: { numBins },
       }),
     );
