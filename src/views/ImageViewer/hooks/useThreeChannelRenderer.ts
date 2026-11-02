@@ -101,7 +101,7 @@ export const useThreeChannelRenderer = (
   imageWidth: number,
   imageHeight: number,
 ) => {
-  const { channelData, onIjsImageReady, onRawDataRendered } = useActiveImage();
+  const { channelData, setIjsImage } = useActiveImage();
   const activeImageId = useSelector(selectActiveImageId);
   const activeChannels = useParameterizedSelector(
     selectActiveExtendedChannels,
@@ -219,12 +219,20 @@ export const useThreeChannelRenderer = (
     // Three.js stage has origin at lower left corner, but imageJS expects top left
     // so the image needs to be flipped before being saved and later used in annotation
     // tools
-    onIjsImageReady(
+    setIjsImage(
       new IJSImage(imageWidth, imageHeight, {
         data: buf,
         colorModel: "RGBA",
       }).flip({ axis: "vertical" }),
     );
-    onRawDataRendered();
-  }, [channelData, activeChannels, imageWidth, imageHeight]);
+  }, [
+    channelData,
+    activeChannels,
+    imageWidth,
+    imageHeight,
+    rendererRef,
+    sceneRef,
+    setIjsImage,
+    cameraRef,
+  ]);
 };
