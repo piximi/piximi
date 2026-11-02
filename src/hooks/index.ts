@@ -7,7 +7,6 @@ export { useTranslation } from "./useTranslation";
 export { useHotkeys } from "./useHotkeys";
 export { useErrorHandler } from "./useErrorHandler";
 export { useUnloadConfirmation } from "./useUnloadConfirmation";
-export { useBreakpointObserver } from "./useBreakpointObserver";
 export { useMobileView } from "./useMobileView";
 export { useCategoryValidation } from "./useCategoryValidation";
 export { useNumberField } from "./useNumberField";
