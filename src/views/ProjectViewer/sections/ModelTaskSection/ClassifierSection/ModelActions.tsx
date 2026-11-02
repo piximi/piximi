@@ -156,7 +156,7 @@ const PredictClassifierButton = ({
       onClick={handlePredict}
       disabled={predictionDisabled}
       startIcon={
-        modelStatus === "idle" ? (
+        modelStatus === "predicting" ? (
           <CircularProgress disableShrink size={"1.15em"} />
         ) : (
           <LabelImportantIcon />
