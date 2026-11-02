@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,60 +17,48 @@ export const PartitionFilterList = () => {
   const activeView = useSelector(selectActiveViewState);
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredPartitions = useMemo(
-    () => activeView.filters.partition,
-    [activeView.filters.partition],
-  );
+  const filteredPartitions = activeView.filters.partition;
 
-  const dispatchOps = useMemo(
-    () =>
-      activeView.view === "images"
-        ? {
-            add: (ptns: Partition[]) =>
-              dispatch(projectSlice.actions.addImagePartitionFilters(ptns)),
-            rem: (ptns: Partition[]) =>
-              dispatch(projectSlice.actions.removeImagePartitionFilters(ptns)),
-          }
-        : {
-            add: (ptns: Partition[]) =>
-              dispatch(
-                projectSlice.actions.addAnnotationPartitionFilters({
-                  kindId: activeView.id,
-                  ids: ptns,
-                }),
-              ),
-            rem: (ptns: Partition[]) =>
-              dispatch(
-                projectSlice.actions.removeAnnotationPartitionFilters({
-                  kindId: activeView.id,
-                  ids: ptns,
-                }),
-              ),
-          },
-    [activeView],
-  );
+  const dispatchOps =
+    activeView.view === "images"
+      ? {
+          add: (ptns: Partition[]) =>
+            dispatch(projectSlice.actions.addImagePartitionFilters(ptns)),
+          rem: (ptns: Partition[]) =>
+            dispatch(projectSlice.actions.removeImagePartitionFilters(ptns)),
+        }
+      : {
+          add: (ptns: Partition[]) =>
+            dispatch(
+              projectSlice.actions.addAnnotationPartitionFilters({
+                kindId: activeView.id,
+                ids: ptns,
+              }),
+            ),
+          rem: (ptns: Partition[]) =>
+            dispatch(
+              projectSlice.actions.removeAnnotationPartitionFilters({
+                kindId: activeView.id,
+                ids: ptns,
+              }),
+            ),
+        };
 
-  const togglePartitionFilter = useCallback(
-    (ptn: Partition) => {
-      if (activeView.filters.partition.includes(ptn)) {
-        dispatchOps.rem([ptn]);
-      } else {
-        dispatchOps.add([ptn]);
-      }
-    },
-    [dispatchOps, activeView.filters.categoryId],
-  );
+  const togglePartitionFilter = (ptn: Partition) => {
+    if (activeView.filters.partition.includes(ptn)) {
+      dispatchOps.rem([ptn]);
+    } else {
+      dispatchOps.add([ptn]);
+    }
+  };
 
-  const toggleAllPartitionFilter = useCallback(
-    (filtered: boolean) => {
-      if (filtered) {
-        dispatchOps.add(Object.values(Partition));
-      } else {
-        dispatchOps.rem(Object.values(Partition));
-      }
-    },
-    [dispatchOps],
-  );
+  const toggleAllPartitionFilter = (filtered: boolean) => {
+    if (filtered) {
+      dispatchOps.add(Object.values(Partition));
+    } else {
+      dispatchOps.rem(Object.values(Partition));
+    }
+  };
 
   const isItemFiltered = (partition: Partition) => {
     return filteredPartitions.includes(partition);

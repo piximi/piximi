@@ -92,7 +92,7 @@ export const useSegmenter = (): SegmenterControls => {
     (key: string, value: number | boolean | string | undefined) => {
       dispatch(segmenterSlice.actions.optionValueSet({ key, value }));
     },
-    [],
+    [dispatch],
   );
 
   const resetOptions = useCallback(() => {
@@ -101,7 +101,7 @@ export const useSegmenter = (): SegmenterControls => {
         availableChannelIds: loadedModel ? availableChannelIds : [],
       }),
     );
-  }, [loadedModel, channelMetas, dispatch]);
+  }, [loadedModel, availableChannelIds, dispatch]);
 
   return {
     loadedModel,

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -37,6 +37,14 @@ const useSort = <T, S extends string>(
     selectActiveSoftmaxById,
     modelTarget,
   );
+  const [seedState, setSeedState] = useState(() => ({
+    sortType,
+    seed: generateSeed(),
+  }));
+  if (seedState.sortType !== sortType) {
+    setSeedState({ sortType, seed: generateSeed() });
+  }
+  const seed = seedState.seed;
 
   const margined = useMemo(
     () =>
@@ -51,14 +59,12 @@ const useSort = <T, S extends string>(
           ),
     [softmaxByItemId],
   );
-  // Re-seed only when sortType changes
-  const seed = useMemo(() => generateSeed(), [sortType]);
 
   return useMemo(() => {
     const factory = cases[sortType];
     return factory ? factory({ margined, seed }) : noopSort;
     // cases intentionally not in deps — only sortType/margined/seed drive output.
-  }, [sortType, margined, seed]);
+  }, [sortType, margined, seed, cases]);
 };
 
 export const useImageSort = (sortType: ImageSortType) => {
