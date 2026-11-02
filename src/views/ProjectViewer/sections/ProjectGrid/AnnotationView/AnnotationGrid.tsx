@@ -82,7 +82,7 @@ export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
         );
       }
     },
-    [dispatch],
+    [dispatch, kindState.id],
   );
 
   if (awaitingImageSelection) {
