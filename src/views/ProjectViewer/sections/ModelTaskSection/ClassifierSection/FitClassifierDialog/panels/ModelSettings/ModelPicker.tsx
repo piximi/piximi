@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,13 +17,9 @@ import { WithLabel, TextFieldWithBlur, StyledSelect } from "components/inputs";
 
 import { classifierSlice } from "store/classifier";
 import { useParameterizedSelector } from "store/hooks";
-import {
-  selectAllCreatedModelNames,
-  selectKindClassifier,
-} from "store/classifier/selectors";
+import { selectKindClassifier } from "store/classifier/selectors";
 import { HelpItem } from "help/HelpContent";
 
-import { getUniqueName } from "utils/stringUtils";
 import { logger } from "utils/logUtils";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
@@ -64,7 +60,6 @@ export const ModelPicker = () => {
         <ModelArchiitectureOptions
           targetId={kindClassifierInfo.modelTargetId}
           newModelArch={kindClassifierInfo.newModelArch}
-          modelTargetName={kindClassifierInfo.modelTargetName}
         />
       )}
     </Box>
@@ -74,19 +69,14 @@ export const ModelPicker = () => {
 const ModelArchiitectureOptions = ({
   targetId,
   newModelArch,
-  modelTargetName,
 }: {
   targetId: string;
   newModelArch: ModelArch;
-  modelTargetName: string;
 }) => {
   const dispatch = useDispatch();
-  const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
 
-  const [userHasUpdated, setUserHasUpdated] = useState(false);
-  const { setNewModelName: setConfirmedName, activeErrors } =
-    useClassifierStatus();
-  const [modelName, setModelName] = useState("");
+  const { newModelName, setNewModelName, activeErrors } = useClassifierStatus();
+  const [draft, setDraft] = useState<string | null>(null);
 
   const handleArchitectureChange = (event: SelectChangeEvent<unknown>) => {
     const value = event.target.value as ModelArch;
@@ -102,26 +92,13 @@ const ModelArchiitectureOptions = ({
   ) => {
     const value = event.target.value;
 
-    if (!userHasUpdated) setUserHasUpdated(true);
-    setModelName(value);
+    setDraft(value);
   };
 
   const handleConfirmName = () => {
-    setConfirmedName(modelName);
+    if (draft !== null) setNewModelName(draft);
+    setDraft(null);
   };
-
-  useEffect(() => {
-    if (userHasUpdated) return;
-    const candidateName = `${modelTargetName}_${newModelArch === 0 ? "Simple-CNN" : "Mobilenet"}`;
-    const uniqueName = getUniqueName(
-      candidateName,
-      restrictedClassifierNames,
-      (base, n) => `${base}${n}`,
-    );
-
-    setModelName(uniqueName);
-    setConfirmedName(uniqueName);
-  }, [userHasUpdated, restrictedClassifierNames, newModelArch]);
 
   return (
     <Stack
@@ -171,7 +148,7 @@ const ModelArchiitectureOptions = ({
         <TextFieldWithBlur
           size="small"
           onChange={handleNameChange}
-          value={modelName}
+          value={draft ?? newModelName}
           fullWidth
           onBlur={handleConfirmName}
           error={activeErrors.some(
