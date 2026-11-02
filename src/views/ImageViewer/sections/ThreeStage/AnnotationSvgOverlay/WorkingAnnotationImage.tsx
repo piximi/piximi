@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { useSelector } from "react-redux";
 
-import { hexToRGBA } from "utils/image";
+import { hexToRGB } from "utils/colorUtils";
 import { maskToDataURL } from "utils/image/imageHelper";
 
 import { selectSelectedCategory } from "@ImageViewer/state/imageViewerData/selectors";
@@ -29,7 +29,7 @@ export const WorkingAnnotationImage = () => {
       workingAnnotation.decodedMask,
       bb[2] - bb[0],
       bb[3] - bb[1],
-      hexToRGBA(selectedCategory.color, 0) as [number, number, number],
+      hexToRGB(selectedCategory.color, false, 0) as [number, number, number],
     );
   }, [workingAnnotation, selectedCategory.color]);
 

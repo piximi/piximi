@@ -4,8 +4,9 @@ import { useSelector } from "react-redux";
 
 import * as THREE from "three";
 
-import { hexToRGBA, decodeRleArray } from "utils/image";
+import { decodeRleArray } from "utils/image";
 import { logger } from "utils/logUtils";
+import { hexToRGB } from "utils/colorUtils";
 
 import { selectSelectedAnnotations } from "@ImageViewer/state/imageViewerData/reselectors";
 import { selectAnnotationsForRender } from "@ImageViewer/state/operations/reselectors";
@@ -237,7 +238,7 @@ export const useThreeAnnotationMeshes = ({
           ? SELECTED_COLOR
           : annotation.category.color;
 
-      const [r, g, b] = hexToRGBA(fill, 0);
+      const [r, g, b] = hexToRGB(fill, false, 0);
       entry.material.uniforms.uColor.value.set(r / 255, g / 255, b / 255);
       entry.mesh.visible = !(annotation.hidden ?? false);
     }
@@ -248,8 +249,8 @@ export const useThreeAnnotationMeshes = ({
   // Dispose everything on unmount.
   useEffect(() => {
     const meshes = meshesRef.current;
+    const scene = sceneRef.current;
     return () => {
-      const scene = sceneRef.current;
       for (const [, entry] of meshes) {
         disposeEntry(scene, entry);
       }
