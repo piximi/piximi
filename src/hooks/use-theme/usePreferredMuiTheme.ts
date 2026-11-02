@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 
@@ -14,9 +14,10 @@ export const usePreferredMuiTheme = () => {
   const dispatch = useDispatch();
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-  const [theme, setTheme] = useState(prefersDarkMode ? darkTheme : lightTheme);
 
   const themeMode = useSelector(selectThemeMode);
+
+  const theme = themeMode === ThemeMode.Light ? lightTheme : darkTheme;
 
   useLayoutEffect(() => {
     dispatch(
@@ -25,14 +26,6 @@ export const usePreferredMuiTheme = () => {
       }),
     );
   }, [prefersDarkMode, dispatch]);
-
-  useLayoutEffect(() => {
-    if (themeMode === ThemeMode.Light) {
-      setTheme(lightTheme);
-    } else {
-      setTheme(darkTheme);
-    }
-  }, [themeMode]);
 
   return theme;
 };

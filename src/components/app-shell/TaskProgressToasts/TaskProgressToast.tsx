@@ -1,4 +1,11 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { useDispatch } from "react-redux";
 
@@ -50,10 +57,10 @@ export const TaskProgressToast = ({ task }: { task: AppTask }) => {
   const dispatch = useDispatch();
   const isActive = task.status === "pending" || task.status === "running";
 
-  const dismissTask = () => {
+  const dismissTask = useCallback(() => {
     dispatch(appTasksSlice.actions.taskDismissed({ id: task.id }));
     taskCancelRegistry.unregister(task.id);
-  };
+  }, [dispatch, task.id]);
 
   const progressBar = useMemo(() => {
     const PROGRESS_STYLE = (theme: Theme) => ({
@@ -85,7 +92,7 @@ export const TaskProgressToast = ({ task }: { task: AppTask }) => {
       dismissTask();
     }, delay);
     return () => clearTimeout(timer);
-  }, [task.status, task.id, dispatch]);
+  }, [task.status, task.id, dismissTask]);
 
   return (
     <Paper
