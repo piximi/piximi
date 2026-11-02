@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 
-import { useDispatch, useSelector, useStore } from "react-redux";
+import { useDispatch, useStore } from "react-redux";
 
 import { generateUUID } from "core/entities";
 import { FileLoader } from "core/file-io/file-loader";
@@ -49,7 +49,6 @@ type UseFileLoaderReturn = {
 export function useFileLoader(): UseFileLoaderReturn {
   const dispatch = useDispatch();
   const store = useStore<RootState>();
-  const experiment = useSelector(selectExperiment);
   const [isUploading, setIsUploading] = useState(false);
   const [tiffDialogOpen, setTiffDialogOpen] = useState(false);
   const [pendingTiffAnalysis, setPendingTiffAnalysis] = useState<
@@ -86,6 +85,7 @@ export function useFileLoader(): UseFileLoaderReturn {
         startedAt: Date.now(),
       };
       dispatch(appTasksSlice.actions.taskRegistered(newTask));
+      const experiment = selectExperiment(store.getState());
       try {
         // 1. Run the pipeline (workers + IndexDB)
         const interpretationResults = interpretFiles(files);
@@ -207,7 +207,7 @@ export function useFileLoader(): UseFileLoaderReturn {
         setIsUploading(false);
       }
     },
-    [dispatch],
+    [dispatch, store],
   );
 
   return {
