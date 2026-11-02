@@ -43,31 +43,26 @@ export const FitClassifierDialog = ({
     selectModelLifecycleStatus,
     modelTarget,
   );
+  const [prevStatus, setPrevStatus] = useState(modelStatus);
+  if (modelStatus !== prevStatus) {
+    setPrevStatus(modelStatus);
+    if (modelStatus === "training") setTabVal("2");
+  }
+
   const modelConfig = useClassificationModel();
 
   const showPlots = useMemo(() => {
     return modelHistory.categoricalAccuracy.length > 0;
   }, [modelHistory]);
+
+  const tabUnavailable =
+    ((tabVal === "2" || tabVal === "4") && !showPlots) ||
+    (tabVal === "3" && !modelConfig?.modelSummary);
+  const visibleTab =
+    modelStatus !== "training" && tabUnavailable ? "1" : tabVal;
   const onTabSelect = (_event: React.SyntheticEvent, newValue: string) => {
     setTabVal(newValue);
   };
-
-  useEffect(() => {
-    if (modelStatus === "training") {
-      setTabVal("2");
-    }
-  }, [modelStatus]);
-
-  // Reset to the HyperParameters tab when the currently selected tab becomes
-  // invalid (e.g. user switched to a new untrained model while the dialog was
-  // closed). Tab 2 needs training history; tab 3 needs a compiled model.
-  // Skip during training — plots are about to populate, and the other effect
-  // above intentionally set tabVal to "2" for live epoch updates.
-  useEffect(() => {
-    if (modelStatus === "training") return;
-    if ((tabVal === "2" || tabVal === "4") && !showPlots) setTabVal("1");
-    if (tabVal === "3" && !modelConfig?.modelSummary) setTabVal("1");
-  }, [tabVal, showPlots, modelConfig?.modelSummary, modelStatus]);
 
   useEffect(() => {
     if (openedDialog) {
@@ -83,7 +78,7 @@ export const FitClassifierDialog = ({
         }),
       );
     }
-  }, [openedDialog]);
+  }, [openedDialog, dispatch]);
 
   return (
     <Dialog
@@ -99,7 +94,7 @@ export const FitClassifierDialog = ({
     >
       <DialogTitleBar title="Fit Model" closeDialog={closeDialog} />
 
-      <Tabs value={tabVal} variant="fullWidth" onChange={onTabSelect}>
+      <Tabs value={visibleTab} variant="fullWidth" onChange={onTabSelect}>
         <ToolTipTab label="HyperParameters" value="1" placement="top" />
 
         <ToolTipTab
@@ -127,19 +122,19 @@ export const FitClassifierDialog = ({
       </Tabs>
 
       <DialogContent sx={{ pb: 0 }}>
-        <Box hidden={tabVal !== "1"}>
+        <Box hidden={visibleTab !== "1"}>
           <ModelSettings />
         </Box>
-        <Box hidden={tabVal !== "2"}>
+        <Box hidden={visibleTab !== "2"}>
           <TrainingPlots />
         </Box>
-        <Box hidden={tabVal !== "3"}>
+        <Box hidden={visibleTab !== "3"}>
           {/* TODO: implement model summary for graph models */}
           {modelConfig?.modelSummary && (
             <ModelSummaryTable modelSummary={modelConfig.modelSummary} />
           )}
         </Box>
-        <Box hidden={tabVal !== "4"}>
+        <Box hidden={visibleTab !== "4"}>
           {/* TODO: implement model summary for graph models */}
           {modelConfig?.modelSummary && <RunSummaryTable />}
         </Box>

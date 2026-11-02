@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { useSelector } from "react-redux";
 
@@ -41,8 +41,10 @@ export const RunSummaryTable = () => {
   );
   const runs = useParameterizedSelector(selectRunsForActiveModel, modelTarget);
 
-  const [hypParams, setHypeParams] = useState<RunHyperparameterSnapshot>();
-  const hypParamsRef = useRef<HTMLButtonElement | null>(null);
+  const [popover, setPopover] = useState<{
+    anchor: HTMLElement;
+    params: RunHyperparameterSnapshot;
+  } | null>(null);
 
   const handleExportRuns = () => {
     const csvContent = buildModelRunsCsv(runs);
@@ -108,10 +110,12 @@ export const RunSummaryTable = () => {
                 <Button
                   variant="text"
                   size="small"
-                  onClick={(e) => {
-                    hypParamsRef.current = e.currentTarget;
-                    setHypeParams(run.hyperparameters);
-                  }}
+                  onClick={(e) =>
+                    setPopover({
+                      anchor: e.currentTarget,
+                      params: run.hyperparameters,
+                    })
+                  }
                 >
                   View
                 </Button>
@@ -121,15 +125,14 @@ export const RunSummaryTable = () => {
         </TableBody>
       </Table>
       <Popover
-        open={!!hypParamsRef.current}
-        anchorEl={hypParamsRef.current}
+        open={popover !== null}
+        anchorEl={popover?.anchor}
         onClose={() => {
-          hypParamsRef.current = null;
-          setHypeParams(undefined);
+          setPopover(null);
         }}
         slotProps={{ paper: { sx: { width: "300px" } } }}
       >
-        <HyperParameterInfoTable hypParams={hypParams} />
+        <HyperParameterInfoTable hypParams={popover?.params} />
       </Popover>
       <Box
         sx={{
