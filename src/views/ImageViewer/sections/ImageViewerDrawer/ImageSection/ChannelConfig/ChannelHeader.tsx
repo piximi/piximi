@@ -25,7 +25,7 @@ const ColorPicker = ({
     null,
   );
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const colorHex = rgbToHex(colorMap);
+  const colorHex = rgbToHex(colorMap, { fractional: true });
   const [draftColorMap, setDraftColorMap] = useState(colorHex);
   const [prevColorMap, setPrevColorMap] = useState(colorHex);
   if (colorHex !== prevColorMap) {
@@ -62,7 +62,7 @@ const ColorPicker = ({
         sx={{
           width: 20,
           height: 16,
-          backgroundColor: rgbToHex(colorMap),
+          backgroundColor: rgbToHex(colorMap, { fractional: true }),
           borderRadius: 0.5,
           cursor: "pointer",
           mr: 2,

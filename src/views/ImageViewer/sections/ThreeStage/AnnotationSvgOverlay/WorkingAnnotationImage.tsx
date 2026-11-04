@@ -29,7 +29,11 @@ export const WorkingAnnotationImage = () => {
       workingAnnotation.decodedMask,
       bb[2] - bb[0],
       bb[3] - bb[1],
-      hexToRGB(selectedCategory.color, false, 0) as [number, number, number],
+      hexToRGB(selectedCategory.color, { toFractional: false }) as [
+        number,
+        number,
+        number,
+      ],
     );
   }, [workingAnnotation, selectedCategory.color]);
 

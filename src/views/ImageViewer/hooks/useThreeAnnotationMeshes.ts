@@ -238,7 +238,7 @@ export const useThreeAnnotationMeshes = ({
           ? SELECTED_COLOR
           : annotation.category.color;
 
-      const [r, g, b] = hexToRGB(fill, false, 0);
+      const [r, g, b] = hexToRGB(fill, { toFractional: false });
       entry.material.uniforms.uColor.value.set(r / 255, g / 255, b / 255);
       entry.mesh.visible = !(annotation.hidden ?? false);
     }
