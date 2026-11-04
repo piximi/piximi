@@ -9,6 +9,7 @@ export type AnnotationVolume = Omit<Predictable, "partition"> & {
   kindId: string;
   categoryId: string;
   timepoint?: number;
+  trackletId?: string;
 };
 export type AnnotationVolumeEntities = Record<string, AnnotationVolume>;
 

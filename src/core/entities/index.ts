@@ -14,3 +14,4 @@ export * from "./channel";
 export * from "./experiment";
 export * from "./image";
 export * from "./kind";
+export * from "./tracklet";
