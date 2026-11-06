@@ -1,7 +1,7 @@
 {
   "name": "piximi",
   "license": "BSD-style license",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "homepage": "https://piximi.app",
   "packageManager": "pnpm@11.2.2",
