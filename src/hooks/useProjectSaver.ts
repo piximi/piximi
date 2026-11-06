@@ -94,7 +94,7 @@ export const useProjectSaver = (): UseProjectSaverReturn => {
           return;
         }
 
-        saveAs(result.blob, `${name}.zip`);
+        saveAs(result.blob, `${name}.piximi`);
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
       } catch (err) {
         dispatch(

@@ -10,14 +10,9 @@ export const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 // Dev server to drive.
 export const BASE_URL = process.env.PIXIMI_URL || "http://localhost:3000";
 
-// Where images are written: the docs repo's img/ folder. Defaults to a sibling
-// checkout named piximi-documentation next to this repo.
-export const OUT_DIR =
-  process.env.DOCS_IMG_DIR ||
-  path.resolve(
-    SCRIPT_DIR,
-    "../../../piximi-documentation/documentation/piximi-documentation/img",
-  );
+// Where images are written. Defaults to an img/ folder next to this script
+// (gitignored); point DOCS_IMG_DIR at the docs repo's img/ folder to write there.
+export const OUT_DIR = process.env.DOCS_IMG_DIR || path.join(SCRIPT_DIR, "img");
 
 // A saved project used by tutorial pages / `--project`.
 export const DEFAULT_PROJECT_FILE = path.join(

@@ -26,12 +26,13 @@ import {
 import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
 import { classifierSlice } from "store/classifier";
-import { selectExperimentChannels } from "store/data/selectors";
+import { selectVisibleChannelCount } from "store/data/selectors";
 
 import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
 import {
   selectActiveLabeledItems,
   selectActiveItemsByPartition,
+  selectActiveKnownCategories,
 } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
@@ -49,6 +50,8 @@ import type { RecursivePartial } from "utils/types";
 export enum ErrorReason {
   NotTrainable,
   NoLabeledImages,
+  TooFewCategories,
+  TooFewLabeledCategories,
   ExistingPredictions,
   ChannelMismatch,
   DuplicateModelName,
@@ -59,6 +62,8 @@ type Precheck = {
   modelTrainable: boolean; // success -> true
   modelValid: boolean; // success -> true
   labeledImages: boolean; // success -> true
+  multipleCategories: boolean; // success -> true
+  multipleLabeledCategories: boolean; // success -> true
   noPendingPredictions: boolean; // success -> true
   channelsValid: boolean; // success -> true
   modelNameValid: boolean; // success -> true
@@ -97,6 +102,8 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
     modelTrainable: false,
     modelValid: false,
     labeledImages: false,
+    multipleCategories: false,
+    multipleLabeledCategories: false,
     noPendingPredictions: false,
     channelsValid: false,
     modelNameValid: false,
@@ -118,7 +125,7 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
 
 const useModelParams = () => {
   const dispatch = useDispatch();
-  const experimentChannels = useSelector(selectExperimentChannels);
+  const visibleChannels = useSelector(selectVisibleChannelCount);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const modelPreprocessingSettings = useParameterizedSelector(
     selectModelPreprocessSettings,
@@ -132,7 +139,7 @@ const useModelParams = () => {
   const [userDefinedSeed, setUserDefinedSeed] = useState<number | undefined>();
 
   const [newModelParams, updateNewModelParams] = useImmer(
-    getDefaultModelParams(experimentChannels),
+    getDefaultModelParams(visibleChannels || undefined),
   );
   const modelParams = useMemo(() => {
     if (modelPreprocessingSettings && modelOptimizerSettings)
@@ -202,8 +209,8 @@ const useModelParams = () => {
       });
       return;
     }
-    handleSetModelParams(getDefaultModelParams(experimentChannels));
-  }, [modelOptimizerSettings, modelPreprocessingSettings, experimentChannels]);
+    handleSetModelParams(getDefaultModelParams(visibleChannels || undefined));
+  }, [modelOptimizerSettings, modelPreprocessingSettings, visibleChannels]);
   return {
     modelParams,
     newModelName,
@@ -241,7 +248,19 @@ export const ClassifierStatusProvider = ({
     modelTarget,
   );
   const activeLabeledItems = useSelector(selectActiveLabeledItems);
-  const experimentChannels = useSelector(selectExperimentChannels);
+  const knownCategories = useSelector(selectActiveKnownCategories);
+  // Categories that will actually reach training. Labeled items in the
+  // inference partition are predictions, which `partitionTrainingData` drops.
+  const labeledCategoryCount = useMemo(
+    () =>
+      new Set(
+        activeLabeledItems
+          .filter((item) => item.partition !== Partition.Inference)
+          .map((item) => item.categoryId),
+      ).size,
+    [activeLabeledItems],
+  );
+  const visibleChannels = useSelector(selectVisibleChannelCount);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
   );
@@ -273,12 +292,15 @@ export const ClassifierStatusProvider = ({
       modelTrainable: !modelConfig || modelConfig.trainable,
       modelValid: modelIsValid === undefined ? true : modelIsValid,
       labeledImages: activeLabeledItems.length > 0,
+      // A classifier needs at least two output classes to learn anything.
+      multipleCategories: knownCategories.length >= 2,
+      multipleLabeledCategories: labeledCategoryCount >= 2,
       noPendingPredictions: inferenceItems.every((item) =>
         representsUnknown(item.categoryId),
       ),
       channelsValid:
-        modelChannels && experimentChannels
-          ? experimentChannels === modelChannels
+        modelChannels && visibleChannels
+          ? visibleChannels === modelChannels
           : true,
       modelNameValid:
         !!modelConfig ||
@@ -287,11 +309,13 @@ export const ClassifierStatusProvider = ({
     }),
     [
       modelConfig,
-      experimentChannels,
+      visibleChannels,
       newModelName,
       restrictedClassifierNames,
       modelIsValid,
       activeLabeledItems,
+      knownCategories,
+      labeledCategoryCount,
       isFitting,
       inferenceItems,
       modelChannels,
@@ -324,10 +348,24 @@ export const ClassifierStatusProvider = ({
         severity: 3,
       });
     }
+    if (!precheck.multipleCategories) {
+      newErrors.push({
+        reason: ErrorReason.TooFewCategories,
+        message: "Create at least two categories to train a classifier.",
+        severity: 2,
+      });
+    } else if (precheck.labeledImages && !precheck.multipleLabeledCategories) {
+      newErrors.push({
+        reason: ErrorReason.TooFewLabeledCategories,
+        message:
+          "Label items in at least two categories to train a classifier.",
+        severity: 3,
+      });
+    }
     if (!precheck.channelsValid) {
       newErrors.push({
         reason: ErrorReason.ChannelMismatch,
-        message: `The number of model input channels (${modelChannels}) must match the images in the project (${experimentChannels})`,
+        message: `The model expects ${modelChannels} input channels, but ${visibleChannels} ${visibleChannels === 1 ? "channel is" : "channels are"} visible. Only visible channels are used: show or hide channels to match, or change the input shape.`,
         severity: 2,
       });
     }
@@ -348,7 +386,7 @@ export const ClassifierStatusProvider = ({
     }
 
     return newErrors;
-  }, [precheck, experimentChannels, newModelName, modelChannels]);
+  }, [precheck, visibleChannels, newModelName, modelChannels]);
 
   const error = useMemo(
     () =>

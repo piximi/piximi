@@ -144,6 +144,20 @@ export const generateInitialPlot = () => {
   };
 };
 
+export const OBJ_MEAS_LABELS: Record<ObjectFeature, string> = {
+  area: "Area",
+  bboxArea: "Bounding Box Area",
+  comX: "Center of Mass X",
+  comY: "Center of Mass Y",
+  compactness: "Compactness",
+  eqpc: "EQPC",
+  extent: "Extent",
+  ped: "PED",
+  perimeter: "Perimeter",
+  sphericity: "Sphericity",
+  radius: "Radius",
+};
+
 export const OBJ_MEAS_LOOKUP: Record<ObjectFeature, string> = {
   area: "Area",
   bboxArea: "Bounding Box Area",
@@ -156,6 +170,18 @@ export const OBJ_MEAS_LOOKUP: Record<ObjectFeature, string> = {
   perimeter: "Perimeter",
   sphericity: "Sphericity",
   radius: "Radius of a circle of equal perimeter",
+};
+
+export const INTENSE_MEAS_LABELS: Record<IntensityMeasurement, string> = {
+  maxValue: "Maximum",
+  minValue: "Minimum",
+  total: "Total",
+  mean: "Mean",
+  median: "Median",
+  std: "Standard Deviation",
+  mad: "MAD",
+  lowerQuartile: "Lower Quartile",
+  upperQuartile: "Upper Quartile",
 };
 
 export const INTENSE_MEAS_LOOKUP = {
