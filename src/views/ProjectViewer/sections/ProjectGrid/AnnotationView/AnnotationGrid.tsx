@@ -56,13 +56,7 @@ export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
     numRows,
   } = useGridLayout(visibleAnns.length);
 
-  const windowCount = useMemo(() => {
-    if (!rowHeight || !columnWidth) return 0;
-    return (
-      Math.round(gridHeight / rowHeight) * Math.round(gridWidth / columnWidth)
-    );
-  }, [gridHeight, rowHeight, gridWidth, columnWidth]);
-  usePreloadSrcs(visibleAnns, windowCount);
+  usePreloadSrcs(visibleAnns);
 
   const handleSelectAnnotation = useCallback(
     (id: string, selected: boolean) => {

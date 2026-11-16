@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import * as Comlink from "comlink";
+import { toChannelDisplay, useBackend } from "core/backend";
 
 import {
   getCacheKey,
@@ -8,70 +8,46 @@ import {
   setRenderedSrc,
 } from "utils/renderedSrcsCache";
 
-import type { BBox, ExtendedChannel, ExtendedImageObject } from "core/entities";
+import type { BBox, ExtendedImageObject } from "core/entities";
 
-type RenderSrcsWorkerResult = Array<
-  { key: string; url: string } | { key: string; error: Error }
->;
-interface RenderedSrcWorkerAPI {
-  renderSrcs(
-    items: Array<{
-      channelsRef: ExtendedChannel[];
-      boundingBox?: BBox;
-    }>,
-  ): Promise<RenderSrcsWorkerResult>;
-}
+/*
+ * Warms the rendered-src cache for grid items ahead of their render. Items are
+ * requested in the order given, so pass the visible window first; the backend
+ * completes earlier requests first and drops the rest when the effect is
+ * cleaned up.
+ */
 export const usePreloadSrcs = <
   T extends Pick<ExtendedImageObject, "channelsRef"> & { boundingBox?: BBox },
 >(
   items: Array<T>,
-  windowCount: number,
 ) => {
+  const backend = useBackend();
   useEffect(() => {
-    if (items.length === 0 || !Number.isInteger(windowCount)) return;
+    if (items.length === 0) return;
     // immediately setting the cache map prevents `useRenderedSrcs` from
     // performing identical, simultaneous computation
-    items.forEach((item) => {
-      const cacheKey = getCacheKey(item.channelsRef, item.boundingBox);
-      if (!getRenderedSrc(cacheKey)) setRenderedSrc(cacheKey, "");
-    });
-    const computeRenderedSrcs = () => {
-      const operantItems = items.filter(
-        (item) =>
-          getRenderedSrc(getCacheKey(item.channelsRef, item.boundingBox)) ===
-          "",
+    const pending = items
+      .map((item) => ({
+        key: getCacheKey(item.channelsRef, item.boundingBox),
+        item,
+      }))
+      .filter(({ key }) => !getRenderedSrc(key));
+    for (const { key } of pending) setRenderedSrc(key, "");
+
+    const controller = new AbortController();
+    void (async () => {
+      const results = backend.render.thumbnails(
+        pending.map(({ item }) => ({
+          channels: item.channelsRef.map(toChannelDisplay),
+          region: item.boundingBox,
+        })),
+        { signal: controller.signal },
       );
-
-      const workers: Worker[] = [];
-
-      const spawnWorker = (group: typeof operantItems) => {
-        if (group.length === 0) return;
-        const worker = new Worker(
-          new URL("../utils/workers/renderedSrcWorker.ts", import.meta.url),
-          { type: "module" },
-        );
-        workers.push(worker);
-        const proxy = Comlink.wrap<RenderedSrcWorkerAPI>(worker);
-        proxy.renderSrcs(group).then((results) => {
-          results.forEach((result) => {
-            if ("url" in result) setRenderedSrc(result.key, result.url);
-          });
-          worker.terminate();
-        });
-      };
-      const groupCutoff1 =
-        Math.floor((operantItems.length - windowCount) / 3) + windowCount;
-      const groupCutoff2 =
-        Math.floor((operantItems.length - windowCount) / 3) + groupCutoff1;
-
-      spawnWorker(operantItems.slice(0, windowCount));
-      spawnWorker(operantItems.slice(windowCount, groupCutoff1));
-      spawnWorker(operantItems.slice(groupCutoff1, groupCutoff2));
-      spawnWorker(operantItems.slice(groupCutoff2));
-
-      return workers;
-    };
-    const workers = computeRenderedSrcs();
-    return () => workers.forEach((w) => w.terminate());
-  }, [items, windowCount]);
+      for await (const result of results) {
+        if (result.ok)
+          setRenderedSrc(pending[result.index].key, result.image.dataUrl);
+      }
+    })();
+    return () => controller.abort();
+  }, [backend, items]);
 };

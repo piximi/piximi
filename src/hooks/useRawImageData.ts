@@ -1,58 +1,44 @@
-import { DataConnector } from "core/data-connector";
+import { useBackend } from "core/backend";
 
 import { useKeyedAsync } from "./useKeyedAsync";
 
-import type { BitDepth, ExtendedChannel } from "core/entities";
+import type { Backend, RawChannelData } from "core/backend";
+import type { ExtendedChannel } from "core/entities";
 
-type ChannelData = Array<{
-  bitDepth: BitDepth;
-  data: Uint8Array<ArrayBuffer> | Uint16Array<ArrayBuffer>;
-}>;
+type ChannelData = Array<Pick<RawChannelData, "bitDepth" | "data">>;
 
 const EMPTY: ChannelData = [];
 
 const loadChannelData = async (
+  backend: Backend,
   visibleChannels: ExtendedChannel[],
 ): Promise<ChannelData | undefined> => {
-  const result = await DataConnector.getInstance().retrieveBatch(
-    visibleChannels.map((c) => ({
-      id: c.storageReference.storageId,
-      storeName: c.storageReference.storeName,
-    })),
-  );
-  if (!result.success) return undefined;
-
-  // Look up by id: the Map's order isn't guaranteed to match the request.
-  return visibleChannels.map((c) => {
-    const { bitDepth, data } = result.data.get(c.storageReference.storageId)!;
-    return {
-      bitDepth,
-      data: bitDepth === 8 ? new Uint8Array(data) : new Uint16Array(data),
-    };
-  });
+  // Only a backend holding the pixels locally serves them raw; otherwise the
+  // viewer works from composites.
+  if (!backend.render.raw) return undefined;
+  const raw = await backend.render.raw(visibleChannels.map((c) => c.id));
+  return raw.map(({ bitDepth, data }) => ({ bitDepth, data }));
 };
 
 /**
  * Returns the raw channel data for the visible channels.
  *
- * Keyed on the visible channels' storage ids only: ramp and colour map are
- * applied by the renderer, so contrast changes don't re-read IndexedDB.
+ * Keyed on the visible channels' ids only: ramp and colour map are applied by
+ * the renderer, so contrast changes don't re-read the pixels.
  */
 export function useRawImageData(channels: ExtendedChannel[]): {
-  channelData: Array<{
-    bitDepth: BitDepth;
-    data: Uint8Array<ArrayBuffer> | Uint16Array<ArrayBuffer>;
-  }>;
+  channelData: ChannelData;
   loading: boolean;
 } {
+  const backend = useBackend();
   const visibleChannels = channels.filter((c) => c.visible);
   const key =
     visibleChannels.length === 0
       ? null
-      : visibleChannels.map((c) => c.storageReference.storageId).join("|");
+      : visibleChannels.map((c) => c.id).join("|");
 
   const { latest, loading } = useKeyedAsync(key, () =>
-    loadChannelData(visibleChannels),
+    loadChannelData(backend, visibleChannels),
   );
 
   return {

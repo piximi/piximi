@@ -50,13 +50,7 @@ export const ImageGrid = () => {
     },
     [dispatch],
   );
-  const windowCount = useMemo(() => {
-    if (!rowHeight || !columnWidth) return 0;
-    return (
-      Math.round(gridHeight / rowHeight) * Math.round(gridWidth / columnWidth)
-    );
-  }, [gridHeight, rowHeight, gridWidth, columnWidth]);
-  usePreloadSrcs(sortedImages, windowCount);
+  usePreloadSrcs(sortedImages);
 
   return (
     <VirtualGrid

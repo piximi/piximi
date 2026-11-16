@@ -1,9 +1,5 @@
-import { DataConnector } from "core/data-connector";
+import { toChannelDisplay, useBackend } from "core/backend";
 
-import {
-  compositeChannelsToDataUrl,
-  layerFromChannel,
-} from "utils/image/compositeChannels";
 import {
   getCacheKey,
   getRenderedSrc,
@@ -12,28 +8,21 @@ import {
 
 import { useKeyedAsync } from "./useKeyedAsync";
 
+import type { Backend } from "core/backend";
 import type { BBox, ExtendedChannel } from "core/entities";
 
 const renderToDataUrl = async (
-  visibleChannels: ExtendedChannel[],
+  backend: Backend,
+  channels: ExtendedChannel[],
   crop: BBox | undefined,
   key: string,
 ): Promise<string | undefined> => {
-  const result = await DataConnector.getInstance().retrieveBatch(
-    visibleChannels.map((c) => ({
-      id: c.storageReference.storageId,
-      storeName: c.storageReference.storeName,
-    })),
-  );
-  if (!result.success) return undefined;
-
-  const url = compositeChannelsToDataUrl(
-    visibleChannels.map(layerFromChannel),
-    result.data,
-    crop,
-  );
-  setRenderedSrc(key, url);
-  return url;
+  const { dataUrl } = await backend.render.image({
+    channels: channels.map(toChannelDisplay),
+    region: crop,
+  });
+  setRenderedSrc(key, dataUrl);
+  return dataUrl;
 };
 /**
  * Returns the rendered preview src for an entity.
@@ -49,14 +38,15 @@ export function useRenderedSrc(
   src: string;
   loading: boolean;
 } {
-  const visibleChannels = channels.filter((c) => c.visible);
-  const key = visibleChannels.length === 0 ? null : getCacheKey(channels, crop);
+  const backend = useBackend();
+  const anyVisible = channels.some((c) => c.visible);
+  const key = anyVisible ? getCacheKey(channels, crop) : null;
 
   // "" is usePreloadSrcs' "worker in flight" placeholder — treat as a miss
   const cached = key ? getRenderedSrc(key) || undefined : undefined;
 
   const { latest, loading } = useKeyedAsync(cached ? null : key, () =>
-    renderToDataUrl(visibleChannels, crop, key!),
+    renderToDataUrl(backend, channels, crop, key!),
   );
 
   if (key === null) return { src: "", loading: false };
