@@ -46,3 +46,11 @@ public/ort/
 
 # Docs screenshot output
 /documentation/screenshots/img/
+
+# python workspace
+python/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+python/**/dist/
