@@ -1,6 +1,6 @@
 import type { ErrorCode } from "core/dl/types";
 
-export type BackendErrorCode = ErrorCode | "NOT_SUPPORTED" | "NOT_FOUND";
+type BackendErrorCode = ErrorCode | "NOT_SUPPORTED" | "NOT_FOUND";
 
 /*
  * Failure of a backend call. Backend methods reject rather than returning a
@@ -17,6 +17,3 @@ export class BackendError extends Error {
     this.code = code;
   }
 }
-
-export const isBackendError = (error: unknown): error is BackendError =>
-  error instanceof Error && error.name === "BackendError";

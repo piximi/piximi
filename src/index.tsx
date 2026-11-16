@@ -4,17 +4,24 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { createRoot } from "react-dom/client";
 
+import { BackendProvider, installBackend } from "core/backend";
+
 import { productionStore } from "store";
 
 import { Application } from "./app/Application";
+
+const backend = installBackend(productionStore);
+void backend.connect();
 
 const domNode = document.getElementById("root");
 const root = createRoot(domNode!);
 
 root.render(
   <Provider store={productionStore}>
-    <DndProvider backend={HTML5Backend}>
-      <Application />
-    </DndProvider>
+    <BackendProvider backend={backend}>
+      <DndProvider backend={HTML5Backend}>
+        <Application />
+      </DndProvider>
+    </BackendProvider>
   </Provider>,
 );

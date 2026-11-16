@@ -5,14 +5,14 @@ import { hasCapability } from "../capabilities";
 import type { BackendEvent } from "../events";
 import type { Backend, ChannelDisplay, RenderRequest } from "../types";
 
-export type ConformanceImage = {
+type ConformanceImage = {
   id: string;
   width: number;
   height: number;
   channelIds: string[];
 };
 
-export type ConformanceContext = {
+type ConformanceContext = {
   backend: Backend;
   /* Every image the backend holds, so paging can be checked for completeness. */
   images: ConformanceImage[];

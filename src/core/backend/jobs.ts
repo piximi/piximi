@@ -30,7 +30,7 @@ const TERMINAL: ReadonlySet<JobStatus> = new Set([
   "cancelled",
 ]);
 
-export const isTerminal = (status: JobStatus): boolean => TERMINAL.has(status);
+const isTerminal = (status: JobStatus): boolean => TERMINAL.has(status);
 
 /*
  * Long-running work a backend performs, observable by every client of the

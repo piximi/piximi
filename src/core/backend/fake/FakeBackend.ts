@@ -55,7 +55,7 @@ import type {
   SegmentationRunSummary,
 } from "../types";
 
-export type FakeImageSeed = {
+type FakeImageSeed = {
   id: string;
   width: number;
   height: number;
