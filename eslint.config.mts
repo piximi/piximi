@@ -240,7 +240,14 @@ export default tseslint.config(
   },
 
   {
-    ignores: ["**/*.json", "**/*.yml", "dist/**/*"],
+    ignores: [
+      "**/*.json",
+      "**/*.yml",
+      "dist/**/*",
+      // Generated from python/packages/piximi-schema by `pnpm protocol:gen`.
+      "src/core/backend/protocol/generated.ts",
+      "src/core/backend/protocol/methods.ts",
+    ],
   },
 
   // must be last

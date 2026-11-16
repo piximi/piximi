@@ -116,6 +116,7 @@
     "husky": "^8.0.0",
     "install": "^0.13.0",
     "jiti": "^2.4.2",
+    "json-schema-to-typescript": "^16.0.0",
     "knip": "^6.6.0",
     "lint-staged": "^17.5.1",
     "playwright": "^1.54.1",
@@ -148,7 +149,8 @@
     "lint": "./scripts/lint.sh",
     "typecheck": "tsc --noEmit",
     "format-check": "prettier --cache --check 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
-    "format-write": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'"
+    "format-write": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
+    "protocol:gen": "node scripts/generateProtocol.mjs"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,js,jsx}": [
@@ -171,5 +173,11 @@
       "last 1 safari version"
     ]
   },
-  "private": true
+  "private": true,
+  "knip": {
+    "ignore": [
+      "src/core/backend/protocol/generated.ts",
+      "src/core/backend/protocol/methods.ts"
+    ]
+  }
 }
