@@ -56,7 +56,16 @@ export const PretrainedModelSelector = ({
     const { displayName, description, use, sources, cite, cloudWarning } =
       models[selectedModel.id];
 
-    return { name: displayName, description, use, sources, cite, cloudWarning };
+    // Every key present is rendered as a row, so leave the optional ones out
+    // when a descriptor carries them as undefined.
+    return {
+      name: displayName,
+      description,
+      use,
+      sources,
+      ...(cite && { cite }),
+      ...(cloudWarning && { cloudWarning }),
+    };
   }, [models, selectedModel]);
 
   return (

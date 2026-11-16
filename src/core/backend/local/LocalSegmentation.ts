@@ -78,8 +78,9 @@ const describe = (
     description: info?.description ?? "",
     use: info?.use ?? "",
     sources: info?.sources ?? [],
-    cite: info?.cite,
-    cloudWarning: info?.cloudWarning,
+    // Only present when set: the details panel renders every key it finds.
+    ...(info?.cite && { cite: info.cite }),
+    ...(info?.cloudWarning && { cloudWarning: info.cloudWarning }),
   };
 };
 
