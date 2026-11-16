@@ -6,6 +6,7 @@ import { registerProjectViewerListeners } from "views/ProjectViewer/state/listen
 import { registerImageViewerListeners } from "views/ImageViewer/state/imageViewerData/listeners";
 
 import { projectReset } from "./actions";
+import { registerDataStorageListeners } from "./data/listeners";
 
 import type { TypedAppStartListening } from "store/types";
 
@@ -13,6 +14,7 @@ export const projectMiddleware = createListenerMiddleware();
 const startAppListening =
   projectMiddleware.startListening as TypedAppStartListening;
 
+registerDataStorageListeners(startAppListening);
 registerProjectViewerListeners(startAppListening);
 registerImageViewerListeners(startAppListening);
 
