@@ -3,52 +3,68 @@ import { Image as IJSImage, encodeDataURL } from "image-js-latest";
 import { createLUT } from "utils/colorUtils";
 
 import type { StoredChannelData } from "core/data-connector/types";
-import type { BBox, ExtendedChannel } from "core/entities";
+import type { BBox, ColorMap, ExtendedChannel } from "core/entities";
 
 export type StoredPixels = Pick<
   StoredChannelData,
   "data" | "width" | "height" | "bitDepth"
 >;
 
+/* One channel's contribution: which pixels, and how to colour them. */
+export type CompositeLayer = {
+  pixelKey: string;
+  colorMap: ColorMap;
+  rampMin: number;
+  rampMax: number;
+};
+
+export const layerFromChannel = (channel: ExtendedChannel): CompositeLayer => ({
+  pixelKey: channel.storageReference.storageId,
+  colorMap: channel.colorMap,
+  rampMin: channel.rampMin,
+  rampMax: channel.rampMax,
+});
+
 /**
- * Additively composites channels into an RGB buffer: each channel's pixels go
+ * Additively composites layers into an RGB buffer: each layer's pixels go
  * through their own colour LUT (ramp + colour map) and the results are summed,
  * saturating at 255.
  *
- * Pixel buffers are looked up by storage id rather than paired by position, so
- * `stored` may hold them in any order.
+ * Pixel buffers are looked up by `pixelKey` rather than paired by position, so
+ * `pixels` may hold them in any order.
  */
 export function compositeChannels(
-  channels: ExtendedChannel[],
-  stored: ReadonlyMap<string, StoredPixels>,
+  layers: CompositeLayer[],
+  pixels: ReadonlyMap<string, StoredPixels>,
   crop?: BBox,
 ): { width: number; height: number; data: Uint8Array } {
-  if (channels.length === 0) {
-    throw new Error("compositeChannels: no channels to render");
+  if (layers.length === 0) {
+    throw new Error("compositeChannels: no layers to render");
   }
 
-  const layers = channels.map((channel) => {
-    const id = channel.storageReference.storageId;
-    const pixels = stored.get(id);
-    if (!pixels) {
-      throw new Error(`compositeChannels: no pixel data for channel ${id}`);
+  const resolved = layers.map((layer) => {
+    const stored = pixels.get(layer.pixelKey);
+    if (!stored) {
+      throw new Error(
+        `compositeChannels: no pixel data for layer ${layer.pixelKey}`,
+      );
     }
     return {
-      pixels,
+      stored,
       buffer:
-        pixels.bitDepth === 8
-          ? new Uint8Array(pixels.data)
-          : new Uint16Array(pixels.data),
+        stored.bitDepth === 8
+          ? new Uint8Array(stored.data)
+          : new Uint16Array(stored.data),
       lut: createLUT({
-        bitDepth: pixels.bitDepth,
-        colorMap: channel.colorMap,
-        min: channel.rampMin,
-        max: channel.rampMax,
+        bitDepth: stored.bitDepth,
+        colorMap: layer.colorMap,
+        min: layer.rampMin,
+        max: layer.rampMax,
       }),
     };
   });
 
-  const { width, height } = layers[0].pixels;
+  const { width, height } = resolved[0].stored;
   const [x0, y0, x1, y1] = crop ?? [0, 0, width, height];
   const outW = x1 - x0;
   const outH = y1 - y0;
@@ -61,7 +77,7 @@ export function compositeChannels(
       let r = 0,
         g = 0,
         b = 0;
-      for (const { buffer, lut } of layers) {
+      for (const { buffer, lut } of resolved) {
         const v = buffer[srcIdx];
         r += lut[0][v];
         g += lut[1][v];
@@ -77,10 +93,10 @@ export function compositeChannels(
 }
 
 export function compositeChannelsToDataUrl(
-  channels: ExtendedChannel[],
-  stored: ReadonlyMap<string, StoredPixels>,
+  layers: CompositeLayer[],
+  pixels: ReadonlyMap<string, StoredPixels>,
   crop?: BBox,
 ): string {
-  const { width, height, data } = compositeChannels(channels, stored, crop);
+  const { width, height, data } = compositeChannels(layers, pixels, crop);
   return encodeDataURL(new IJSImage(width, height, { data }));
 }

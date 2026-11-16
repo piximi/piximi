@@ -4,7 +4,10 @@ import "./workerPolyfills";
 
 import { DataConnector } from "core/data-connector";
 
-import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
+import {
+  compositeChannelsToDataUrl,
+  layerFromChannel,
+} from "utils/image/compositeChannels";
 import { getCacheKey } from "utils/renderedSrcsCache";
 
 import type { BBox, ExtendedChannel } from "core/entities";
@@ -34,7 +37,7 @@ const renderSrcs = async (
       );
       if (result.success) {
         const url = compositeChannelsToDataUrl(
-          visibleChannels,
+          visibleChannels.map(layerFromChannel),
           result.data,
           item.boundingBox,
         );

@@ -1,6 +1,9 @@
 import { DataConnector } from "core/data-connector";
 
-import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
+import {
+  compositeChannelsToDataUrl,
+  layerFromChannel,
+} from "utils/image/compositeChannels";
 import {
   getCacheKey,
   getRenderedSrc,
@@ -24,7 +27,11 @@ const renderToDataUrl = async (
   );
   if (!result.success) return undefined;
 
-  const url = compositeChannelsToDataUrl(visibleChannels, result.data, crop);
+  const url = compositeChannelsToDataUrl(
+    visibleChannels.map(layerFromChannel),
+    result.data,
+    crop,
+  );
   setRenderedSrc(key, url);
   return url;
 };
