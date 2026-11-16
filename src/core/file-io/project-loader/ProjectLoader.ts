@@ -107,7 +107,7 @@ export class ProjectLoader implements IProjectLoader {
         overallProgress: STAGES.storeChannels.end,
         stageProgress: 1,
       });
-      this.registerClassifiers(modelFiles, (p: number) =>
+      await this.registerClassifiers(modelFiles, (p: number) =>
         this.updateProgress({
           overallProgress:
             STAGES.storeChannels.end +
