@@ -22,13 +22,14 @@ const loadChannelData = async (
   );
   if (!result.success) return undefined;
 
-  const { bitDepth } = result.data.get(
-    visibleChannels[0].storageReference.storageId,
-  )!;
-  return [...result.data.values()].map((c) => ({
-    bitDepth,
-    data: bitDepth === 8 ? new Uint8Array(c.data) : new Uint16Array(c.data),
-  }));
+  // Look up by id: the Map's order isn't guaranteed to match the request.
+  return visibleChannels.map((c) => {
+    const { bitDepth, data } = result.data.get(c.storageReference.storageId)!;
+    return {
+      bitDepth,
+      data: bitDepth === 8 ? new Uint8Array(data) : new Uint16Array(data),
+    };
+  });
 };
 
 /**

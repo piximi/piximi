@@ -1,11 +1,10 @@
-import { Image as IJSImage, encodeDataURL } from "image-js-latest";
 import * as Comlink from "comlink";
 
 import "./workerPolyfills";
 
 import { DataConnector } from "core/data-connector";
 
-import { createLUT } from "utils/colorUtils";
+import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
 import { getCacheKey } from "utils/renderedSrcsCache";
 
 import type { BBox, ExtendedChannel } from "core/entities";
@@ -21,61 +20,24 @@ const renderSrcs = async (
     { key: string; url: string } | { key: string; error: Error }
   > = [];
   for (const item of items) {
+    // The key covers every channel (visibility included) but only the visible
+    // ones are drawn, matching `useRenderedSrc`.
     const cacheKey = getCacheKey(item.channelsRef, item.boundingBox);
+    const visibleChannels = item.channelsRef.filter((c) => c.visible);
+    if (visibleChannels.length === 0) continue;
     try {
       const result = await storage.retrieveBatch(
-        item.channelsRef.map((e) => ({
-          id: e.storageReference.storageId,
-          storeName: e.storageReference.storeName,
+        visibleChannels.map((c) => ({
+          id: c.storageReference.storageId,
+          storeName: c.storageReference.storeName,
         })),
       );
       if (result.success) {
-        const { width, height, bitDepth } = result.data.get(
-          item.channelsRef[0].storageReference.storageId,
-        )!;
-        const [x0, y0, x1, y1] = item.boundingBox ?? [0, 0, width, height];
-        const outW = x1 - x0;
-        const outH = y1 - y0;
-        const pixelCount = outW * outH;
-        const rgbBuffer = new Uint8Array(pixelCount * 3);
-
-        const luts = [...result.data.values()].map(({ data }, idx) => {
-          const { rampMin, rampMax, colorMap } = item.channelsRef[idx];
-          const lut = createLUT({
-            bitDepth,
-            colorMap,
-            min: rampMin,
-            max: rampMax,
-          });
-          return {
-            buffer:
-              bitDepth === 8 ? new Uint8Array(data) : new Uint16Array(data),
-            lut,
-          };
-        });
-        for (let row = 0; row < outH; row++) {
-          for (let col = 0; col < outW; col++) {
-            const srcIdx = (y0 + row) * width + (x0 + col);
-            const dstIdx = row * outW + col;
-            let r = 0,
-              g = 0,
-              b = 0;
-            for (const { buffer, lut } of luts) {
-              const v = buffer[srcIdx];
-              r += lut[0][v];
-              g += lut[1][v];
-              b += lut[2][v];
-            }
-            rgbBuffer[dstIdx * 3 + 0] = Math.min(255, r);
-            rgbBuffer[dstIdx * 3 + 1] = Math.min(255, g);
-            rgbBuffer[dstIdx * 3 + 2] = Math.min(255, b);
-          }
-        }
-        const colorImage = new IJSImage(outW, outH, {
-          data: rgbBuffer,
-        });
-        const url = encodeDataURL(colorImage);
-
+        const url = compositeChannelsToDataUrl(
+          visibleChannels,
+          result.data,
+          item.boundingBox,
+        );
         cacheResults.push({ key: cacheKey, url });
       } else {
         cacheResults.push({ key: cacheKey, error: result.error });
