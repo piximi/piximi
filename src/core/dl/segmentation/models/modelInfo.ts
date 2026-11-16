@@ -1,6 +1,6 @@
-import type { ModelDisplayInfo, ModelName } from "../types";
+import type { BuiltinModelName, ModelDisplayInfo } from "../types";
 
-export const modelInfo: Record<ModelName, ModelDisplayInfo> = {
+export const modelInfo: Record<BuiltinModelName, ModelDisplayInfo> = {
   StardistVHE: {
     name: "StardistVHE",
     displayName: "Stardist (Versatile) H&E Nuclei Segmentation",

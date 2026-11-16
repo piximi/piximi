@@ -1,18 +1,17 @@
 import { MODELS } from "core/dl/segmentation/types";
 
-import { createBlankModelConfigMap } from "./segmenterSlice";
+import {
+  createBlankModelConfigMap,
+  getBlankModelConfig,
+} from "./segmenterSlice";
 
 import type { SerializedSegmenterState } from "core/file-io/project-saver/types";
 import type {
-  ModelName,
   SegmenterOptionType,
   SegmenterOptionValues,
 } from "core/dl/segmentation/types";
 
 import type { SegmenterSliceState } from "./types";
-
-const isModelName = (name: string): name is ModelName =>
-  (MODELS as readonly string[]).includes(name);
 
 /*
  * `undefined` is a legal option value — an `optional` number field committed
@@ -41,6 +40,10 @@ const validOptionValues = (
  * this build and this project. Anything else is dropped silently, so a stale
  * file can never leave the segmenter unusable.
  *
+ * A config for a model this build does not bundle is kept: the model may be
+ * provided by a backend this project is later opened against, and an unused
+ * config never renders.
+ *
  * `loadedModel` is always `undefined`. The saved name is provenance only —
  * restoring it would claim a model is loaded when the worker registry holds no
  * weights for it.
@@ -57,9 +60,11 @@ export const hydrateSegmenterState = (
   const configMap = createBlankModelConfigMap(MODELS);
 
   for (const config of saved.configs) {
-    if (!isModelName(config.model)) continue;
+    if (typeof config.model !== "string" || config.model.length === 0) continue;
 
-    const target = configMap[config.model];
+    const target = (configMap[config.model] ??= getBlankModelConfig(
+      config.model,
+    ));
 
     // The policy-length check belongs to `reconcileChannelSelection`, which
     // runs when a model is actually loaded and its ChannelPolicy is known. All

@@ -72,6 +72,9 @@ export const segmenterSlice = createSlice({
     ) {
       const { model, availableChannelIds } = action.payload;
       state.loadedModel = model;
+      // The map is seeded with the builtin models only; one from elsewhere
+      // gets its config on first load.
+      state.configMap[model.name] ??= getBlankModelConfig(model.name);
 
       if (
         !state.configMap[model.name].kindName &&

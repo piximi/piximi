@@ -13,8 +13,8 @@ import type { Token } from "core/dl/cancel";
 import type { LoadCB } from "utils/types";
 
 import type {
+  BuiltinModelName,
   ChannelPolicy,
-  ModelName,
   OutputPolicy,
   SegmentationResults,
   SegmenterOptionSchema,
@@ -22,7 +22,7 @@ import type {
 } from "../../types";
 
 type ModelArgs = {
-  name: ModelName;
+  name: BuiltinModelName;
   outputPolicy: OutputPolicy;
   channelPolicy: ChannelPolicy;
   /*
@@ -40,7 +40,7 @@ type ModelArgs = {
   cancellableLoad?: boolean;
 };
 export abstract class Segmenter {
-  readonly name: ModelName;
+  readonly name: BuiltinModelName;
   readonly outputPolicy: OutputPolicy;
   readonly channelPolicy: ChannelPolicy;
   readonly optionSchema?: SegmenterOptionSchema;

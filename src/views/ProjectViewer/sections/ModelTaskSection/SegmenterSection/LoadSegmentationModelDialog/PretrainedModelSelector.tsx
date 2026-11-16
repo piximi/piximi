@@ -13,6 +13,7 @@ import {
 import { modelInfo } from "core/dl/segmentation";
 
 import type {
+  BuiltinModelName,
   ModelDisplayInfo,
   ModelName,
   SegmentationModelDetails,
@@ -58,7 +59,12 @@ export const PretrainedModelSelector = ({
 
   const modelDetails: ModelDetails | undefined = useMemo(() => {
     if (!selectedModel) return undefined;
-    const { name, displayName, ...rest } = modelInfo[selectedModel.label];
+    // Only the bundled models have display info here; see `modelInfo`.
+    const info = modelInfo[selectedModel.label as BuiltinModelName] as
+      | ModelDisplayInfo
+      | undefined;
+    if (!info) return undefined;
+    const { name, displayName, ...rest } = info;
 
     return {
       name: displayName,

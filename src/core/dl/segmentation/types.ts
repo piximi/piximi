@@ -9,6 +9,7 @@ import type { CHANNEL_MODE } from "./optionUtils";
 import type { Token } from "../cancel";
 import type { ApiResult, InferenceInput, SerializedModelData } from "../types";
 
+/* The segmenters bundled with the app and run in the segmenter worker. */
 export const MODELS = [
   "Cellpose-SAM",
   "StardistVHE",
@@ -17,7 +18,14 @@ export const MODELS = [
   "COCO-SSD",
 ] as const;
 
-export type ModelName = (typeof MODELS)[number];
+export type BuiltinModelName = (typeof MODELS)[number];
+
+/*
+ * Any model a backend can expose, builtin or not. Kept open so configs and
+ * descriptors for models that live elsewhere (a remote engine, a plugin) type
+ * the same way as the bundled ones.
+ */
+export type ModelName = string;
 
 export type ModelDisplayInfo = {
   name: ModelName;

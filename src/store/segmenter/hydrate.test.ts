@@ -8,11 +8,10 @@ import type { SerializedSegmenterState } from "core/file-io/project-saver/types"
 /*
  * `hydrateSegmenterState` is the only thing standing between a project file and
  * redux, so these assertions are about what it refuses to trust. A file can be
- * older than the build opening it: it may name a model that has since been
- * retired, point at channels the project no longer has, or carry an option
- * value of a type the schema never produces. Each of those has to degrade to a
- * usable default rather than propagate, because the segmenter has no other
- * validation layer behind this one.
+ * older than the build opening it: it may point at channels the project no
+ * longer has, or carry an option value of a type the schema never produces.
+ * Each of those has to degrade to a usable default rather than propagate,
+ * because the segmenter has no other validation layer behind this one.
  */
 describe("hydrateSegmenterState", () => {
   const available = ["ch-1", "ch-2", "ch-3"];
@@ -136,14 +135,41 @@ describe("hydrateSegmenterState", () => {
     ).toBe(false);
   });
 
-  it("skips a config naming a model this build no longer has", () => {
+  // A model this build does not bundle may still be served by the backend the
+  // project is opened against, so its config is kept rather than dropped.
+  it("keeps a config naming a model this build does not bundle", () => {
     const saved: SerializedSegmenterState = {
       loadedModel: null,
       configs: [
         {
-          model: "RetiredNet",
+          model: "RemoteNet",
           channelSelection: ["ch-1"],
           optionValues: { whatever: 1 },
+          kindName: "Cell",
+        },
+      ],
+    };
+
+    const restored = hydrateSegmenterState(saved, available);
+
+    expect(restored.configMap.RemoteNet).toEqual({
+      model: "RemoteNet",
+      modelStatus: "idle",
+      channelSelection: ["ch-1"],
+      optionValues: { whatever: 1 },
+      kindName: "Cell",
+    });
+    expect(restored.loadedModel).toBeUndefined();
+  });
+
+  it("skips a config with an empty model name", () => {
+    const saved: SerializedSegmenterState = {
+      loadedModel: null,
+      configs: [
+        {
+          model: "",
+          channelSelection: ["ch-1"],
+          optionValues: {},
           kindName: undefined,
         },
       ],
