@@ -126,7 +126,8 @@ export interface IDataConnector {
   /**
    * Retrieve the raw {@link StoredChannelData} (ArrayBuffer + metadata)
    * for the given items.
-   * Checks the LRU cache first, falling back to IndexedDB.
+   * Checks the LRU cache first, falling back to IndexedDB. The Map is in
+   * request order; any missing item fails the whole call.
    */
   retrieveBatch(
     items: { id: string; storeName: StoreName }[],

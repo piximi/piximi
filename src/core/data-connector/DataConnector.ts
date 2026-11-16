@@ -250,10 +250,16 @@ export class DataConnector implements IDataConnector {
     }
   }
 
+  /**
+   * The returned Map is in request order and holds every requested id. A
+   * missing channel fails the whole call, like `retrieve`: callers pair the
+   * buffers with their channel list, and a silent gap would shift every
+   * later channel by one.
+   */
   async retrieveBatch(
     items: { id: string; storeName: StoreName }[],
   ): Promise<StorageResult<Map<string, StoredChannelData>>> {
-    const channelDataMap: Map<string, StoredChannelData> = new Map();
+    const found: Map<string, StoredChannelData> = new Map();
     try {
       await this.init();
 
@@ -262,7 +268,7 @@ export class DataConnector implements IDataConnector {
       for (const item of items) {
         const cached = this.cache.get(item.id);
         if (cached) {
-          channelDataMap.set(item.id, cached);
+          found.set(item.id, cached);
           continue;
         }
 
@@ -282,12 +288,25 @@ export class DataConnector implements IDataConnector {
           const data = fetched[i] as StoredChannelData | undefined;
           if (data) {
             this.cache.set(data.id, data, data.byteSize);
-            channelDataMap.set(data.id, data);
+            found.set(data.id, data);
           }
         }
       }
 
-      return { success: true, data: channelDataMap };
+      const missing = items.filter(({ id }) => !found.has(id));
+      if (missing.length > 0) {
+        return {
+          success: false,
+          error: new Error(
+            `Channel data not found: ${missing.map(({ id }) => id).join(", ")}`,
+          ),
+        };
+      }
+
+      // Cache hits were collected before the IndexedDB fetches; re-key in
+      // request order so iteration matches the caller's channel list.
+      const ordered = new Map(items.map(({ id }) => [id, found.get(id)!]));
+      return { success: true, data: ordered };
     } catch (error) {
       return {
         success: false,

@@ -87,6 +87,40 @@ describe("DataConnector", () => {
     });
   });
 
+  describe("retrieveBatch", () => {
+    const ids = ["a", "b", "c"];
+    const request = ids.map((id) => ({ id, storeName: STORES.CHANNEL_DATA }));
+
+    it("returns channels in request order regardless of cache state", async () => {
+      await service.storeBatch(
+        ids.map((id) => ({
+          id,
+          data: createTestChannel(id),
+          storeName: STORES.CHANNEL_DATA,
+        })),
+      );
+      // "a" has to come from IndexedDB while "b" and "c" are cache hits
+      service.evictFromCache(["a"]);
+
+      const result = await service.retrieveBatch(request);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect([...result.data.keys()]).toEqual(ids);
+      }
+    });
+
+    it("fails when a requested channel is missing", async () => {
+      await service.store("a", createTestChannel("a"), STORES.CHANNEL_DATA);
+
+      const result = await service.retrieveBatch(request);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.message).toContain("b");
+        expect(result.error.message).toContain("c");
+      }
+    });
+  });
+
   describe("cache behavior", () => {
     it("should return cached data on second retrieve", async () => {
       await service.store(
