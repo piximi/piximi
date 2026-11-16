@@ -31,3 +31,35 @@ jobs:
         run: pnpm test  --silent
         env:
           CI: true
+
+  # The wire contract lives in python/packages/piximi-schema; the bundle and
+  # the TypeScript generated from it are checked in and must not drift.
+  protocol_job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/setup@v1
+        with:
+          version: 11.2.2
+          runtime: node@22
+          cache: true
+
+      - name: Install Packages
+        run: pnpm install --dangerously-allow-all-builds
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          working-directory: python
+
+      - name: Schema tests
+        run: uv run --project python pytest -q
+
+      - name: Regenerate protocol
+        run: pnpm protocol:gen
+
+      - name: Check for drift
+        run: git diff --exit-code -- python/packages/piximi-schema/schema src/core/backend/protocol
