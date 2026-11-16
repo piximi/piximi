@@ -55,7 +55,7 @@ jobs:
           enable-cache: true
           working-directory: python
 
-      - name: Schema tests
+      - name: Python tests
         run: uv run --project python pytest -q
 
       - name: Regenerate protocol
@@ -63,3 +63,9 @@ jobs:
 
       - name: Check for drift
         run: git diff --exit-code -- python/packages/piximi-schema/schema src/core/backend/protocol
+
+      # The TypeScript peer against the Python one over a real WebSocket.
+      - name: Cross-language RPC tests
+        run: pnpm test --run src/core/backend/remote
+        env:
+          PIXIMI_REMOTE_TEST: "1"
