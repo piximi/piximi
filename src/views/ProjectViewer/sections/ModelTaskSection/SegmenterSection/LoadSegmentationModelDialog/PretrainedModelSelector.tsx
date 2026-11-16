@@ -10,17 +10,11 @@ import {
   Typography,
 } from "@mui/material";
 
-import { modelInfo } from "core/dl/segmentation";
-
-import type {
-  BuiltinModelName,
-  ModelDisplayInfo,
-  ModelName,
-  SegmentationModelDetails,
-} from "core/dl/segmentation/types";
+import type { SegmentationModelDescriptor } from "core/backend";
+import type { ModelDisplayInfo } from "core/dl/segmentation/types";
 
 interface ModelOptionType {
-  label: ModelName;
+  label: string;
   id: number;
 }
 
@@ -36,8 +30,8 @@ export const PretrainedModelSelector = ({
   errorText,
   initModel = "-1",
 }: {
-  models: Array<SegmentationModelDetails>;
-  setModel: (model: SegmentationModelDetails | undefined) => void;
+  models: Array<SegmentationModelDescriptor>;
+  setModel: (model: SegmentationModelDescriptor | undefined) => void;
   error?: boolean;
   errorText?: string;
   initModel: string;
@@ -59,18 +53,11 @@ export const PretrainedModelSelector = ({
 
   const modelDetails: ModelDetails | undefined = useMemo(() => {
     if (!selectedModel) return undefined;
-    // Only the bundled models have display info here; see `modelInfo`.
-    const info = modelInfo[selectedModel.label as BuiltinModelName] as
-      | ModelDisplayInfo
-      | undefined;
-    if (!info) return undefined;
-    const { name, displayName, ...rest } = info;
+    const { displayName, description, use, sources, cite, cloudWarning } =
+      models[selectedModel.id];
 
-    return {
-      name: displayName,
-      ...rest,
-    };
-  }, [selectedModel]);
+    return { name: displayName, description, use, sources, cite, cloudWarning };
+  }, [models, selectedModel]);
 
   return (
     <Fragment>

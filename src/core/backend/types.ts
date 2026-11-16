@@ -173,6 +173,8 @@ export type SegmentationRunSummary = {
   added: number;
   skipped: number;
   cancelled: boolean;
+  /* Non-fatal problems, e.g. measurements that could not be computed. */
+  warnings?: string[];
 };
 
 export interface BackendSegmentation {

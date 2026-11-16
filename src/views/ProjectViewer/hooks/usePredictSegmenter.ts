@@ -1,55 +1,30 @@
 import { useCallback } from "react";
 
-import { batch, useDispatch, useSelector, useStore } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { generateKind, generateUUID } from "core/entities";
-import { useSegmenterApi } from "core/dl/segmentation";
+import { useBackend } from "core/backend";
+import { generateUUID } from "core/entities";
 import { sanitizeOptions } from "core/dl/segmentation/optionUtils";
-import { toInferenceInput } from "core/dl/utils";
-import { CancelSource } from "core/dl/cancel";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { dataSlice } from "store/data";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
-import {
-  selectAllKinds,
-  selectAnnotationEntities,
-  selectAnnotationVolumeEntities,
-  selectExtendedImages,
-} from "store/data/selectors";
+import { selectExtendedImages } from "store/data/selectors";
 
-import { createCachedDecoder, isDuplicate } from "utils/iouUtils";
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType } from "utils/enums";
-import { useMeasurementsApi } from "utils/measurements/hooks/useMeasurementsApi";
 
 import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
 
 import { useSegmenter } from "./useSegmenter";
 
-import type {
-  AnnotationCategory,
-  AnnotationObject,
-  AnnotationVolume,
-  Kind,
-  Shape,
-} from "core/entities";
-import type {
-  PredictedAnnotationObject,
-  SegmentationModelDetails,
-} from "core/dl/segmentation/types";
-
-import type { RootState } from "store/rootReducer";
-
-import type { AlertState, LoadCB } from "utils/types";
+import type { AlertState } from "utils/types";
 
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
-  const store = useStore<RootState>();
+  const backend = useBackend();
   const allImages = useSelector(selectExtendedImages);
   const selectedImages = useSelector(selectSelectedImages);
-  const kinds = useSelector(selectAllKinds);
 
   const {
     setModelStatus,
@@ -59,8 +34,6 @@ export const usePredictSegmenter = () => {
     error,
     kindName,
   } = useSegmenter();
-  const segApi = useSegmenterApi();
-  const measurementsApi = useMeasurementsApi();
 
   const handleError = useCallback(
     async (error: Error, name: string, taskId: string) => {
@@ -97,8 +70,6 @@ export const usePredictSegmenter = () => {
 
   const predictSegmenter = async () => {
     if (!loadedModel || error) return;
-    const Cancel = new CancelSource();
-    Cancel.reset();
     const taskId = generateUUID();
     dispatch(
       appTasksSlice.actions.taskRegistered({
@@ -111,8 +82,9 @@ export const usePredictSegmenter = () => {
         startedAt: Date.now(),
       }),
     );
+    const controller = new AbortController();
     taskCancelRegistry.register(taskId, async () => {
-      Cancel.signal();
+      controller.abort();
       dispatch(
         appTasksSlice.actions.taskUpdated({
           id: taskId,
@@ -122,309 +94,86 @@ export const usePredictSegmenter = () => {
         }),
       );
     });
-    const modelInfoResult = await segApi.getModelInfo(loadedModel.name);
-    let modelDetails: SegmentationModelDetails;
-    if (modelInfoResult.success) modelDetails = modelInfoResult.data;
-    else {
+
+    const { segmentation } = backend;
+    if (!segmentation) {
       await handleError(
-        new Error(
-          `[predictSegmenter] ${modelInfoResult.reason.code}: ${modelInfoResult.reason.message}`,
-          { cause: modelInfoResult.reason.cause },
-        ),
-        "fetch details error",
+        new Error("The connected backend cannot run segmentation"),
+        "Segmentation unavailable",
         taskId,
       );
+      taskCancelRegistry.unregister(taskId);
       return;
-    }
-
-    if (!modelDetails.modelLoaded) {
-      const loadResult = await segApi.loadModel(loadedModel.name);
-      if (!loadResult.success) {
-        await handleError(
-          new Error(
-            `[predictSegmenter] ${loadResult.reason.code}: ${loadResult.reason.message}`,
-            { cause: loadResult.reason.cause },
-          ),
-          "fetch details error",
-          taskId,
-        );
-      }
     }
 
     const inferenceImages =
       selectedImages.length > 0 ? selectedImages : allImages;
-
     if (inferenceImages.length === 0) {
       await handleError(
         new Error("Inference set is empty"),
         `There are no images to segment.`,
         taskId,
       );
-
+      taskCancelRegistry.unregister(taskId);
       return;
     }
 
-    /* PREDICT */
     setModelStatus("predicting");
-
-    const progressCb: LoadCB = (
-      progressPercent: number,
-      progressMessage: string,
-    ) => {
-      dispatch(
-        appTasksSlice.actions.taskUpdated({
-          id: taskId,
-          progress: progressPercent,
-          label: progressMessage,
-        }),
-      );
-    };
-
-    progressCb(-1, "starting inference...");
-
-    let predictedAnnotations: PredictedAnnotationObject[][];
-    let predictionCancelled: boolean = false;
     try {
-      const channelIds = channelSelection;
-      const inferenceInput = inferenceImages.map((item) =>
-        toInferenceInput(item, channelIds),
+      // The backend adds the results itself and announces them as events,
+      // which the store sync applies; only the task bookkeeping is here.
+      const summary = await segmentation.run(
+        {
+          modelId: loadedModel.name,
+          imageIds: inferenceImages.map((image) => image.id),
+          channelMetaIds: channelSelection,
+          options: sanitizeOptions(loadedModel.optionSchema, optionValues),
+          kindName,
+        },
+        {
+          signal: controller.signal,
+          onProgress: ({ percent, message }) =>
+            dispatch(
+              appTasksSlice.actions.taskUpdated({
+                id: taskId,
+                progress: percent,
+                label: message,
+              }),
+            ),
+        },
       );
-      const predictionResult = await segApi.predict(
-        loadedModel.name,
-        inferenceInput,
-        Cancel.token,
-        progressCb,
-        sanitizeOptions(loadedModel.optionSchema, optionValues),
-        kindName,
-      );
-      if (predictionResult.success) {
-        predictedAnnotations = predictionResult.data.annotations;
-        predictionCancelled = !!predictionResult.data.cancelled;
-        for (let i = 0; i < predictedAnnotations.length; i++) {
-          for (let j = 0; j < predictedAnnotations[i].length; j++) {
-            const bbox = predictedAnnotations[i][j].boundingBox;
-            let xDiff = 0;
-            let yDiff = 0;
 
-            if (bbox[0] < 0) {
-              xDiff = Math.abs(bbox[0]);
-            }
-            if (bbox[1] < 0) {
-              yDiff = Math.abs(bbox[1]);
-            }
-            predictedAnnotations[i][j].boundingBox = [
-              bbox[0] + xDiff,
-              bbox[1] + yDiff,
-              bbox[2] + xDiff,
-              bbox[3] + yDiff,
-            ];
-          }
-        }
-      } else
-        throw new Error(
-          `[predictSegmenter] ${predictionResult.reason.code}: ${predictionResult.reason.message}`,
-          { cause: predictionResult.reason.cause },
+      for (const warning of summary.warnings ?? []) {
+        dispatch(
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: {
+              alertType: AlertType.Warning,
+              name: "Measurement computation failed",
+              description: warning,
+            },
+          }),
         );
+      }
+
+      if (summary.cancelled) {
+        dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
+      } else {
+        dispatch(
+          appTasksSlice.actions.taskCompleted({
+            id: taskId,
+            label:
+              summary.skipped > 0
+                ? `Segmentation finished: ${summary.added} added, ${summary.skipped} skipped as duplicates`
+                : `Segmentation finished: ${summary.added} added`,
+          }),
+        );
+      }
+      setModelStatus("idle");
     } catch (error) {
       await handleError(error as Error, "Error in running predictions", taskId);
+    } finally {
       taskCancelRegistry.unregister(taskId);
-      return;
     }
-    let addedCount = 0;
-    let skippedCount = 0;
-    try {
-      const uniquePredictedKindNames = [
-        ...new Set(
-          predictedAnnotations.flatMap((imAnns) =>
-            imAnns.map((ann) => ann.kindName as string),
-          ),
-        ),
-      ];
-
-      const addKindPayload: Array<{
-        kind: Kind;
-        category: AnnotationCategory;
-      }> = [];
-
-      const predictedKinds: Record<string, Kind> = {};
-      uniquePredictedKindNames.forEach((kindName) => {
-        const existingKind = kinds.find((k) => k.name === kindName);
-        if (!existingKind) {
-          const generated = generateKind(kindName);
-          predictedKinds[generated.kind.name] = generated.kind;
-          addKindPayload.push({
-            kind: generated.kind,
-            category: generated.unknownCategory,
-          });
-          return;
-        }
-        predictedKinds[existingKind.name] = existingKind;
-      });
-
-      dispatch(dataSlice.actions.batchAddKind(addKindPayload));
-      // Snapshot after inference: the user may have edited annotations while it ran
-      const state = store.getState();
-      const annotationEntities = selectAnnotationEntities(state);
-      const volumeEntities = selectAnnotationVolumeEntities(state);
-
-      const annVolumes: AnnotationVolume[] = [];
-      const annotations: AnnotationObject[] = [];
-      const intensityBatches: Array<{
-        channelRefs: Array<{ id: string }>;
-        objs: AnnotationObject[];
-      }> = [];
-
-      const totalAnnotations = predictedAnnotations.reduce(
-        (cnt: number, anns) => {
-          cnt += anns.length;
-          return cnt;
-        },
-        0,
-      );
-      dispatch(
-        appTasksSlice.actions.taskUpdated({
-          id: taskId,
-          progress: -1,
-          label: `Processing ${totalAnnotations} annotations`,
-        }),
-      );
-      for await (const [i, _annotations] of predictedAnnotations.entries()) {
-        const image = inferenceImages[i];
-        const imageAnns: AnnotationObject[] = [];
-        const existingByKind: Record<string, AnnotationObject[]> = {};
-        for (const ann of Object.values(annotationEntities)) {
-          if (
-            !ann ||
-            ann.imageId !== image.id ||
-            ann.planeId !== image.activePlaneId
-          )
-            continue;
-          const kindId = volumeEntities[ann.volumeId]?.kindId;
-          if (!kindId) continue;
-          (existingByKind[kindId] ??= []).push(ann);
-        }
-        const decodeCached = createCachedDecoder();
-
-        for (let j = 0; j < _annotations.length; j++) {
-          const { kindName, ...predictedAnn } = _annotations[j];
-          const bbox = predictedAnn.boundingBox!;
-          const width = bbox[2] - bbox[0];
-          const height = bbox[3] - bbox[1];
-
-          if (bbox[1] + height > image.shape.height) {
-            continue;
-          }
-
-          const shape: Shape = {
-            planes: 1,
-            channels: image.shape.channels,
-            width,
-            height,
-          };
-
-          const annKind = predictedKinds[kindName];
-
-          if (!annKind) {
-            console.error("cannot find kind for annotation");
-            continue;
-          }
-          if (
-            isDuplicate(
-              predictedAnn,
-              existingByKind[annKind.id] ?? [],
-              decodeCached,
-            )
-          ) {
-            skippedCount++;
-            continue;
-          }
-          const annVol: AnnotationVolume = {
-            id: generateUUID(),
-            kindId: annKind.id,
-            imageId: image.id,
-            categoryId: annKind.unknownCategoryId,
-          };
-          const finalAnn: AnnotationObject = {
-            ...predictedAnn,
-            shape,
-            imageId: image.id,
-            planeId: image.activePlaneId,
-            volumeId: annVol.id,
-          };
-          annVolumes.push(annVol);
-          annotations.push(finalAnn);
-          imageAnns.push(finalAnn);
-        }
-
-        if (imageAnns.length > 0) {
-          intensityBatches.push({
-            channelRefs: image.channelsRef.map((c) => ({ id: c.id })),
-            objs: imageAnns,
-          });
-        }
-      }
-
-      if (annotations.length > 0) {
-        try {
-          const [featureResults, intensityResults] = await Promise.all([
-            measurementsApi.computeFeatures(annotations),
-            measurementsApi.computeIntensityMeasurements(intensityBatches),
-          ]);
-          for (const ann of annotations) {
-            if (featureResults[ann.id]) ann.features = featureResults[ann.id];
-            if (intensityResults[ann.id])
-              ann.intensityMeasurements = intensityResults[ann.id];
-          }
-        } catch (error) {
-          console.warn(
-            "[predictSegmenter] measurement computation failed; annotations will be added without features/intensityMeasurements",
-            error,
-          );
-          dispatch(
-            applicationSettingsSlice.actions.updateAlertState({
-              alertState: {
-                alertType: AlertType.Warning,
-                name: "Measurement computation failed",
-                description:
-                  "Predicted annotations were added, but their measurements could not be computed.",
-                stackTrace: await getStackTraceFromError(error as Error),
-              },
-            }),
-          );
-        }
-      }
-
-      batch(() => {
-        dispatch(dataSlice.actions.batchAddAnnotationVolume(annVolumes));
-        dispatch(dataSlice.actions.batchAddAnnotation(annotations));
-      });
-      addedCount = annotations.length;
-    } catch (error) {
-      await handleError(
-        error as Error,
-        "Error converting predictions to Piximi types",
-        taskId,
-      );
-
-      taskCancelRegistry.unregister(taskId);
-
-      return;
-    }
-    if (predictionCancelled)
-      dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
-    else
-      dispatch(
-        appTasksSlice.actions.taskCompleted({
-          id: taskId,
-          label:
-            skippedCount > 0
-              ? `Segmentation finished: ${addedCount} added, ${skippedCount} skipped as duplicates`
-              : `Segmentation finished: ${addedCount} added`,
-        }),
-      );
-    setModelStatus("idle");
-
-    taskCancelRegistry.unregister(taskId);
   };
   return predictSegmenter;
 };

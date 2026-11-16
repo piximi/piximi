@@ -1,5 +1,6 @@
 import { DataConnector } from "core/data-connector";
 import { generateUUID } from "core/entities";
+import { getSegmenterApi } from "core/dl/segmentation/SegmenterApi";
 
 import {
   selectAllCategories,
@@ -9,15 +10,16 @@ import {
 } from "store/data/selectors";
 
 import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
+import { MeasurementsApi } from "utils/measurements/workers/MeasurementsApi";
 
 import { BackendError } from "../errors";
 import { EventBus } from "../events";
 import { JobRegistry } from "../jobs";
+import { LocalSegmentation } from "./LocalSegmentation";
 import { ThumbnailWorkerPool } from "./ThumbnailWorkerPool";
 
 import type { StorageReference } from "core/entities";
-
-import type { RootState } from "store/rootReducer";
+import type { ISegmenterApi } from "core/dl/segmentation/types";
 
 import type { CompositeLayer } from "utils/image/compositeChannels";
 
@@ -28,6 +30,7 @@ import type {
   AnnotationQuery,
   AnnotationRecord,
   Backend,
+  BackendSegmentation,
   BackendSession,
   CallOptions,
   ImageQuery,
@@ -40,15 +43,17 @@ import type {
   RenderResult,
   RenderedImage,
 } from "../types";
+import type { MeasurementsProvider } from "./LocalSegmentation";
+import type { StoreHandle } from "./store";
 import type { ThumbnailItem, ThumbnailRenderer } from "./thumbnails";
-
-/* The slice of the Redux store the local backend reads metadata from. */
-export type StoreHandle = { getState(): RootState };
 
 type LocalBackendDeps = {
   store: StoreHandle;
   dataConnector?: DataConnector;
   thumbnails?: ThumbnailRenderer;
+  /* Factories, so that constructing the backend spawns no workers. */
+  segmenter?: () => ISegmenterApi;
+  measurements?: () => MeasurementsProvider;
 };
 
 const groupBy = <T>(
@@ -87,7 +92,7 @@ const paginate = <T>(
  */
 export class LocalBackend implements Backend {
   readonly kind = "local" as const;
-  readonly capabilities: readonly Capability[] = ["raw-local"];
+  readonly capabilities: readonly Capability[] = ["raw-local", "segmentation"];
   readonly session: BackendSession = {
     id: generateUUID(),
     protocolVersion: "local",
@@ -98,11 +103,19 @@ export class LocalBackend implements Backend {
   readonly #thumbnails: ThumbnailRenderer;
   readonly #bus = new EventBus();
   readonly #jobs = new JobRegistry(this.#bus);
+  readonly segmentation: BackendSegmentation;
 
   constructor(deps: LocalBackendDeps) {
     this.#store = deps.store;
     this.#storage = deps.dataConnector ?? DataConnector.getInstance();
     this.#thumbnails = deps.thumbnails ?? new ThumbnailWorkerPool();
+    this.segmentation = new LocalSegmentation({
+      store: deps.store,
+      segmenter: deps.segmenter ?? getSegmenterApi,
+      measurements: deps.measurements ?? (() => MeasurementsApi.getInstance()),
+      jobs: this.#jobs,
+      bus: this.#bus,
+    });
   }
 
   async connect(): Promise<void> {

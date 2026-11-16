@@ -10,8 +10,9 @@ import {
   DialogContent,
 } from "@mui/material";
 
-import { useSegmenterApi } from "core/dl/segmentation";
+import { useBackend } from "core/backend";
 import { generateUUID } from "core/entities";
+import { isTaskCancelledError } from "core/dl/cancel";
 
 import { useHotkeys } from "hooks";
 
@@ -30,9 +31,8 @@ import { PretrainedModelSelector } from "./PretrainedModelSelector";
 
 import type React from "react";
 
+import type { SegmentationModelDescriptor } from "core/backend";
 import type { SegmentationModelDetails } from "core/dl/segmentation/types";
-
-import type { LoadCB } from "utils/types";
 
 type LoadSegmentationModelDialogProps = {
   onClose: () => void;
@@ -45,13 +45,13 @@ export const LoadSegmentationModelDialog = ({
 }: LoadSegmentationModelDialogProps) => {
   const dispatch = useDispatch();
   const { loadedModel, setLoadedModel } = useSegmenter();
-  const segApi = useSegmenterApi();
+  const backend = useBackend();
 
   const [selectedModel, setSelectedModel] = useState<
     SegmentationModelDetails | undefined
   >(loadedModel);
   const [pretrainedModels, setPretrainedModels] = useState<
-    Array<SegmentationModelDetails>
+    Array<SegmentationModelDescriptor>
   >([]);
 
   const handleModelSelect = (model: SegmentationModelDetails | undefined) => {
@@ -64,6 +64,9 @@ export const LoadSegmentationModelDialog = ({
         console.warn("Attempting to dispatch undefined model");
       return;
     }
+    const { segmentation } = backend;
+    if (!segmentation) return;
+
     const taskId = generateUUID();
     dispatch(
       appTasksSlice.actions.taskRegistered({
@@ -78,18 +81,22 @@ export const LoadSegmentationModelDialog = ({
         startedAt: Date.now(),
       }),
     );
-    const progressCb: LoadCB = (
-      progressPercent: number,
-      progressMessage: string,
-    ) => {
+    const onProgress = ({
+      percent,
+      message,
+    }: {
+      percent: number;
+      message: string;
+    }) => {
       dispatch(
         appTasksSlice.actions.taskUpdated({
           id: taskId,
-          progress: progressPercent,
-          label: progressMessage,
+          progress: percent,
+          label: message,
         }),
       );
     };
+    const controller = new AbortController();
     if (selectedModel.cancellableLoad)
       taskCancelRegistry.register(taskId, async () => {
         dispatch(
@@ -100,22 +107,20 @@ export const LoadSegmentationModelDialog = ({
             label: "Stopping...",
           }),
         );
-        await segApi.cancelLoadModel(selectedModel.name);
+        controller.abort();
       });
 
-    let result: Awaited<ReturnType<typeof segApi.loadModel>>;
     try {
-      result = await segApi.loadModel(selectedModel.name, progressCb);
-    } finally {
-      taskCancelRegistry.unregister(taskId);
-    }
-
-    if (!result.success) {
-      if (result.reason.code === "LOAD_CANCELLED") {
+      await segmentation.loadModel(selectedModel.name, {
+        signal: controller.signal,
+        onProgress,
+      });
+    } catch (error) {
+      if (isTaskCancelledError(error)) {
         dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
         return;
       }
-      const description = `${result.reason.code}: ${result.reason.message}`;
+      const description = (error as Error).message;
       dispatch(
         appTasksSlice.actions.taskFailed({ id: taskId, error: description }),
       );
@@ -125,20 +130,18 @@ export const LoadSegmentationModelDialog = ({
             alertType: AlertType.Error,
             name: `Could not load ${selectedModel.displayName}`,
             description,
-            stackTrace: await getStackTraceFromError(
-              result.reason.cause instanceof Error
-                ? result.reason.cause
-                : new Error(description),
-            ),
+            stackTrace: await getStackTraceFromError(error as Error),
           },
         }),
       );
       // Leave the dialog open so the error stays in context and another model
       // can be chosen without reopening.
       return;
+    } finally {
+      taskCancelRegistry.unregister(taskId);
     }
 
-    progressCb(100, "Model Loaded Successfully");
+    onProgress({ percent: 100, message: "Model Loaded Successfully" });
     dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
     setLoadedModel(selectedModel);
     onClose();
@@ -158,14 +161,13 @@ export const LoadSegmentationModelDialog = ({
   );
 
   useEffect(() => {
-    (async () => {
-      const results = await segApi.getAvailableSegmentationModels();
-      if (results.success) {
-        const availableModels = Object.values(results.data);
-        setPretrainedModels(availableModels);
-      }
-    })();
-  }, [segApi]);
+    backend.segmentation
+      ?.listModels()
+      .then(setPretrainedModels)
+      .catch((error) =>
+        console.error("[LoadSegmentationModelDialog] listModels", error),
+      );
+  }, [backend]);
 
   return (
     <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>

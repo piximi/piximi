@@ -6,19 +6,81 @@ import {
   UNKNOWN_IMAGE_CATEGORY,
   UNKNOWN_KIND,
   UNKNOWN_KIND_CATEGORY,
+  generateUUID,
 } from "core/entities";
 import { Partition } from "core/dl/enums";
+import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
+import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 
 import { dataSlice } from "store/data";
 
+import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
+import { computeObjectIntensityMeasurements } from "utils/measurements/computeObjectIntensityMeasurements";
+
 import { describeBackendConformance } from "../conformance/backendConformance";
+import { connectBackendToStore } from "../sync/connectBackendToStore";
 import { LocalBackend } from "./LocalBackend";
 import { createMainThreadThumbnailRenderer } from "./thumbnails";
 
 import type { Channel, ChannelMeta } from "core/entities";
 import type { ChannelStorageInput } from "core/data-connector/types";
+import type {
+  ISegmenterApi,
+  SegmentationModelDetails,
+} from "core/dl/segmentation/types";
 
-import type { StoreHandle } from "./LocalBackend";
+import type { StoreHandle } from "./store";
+
+const FAKE_MODEL = "fake-whole-image";
+
+/* Stands in for the segmenter worker: one whole-image object per input. */
+const createFakeSegmenter = (): ISegmenterApi => {
+  let loaded = false;
+  const details = (): SegmentationModelDetails => ({
+    name: FAKE_MODEL,
+    displayName: "Whole-image labeller",
+    modelLoaded: loaded,
+    outputPolicy: { mode: OUTPUT_MODE.SINGLE, defaultKindName: "Object" },
+    channelPolicy: { mode: CHANNEL_MODE.PASSTHROUGH, maxChannels: 1 },
+    cancellableLoad: false,
+  });
+  const unsupported = {
+    success: false as const,
+    reason: { code: "UNKNOWN" as const, message: "not supported by the fake" },
+  };
+  return {
+    getModelNames: async () => ({ success: true, data: [FAKE_MODEL] }),
+    getModelInfo: async () => ({ success: true, data: details() }),
+    hasModel: async (name) => ({ success: true, data: name === FAKE_MODEL }),
+    getAvailableSegmentationModels: async () => ({
+      success: true,
+      data: { [FAKE_MODEL]: details() },
+    }),
+    loadModel: async (_name, loadCB) => {
+      loaded = true;
+      loadCB?.(100, "Loaded");
+      return { success: true };
+    },
+    cancelLoadModel: async () => ({ success: true }),
+    predict: async (_name, items, _token, _loadCB, _options, kindName) => ({
+      success: true,
+      data: {
+        annotations: items.map((item) => [
+          {
+            id: generateUUID(),
+            partition: Partition.Unassigned,
+            boundingBox: [0, 0, item.shape.width, item.shape.height] as const,
+            encodedMask: [0, item.shape.width * item.shape.height],
+            kindName: kindName ?? "Object",
+          },
+        ]),
+      },
+    }),
+    getSavedModelData: async () => unsupported,
+    getZippedModelsBuffer: async () => unsupported,
+    destroy: async () => ({ success: true }),
+  };
+};
 
 type ImageSeed = {
   id: string;
@@ -89,7 +151,7 @@ const makeProject = () => ({
       width: im.width,
       channels: im.channels,
     },
-    categoryId: "unknown",
+    categoryId: UNKNOWN_IMAGE_CATEGORY.id,
     activePlaneId: `${im.id}-plane`,
     timepoint: 0,
     bitDepth: 8 as const,
@@ -143,11 +205,22 @@ describeBackendConformance("LocalBackend", async () => {
   });
   store.dispatch(dataSlice.actions.setState(makeProject()));
 
+  const handle = store as unknown as StoreHandle;
+  const segmenter = createFakeSegmenter();
   const backend = new LocalBackend({
-    store: store as unknown as StoreHandle,
+    store: handle,
     dataConnector: storage,
     thumbnails: createMainThreadThumbnailRenderer(storage),
+    segmenter: () => segmenter,
+    // The worker-free versions; the intensity one reads the same IndexedDB.
+    measurements: () => ({
+      computeFeatures: async (objects) => computeObjectFeatures(objects),
+      computeIntensityMeasurements: computeObjectIntensityMeasurements,
+    }),
   });
+  // The local backend's own state is the store, so its queries only reflect
+  // a run once the sync has applied the events.
+  connectBackendToStore(backend, handle);
 
   return {
     backend,
