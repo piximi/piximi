@@ -1,3 +1,5 @@
+import { CancelSource } from "core/dl/cancel";
+
 import { getReader } from "./readers";
 import {
   applyDimensionsToStack,
@@ -6,7 +8,7 @@ import {
 
 import type { BitDepth } from "image-js-latest";
 
-import type { CancelToken } from "utils/workers/types";
+import type { Token } from "core/dl/cancel";
 
 import type {
   ImportImageInput,
@@ -16,7 +18,7 @@ import type {
 
 export async function loadImage(
   input: ImportImageInput,
-  cancelToken: CancelToken,
+  cancelToken: Token,
   onProgress: ({ value, stage }: { value: number; stage: ReadStage }) => void,
   requiredChannels?: number,
 ): Promise<LoadAndPrepareOutput> {
@@ -29,15 +31,11 @@ export async function loadImage(
       `Image channel must match existing images (${requiredChannels}-channels)`,
     );
   onProgress({ stage: "extract", value: 1 });
-  if (cancelToken.cancelled) {
-    throw new DOMException("Task cancelled", "AbortError");
-  }
+  await CancelSource.throwIfSignaled(cancelToken);
 
   const imageSeriesMap = applyDimensionsToStack(stack, dimConfig);
   onProgress({ stage: "toDims", value: 1 });
-  if (cancelToken.cancelled) {
-    throw new DOMException("Task cancelled", "AbortError");
-  }
+  await CancelSource.throwIfSignaled(cancelToken);
   const { imageSeries, images, planes, channels, channelMetas } =
     experimentFromStack(
       imageSeriesMap,

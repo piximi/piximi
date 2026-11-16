@@ -2,6 +2,7 @@ import JSZip from "jszip";
 import { clean, eq, lt, lte, valid } from "semver";
 
 import { MODEL_MANIFEST_FILENAME } from "core/file-io/consts";
+import { CancelSource } from "core/dl/cancel";
 
 import { logger } from "utils/logUtils";
 import { recursiveAssign } from "utils/objectUtils";
@@ -20,8 +21,7 @@ import { convertV01ToV02 } from "./version-converters/v01Tov02";
 import { subProgress } from "./progress";
 
 import type { ExtractedModelFileMap } from "core/dl/types";
-
-import type { CancelToken } from "utils/workers/types";
+import type { Token } from "core/dl/cancel";
 
 import type { CustomStore } from "../zarr/stores";
 import type { LoadProjectInput, LoadProjectOutput } from "./types";
@@ -31,10 +31,11 @@ type VersionRange = "0.1.0" | "0.2-1.0" | "1.1" | "2" | "3+";
 
 export async function loadProject(
   input: LoadProjectInput,
-  cancelToken: CancelToken,
+  cancelToken: Token,
   onProgress: ({ value }: { value: number }) => void,
 ): Promise<LoadProjectOutput> {
   const { store, modelFiles } = await openStore(input.files);
+  await CancelSource.throwIfSignaled(cancelToken);
   const { projectVersion, versionRange } = await detectVersion(store);
   let v2: V2PiximiState;
   const updateProgress = (p: number) => onProgress({ value: p });
@@ -96,6 +97,7 @@ export async function loadProject(
     default:
       throw new Error(`Unsupported version: ${projectVersion}`);
   }
+  await CancelSource.throwIfSignaled(cancelToken);
   const annotations = v2.data.annotations.entities;
   const annotationList = Object.values(annotations);
 
@@ -103,6 +105,7 @@ export async function loadProject(
   Object.entries(objectFeatures).forEach(([id, features]) => {
     annotations[id].features = features;
   });
+  await CancelSource.throwIfSignaled(cancelToken);
 
   const annotationsByPlane = annotationList.reduce<
     Record<string, typeof annotationList>

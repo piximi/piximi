@@ -1,16 +1,17 @@
 import * as Comlink from "comlink";
 
 import { getClassifierApi } from "core/dl/classification";
+import { CancelSource } from "core/dl/cancel";
 
 import { logger, parseError } from "utils/logUtils";
 import { INITIAL_PROGRESS } from "utils/types";
 
 import type { SerializedModels } from "core/dl/types";
+import type { Token } from "core/dl/cancel";
 
 import type { ClassifierState } from "store/classifier/types";
 
 import type { Progress } from "utils/types";
-import type { CancelToken } from "utils/workers/types";
 
 import type {
   IProjectSaver,
@@ -29,7 +30,7 @@ type OnProgressCallback = (args: { value: number }) => void;
 interface SaveProjectWorkerAPI {
   saveProject(
     input: SaveProjectWorkerInput,
-    cancelToken: CancelToken,
+    cancelToken: Token,
     onProgress: OnProgressCallback,
   ): Promise<{ blob: Blob }>;
 }
@@ -48,11 +49,11 @@ interface SaveProjectWorkerAPI {
 export class ProjectSaver implements IProjectSaver {
   private progress: Progress = { ...INITIAL_PROGRESS };
   private progressListeners: Set<(progress: Progress) => void> = new Set();
-  private abortController: AbortController | null = null;
+  private cancelSource: CancelSource | null = null;
 
   async saveProject(input: SaveProjectInput): Promise<SaveProjectResult> {
     this.resetProgress();
-    const abortController = this.abortController;
+    const cancelSource = this.cancelSource!;
 
     const worker = new Worker(
       new URL("./worker/saveProjectWorker.ts", import.meta.url),
@@ -69,27 +70,28 @@ export class ProjectSaver implements IProjectSaver {
         stageProgress: 1,
       });
 
-      const { blob } = await proxy.saveProject(
-        { ...input, models },
-        {
-          get cancelled() {
-            return abortController?.signal.aborted ?? false;
-          },
-        },
-        Comlink.proxy(({ value }: { value: number }) => {
-          this.updateProgress({
-            overallProgress:
-              STAGES.writeProject.start +
-              (STAGES.writeProject.end - STAGES.writeProject.start) * value,
-            stageProgress: value,
-          });
-        }),
-      );
+      // Raced so a cancel settles the call even mid-write; `finally` then
+      // terminates the worker.
+      const { blob } = await Promise.race([
+        proxy.saveProject(
+          { ...input, models },
+          Comlink.proxy(cancelSource.token),
+          Comlink.proxy(({ value }: { value: number }) => {
+            this.updateProgress({
+              overallProgress:
+                STAGES.writeProject.start +
+                (STAGES.writeProject.end - STAGES.writeProject.start) * value,
+              stageProgress: value,
+            });
+          }),
+        ),
+        cancelSource.whenSignaled,
+      ]);
 
       this.updateProgress({ stage: "complete", overallProgress: 1 });
       return { success: true, blob };
     } catch (e) {
-      if (abortController?.signal.aborted) {
+      if (cancelSource.isSignaled()) {
         return { success: false, cancelled: true };
       }
       this.updateProgress({ stage: "error" });
@@ -159,8 +161,8 @@ export class ProjectSaver implements IProjectSaver {
   }
 
   cancel(): void {
-    if (this.abortController) {
-      this.abortController.abort();
+    if (this.cancelSource) {
+      this.cancelSource.signal();
       this.updateProgress({ stage: "cancelled" });
     }
   }
@@ -178,6 +180,6 @@ export class ProjectSaver implements IProjectSaver {
 
   private resetProgress(): void {
     this.progress = { ...INITIAL_PROGRESS };
-    this.abortController = new AbortController();
+    this.cancelSource = new CancelSource();
   }
 }

@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 import { UNKNOWN_KIND_ID } from "core/entities";
+import { CancelSource } from "core/dl/cancel";
 
 import { loadProject } from "./loadProject";
 
@@ -68,7 +69,7 @@ const load = async (file: string): Promise<LoadProjectOutput> => {
   const asFile = new File([new Uint8Array(bytes)], file, {
     type: "application/zip",
   });
-  return loadProject({ files: [asFile] }, { cancelled: false }, () => {});
+  return loadProject({ files: [asFile] }, new CancelSource().token, () => {});
 };
 
 describe.each(FIXTURES)("legacy project $version ($file)", (fixture) => {

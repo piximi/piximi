@@ -1,10 +1,11 @@
 import { DataConnector } from "core/data-connector";
 import { STORES } from "core/entities";
+import { CancelSource, TaskCancelledError } from "core/dl/cancel";
 
 import { PiximiStore } from "../zarr/stores";
 import { writeV2 } from "./version-writers/writeV2";
 
-import type { CancelToken } from "utils/workers/types";
+import type { Token } from "core/dl/cancel";
 
 import type { ChannelDataAccessor, SaveProjectWorkerInput } from "./types";
 
@@ -46,7 +47,7 @@ const createChannelAccessor = (): ChannelDataAccessor => {
 
 export async function saveProject(
   input: SaveProjectWorkerInput,
-  cancelToken: CancelToken,
+  cancelToken: Token,
   onProgress: ({ value }: { value: number }) => void,
 ): Promise<{ blob: Blob }> {
   // `createStoreFromZip` recovers the zarr root by splitting its folder name on
@@ -55,18 +56,28 @@ export async function saveProject(
   const rootName = input.name.replace(/[./\\]/g, "_") || "project";
   const store = new PiximiStore(rootName);
 
+  // The token is a Comlink proxy, so reading it is async, but `writeV2`'s
+  // progress callback is sync. Poll on each tick and latch the answer so the
+  // next tick can throw.
+  let cancelled = false;
+  const pollCancel = () => {
+    void CancelSource.isSignaled(cancelToken).then((signaled) => {
+      if (signaled) cancelled = true;
+    });
+  };
   const throwIfCancelled = () => {
-    if (cancelToken.cancelled) throw new Error("Project save cancelled");
+    if (cancelled) throw new TaskCancelledError("Project save cancelled");
   };
 
   // `writeV2` creates the root group itself: the format version is one of its
   // attributes, and Zarr v3 only accepts attributes at creation time.
   await writeV2(store, input.project, createChannelAccessor(), (p) => {
     throwIfCancelled();
+    pollCancel();
     onProgress({ value: STAGES.write.end * p });
   });
 
-  throwIfCancelled();
+  await CancelSource.throwIfSignaled(cancelToken);
   store.attachModels(input.models);
 
   const blob = await store.zip.generateAsync(
@@ -89,6 +100,6 @@ export async function saveProject(
     },
   );
 
-  throwIfCancelled();
+  await CancelSource.throwIfSignaled(cancelToken);
   return { blob };
 }

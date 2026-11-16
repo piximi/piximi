@@ -8,13 +8,15 @@ import {
   STORES,
 } from "core/entities";
 import { DataConnector } from "core/data-connector";
+import { CancelSource, isTaskCancelledError } from "core/dl/cancel";
 
 import { parseError } from "utils/logUtils";
 
 import { overallProgress } from "./progress";
 
+import type { Token } from "core/dl/cancel";
+
 import type { Progress, TaskError } from "utils/types";
-import type { CancelToken } from "utils/workers/types";
 
 import type {
   ChannelResult,
@@ -44,7 +46,7 @@ type OnProgressCallback = (args: { value: number; stage: StageName }) => void;
 interface LoadImageWorkerAPI {
   loadImage(
     payload: ImportImageInput,
-    cancelToken: CancelToken,
+    cancelToken: Token,
     onProgress: OnProgressCallback,
     requiredChannels?: number,
   ): Promise<LoadAndPrepareOutput>;
@@ -67,7 +69,7 @@ export class FileLoader implements IFileLoader {
   private storage: DataConnector;
   private progress: Progress = { ...INITIAL_PROGRESS };
   private progressListeners: Set<(progress: Progress) => void> = new Set();
-  private abortController: AbortController | null = null;
+  private cancelSource: CancelSource | null = null;
   private tiffConfigs?: Map<string, TiffImportConfig>;
   private cachedBuffers?: Map<string, ArrayBuffer>;
   private fileIntepretation: FileInterpretationResult;
@@ -188,9 +190,10 @@ export class FileLoader implements IFileLoader {
       fileName: string;
       promise: Promise<LoadAndPrepareOutput>;
     }> = [];
+    const cancelSource = (this.cancelSource ??= new CancelSource());
 
     for (let i = 0; i < files.length; i++) {
-      if (this.abortController?.signal.aborted) {
+      if (cancelSource.isSignaled()) {
         return { success: false, cancelled: true };
       }
 
@@ -204,34 +207,33 @@ export class FileLoader implements IFileLoader {
         );
         this.activeWorkers.push(worker);
         const proxy = Comlink.wrap<LoadImageWorkerAPI>(worker);
-        const abortController = this.abortController;
-        const promise = proxy
-          .loadImage(
+        // The token is proxied so the worker's checks see the live source.
+        // `cancel()` also terminates the worker, after which its call never
+        // settles, so race it against the source's rejection.
+        const promise = Promise.race([
+          proxy.loadImage(
             {
               fileData,
               fileName: file.name,
               mimeType: fileAnalyses[file.name].mimeType,
               dimConfig: tiffConfigs?.get(file.name),
             },
-            {
-              get cancelled() {
-                return abortController?.signal.aborted ?? false;
-              },
-            },
+            Comlink.proxy(cancelSource.token),
             Comlink.proxy(({ value, stage }) => {
               this.updateProgress({
                 stageProgress: overallProgress(stage, value),
               });
             }),
             this.requiredChannels,
-          )
-          .finally(() => {
-            worker.terminate();
-            this.activeWorkers = this.activeWorkers.filter((w) => w !== worker);
-            this.updateProgress({
-              overallProgress: overallProgress("load", i / files.length),
-            });
+          ),
+          cancelSource.whenSignaled,
+        ]).finally(() => {
+          worker.terminate();
+          this.activeWorkers = this.activeWorkers.filter((w) => w !== worker);
+          this.updateProgress({
+            overallProgress: overallProgress("load", i / files.length),
           });
+        });
 
         workerTasks.push({ fileName: file.name, promise });
       } catch (err) {
@@ -259,14 +261,14 @@ export class FileLoader implements IFileLoader {
     }> = [];
 
     for (const { fileName, promise } of workerTasks) {
-      if (this.abortController?.signal.aborted) {
+      if (this.cancelSource?.isSignaled()) {
         return { success: false, cancelled: true };
       }
       try {
         const output = await promise;
         results.push({ fileName, output });
       } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") {
+        if (isTaskCancelledError(err)) {
           // Cancelled -- don't count as error
           continue;
         }
@@ -394,8 +396,8 @@ export class FileLoader implements IFileLoader {
    * Cancel current operation
    */
   cancel(): void {
-    if (this.abortController) {
-      this.abortController.abort();
+    if (this.cancelSource) {
+      this.cancelSource.signal();
       for (const worker of this.activeWorkers) {
         worker.terminate();
       }
@@ -440,7 +442,7 @@ export class FileLoader implements IFileLoader {
 
   private resetProgress(): void {
     this.progress = { ...INITIAL_PROGRESS };
-    this.abortController = new AbortController();
+    this.cancelSource = new CancelSource();
   }
 
   // ============================================================

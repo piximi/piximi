@@ -9,14 +9,15 @@ import {
 } from "core/entities";
 import { DataConnector } from "core/data-connector";
 import { getClassifierApi } from "core/dl/classification";
+import { CancelSource } from "core/dl/cancel";
 
 import { INITIAL_PROGRESS } from "utils/types";
 import { logger, parseError } from "utils/logUtils";
 
 import type { StorageInput } from "core/data-connector/types";
 import type { ExtractedModelFileMap } from "core/dl/types";
+import type { Token } from "core/dl/cancel";
 
-import type { CancelToken } from "utils/workers/types";
 import type { Progress, TaskError } from "utils/types";
 
 import type { V2Channel } from "./version-readers/version-types/v2Types";
@@ -41,7 +42,7 @@ type OnProgressCallback<TExtra = object> = (
 interface LoadImageWorkerAPI {
   loadProject(
     payload: LoadProjectInput,
-    cancelToken: CancelToken,
+    cancelToken: Token,
     onProgress: OnProgressCallback<object>,
   ): Promise<LoadProjectOutput>;
 }
@@ -65,7 +66,7 @@ export class ProjectLoader implements IProjectLoader {
   private storage: DataConnector;
   private progress: Progress = { ...INITIAL_PROGRESS };
   private progressListeners: Set<(progress: Progress) => void> = new Set();
-  private abortController: AbortController | null = null;
+  private cancelSource: CancelSource | null = null;
 
   constructor() {
     this.storage = DataConnector.getInstance();
@@ -75,28 +76,30 @@ export class ProjectLoader implements IProjectLoader {
   // ============================================================
 
   async uploadProject(files: File[]): Promise<DeserializedProjectResult> {
+    this.resetProgress();
+    const cancelSource = this.cancelSource!;
+
     const worker = new Worker(
       new URL("./worker/loadProjectWorker.ts", import.meta.url),
       { type: "module" },
     );
     const proxy = Comlink.wrap<LoadImageWorkerAPI>(worker);
-    const abortController = this.abortController;
     try {
-      // const { project: v2Raw, modelFiles } = await handle.promise;
-      const { project: v2Raw, modelFiles } = await proxy.loadProject(
-        { files },
-        {
-          get cancelled() {
-            return abortController?.signal.aborted ?? false;
-          },
-        },
-        Comlink.proxy(({ value }) => {
-          this.updateProgress({
-            overallProgress: STAGES.loadProject.end * value,
-            stageProgress: value,
-          });
-        }),
-      );
+      // Raced so a cancel settles the call even if the worker is mid-read;
+      // `finally` then terminates it.
+      const { project: v2Raw, modelFiles } = await Promise.race([
+        proxy.loadProject(
+          { files },
+          Comlink.proxy(cancelSource.token),
+          Comlink.proxy(({ value }) => {
+            this.updateProgress({
+              overallProgress: STAGES.loadProject.end * value,
+              stageProgress: value,
+            });
+          }),
+        ),
+        cancelSource.whenSignaled,
+      ]);
 
       this.updateProgress({ stageProgress: 0 });
       const channels = await this.storeChannels(v2Raw.data.channels.entities);
@@ -138,7 +141,13 @@ export class ProjectLoader implements IProjectLoader {
 
       return { success: true, project: piximiState };
     } catch (e) {
+      if (cancelSource.isSignaled()) {
+        return { success: false, cancelled: true };
+      }
       return { success: false, cancelled: false, error: parseError(e) };
+    } finally {
+      proxy[Comlink.releaseProxy]();
+      worker.terminate();
     }
   }
 
@@ -241,8 +250,8 @@ export class ProjectLoader implements IProjectLoader {
    * Cancel current operation
    */
   cancel(): void {
-    if (this.abortController) {
-      this.abortController.abort();
+    if (this.cancelSource) {
+      this.cancelSource.signal();
       this.updateProgress({ stage: "cancelled" });
     }
   }
@@ -275,7 +284,7 @@ export class ProjectLoader implements IProjectLoader {
 
   private resetProgress(): void {
     this.progress = { ...INITIAL_PROGRESS };
-    this.abortController = new AbortController();
+    this.cancelSource = new CancelSource();
   }
 
   // ============================================================

@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 
 import { describe, expect, it } from "vitest";
 
+import { CancelSource } from "core/dl/cancel";
+
 import { hydrateSegmenterState } from "store/segmenter/hydrate";
 import { getInitialState } from "store/segmenter/segmenterSlice";
 
@@ -34,7 +36,7 @@ const load = async (file: string): Promise<LoadProjectOutput> => {
   const asFile = new File([new Uint8Array(bytes)], file, {
     type: "application/zip",
   });
-  return loadProject({ files: [asFile] }, { cancelled: false }, () => {});
+  return loadProject({ files: [asFile] }, new CancelSource().token, () => {});
 };
 
 describe("zarr-v2-on-disk archive at Piximi format 2.x", () => {

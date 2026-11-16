@@ -10,6 +10,7 @@ import {
   OptimizationAlgorithm,
   Partition,
 } from "core/dl/enums";
+import { CancelSource } from "core/dl/cancel";
 import { ModelArch } from "core/dl/classification/types";
 import { MODELS } from "core/dl/segmentation/types";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
@@ -931,7 +932,7 @@ describe("v2 project archive", () => {
     });
     const { modelFiles } = await loadProject(
       { files: [file] },
-      { cancelled: false },
+      new CancelSource().token,
       () => {},
     );
 
@@ -970,7 +971,7 @@ describe("v2 project archive", () => {
           new File([blob], "legacy-models.zip", { type: "application/zip" }),
         ],
       },
-      { cancelled: false },
+      new CancelSource().token,
       () => {},
     );
 
@@ -997,7 +998,7 @@ describe("v2 project archive", () => {
 
     const { project } = await loadProject(
       { files: [file] },
-      { cancelled: false },
+      new CancelSource().token,
       () => {},
     );
 

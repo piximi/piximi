@@ -31,16 +31,43 @@ export class CancelToken {
 
 export type Token = CancelToken;
 
+/**
+ * `TaskCancelledError` crosses the worker boundary as a plain `Error`, so
+ * this checks the name rather than `instanceof`.
+ */
+export const isTaskCancelledError = (error: unknown): boolean =>
+  error instanceof Error && error.name === "TaskCancelledError";
+
 export class CancelSource {
   #signaled = false;
   #token = new CancelToken(this);
+  #whenSignaled: Promise<never> | null = null;
+  #rejectWhenSignaled: ((error: TaskCancelledError) => void) | null = null;
 
   get token(): Token {
     return this.#token;
   }
 
+  /**
+   * Rejects with `TaskCancelledError` once `signal()` is called. Race a
+   * worker call against it when the worker gets terminated on cancel: a
+   * terminated worker never answers, so the call would otherwise hang.
+   */
+  get whenSignaled(): Promise<never> {
+    if (!this.#whenSignaled) {
+      this.#whenSignaled = new Promise<never>((_, reject) => {
+        this.#rejectWhenSignaled = reject;
+      });
+      // Only consumers that race against it should observe the rejection.
+      this.#whenSignaled.catch(() => {});
+      if (this.#signaled) this.#rejectWhenSignaled!(new TaskCancelledError());
+    }
+    return this.#whenSignaled;
+  }
+
   signal() {
     this.#signaled = true;
+    this.#rejectWhenSignaled?.(new TaskCancelledError());
   }
 
   /**
@@ -49,6 +76,8 @@ export class CancelSource {
    */
   reset() {
     this.#signaled = false;
+    this.#whenSignaled = null;
+    this.#rejectWhenSignaled = null;
   }
 
   isSignaled() {
