@@ -1,7 +1,5 @@
 import type { AnnotationObject } from "core/entities";
 
-import type { HelpItem } from "help/HelpContent";
-
 import type { LoadCB } from "utils/types";
 
 import type { OUTPUT_MODE } from "./models/consts";
@@ -72,7 +70,8 @@ type SegmenterOptionCondition = {
 type SegmenterOptionFieldBase = {
   key: string;
   label: string;
-  help?: HelpItem;
+  /* Key of a help entry the UI may have for this field (see HelpItem). */
+  help?: string;
   tooltip?: string;
   advanced?: boolean;
   visibleWhen?: SegmenterOptionCondition;

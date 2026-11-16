@@ -22,8 +22,6 @@ import type {
   SegmenterChannelOptionField,
 } from "core/dl/segmentation/types";
 
-import type { HelpItem } from "help/HelpContent";
-
 const LABEL_SX = { flexShrink: 0, mr: 1, whiteSpace: "nowrap" } as const;
 
 /*
@@ -42,7 +40,7 @@ const Row = ({
 }: {
   label: string;
   tooltip?: string;
-  help?: HelpItem;
+  help?: string;
   layout: SegmenterOptionLayout;
   children: React.ReactNode;
 }) => {
