@@ -27,6 +27,69 @@ such as the Vite dev server, with `?backend=ws://127.0.0.1:<port>/ws&token=…`.
 Pages from loopback origins may always connect; add `--allow-origin` for
 others, or `--no-auth` to skip the token locally.
 
+A wheel built after `pnpm engine:frontend` carries the frontend inside the
+package (`piximi_engine/frontend/`), so an installed `piximi serve` needs no
+`--frontend` at all. `uv build --package piximi-engine` writes it to
+`python/dist/`.
+
+## From a notebook
+
+Jupyter and marimo run cells on an asyncio loop, and the server shares it,
+so the engine is a Python object in the same kernel as your analysis:
+
+```python
+from piximi_engine.notebook import serve
+
+session = await serve("/path/to/images")   # the last expression of a cell renders the app
+session.project.add_images("more.tif")      # shows up in the app at once
+summary = await session.project.segment("cellcast-stardist-fluo", channels=[2])
+labels = session.project.labels("cell-painting", kind="Nucleus")   # numpy label image
+```
+
+`session.url` is the link to open in a tab, `session.project` the Python
+API (`images`, `pixels`, `annotations`, `labels`, `segment`, ...), and
+`await session.stop()` ends it. In marimo, `mo.Html(session._repr_html_())`
+or `mo.iframe(session.url)` embeds it.
+
+### Jupyter launcher, JupyterHub
+
+With [jupyter-server-proxy](https://jupyter-server-proxy.readthedocs.io/)
+installed next to `piximi-engine`, JupyterLab shows a **Piximi** tile that
+starts `piximi serve` and proxies it under `<jupyter>/piximi/`. Set
+`PIXIMI_IMAGES` (and optionally `PIXIMI_DATA_DIR`) in the Jupyter server's
+environment to choose the folder; Jupyter authenticates the path, so the
+engine itself runs without a token, on loopback.
+
+A session started from a kernel on JupyterHub is reached the same way:
+`session.url` becomes the hub-relative `…/proxy/<port>/` path, and the
+inline frame renders through it. The served page learns its prefix from the
+proxy's `X-Forwarded-Prefix` header, so nothing needs configuring.
+
+### Mounted in an ASGI app (e.g. alongside marimo)
+
+`create_app` is a Starlette app; mount it under a prefix and tell it where:
+
+```python
+import marimo
+from starlette.applications import Starlette
+from starlette.routing import Mount
+from piximi_engine import ReferenceEngine
+from piximi_engine.cli import find_frontend
+from piximi_link.server import create_app
+from piximi_link.session import SessionHub
+
+engine = ReferenceEngine(".piximi")
+engine.ingest_folder("images")
+notebooks = marimo.create_asgi_app().with_app(path="/", root="analysis.py").build()
+app = Starlette(routes=[
+    Mount("/piximi", create_app(SessionHub(engine), static_dir=find_frontend(None), base_path="/piximi")),
+    Mount("/", notebooks),
+])
+```
+
+`piximi serve --base-path /piximi` is the same thing for the CLI behind a
+proxy that strips the prefix without announcing it.
+
 ## Working on the packages
 
 ```sh
@@ -34,6 +97,7 @@ cd python
 uv sync                      # creates .venv with every workspace package
 uv run pytest                # all package tests
 cd .. && pnpm protocol:gen   # re-export the bundle and regenerate the TS types
+pnpm engine:frontend         # build the frontend and copy it into the engine package
 PIXIMI_REMOTE_TEST=1 pnpm test --run src/core/backend/remote   # TS ↔ Python, incl. RemoteBackend conformance
 ```
 
