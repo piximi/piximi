@@ -21,6 +21,10 @@ cellcast = ["cellcast>=0.3"]
 [project.scripts]
 piximi = "piximi_engine.cli:main"
 
+# A "Piximi" tile in the JupyterLab launcher when jupyter-server-proxy is installed.
+[project.entry-points.jupyter_serverproxy_servers]
+piximi = "piximi_engine.jupyter:setup_piximi"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

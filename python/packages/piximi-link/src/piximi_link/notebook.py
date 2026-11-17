@@ -10,6 +10,7 @@ so their events reach the connected tabs.
 from __future__ import annotations
 
 import html
+import os
 from pathlib import Path
 
 from .auth import Auth
@@ -37,12 +38,18 @@ class NotebookSession:
 
     @property
     def url(self) -> str:
-        """The URL to open in a browser tab, launch token included."""
+        """The URL to open in a browser tab, launch token included. Under
+        JupyterHub the kernel's host is not reachable from the browser, so
+        it is the path through jupyter-server-proxy, relative to the hub,
+        which is how the notebook page resolves it."""
         query = f"?token={self.auth.token}" if self.auth.token else ""
         if self.static_dir is None:
             # No bundle to serve: point a frontend elsewhere at the backend.
             extra = f"&token={self.auth.token}" if self.auth.token else ""
             return f"http://localhost:3000/?backend={self.ws_url}{extra}"
+        hub_prefix = os.environ.get("JUPYTERHUB_SERVICE_PREFIX")
+        if hub_prefix:
+            return f"{hub_prefix.rstrip('/')}/proxy/{self.port}/{query}"
         return f"http://{self.host}:{self.port}/{query}"
 
     async def stop(self) -> None:
