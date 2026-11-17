@@ -3,7 +3,7 @@ name = "piximi-link"
 version = "0.1.0"
 description = "Transport and RPC layer between the Piximi frontend and a backend engine: msgpack framing, a symmetric JSON-RPC peer, and WebSocket transports."
 requires-python = ">=3.12"
-dependencies = ["piximi-schema", "msgpack>=1.1", "websockets>=14"]
+dependencies = ["piximi-schema", "msgpack>=1.1", "websockets>=14", "starlette>=0.41", "uvicorn>=0.30"]
 
 [project.scripts]
 piximi-link-echo = "piximi_link.testing.echo_server:main"
