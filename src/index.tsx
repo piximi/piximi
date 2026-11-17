@@ -10,18 +10,19 @@ import { productionStore } from "store";
 
 import { Application } from "./app/Application";
 
-const backend = installBackend(productionStore);
-void backend.connect();
-
 const domNode = document.getElementById("root");
 const root = createRoot(domNode!);
 
-root.render(
-  <Provider store={productionStore}>
-    <BackendProvider backend={backend}>
-      <DndProvider backend={HTML5Backend}>
-        <Application />
-      </DndProvider>
-    </BackendProvider>
-  </Provider>,
-);
+// A remote session has to connect and fill the store before the first paint.
+void installBackend(productionStore).then((backend) => {
+  void backend.connect();
+  root.render(
+    <Provider store={productionStore}>
+      <BackendProvider backend={backend}>
+        <DndProvider backend={HTML5Backend}>
+          <Application />
+        </DndProvider>
+      </BackendProvider>
+    </Provider>,
+  );
+});
