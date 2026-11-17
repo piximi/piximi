@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
 import {
+  appPath,
   forgetSession,
   installLocalBackend,
   installRemoteBackend,
@@ -18,8 +19,9 @@ import type { StoreHandle } from "core/backend/local/store";
 
 /* A remote session already holds a project, so skip the welcome screen. */
 const enterProject = () => {
-  if (window.location.pathname !== "/") return;
-  window.history.replaceState(window.history.state, "", "/project");
+  const root = appPath("/");
+  if (window.location.pathname.replace(/\/+$/, "/") !== root) return;
+  window.history.replaceState(window.history.state, "", appPath("/project"));
 };
 
 type Phase =

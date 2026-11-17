@@ -5,6 +5,12 @@
 - With a frontend bundle configured, everything else serves it as a
   single-page app, with the backend's location injected into ``index.html``
   so the page connects to the server that served it.
+
+Behind a path-prefixing proxy (jupyter-server-proxy, a ``Mount`` in a larger
+ASGI app) the page needs its public prefix for the WebSocket URL and the
+router; it comes from ``base_path`` when given, else per request from the
+``X-Forwarded-Prefix`` header such proxies send. The bundle's own asset
+URLs are relative, so they need nothing.
 """
 
 from __future__ import annotations
@@ -51,6 +57,22 @@ def origin_allowed(origin: str | None, host: str | None, allowed: set[str]) -> b
     return origin in allowed
 
 
+def normalize_prefix(prefix: str | None) -> str:
+    """``/a/b/`` → ``/a/b``; the root (or nothing) → ``""``."""
+    if not prefix:
+        return ""
+    prefix = "/" + prefix.strip("/")
+    return "" if prefix == "/" else prefix
+
+
+def page_config(prefix: str) -> dict:
+    """What the served page needs to reach this backend from ``prefix``."""
+    config: dict = {"url": f"{prefix}/ws"}
+    if prefix:
+        config["basePath"] = prefix
+    return config
+
+
 def inject_config(index_html: str, config: dict) -> str:
     script = f"<script>window.{CONFIG_GLOBAL} = {json.dumps(config)};</script>"
     marker = "</head>"
@@ -65,9 +87,11 @@ def create_app(
     auth: Auth | None = None,
     static_dir: Path | None = None,
     allowed_origins: set[str] | None = None,
+    base_path: str | None = None,
 ) -> Starlette:
     auth = auth or Auth(None)
     allowed = allowed_origins or set()
+    fixed_prefix = normalize_prefix(base_path) if base_path is not None else None
 
     async def session_endpoint(request: Request) -> Response:
         if not origin_allowed(request.headers.get("origin"), request.headers.get("host"), allowed):
@@ -103,7 +127,7 @@ def create_app(
 
     if static_dir is not None:
         root = static_dir.resolve()
-        index = inject_config((root / "index.html").read_text(), {"url": "/ws"})
+        index_html = (root / "index.html").read_text()
 
         async def static_endpoint(request: Request) -> Response:
             path = request.path_params.get("path", "")
@@ -112,7 +136,12 @@ def create_app(
                 if candidate.is_file() and root in candidate.parents:
                     return FileResponse(candidate)
             # Everything else is the app, including its client-side routes.
-            return HTMLResponse(index)
+            prefix = (
+                fixed_prefix
+                if fixed_prefix is not None
+                else normalize_prefix(request.headers.get("x-forwarded-prefix"))
+            )
+            return HTMLResponse(inject_config(index_html, page_config(prefix)))
 
         routes.append(Route("/", static_endpoint))
         routes.append(Route("/{path:path}", static_endpoint))
@@ -156,10 +185,17 @@ async def serve(
     auth: Auth | None = None,
     static_dir: Path | None = None,
     allowed_origins: set[str] | None = None,
+    base_path: str | None = None,
 ) -> Served:
     """Starts serving on the running loop and returns once the port is bound,
     so a caller can print it or connect to it. ``port=0`` picks a free one."""
-    app = create_app(hub, auth=auth, static_dir=static_dir, allowed_origins=allowed_origins)
+    app = create_app(
+        hub,
+        auth=auth,
+        static_dir=static_dir,
+        allowed_origins=allowed_origins,
+        base_path=base_path,
+    )
     config = uvicorn.Config(app, host=host, port=port, log_level="warning", ws="websockets")
     server = uvicorn.Server(config)
     task = asyncio.create_task(server.serve(), name="piximi-link-server")

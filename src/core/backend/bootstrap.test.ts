@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { exchangeToken, resolveSessionConfig } from "./bootstrap";
+import {
+  appPath,
+  exchangeToken,
+  resolveBasePath,
+  resolveSessionConfig,
+} from "./bootstrap";
 
 const location = { search: "", protocol: "https:", host: "app.example" };
 
@@ -97,6 +102,24 @@ describe("exchangeToken", () => {
     vi.stubGlobal("fetch", async () => ({ ok: false, status: 403 }));
     await expect(exchangeToken("ws://h:9/ws", "wrong")).rejects.toThrow(
       "rejected the token",
+    );
+  });
+});
+
+describe("resolveBasePath", () => {
+  it("is the root unless a serving backend says where the app is mounted", () => {
+    expect(resolveBasePath(undefined)).toBe("/");
+    expect(resolveBasePath({ url: "/ws" })).toBe("/");
+    expect(resolveBasePath({ url: "/p/ws", basePath: "/p/" })).toBe("/p");
+    expect(resolveBasePath({ basePath: "user/x/proxy/1" })).toBe(
+      "/user/x/proxy/1",
+    );
+  });
+
+  it("prefixes app paths", () => {
+    expect(appPath("/project", "/")).toBe("/project");
+    expect(appPath("/project", "/user/x/proxy/1")).toBe(
+      "/user/x/proxy/1/project",
     );
   });
 });

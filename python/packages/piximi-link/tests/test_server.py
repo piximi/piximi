@@ -4,11 +4,20 @@ frontend bundle with the backend location injected."""
 from pathlib import Path
 
 import pytest
+from starlette.applications import Starlette
+from starlette.routing import Mount
 from starlette.testclient import TestClient
 
 from piximi_link import BackendError, Peer
 from piximi_link.auth import Auth
-from piximi_link.server import CONFIG_GLOBAL, create_app, inject_config, origin_allowed
+from piximi_link.server import (
+    CONFIG_GLOBAL,
+    create_app,
+    inject_config,
+    normalize_prefix,
+    origin_allowed,
+    page_config,
+)
 from piximi_link.session import SessionHub
 from piximi_link.testing.echo_server import register_handlers
 from piximi_link.transports import loopback_pair
@@ -96,6 +105,33 @@ def test_session_endpoint_and_static_bundle(tmp_path: Path):
         assert CONFIG_GLOBAL in client.get("/").text
         assert CONFIG_GLOBAL in client.get("/project").text, "client-side routes get the app"
         assert client.get("/../etc/passwd").status_code in (200, 404)  # never a file outside
+
+
+def test_prefix_normalization_and_page_config():
+    assert normalize_prefix(None) == normalize_prefix("/") == normalize_prefix("") == ""
+    assert normalize_prefix("/user/x/proxy/1/") == normalize_prefix("user/x/proxy/1") == "/user/x/proxy/1"
+    assert page_config("") == {"url": "/ws"}
+    assert page_config("/p") == {"url": "/p/ws", "basePath": "/p"}
+
+
+def test_page_learns_its_prefix_from_the_proxy_or_the_mount(tmp_path: Path):
+    (tmp_path / "index.html").write_text("<html><head></head><body>app</body></html>")
+    hub = SessionHub(NoEngine())
+
+    # jupyter-server-proxy strips the prefix and names it in a header.
+    with TestClient(create_app(hub, static_dir=tmp_path)) as client:
+        assert '"url": "/ws"' in client.get("/").text
+        page = client.get("/project", headers={"x-forwarded-prefix": "/user/x/proxy/1/"}).text
+        assert '"url": "/user/x/proxy/1/ws"' in page and '"basePath": "/user/x/proxy/1"' in page
+
+    # A Mount in a larger app strips it too, and the app is told at construction.
+    outer = Starlette(
+        routes=[Mount("/piximi", create_app(hub, static_dir=tmp_path, base_path="/piximi"))]
+    )
+    with TestClient(outer) as client:
+        page = client.get("/piximi/project").text
+        assert '"url": "/piximi/ws"' in page and '"basePath": "/piximi"' in page
+        assert client.get("/piximi/assets/none.js").status_code == 200, "SPA fallback"
 
 
 async def test_initialize_requires_a_ticket():

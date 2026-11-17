@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { CssBaseline } from "@mui/material";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
+import { resolveBasePath } from "core/backend/bootstrap";
 import { DataConnector } from "core/data-connector";
 
 import { usePreferredMuiTheme } from "hooks";
@@ -46,7 +47,7 @@ export const Application = () => {
           <HelpOverlay />
           {alertState.visible && <AlertBar alertState={alertState} />}
           <TaskProgressToasts />
-          <BrowserRouter basename={"/"}>
+          <BrowserRouter basename={resolveBasePath()}>
             <Routes>
               <Route path="/" element={<WelcomeScreen />} />
               <Route path="project" element={<ProjectViewer />} />

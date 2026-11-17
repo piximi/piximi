@@ -14,7 +14,7 @@ export type SessionConfig = { url: string; token?: string };
 declare global {
   interface Window {
     /* Injected into index.html by a server that serves the frontend itself. */
-    __PIXIMI_BACKEND__?: { url?: string };
+    __PIXIMI_BACKEND__?: { url?: string; basePath?: string };
   }
 }
 
@@ -35,6 +35,22 @@ const absoluteWebSocketUrl = (
   url.startsWith("/")
     ? `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}${url}`
     : url;
+
+/*
+ * Where the app is mounted: a serving backend behind a path-prefixing proxy
+ * injects it; otherwise the root. Normalized to have no trailing slash
+ * except for the root itself.
+ */
+export const resolveBasePath = (
+  injected: Window["__PIXIMI_BACKEND__"] = window.__PIXIMI_BACKEND__,
+): string => {
+  const base = injected?.basePath?.replace(/\/+$/, "") ?? "";
+  return base === "" ? "/" : base.startsWith("/") ? base : `/${base}`;
+};
+
+/* A path within the app, e.g. `/project`, as the browser must see it. */
+export const appPath = (path: string, basePath = resolveBasePath()): string =>
+  basePath === "/" ? path : `${basePath}${path}`;
 
 /*
  * The session this page should join: its URL from `?backend=`, else the

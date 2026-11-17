@@ -47,6 +47,7 @@ async def _serve(args: argparse.Namespace) -> None:
         auth=auth,
         static_dir=frontend,
         allowed_origins=set(args.allow_origin or []),
+        base_path=args.base_path,
     )
 
     host = args.host
@@ -85,6 +86,12 @@ def main(argv: list[str] | None = None) -> int:
         action="append",
         metavar="ORIGIN",
         help="Also allow this page origin to connect (loopback origins always may)",
+    )
+    run.add_argument(
+        "--base-path",
+        metavar="PATH",
+        help="Public path prefix when a proxy strips one (otherwise read from "
+        "the X-Forwarded-Prefix header it sends)",
     )
     run.add_argument("--no-gpu", action="store_true", help="Run models on the CPU")
     run.add_argument("-v", "--verbose", action="store_true")
