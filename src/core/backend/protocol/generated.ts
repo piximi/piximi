@@ -520,6 +520,15 @@ export interface ImageQuery {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImagesDidAdd".
+ */
+export interface ImagesDidAdd {
+  type: "images/didAdd";
+  records: ImageRecord[];
+  channelMetas: ChannelMeta[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ImagesParams".
  */
 export interface ImagesParams {

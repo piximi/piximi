@@ -64,6 +64,13 @@ const withStorageReference = (channel: P.Channel): Channel => ({
   },
 });
 
+const toImageRecord = (record: P.ImageRecord): ImageRecord => ({
+  image: { ...record.image, partition: record.image.partition as Partition },
+  series: record.series,
+  planes: record.planes,
+  channels: record.channels.map(withStorageReference),
+});
+
 const toDataUrl = (mime: string, bytes: Uint8Array): string => {
   let binary = "";
   const CHUNK = 0x8000;
@@ -134,6 +141,14 @@ export class RemoteBackend implements Backend {
         job: (params as P.JobsDidUpdate).job,
       }),
     );
+    peer.onNotification("images/didAdd", (params) => {
+      const event = params as P.ImagesDidAdd;
+      this.#bus.emit({
+        type: "images/didAdd",
+        records: event.records.map(toImageRecord),
+        channelMetas: event.channelMetas,
+      });
+    });
   }
 
   #call<M extends keyof Methods>(
@@ -203,15 +218,7 @@ export class RemoteBackend implements Backend {
       return {
         total: result.total,
         nextCursor: result.nextCursor,
-        items: result.items.map((record) => ({
-          image: {
-            ...record.image,
-            partition: record.image.partition as Partition,
-          },
-          series: record.series,
-          planes: record.planes,
-          channels: record.channels.map(withStorageReference),
-        })),
+        items: result.items.map(toImageRecord),
       };
     },
 

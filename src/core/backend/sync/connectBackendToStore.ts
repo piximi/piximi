@@ -4,12 +4,14 @@ import { dataSlice } from "store/data";
 
 import { isTerminal } from "../jobs";
 
+import type { ChannelMeta, ImageSeries } from "core/entities";
+
 import type { AppTaskType } from "store/appTasks/types";
 
 import type { BackendEvent } from "../events";
 import type { Job, JobKind } from "../jobs";
 import type { StoreHandle } from "../local/store";
-import type { Backend } from "../types";
+import type { Backend, ImageRecord } from "../types";
 
 const taskType: Record<JobKind, AppTaskType> = {
   segmentation: "image-segmentation",
@@ -87,6 +89,25 @@ const applyJobUpdate = (job: Job, backend: Backend, store: StoreHandle) => {
   taskCancelRegistry.unregister(job.id);
 };
 
+/* Records carry their series; several of them may share one. */
+const applyImagesAdded = (
+  records: ImageRecord[],
+  channelMetas: ChannelMeta[],
+  store: StoreHandle,
+) => {
+  const series = new Map<string, ImageSeries>();
+  for (const record of records) series.set(record.series.id, record.series);
+  store.dispatch(
+    dataSlice.actions.addImageSeries({
+      imageSeries: [...series.values()],
+      images: records.map((record) => record.image),
+      planes: records.flatMap((record) => record.planes),
+      channels: records.flatMap((record) => record.channels),
+      channelMetas,
+    }),
+  );
+};
+
 /*
  * Turns a backend event into store updates. The data slice stays the UI's
  * source of truth for metadata; this is how changes the backend originates
@@ -107,6 +128,9 @@ const applyBackendEvent = (
       return;
     case "jobs/didUpdate":
       applyJobUpdate(event.job, backend, store);
+      return;
+    case "images/didAdd":
+      applyImagesAdded(event.records, event.channelMetas, store);
       return;
   }
 };

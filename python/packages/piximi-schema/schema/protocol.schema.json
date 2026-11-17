@@ -997,6 +997,34 @@
       "title": "ImageSeries",
       "type": "object"
     },
+    "ImagesDidAdd": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "images/didAdd",
+          "type": "string"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/ImageRecord"
+          },
+          "type": "array"
+        },
+        "channelMetas": {
+          "items": {
+            "$ref": "#/$defs/ChannelMeta"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "records",
+        "channelMetas"
+      ],
+      "title": "ImagesDidAdd",
+      "type": "object"
+    },
     "ImagesParams": {
       "additionalProperties": false,
       "properties": {
@@ -2427,6 +2455,10 @@
     "jobs/didUpdate": {
       "direction": "server->client",
       "params": "#/$defs/JobsDidUpdate"
+    },
+    "images/didAdd": {
+      "direction": "server->client",
+      "params": "#/$defs/ImagesDidAdd"
     }
   }
 }

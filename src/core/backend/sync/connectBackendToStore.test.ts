@@ -125,3 +125,38 @@ describe("connectBackendToStore: jobs", () => {
     expect(tasks()["old"]).toBeUndefined();
   });
 });
+
+describe("connectBackendToStore: images", () => {
+  it("adds the images, their series once, and only new channel metas", () => {
+    const bus = new EventBus();
+    const store = configureStore({
+      reducer: { data: dataSlice.reducer, appTasks: appTasksSlice.reducer },
+      middleware: (getDefault) => getDefault({ serializableCheck: false }),
+    });
+    const backend = {
+      subscribe: bus.subscribe.bind(bus),
+      jobs: { cancel: async () => {}, list: async () => [] },
+    } as unknown as Backend;
+    connectBackendToStore(backend, store as unknown as StoreHandle);
+
+    const series = { id: "s1", name: "s", imageIds: ["i1", "i2"] };
+    const record = (id: string) => ({
+      image: { id, name: id, seriesId: "s1", activePlaneId: `${id}-p` },
+      series,
+      planes: [{ id: `${id}-p`, imageId: id, channelIds: [`${id}-c`] }],
+      channels: [{ id: `${id}-c`, planeId: `${id}-p`, channelMetaId: "m0" }],
+    });
+    bus.emit({
+      type: "images/didAdd",
+      records: [record("i1"), record("i2")] as never,
+      channelMetas: [{ id: "m0", name: "ch0" }] as never,
+    });
+
+    const { data } = store.getState();
+    expect(data.images.ids).toEqual(["i1", "i2"]);
+    expect(data.imageSeries.ids).toEqual(["s1"]);
+    expect(data.planes.ids).toEqual(["i1-p", "i2-p"]);
+    expect(data.channels.ids).toEqual(["i1-c", "i2-c"]);
+    expect(data.channelMetas.ids).toEqual(["m0"]);
+  });
+});

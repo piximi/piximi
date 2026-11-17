@@ -6,8 +6,9 @@ from typing import Annotated, Literal
 from pydantic import Field
 
 from .base import WireModel
-from .entities import AnnotationCategory, AnnotationObject, AnnotationVolume, Kind
+from .entities import AnnotationCategory, AnnotationObject, AnnotationVolume, ChannelMeta, Kind
 from .jobs import Job
+from .query import ImageRecord
 
 
 class KindWithCategory(WireModel):
@@ -32,8 +33,15 @@ class JobsDidUpdate(WireModel):
     job: Job
 
 
+class ImagesDidAdd(WireModel):
+    type: Literal["images/didAdd"]
+    records: list[ImageRecord]
+    channel_metas: list[ChannelMeta]
+    """Channel metas created for these images; existing ones are not repeated."""
+
+
 BackendEvent = Annotated[
-    KindsDidAdd | AnnotationsDidAdd | JobsDidUpdate, Field(discriminator="type")
+    KindsDidAdd | AnnotationsDidAdd | JobsDidUpdate | ImagesDidAdd, Field(discriminator="type")
 ]
 
-EVENT_TYPES: tuple[type[WireModel], ...] = (KindsDidAdd, AnnotationsDidAdd, JobsDidUpdate)
+EVENT_TYPES: tuple[type[WireModel], ...] = (KindsDidAdd, AnnotationsDidAdd, JobsDidUpdate, ImagesDidAdd)

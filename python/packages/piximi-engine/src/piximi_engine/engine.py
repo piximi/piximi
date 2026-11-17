@@ -32,7 +32,7 @@ from piximi_schema.entities import (
     Plane,
     Shape,
 )
-from piximi_schema.events import AnnotationsDidAdd, KindsDidAdd, KindWithCategory
+from piximi_schema.events import AnnotationsDidAdd, ImagesDidAdd, KindsDidAdd, KindWithCategory
 from piximi_schema.jobs import Job, JobKind, JobStatus
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
@@ -184,11 +184,11 @@ class ReferenceEngine:
             experiment = experiment.model_copy(update={"channels": decoded.channels})
             self.meta.put("experiment", _ExperimentRow(id="experiment", experiment=experiment))
         metas = {meta.id: meta for meta in self.meta.list("channel_meta", ChannelMeta)}
+        new_metas: list[ChannelMeta] = []
         for index in range(decoded.channels):
             meta_id = f"channel-meta-{index}"
             if meta_id not in metas:
-                self.meta.put(
-                    "channel_meta",
+                new_metas.append(
                     ChannelMeta(
                         id=meta_id,
                         name=f"Channel {index}",
@@ -201,8 +201,9 @@ class ReferenceEngine:
                         ramp_max=max_intensity,
                         ramp_min_limit=0,
                         ramp_max_limit=max_intensity,
-                    ),
+                    )
                 )
+        self.meta.put_many("channel_meta", [(meta, None) for meta in new_metas])
 
         series_id, image_id = generate_uuid(), generate_uuid()
         shape = Shape(planes=len(decoded.planes), height=height, width=width, channels=decoded.channels)
@@ -252,6 +253,13 @@ class ReferenceEngine:
         self.meta.put_many("plane", [(plane, image_id) for plane in planes])
         self.meta.put_many("channel", channels)
         self.meta.record_source(str(path.resolve()), [image_id])
+        self._emit(
+            ImagesDidAdd(
+                type="images/didAdd",
+                records=[self._image_record(image_id)],
+                channel_metas=new_metas,
+            )
+        )
         return [image_id]
 
     # ── Engine protocol: query ──────────────────────────────────────────────

@@ -2,10 +2,12 @@ import type {
   AnnotationCategory,
   AnnotationObject,
   AnnotationVolume,
+  ChannelMeta,
   Kind,
 } from "core/entities";
 
 import type { Job } from "./jobs";
+import type { ImageRecord } from "./types";
 
 /*
  * Changes a backend announces after the fact. Both backends emit these for
@@ -23,7 +25,13 @@ export type BackendEvent =
       volumes: AnnotationVolume[];
       annotations: AnnotationObject[];
     }
-  | { type: "jobs/didUpdate"; job: Job };
+  | { type: "jobs/didUpdate"; job: Job }
+  | {
+      type: "images/didAdd";
+      records: ImageRecord[];
+      /* Only metas created for these images; existing ones are not repeated. */
+      channelMetas: ChannelMeta[];
+    };
 
 export type BackendEventListener = (event: BackendEvent) => void;
 

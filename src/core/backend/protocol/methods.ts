@@ -100,4 +100,5 @@ export type ProtocolNotifications = {
     direction: "server->client";
   };
   "jobs/didUpdate": { params: P.JobsDidUpdate; direction: "server->client" };
+  "images/didAdd": { params: P.ImagesDidAdd; direction: "server->client" };
 };
