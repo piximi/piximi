@@ -12,13 +12,20 @@ Piximi's pluggable backends.
 ## Serving a folder of images
 
 ```sh
+pnpm build                                 # once: the frontend bundle in dist/
 cd python
-uv run piximi serve /path/to/images        # prints PORT and the ws:// URL
+uv run piximi serve /path/to/images --frontend ../dist
 ```
 
-Then open the frontend with `?backend=ws://127.0.0.1:<port>/ws`. The project
+This prints a URL with a launch token (`http://127.0.0.1:<port>/?token=…`);
+open it and the frontend connects to the server that served it. The project
 (SQLite + zarr) lives in `/path/to/images/.piximi`; re-serving the folder
 skips files already imported.
+
+Without `--frontend` (or `PIXIMI_FRONTEND_DIR`), open a frontend elsewhere,
+such as the Vite dev server, with `?backend=ws://127.0.0.1:<port>/ws&token=…`.
+Pages from loopback origins may always connect; add `--allow-origin` for
+others, or `--no-auth` to skip the token locally.
 
 ## Working on the packages
 
