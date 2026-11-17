@@ -92,7 +92,17 @@ const paginate = <T>(
  */
 export class LocalBackend implements Backend {
   readonly kind = "local" as const;
-  readonly capabilities: readonly Capability[] = ["raw-local", "segmentation"];
+  // Everything the in-browser app can do; remote backends declare a subset.
+  readonly capabilities: readonly Capability[] = [
+    "raw-local",
+    "segmentation",
+    "classification",
+    "classification.train",
+    "measurements",
+    "ingest.upload",
+    "project.io",
+    "annotations.commit",
+  ];
   readonly session: BackendSession = {
     id: generateUUID(),
     protocolVersion: "local",

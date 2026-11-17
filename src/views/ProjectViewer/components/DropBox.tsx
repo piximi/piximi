@@ -1,5 +1,7 @@
 import { Box } from "@mui/material";
 
+import { useCapability } from "core/backend";
+
 import { useDndFileDrop, useFileLoader } from "hooks";
 
 import { TiffConfigDialog } from "./dialogs/tiff-config/TiffConfigDialog";
@@ -15,8 +17,11 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
     handleCancelTiffConfig,
   } = useFileLoader();
 
+  // Dropped files go into the local store; a backend that holds the
+  // project takes images another way.
+  const canUpload = useCapability("ingest.upload");
   const handleDrop = async (files: FileList) => {
-    await upload(files);
+    if (canUpload) await upload(files);
   };
   const [{ isOver }, dropTarget] = useDndFileDrop(handleDrop);
   return (
@@ -30,7 +35,7 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
             duration: theme.transitions.duration.enteringScreen,
             easing: theme.transitions.easing.easeOut,
           }),
-          border: isOver ? "5px solid blue" : "",
+          border: isOver && canUpload ? "5px solid blue" : "",
           height: "100%",
         })}
       >

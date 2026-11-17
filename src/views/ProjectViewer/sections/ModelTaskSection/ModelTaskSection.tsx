@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
+import { useCapability } from "core/backend";
+
 import { HelpItem } from "help/HelpContent";
 
 import { ClassifierStatusProvider } from "@ProjectViewer/contexts/ClassifierStatusProvider";
@@ -14,9 +16,11 @@ import { ClassifierSection } from "./ClassifierSection";
 import type React from "react";
 
 export const ModelTaskSection = () => {
+  const canClassify = useCapability("classification");
+  const canSegment = useCapability("segmentation");
   const [learningTask, setLearningTask] = useState<
     "Classification" | "Segmentation"
-  >("Classification");
+  >(canClassify ? "Classification" : "Segmentation");
 
   const handleToggleLearningTask = (
     event: React.MouseEvent<HTMLElement>,
@@ -55,10 +59,18 @@ export const ModelTaskSection = () => {
           },
         }}
       >
-        <ToggleButton value="Classification" sx={{ width: "50%" }}>
+        <ToggleButton
+          value="Classification"
+          sx={{ width: "50%" }}
+          disabled={!canClassify}
+        >
           Classification
         </ToggleButton>
-        <ToggleButton value="Segmentation" sx={{ width: "50%" }}>
+        <ToggleButton
+          value="Segmentation"
+          sx={{ width: "50%" }}
+          disabled={!canSegment}
+        >
           Segmentation
         </ToggleButton>
       </ToggleButtonGroup>

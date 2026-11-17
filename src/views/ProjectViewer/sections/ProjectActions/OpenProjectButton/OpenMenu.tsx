@@ -1,5 +1,7 @@
 import { Menu } from "@mui/material";
 
+import { useCapability } from "core/backend";
+
 import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
 import { OpenImageMenuItem } from "./OpenImageMenuItem";
 
@@ -18,6 +20,8 @@ export const OpenMenu = ({
   onClose,
   open,
 }: OpenMenuProps) => {
+  const projectIO = useCapability("project.io");
+  const upload = useCapability("ingest.upload");
   return (
     <Menu
       anchorEl={anchorEl}
@@ -32,9 +36,9 @@ export const OpenMenu = ({
         },
       }}
     >
-      <OpenProjectMenuItem onClose={onClose} />
+      {projectIO && <OpenProjectMenuItem onClose={onClose} />}
 
-      <OpenImageMenuItem onCloseMenu={onClose} />
+      {upload && <OpenImageMenuItem onCloseMenu={onClose} />}
       {/* TODO: Fix and implement Annotation Uploads*/}
     </Menu>
   );

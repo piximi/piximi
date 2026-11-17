@@ -1,5 +1,7 @@
 import { Box } from "@mui/material";
 
+import { useCapability } from "core/backend";
+
 import { ConfirmReplaceDialogProvider } from "@ProjectViewer/hooks/useConfirmReplaceProjectDialog";
 
 import { NewProjectButton } from "./NewProjectButton";
@@ -7,6 +9,9 @@ import { OpenProjectButton } from "./OpenProjectButton";
 import { SaveProjectButton } from "./SaveProjectButton";
 
 export const ProjectActions = () => {
+  // A backend that holds the project itself owns opening and saving it.
+  const projectIO = useCapability("project.io");
+  const upload = useCapability("ingest.upload");
   return (
     <ConfirmReplaceDialogProvider>
       <Box
@@ -17,9 +22,9 @@ export const ProjectActions = () => {
           px: 2,
         }}
       >
-        <NewProjectButton />
-        <OpenProjectButton />
-        <SaveProjectButton />
+        {projectIO && <NewProjectButton />}
+        {(projectIO || upload) && <OpenProjectButton />}
+        {projectIO && <SaveProjectButton />}
       </Box>
     </ConfirmReplaceDialogProvider>
   );
