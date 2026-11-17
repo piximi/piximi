@@ -1,0 +1,11 @@
+{
+  "description": "Binary RLE vectors shared by src/utils/image/rle.ts and piximi_engine.rle: masks are row-major over [height, width]; runs alternate background/foreground starting with background.",
+  "cases": [
+    { "name": "all background", "shape": [2, 3], "mask": [0, 0, 0, 0, 0, 0], "runs": [6] },
+    { "name": "all foreground", "shape": [2, 2], "mask": [1, 1, 1, 1], "runs": [0, 4] },
+    { "name": "starts with foreground", "shape": [1, 5], "mask": [1, 1, 0, 1, 0], "runs": [0, 2, 1, 1, 1] },
+    { "name": "starts with background", "shape": [2, 4], "mask": [0, 1, 1, 0, 0, 0, 1, 1], "runs": [1, 2, 3, 2] },
+    { "name": "single pixel", "shape": [1, 1], "mask": [1], "runs": [0, 1] },
+    { "name": "checkerboard", "shape": [2, 2], "mask": [1, 0, 0, 1], "runs": [0, 1, 2, 1] }
+  ]
+}

@@ -3,7 +3,7 @@ name = "piximi-workspace"
 version = "0.0.0"
 description = "uv workspace for Piximi's Python packages (schema, link, engine)."
 requires-python = ">=3.12"
-dependencies = ["piximi-schema", "piximi-link"]
+dependencies = ["piximi-schema", "piximi-link", "piximi-engine"]
 
 [tool.uv]
 package = false
@@ -11,6 +11,7 @@ package = false
 [tool.uv.sources]
 piximi-schema = { workspace = true }
 piximi-link = { workspace = true }
+piximi-engine = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
