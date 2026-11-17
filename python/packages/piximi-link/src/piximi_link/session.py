@@ -33,6 +33,7 @@ from piximi_schema.rpc import INVALID_PARAMS
 from piximi_schema.segmentation import SegmentationRunRequest
 from piximi_schema.session import InitializeParams, InitializeResult, PeerInfo
 
+from .auth import Auth
 from .engine import BackendEvent, Engine
 from .errors import BackendError, RpcRemoteError
 from .peer import HandlerContext, Peer
@@ -47,8 +48,9 @@ def _major(version: str) -> str:
 
 
 class SessionHub:
-    def __init__(self, engine: Engine) -> None:
+    def __init__(self, engine: Engine, *, auth: Auth | None = None) -> None:
         self.engine = engine
+        self.auth = auth or Auth(None)
         self.session_id = str(uuid.uuid4())
         self._peers: set[Peer] = set()
         self._unsubscribe = engine.subscribe(self._broadcast)
@@ -107,6 +109,8 @@ class SessionHub:
             return handler
 
         async def initialize(params: InitializeParams, _ctx: HandlerContext) -> InitializeResult:
+            if not self.auth.redeem(params.auth.ticket if params.auth else None):
+                raise BackendError("UNAUTHORIZED", "A valid session ticket is required")
             if _major(params.protocol_version) != _major(PROTOCOL_VERSION):
                 raise BackendError(
                     "NOT_SUPPORTED",

@@ -55,6 +55,13 @@ class HandlerContext:
         if self._send_progress is not None:
             self._send_progress(value)
 
+    def with_progress(self, send: Callable[[Any], None]) -> HandlerContext:
+        """A context sharing this one's cancellation but reporting progress
+        through ``send`` (which may also forward to this one)."""
+        derived = HandlerContext(send)
+        derived._cancelled = self._cancelled
+        return derived
+
 
 RequestHandler = Callable[[Any, HandlerContext], Awaitable[Any]]
 NotificationHandler = Callable[[Any], Any]

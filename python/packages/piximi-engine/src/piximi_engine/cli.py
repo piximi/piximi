@@ -1,17 +1,32 @@
-"""``piximi serve <images>``: import a folder of images and serve them."""
+"""``piximi serve <images>``: import a folder of images and serve them, with
+the frontend if a build is available."""
 
 from __future__ import annotations
 
 import argparse
 import asyncio
 import logging
+import os
 import sys
 from pathlib import Path
 
+from piximi_link.auth import Auth
 from piximi_link.server import serve
 from piximi_link.session import SessionHub
 
 from .engine import ReferenceEngine
+
+PACKAGED_FRONTEND = Path(__file__).resolve().parent / "frontend"
+
+
+def find_frontend(explicit: str | None) -> Path | None:
+    """The frontend build to serve: as given, else from PIXIMI_FRONTEND_DIR,
+    else the copy packaged with this module, else none."""
+    candidates = [explicit, os.environ.get("PIXIMI_FRONTEND_DIR"), str(PACKAGED_FRONTEND)]
+    for candidate in candidates:
+        if candidate and (Path(candidate) / "index.html").is_file():
+            return Path(candidate).resolve()
+    return None
 
 
 async def _serve(args: argparse.Namespace) -> None:
@@ -21,12 +36,32 @@ async def _serve(args: argparse.Namespace) -> None:
     if images is not None:
         added = engine.ingest_folder(images)
         print(f"Imported {len(added)} new image(s) from {images}", flush=True)
-    hub = SessionHub(engine)
-    served = await serve(hub, host=args.host, port=args.port)
-    url = f"ws://{args.host}:{served.port}/ws"
+
+    auth = Auth(None if args.no_auth else (args.token or Auth.generate_token()))
+    frontend = find_frontend(args.frontend)
+    hub = SessionHub(engine, auth=auth)
+    served = await serve(
+        hub,
+        host=args.host,
+        port=args.port,
+        auth=auth,
+        static_dir=frontend,
+        allowed_origins=set(args.allow_origin or []),
+    )
+
+    host = args.host
+    query = f"?token={auth.token}" if auth.token else ""
     print(f"PORT {served.port}", flush=True)
-    print(f"Backend: {url}", flush=True)
-    print(f"Open the frontend with ?backend={url}", flush=True)
+    print(f"Backend: ws://{host}:{served.port}/ws", flush=True)
+    if frontend is not None:
+        print(f"Open: http://{host}:{served.port}/{query}", flush=True)
+    else:
+        extra = f"&token={auth.token}" if auth.token else ""
+        print(
+            f"No frontend build found; open a Piximi frontend with "
+            f"?backend=ws://{host}:{served.port}/ws{extra}",
+            flush=True,
+        )
     try:
         await served.wait()
     finally:
@@ -42,6 +77,15 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--data-dir", help="Where to keep the project (default: <images>/.piximi)")
     run.add_argument("--host", default="127.0.0.1")
     run.add_argument("--port", type=int, default=0, help="0 picks a free port")
+    run.add_argument("--frontend", help="A Piximi frontend build (dist/) to serve at /")
+    run.add_argument("--token", help="Launch token (default: generated)")
+    run.add_argument("--no-auth", action="store_true", help="Accept connections without a token")
+    run.add_argument(
+        "--allow-origin",
+        action="append",
+        metavar="ORIGIN",
+        help="Also allow this page origin to connect (loopback origins always may)",
+    )
     run.add_argument("--no-gpu", action="store_true", help="Run models on the CPU")
     run.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
