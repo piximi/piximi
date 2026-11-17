@@ -84,6 +84,7 @@ def test_discriminated_unions_parse_by_tag():
                 "status": "running",
                 "progress": -1,
                 "message": "Starting",
+                "cancellable": True,
                 "startedAt": 0,
             },
         }

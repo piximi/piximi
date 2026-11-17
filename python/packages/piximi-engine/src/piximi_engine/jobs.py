@@ -20,13 +20,14 @@ class JobRegistry:
         self._cancelling: set[str] = set()
         self._emit = emit
 
-    def start(self, kind: JobKind, message: str) -> Job:
+    def start(self, kind: JobKind, message: str, *, cancellable: bool = True) -> Job:
         job = Job(
             id=generate_uuid(),
             kind=kind,
             status=JobStatus.RUNNING,
             progress=-1,
             message=message,
+            cancellable=cancellable,
             started_at=time.time() * 1000,
         )
         self._jobs[job.id] = job

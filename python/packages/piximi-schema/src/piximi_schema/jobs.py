@@ -26,6 +26,8 @@ class Job(WireModel):
     progress: float
     """``0..100``, or ``-1`` while indeterminate."""
     message: str
+    cancellable: bool
+    """Whether ``jobs/cancel`` can stop it; shown as a control by the UI."""
     error: str | None = None
     started_at: float
     """Milliseconds since the epoch."""

@@ -26,6 +26,7 @@ export type ErrorCode =
   | "INVALID_FILE_FORMAT"
   | "NOT_SUPPORTED"
   | "NOT_FOUND"
+  | "UNAUTHORIZED"
   | "UNKNOWN";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -565,6 +566,7 @@ export interface Job {
   status: JobStatus;
   progress: number;
   message: string;
+  cancellable: boolean;
   error?: string;
   startedAt: number;
   finishedAt?: number;

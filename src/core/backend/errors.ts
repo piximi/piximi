@@ -1,6 +1,10 @@
 import type { ErrorCode } from "core/dl/types";
 
-export type BackendErrorCode = ErrorCode | "NOT_SUPPORTED" | "NOT_FOUND";
+export type BackendErrorCode =
+  | ErrorCode
+  | "NOT_SUPPORTED"
+  | "NOT_FOUND"
+  | "UNAUTHORIZED";
 
 /*
  * Failure of a backend call. Backend methods reject rather than returning a

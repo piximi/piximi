@@ -756,6 +756,7 @@
         "INVALID_FILE_FORMAT",
         "NOT_SUPPORTED",
         "NOT_FOUND",
+        "UNAUTHORIZED",
         "UNKNOWN"
       ],
       "title": "ErrorCode",
@@ -1102,6 +1103,9 @@
         "message": {
           "type": "string"
         },
+        "cancellable": {
+          "type": "boolean"
+        },
         "error": {
           "type": "string"
         },
@@ -1118,6 +1122,7 @@
         "status",
         "progress",
         "message",
+        "cancellable",
         "startedAt"
       ],
       "title": "Job",

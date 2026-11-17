@@ -19,6 +19,8 @@ export type Job = {
   /* 0–100, or -1 while indeterminate. */
   progress: number;
   message: string;
+  /* Whether `jobs.cancel` can stop it; shown as a control by the UI. */
+  cancellable: boolean;
   error?: string;
   startedAt: number;
   finishedAt?: number;
@@ -30,7 +32,7 @@ const TERMINAL: ReadonlySet<JobStatus> = new Set([
   "cancelled",
 ]);
 
-const isTerminal = (status: JobStatus): boolean => TERMINAL.has(status);
+export const isTerminal = (status: JobStatus): boolean => TERMINAL.has(status);
 
 /*
  * Long-running work a backend performs, observable by every client of the
@@ -47,7 +49,12 @@ export class JobRegistry {
     this.#bus = bus;
   }
 
-  start(kind: JobKind, message: string, signal?: AbortSignal): Job {
+  start(
+    kind: JobKind,
+    message: string,
+    signal?: AbortSignal,
+    options: { cancellable?: boolean } = {},
+  ): Job {
     const controller = new AbortController();
     if (signal) {
       if (signal.aborted) controller.abort();
@@ -62,6 +69,7 @@ export class JobRegistry {
       status: "running",
       progress: -1,
       message,
+      cancellable: options.cancellable ?? true,
       startedAt: Date.now(),
     };
     this.#jobs.set(job.id, job);
