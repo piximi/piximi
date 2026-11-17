@@ -11,15 +11,12 @@ import {
 } from "@mui/material";
 
 import { useBackend } from "core/backend";
-import { generateUUID } from "core/entities";
 import { isTaskCancelledError } from "core/dl/cancel";
 
 import { useHotkeys } from "hooks";
 
 import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
-import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { AlertType, HotkeyContext } from "utils/enums";
@@ -58,6 +55,8 @@ export const LoadSegmentationModelDialog = ({
     setSelectedModel(model);
   };
 
+  // The backend's model-load job drives the task toast and its cancel
+  // control; only the outcome is handled here.
   const handleLoadModel = async () => {
     if (!selectedModel) {
       import.meta.env.NODE_ENV !== "production" &&
@@ -67,63 +66,11 @@ export const LoadSegmentationModelDialog = ({
     const { segmentation } = backend;
     if (!segmentation) return;
 
-    const taskId = generateUUID();
-    dispatch(
-      appTasksSlice.actions.taskRegistered({
-        id: taskId,
-        type: "image-segmentation",
-        progress: 0,
-        status: "running",
-        label: `Loading ${selectedModel.displayName}`,
-        // Only offer cancellation where the model's loader honours the signal;
-        // otherwise the control shows "Stopping..." and the load finishes anyway.
-        cancellable: selectedModel.cancellableLoad,
-        startedAt: Date.now(),
-      }),
-    );
-    const onProgress = ({
-      percent,
-      message,
-    }: {
-      percent: number;
-      message: string;
-    }) => {
-      dispatch(
-        appTasksSlice.actions.taskUpdated({
-          id: taskId,
-          progress: percent,
-          label: message,
-        }),
-      );
-    };
-    const controller = new AbortController();
-    if (selectedModel.cancellableLoad)
-      taskCancelRegistry.register(taskId, async () => {
-        dispatch(
-          appTasksSlice.actions.taskUpdated({
-            id: taskId,
-            progress: -1,
-            status: "stopping",
-            label: "Stopping...",
-          }),
-        );
-        controller.abort();
-      });
-
     try {
-      await segmentation.loadModel(selectedModel.name, {
-        signal: controller.signal,
-        onProgress,
-      });
+      await segmentation.loadModel(selectedModel.name);
     } catch (error) {
-      if (isTaskCancelledError(error)) {
-        dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
-        return;
-      }
+      if (isTaskCancelledError(error)) return;
       const description = (error as Error).message;
-      dispatch(
-        appTasksSlice.actions.taskFailed({ id: taskId, error: description }),
-      );
       dispatch(
         applicationSettingsSlice.actions.updateAlertState({
           alertState: {
@@ -137,12 +84,8 @@ export const LoadSegmentationModelDialog = ({
       // Leave the dialog open so the error stays in context and another model
       // can be chosen without reopening.
       return;
-    } finally {
-      taskCancelRegistry.unregister(taskId);
     }
 
-    onProgress({ percent: 100, message: "Model Loaded Successfully" });
-    dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
     setLoadedModel(selectedModel);
     onClose();
   };

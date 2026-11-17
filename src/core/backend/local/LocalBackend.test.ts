@@ -12,6 +12,7 @@ import { Partition } from "core/dl/enums";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 
+import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { dataSlice } from "store/data";
 
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
@@ -200,7 +201,7 @@ describeBackendConformance("LocalBackend", async () => {
   );
 
   const store = configureStore({
-    reducer: { data: dataSlice.reducer },
+    reducer: { data: dataSlice.reducer, appTasks: appTasksSlice.reducer },
     middleware: (getDefault) => getDefault({ serializableCheck: false }),
   });
   store.dispatch(dataSlice.actions.setState(makeProject()));

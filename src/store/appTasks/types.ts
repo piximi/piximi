@@ -5,6 +5,7 @@ export type AppTaskType =
   | "project-download"
   | "image-classification"
   | "image-segmentation"
+  | "model-load"
   | "measurement";
 
 export type AppTaskStatus =

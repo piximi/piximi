@@ -406,7 +406,27 @@ class ReferenceEngine:
         return [model.describe() for model in self._models.values()]
 
     async def segmentation_load_model(self, model_id: str, ctx: HandlerContext) -> None:
-        await self._model(model_id).load(ctx)
+        model = self._model(model_id)
+        if model.loaded:
+            return
+        job = self.jobs.start(
+            JobKind.MODEL_LOAD, f"Loading {model.display_name}", cancellable=model.cancellable_load
+        )
+
+        def progress(value: Any) -> None:
+            ctx.progress(value)
+            if isinstance(value, dict):
+                self.jobs.update(job.id, progress=value.get("percent", -1), message=value.get("message"))
+
+        try:
+            await model.load(ctx.with_progress(progress))
+        except RequestCancelled:
+            self.jobs.finish(job.id, JobStatus.CANCELLED)
+            raise
+        except Exception as error:
+            self.jobs.finish(job.id, JobStatus.FAILED, error=str(error))
+            raise
+        self.jobs.finish(job.id, JobStatus.SUCCEEDED, message="Model loaded")
 
     async def segmentation_run(
         self, request: SegmentationRunRequest, ctx: HandlerContext
@@ -421,10 +441,11 @@ class ReferenceEngine:
         except Exception as error:
             self.jobs.finish(job.id, JobStatus.FAILED, error=str(error))
             raise
+        message = f"Segmentation finished: {summary.added} added"
+        if summary.skipped:
+            message += f", {summary.skipped} skipped as duplicates"
         self.jobs.finish(
-            job.id,
-            JobStatus.CANCELLED if summary.cancelled else JobStatus.SUCCEEDED,
-            message=f"Segmentation finished: {summary.added} added",
+            job.id, JobStatus.CANCELLED if summary.cancelled else JobStatus.SUCCEEDED, message=message
         )
         return summary
 
@@ -448,7 +469,7 @@ class ReferenceEngine:
         if cancelled():
             return summary(0, 0, True)
         if not model.loaded:
-            await model.load(ctx)
+            await self.segmentation_load_model(request.model_id, ctx)
 
         images: list[ImageObject] = []
         for image_id in request.image_ids:

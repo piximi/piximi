@@ -114,22 +114,48 @@ export class LocalSegmentation implements BackendSegmentation {
 
   async loadModel(modelId: string, options?: CallOptions): Promise<void> {
     const segmenter = this.#deps.segmenter();
-    if (options?.signal?.aborted) throw new TaskCancelledError();
+    const info = await segmenter.getModelInfo(modelId);
+    if (!info.success) throw toBackendError(info.reason);
+    if (info.data.modelLoaded) return;
+
+    const { jobs } = this.#deps;
+    const job = jobs.start(
+      "model-load",
+      `Loading ${info.data.displayName}`,
+      options?.signal,
+      { cancellable: info.data.cancellableLoad },
+    );
+    const signal = jobs.signal(job.id);
+    if (signal.aborted) {
+      jobs.finish(job.id, "cancelled");
+      throw new TaskCancelledError();
+    }
     // An AbortSignal cannot cross into the worker; its controller lives
     // there and this trips it.
     const onAbort = () => void segmenter.cancelLoadModel(modelId);
-    options?.signal?.addEventListener("abort", onAbort, { once: true });
+    signal.addEventListener("abort", onAbort, { once: true });
     try {
-      const result = await segmenter.loadModel(modelId, (percent, message) =>
-        options?.onProgress?.({ percent, message }),
-      );
+      const result = await segmenter.loadModel(modelId, (percent, message) => {
+        options?.onProgress?.({ percent, message });
+        jobs.update(job.id, { progress: percent, message });
+      });
       if (!result.success) {
         if (result.reason.code === "LOAD_CANCELLED")
           throw new TaskCancelledError(result.reason.message);
         throw toBackendError(result.reason);
       }
+      jobs.finish(job.id, "succeeded", { message: "Model loaded" });
+    } catch (error) {
+      jobs.finish(
+        job.id,
+        isTaskCancelledError(error) ? "cancelled" : "failed",
+        {
+          error: (error as Error).message,
+        },
+      );
+      throw error;
     } finally {
-      options?.signal?.removeEventListener("abort", onAbort);
+      signal.removeEventListener("abort", onAbort);
     }
   }
 
@@ -151,7 +177,10 @@ export class LocalSegmentation implements BackendSegmentation {
         options,
       );
       jobs.finish(job.id, summary.cancelled ? "cancelled" : "succeeded", {
-        message: `Segmentation finished: ${summary.added} added`,
+        message:
+          summary.skipped > 0
+            ? `Segmentation finished: ${summary.added} added, ${summary.skipped} skipped as duplicates`
+            : `Segmentation finished: ${summary.added} added`,
       });
       return summary;
     } catch (error) {
