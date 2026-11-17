@@ -47,5 +47,6 @@ export const installBackend = async (
   }
   const backend = new LocalBackend({ store });
   connectBackendToStore(backend, store);
+  await backend.connect();
   return backend;
 };

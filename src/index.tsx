@@ -15,7 +15,6 @@ const root = createRoot(domNode!);
 
 // A remote session has to connect and fill the store before the first paint.
 void installBackend(productionStore).then((backend) => {
-  void backend.connect();
   root.render(
     <Provider store={productionStore}>
       <BackendProvider backend={backend}>

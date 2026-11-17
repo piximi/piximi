@@ -148,6 +148,7 @@ export class RemoteBackend implements Backend {
   }
 
   async connect(): Promise<void> {
+    if (this.session.id) return;
     const result = await this.#call("initialize", {
       protocolVersion: PROTOCOL_VERSION,
       clientInfo: {
