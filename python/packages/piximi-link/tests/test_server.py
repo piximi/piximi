@@ -70,6 +70,28 @@ def test_session_endpoint_and_static_bundle(tmp_path: Path):
             "/session", json={"token": "secret"}, headers={"origin": "https://evil.example"}
         ).status_code == 403
 
+        # The dev server's page preflights its cross-origin token exchange.
+        preflight = client.options(
+            "/session",
+            headers={
+                "origin": "http://localhost:3000",
+                "access-control-request-method": "POST",
+                "access-control-request-headers": "content-type",
+            },
+        )
+        assert preflight.status_code == 200
+        assert preflight.headers["access-control-allow-origin"] == "http://localhost:3000"
+        exchanged = client.post(
+            "/session", json={"token": "secret"}, headers={"origin": "http://localhost:3000"}
+        )
+        assert exchanged.status_code == 200
+        assert exchanged.headers["access-control-allow-origin"] == "http://localhost:3000"
+        denied = client.options(
+            "/session",
+            headers={"origin": "https://evil.example", "access-control-request-method": "POST"},
+        )
+        assert "access-control-allow-origin" not in denied.headers
+
         assert client.get("/assets/app.js").text == "console.log(1)"
         assert CONFIG_GLOBAL in client.get("/").text
         assert CONFIG_GLOBAL in client.get("/project").text, "client-side routes get the app"

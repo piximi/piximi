@@ -17,6 +17,8 @@ from urllib.parse import urlsplit
 
 import uvicorn
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from starlette.routing import Route, WebSocketRoute
@@ -32,6 +34,8 @@ log = logging.getLogger(__name__)
 CONFIG_GLOBAL = "__PIXIMI_BACKEND__"
 
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "[::1]"}
+# The same loopback rule as `origin_allowed`, for the CORS preflight.
+LOOPBACK_ORIGIN_REGEX = r"^https?://(localhost|127\.0\.0\.1|\[::1\]|[^/]+\.localhost)(:\d+)?$"
 
 
 def origin_allowed(origin: str | None, host: str | None, allowed: set[str]) -> bool:
@@ -113,7 +117,16 @@ def create_app(
         routes.append(Route("/", static_endpoint))
         routes.append(Route("/{path:path}", static_endpoint))
 
-    return Starlette(routes=routes)
+    # A page on another origin (the Vite dev server, the public site) trades
+    # its token over a cross-origin POST, which the browser preflights.
+    cors = Middleware(
+        CORSMiddleware,
+        allow_origins=sorted(allowed),
+        allow_origin_regex=LOOPBACK_ORIGIN_REGEX,
+        allow_methods=["POST"],
+        allow_headers=["content-type"],
+    )
+    return Starlette(routes=routes, middleware=[cors])
 
 
 class Served:
