@@ -53,7 +53,7 @@ export type Capability =
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "DType".
  */
-export type DType = "uint8" | "int32" | "float32";
+export type DType = "uint8" | "uint16" | "int32" | "float32";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ChannelFeature".
@@ -484,8 +484,22 @@ export interface ImagePage {
  */
 export interface ImageRecord {
   image: ImageObject;
+  series: ImageSeries;
   planes: Plane[];
   channels: Channel[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageSeries".
+ */
+export interface ImageSeries {
+  id: string;
+  experimentId: string;
+  name: string;
+  bitDepth: BitDepth;
+  shape: Shape;
+  timeSeries: boolean;
+  activeImageId: string;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -502,19 +516,6 @@ export interface Plane {
  */
 export interface ImageQuery {
   ids?: string[];
-}
-/**
- * This interface was referenced by `PiximiProtocol`'s JSON-Schema
- * via the `definition` "ImageSeries".
- */
-export interface ImageSeries {
-  id: string;
-  experimentId: string;
-  name: string;
-  bitDepth: BitDepth;
-  shape: Shape;
-  timeSeries: boolean;
-  activeImageId: string;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -901,7 +902,7 @@ export interface SegmentationRunRequest {
  * via the `definition` "SegmentationRunSummary".
  */
 export interface SegmentationRunSummary {
-  jobId: string;
+  jobId?: string;
   added: number;
   skipped: number;
   cancelled: boolean;

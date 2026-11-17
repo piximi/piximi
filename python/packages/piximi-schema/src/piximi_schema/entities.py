@@ -24,6 +24,7 @@ class BitDepth(IntEnum):
 
 class DType(StrEnum):
     UINT8 = "uint8"
+    UINT16 = "uint16"
     INT32 = "int32"
     FLOAT32 = "float32"
 

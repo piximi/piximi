@@ -9,6 +9,7 @@ import type {
   ColorMap,
   Experiment,
   ImageObject,
+  ImageSeries,
   Kind,
   Plane,
 } from "core/entities";
@@ -73,6 +74,8 @@ export type ImageQuery = { ids?: string[] };
 
 export type ImageRecord = {
   image: ImageObject;
+  /* The series the image belongs to; several records may share one. */
+  series: ImageSeries;
   planes: Plane[];
   channels: Channel[];
 };
@@ -169,7 +172,8 @@ export type SegmentationRunRequest = {
 };
 
 export type SegmentationRunSummary = {
-  jobId: string;
+  /* Absent when the run was cancelled before it started, so no job exists. */
+  jobId?: string;
   added: number;
   skipped: number;
   cancelled: boolean;

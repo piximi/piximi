@@ -151,7 +151,8 @@ export class LocalBackend implements Backend {
       query: ImageQuery,
       page: PageRequest,
     ): Promise<Page<ImageRecord>> => {
-      const { images, planes, channels } = this.#store.getState().data;
+      const { images, imageSeries, planes, channels } =
+        this.#store.getState().data;
       const ids = query.ids
         ? query.ids.filter((id) => images.entities[id])
         : images.ids;
@@ -163,6 +164,7 @@ export class LocalBackend implements Backend {
         const imagePlanes = planesByImage.get(id) ?? [];
         return {
           image: images.entities[id],
+          series: imageSeries.entities[images.entities[id].seriesId],
           planes: imagePlanes,
           channels: imagePlanes.flatMap((p) => channelsByPlane.get(p.id) ?? []),
         };

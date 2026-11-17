@@ -20,5 +20,8 @@ class WireModel(BaseModel):
     )
 
     def to_wire(self) -> dict:
-        """The JSON-compatible form sent over the wire."""
-        return self.model_dump(mode="json", exclude_none=True)
+        """The form sent over the wire: camelCase keys, unset optionals
+        omitted, and ``bytes`` left as bytes for msgpack (JSON mode would
+        try to decode them as text). Enums are str/int subclasses, so both
+        msgpack and ``json.dumps`` take the result as is."""
+        return self.model_dump(mode="python", by_alias=True, exclude_none=True)

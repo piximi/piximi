@@ -7,6 +7,7 @@ from .entities import (
     ChannelMeta,
     Experiment,
     ImageObject,
+    ImageSeries,
     Kind,
     Plane,
 )
@@ -23,6 +24,8 @@ class ImageQuery(WireModel):
 
 class ImageRecord(WireModel):
     image: ImageObject
+    series: ImageSeries
+    """The series the image belongs to; several records may share one."""
     planes: list[Plane]
     channels: list[Channel]
 

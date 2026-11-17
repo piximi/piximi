@@ -220,6 +220,7 @@ export class FakeBackend implements Backend {
           const planeIds = new Set(planes.map((p) => p.id));
           return {
             image,
+            series: this.#series.find((s) => s.id === image.seriesId)!,
             planes,
             channels: this.#channels.filter((c) => planeIds.has(c.planeId)),
           };

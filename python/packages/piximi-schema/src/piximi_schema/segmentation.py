@@ -159,7 +159,8 @@ class SegmentationRunRequest(WireModel):
 
 
 class SegmentationRunSummary(WireModel):
-    job_id: str
+    job_id: str | None = None
+    """Absent when the run was cancelled before it started, so no job exists."""
     added: int
     skipped: int
     cancelled: bool

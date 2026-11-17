@@ -734,6 +734,7 @@
     "DType": {
       "enum": [
         "uint8",
+        "uint16",
         "int32",
         "float32"
       ],
@@ -933,6 +934,9 @@
         "image": {
           "$ref": "#/$defs/ImageObject"
         },
+        "series": {
+          "$ref": "#/$defs/ImageSeries"
+        },
         "planes": {
           "items": {
             "$ref": "#/$defs/Plane"
@@ -948,6 +952,7 @@
       },
       "required": [
         "image",
+        "series",
         "planes",
         "channels"
       ],
@@ -2139,7 +2144,6 @@
         }
       },
       "required": [
-        "jobId",
         "added",
         "skipped",
         "cancelled"

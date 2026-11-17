@@ -5,6 +5,7 @@ export type DataArray = Uint8Array | Uint16Array;
 
 export const DTYPES = {
   UINT8: "uint8",
+  UINT16: "uint16",
   INT32: "int32",
   FLOAT32: "float32",
 } as const;
