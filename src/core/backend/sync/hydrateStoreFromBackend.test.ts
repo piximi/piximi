@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { describe, expect, it } from "vitest";
 
+import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 
 import { FAKE_MODEL_ID, FakeBackend } from "../fake/FakeBackend";
@@ -21,7 +22,7 @@ describe("hydrateStoreFromBackend", () => {
       kindName: "Cell",
     });
     const store = configureStore({
-      reducer: { data: dataSlice.reducer },
+      reducer: { data: dataSlice.reducer, classifier: classifierSlice.reducer },
       middleware: (getDefault) => getDefault({ serializableCheck: false }),
     });
 
@@ -39,6 +40,11 @@ describe("hydrateStoreFromBackend", () => {
     for (const id of data.annotations.ids) {
       const annotation = data.annotations.entities[id];
       expect(annotation.encodedMask.length).toBeGreaterThan(0);
+    }
+    // The classifier keeps state per kind; every hydrated kind must have it.
+    const { kindClassifiers } = store.getState().classifier;
+    for (const id of data.kinds.ids) {
+      expect(kindClassifiers[id]?.modelTargetId).toBe(id);
     }
   });
 });

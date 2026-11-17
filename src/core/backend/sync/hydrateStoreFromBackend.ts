@@ -1,3 +1,4 @@
+import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 
 import type { Dispatch } from "@reduxjs/toolkit";
@@ -60,6 +61,13 @@ export const hydrateStoreFromBackend = async (
     cursor = page.nextCursor;
   }
 
+  // Slices that keep per-kind state learn of kinds through the add actions,
+  // which `setState` bypasses; seed them for every kind the backend holds.
+  dispatch(
+    classifierSlice.actions.addKindClassifiers(
+      summary.kinds.map((kind) => ({ id: kind.id, targetName: kind.name })),
+    ),
+  );
   dispatch(
     dataSlice.actions.setState({
       experiment: summary.experiment,
