@@ -54,3 +54,5 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 python/**/dist/
+# the frontend build copied into the engine wheel by `pnpm engine:frontend`
+python/packages/piximi-engine/src/piximi_engine/frontend/

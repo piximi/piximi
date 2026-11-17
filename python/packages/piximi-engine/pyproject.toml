@@ -31,6 +31,12 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/piximi_engine"]
+# The frontend build `pnpm engine:frontend` copies in is gitignored, which
+# hatch would otherwise honour; ship it when present.
+artifacts = ["src/piximi_engine/frontend/"]
+
+[tool.hatch.build.targets.sdist]
+artifacts = ["src/piximi_engine/frontend/"]
 
 [tool.uv.sources]
 piximi-schema = { workspace = true }

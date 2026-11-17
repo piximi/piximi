@@ -151,7 +151,8 @@
     "typecheck": "tsc --noEmit",
     "format-check": "prettier --cache --check 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
     "format-write": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
-    "protocol:gen": "node scripts/generateProtocol.mjs"
+    "protocol:gen": "node scripts/generateProtocol.mjs",
+    "engine:frontend": "pnpm build && node scripts/packageFrontend.mjs"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,js,jsx}": [
