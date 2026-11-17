@@ -4,24 +4,26 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { createRoot } from "react-dom/client";
 
-import { BackendProvider, installBackend } from "core/backend";
+import { BackendProvider } from "core/backend";
 
 import { productionStore } from "store";
 
 import { Application } from "./app/Application";
+import { BackendBoot } from "./app/BackendBoot";
 
 const domNode = document.getElementById("root");
 const root = createRoot(domNode!);
 
-// A remote session has to connect and fill the store before the first paint.
-void installBackend(productionStore).then((backend) => {
-  root.render(
-    <Provider store={productionStore}>
-      <BackendProvider backend={backend}>
-        <DndProvider backend={HTML5Backend}>
-          <Application />
-        </DndProvider>
-      </BackendProvider>
-    </Provider>,
-  );
-});
+root.render(
+  <Provider store={productionStore}>
+    <BackendBoot store={productionStore}>
+      {(backend) => (
+        <BackendProvider backend={backend}>
+          <DndProvider backend={HTML5Backend}>
+            <Application />
+          </DndProvider>
+        </BackendProvider>
+      )}
+    </BackendBoot>
+  </Provider>,
+);

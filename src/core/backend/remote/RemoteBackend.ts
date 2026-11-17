@@ -104,11 +104,14 @@ export class RemoteBackend implements Backend {
   readonly #peer: RpcPeer;
   readonly #bus = new EventBus();
 
-  static async connect(url: string): Promise<RemoteBackend> {
+  static async connect(
+    url: string,
+    options: { ticket?: string } = {},
+  ): Promise<RemoteBackend> {
     const backend = new RemoteBackend(
       new RpcPeer(await WebSocketTransport.connect(url)),
     );
-    await backend.connect();
+    await backend.connect(options.ticket);
     return backend;
   }
 
@@ -147,7 +150,8 @@ export class RemoteBackend implements Backend {
     });
   }
 
-  async connect(): Promise<void> {
+  /* `ticket` is what the launch token was exchanged for; see `bootstrap`. */
+  async connect(ticket?: string): Promise<void> {
     if (this.session.id) return;
     const result = await this.#call("initialize", {
       protocolVersion: PROTOCOL_VERSION,
@@ -156,6 +160,7 @@ export class RemoteBackend implements Backend {
         version: import.meta.env.VITE_APP_VERSION ?? "dev",
       },
       clientCapabilities: [],
+      ...(ticket && { auth: { ticket } }),
     });
     this.capabilities = result.serverCapabilities;
     this.session = {

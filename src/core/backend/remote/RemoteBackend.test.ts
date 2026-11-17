@@ -30,6 +30,7 @@ const startServer = (imagesDir: string) =>
       "--port",
       "0",
       "--no-gpu",
+      "--no-auth",
     ]);
     const child = spawn(command, args, {
       cwd: root,

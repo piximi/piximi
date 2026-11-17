@@ -1,6 +1,3 @@
-import { applicationSettingsSlice } from "store/applicationSettings";
-
-import { AlertType } from "utils/enums";
 import { logger } from "utils/logUtils";
 
 import { LocalBackend } from "./local/LocalBackend";
@@ -11,40 +8,143 @@ import { hydrateStoreFromBackend } from "./sync/hydrateStoreFromBackend";
 import type { StoreHandle } from "./local/store";
 import type { Backend } from "./types";
 
-/* `?backend=ws://host:port/ws` selects a remote session for this page load. */
-const backendUrlFromLocation = (
-  location: Pick<Location, "search">,
-): string | null => new URLSearchParams(location.search).get("backend");
+/* Where a remote session is, and the launch token that opens it. */
+export type SessionConfig = { url: string; token?: string };
+
+declare global {
+  interface Window {
+    /* Injected into index.html by a server that serves the frontend itself. */
+    __PIXIMI_BACKEND__?: { url?: string };
+  }
+}
+
+const STORAGE_KEY = "piximi.session";
+
+const sessionStorageOrNull = (): Storage | null => {
+  try {
+    return window.sessionStorage;
+  } catch {
+    return null;
+  }
+};
+
+const absoluteWebSocketUrl = (
+  url: string,
+  location: Pick<Location, "protocol" | "host">,
+): string =>
+  url.startsWith("/")
+    ? `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}${url}`
+    : url;
 
 /*
- * Picks the backend for this session and wires its events into the store.
- * A remote backend also fills the store with the project it holds. Failing
- * to reach it falls back to the local backend, loudly: the alert says so.
+ * The session this page should join: its URL from `?backend=`, else the
+ * config a serving backend injected, else what this tab remembered; and its
+ * token from `?token=`, else the remembered one when it belongs to that same
+ * URL. `null` means run locally.
  */
-export const installBackend = async (
-  store: StoreHandle,
-  url: string | null = backendUrlFromLocation(window.location),
-): Promise<Backend> => {
-  if (url) {
-    try {
-      const backend = await RemoteBackend.connect(url);
-      connectBackendToStore(backend, store);
-      await hydrateStoreFromBackend(backend, store.dispatch);
-      logger(`Connected to backend ${url} (session ${backend.session.id})`);
-      return backend;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      store.dispatch(
-        applicationSettingsSlice.actions.updateAlertState({
-          alertState: {
-            alertType: AlertType.Error,
-            name: "Could not connect to the backend",
-            description: `${url}: ${message}. Running with the local backend instead.`,
-          },
-        }),
-      );
-    }
+export const resolveSessionConfig = (
+  location: Pick<Location, "search" | "protocol" | "host"> = window.location,
+  injected: Window["__PIXIMI_BACKEND__"] = window.__PIXIMI_BACKEND__,
+  storage: Storage | null = sessionStorageOrNull(),
+): SessionConfig | null => {
+  const params = new URLSearchParams(location.search);
+  let remembered: SessionConfig | null = null;
+  try {
+    const stored = storage?.getItem(STORAGE_KEY);
+    remembered = stored ? (JSON.parse(stored) as SessionConfig) : null;
+  } catch {
+    remembered = null;
   }
+
+  const fromUrl = params.get("backend");
+  const url = fromUrl
+    ? absoluteWebSocketUrl(fromUrl, location)
+    : injected?.url
+      ? absoluteWebSocketUrl(injected.url, location)
+      : remembered?.url;
+  if (!url) return null;
+
+  const token =
+    params.get("token") ??
+    (remembered?.url === url ? remembered.token : undefined);
+  return { url, token };
+};
+
+/* Keeps the session for reloads of this tab; the URL loses the token. */
+export const rememberSession = (config: SessionConfig): void => {
+  try {
+    sessionStorageOrNull()?.setItem(STORAGE_KEY, JSON.stringify(config));
+  } catch {
+    // Nothing to do: the next reload will need the URL again.
+  }
+};
+
+export const forgetSession = (): void => {
+  try {
+    sessionStorageOrNull()?.removeItem(STORAGE_KEY);
+  } catch {
+    // Nothing to do.
+  }
+};
+
+/* Drops `backend` and `token` from the address bar once they have been used. */
+export const stripSessionParams = (): void => {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has("backend") && !url.searchParams.has("token"))
+    return;
+  url.searchParams.delete("backend");
+  url.searchParams.delete("token");
+  window.history.replaceState(window.history.state, "", url.toString());
+};
+
+const sessionEndpoint = (wsUrl: string): string => {
+  const http = new URL(wsUrl);
+  http.protocol = http.protocol === "wss:" ? "https:" : "http:";
+  http.pathname = `${http.pathname.replace(/\/ws\/?$/, "")}/session`;
+  http.search = "";
+  return http.toString();
+};
+
+/* Trades the launch token for a single-use ticket over HTTP. */
+export const exchangeToken = async (
+  wsUrl: string,
+  token: string,
+): Promise<string> => {
+  const response = await fetch(sessionEndpoint(wsUrl), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ token }),
+  });
+  if (!response.ok) {
+    throw new Error(
+      response.status === 403
+        ? "The backend rejected the token"
+        : `The backend answered ${response.status} to the session request`,
+    );
+  }
+  const { ticket } = (await response.json()) as { ticket: string };
+  return ticket;
+};
+
+/* Joins a remote session and fills the store from it. Rejects on failure. */
+export const installRemoteBackend = async (
+  store: StoreHandle,
+  config: SessionConfig,
+): Promise<Backend> => {
+  const ticket =
+    config.token !== undefined
+      ? await exchangeToken(config.url, config.token)
+      : undefined;
+  const backend = await RemoteBackend.connect(config.url, { ticket });
+  connectBackendToStore(backend, store);
+  await hydrateStoreFromBackend(backend, store.dispatch);
+  logger(`Connected to backend ${config.url} (session ${backend.session.id})`);
+  return backend;
+};
+
+export const installLocalBackend = async (
+  store: StoreHandle,
+): Promise<Backend> => {
   const backend = new LocalBackend({ store });
   connectBackendToStore(backend, store);
   await backend.connect();
