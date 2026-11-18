@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   appPath,
   exchangeToken,
+  parseBackendAddress,
   resolveBasePath,
   resolveSessionConfig,
 } from "./bootstrap";
@@ -121,5 +122,39 @@ describe("resolveBasePath", () => {
     expect(appPath("/project", "/user/x/proxy/1")).toBe(
       "/user/x/proxy/1/project",
     );
+  });
+});
+
+describe("parseBackendAddress", () => {
+  it("takes the socket line as printed", () => {
+    expect(parseBackendAddress(" ws://127.0.0.1:8765/ws ")).toEqual({
+      url: "ws://127.0.0.1:8765/ws",
+      token: undefined,
+    });
+  });
+
+  it("turns the page line into the socket next to it, token included", () => {
+    expect(parseBackendAddress("http://127.0.0.1:8765/?token=abc")).toEqual({
+      url: "ws://127.0.0.1:8765/ws",
+      token: "abc",
+    });
+    expect(
+      parseBackendAddress("https://hub.example/user/proxy/8765/index.html"),
+    ).toEqual({
+      url: "wss://hub.example/user/proxy/8765/ws",
+      token: undefined,
+    });
+  });
+
+  it("accepts a bare host and port", () => {
+    expect(parseBackendAddress("localhost:8765").url).toBe(
+      "ws://localhost:8765/ws",
+    );
+  });
+
+  it("rejects what cannot be an address", () => {
+    expect(() => parseBackendAddress("")).toThrow("Enter the backend");
+    expect(() => parseBackendAddress("ftp://x/ws")).toThrow("must start with");
+    expect(() => parseBackendAddress("ws://")).toThrow();
   });
 });

@@ -7,7 +7,11 @@ import { Logo } from "components/ui";
 import { DIMENSIONS } from "utils/constants";
 
 import { ExperimentNameTextField } from "./ExperimentNameTextField";
-import { ImageViewerButton, MeasurementsButton } from "../../components";
+import {
+  BackendStatusChip,
+  ImageViewerButton,
+  MeasurementsButton,
+} from "../../components";
 
 export const ProjectAppBar = () => {
   const isMobile = useMobileView();
@@ -43,6 +47,7 @@ export const ProjectAppBar = () => {
 
       <Box sx={{ flexGrow: 1 }} />
 
+      <BackendStatusChip />
       {!isMobile && (
         <Box data-doc="view-nav" sx={{ display: "flex", flexShrink: 1 }}>
           <ImageViewerButton mobileAlt={true} />

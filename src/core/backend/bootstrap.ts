@@ -105,6 +105,60 @@ export const forgetSession = (): void => {
   }
 };
 
+/*
+ * What a person pastes to connect: the `Backend: ws://host:port/ws` line
+ * `piximi serve` prints, its `Open: http://host:port/?token=…` line (the page
+ * URL becomes the socket next to it, token included), or just `host:port`.
+ */
+export const parseBackendAddress = (input: string): SessionConfig => {
+  const text = input.trim();
+  if (!text) throw new Error("Enter the backend address");
+  const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(text)
+    ? text
+    : `ws://${text}`;
+  let url: URL;
+  try {
+    url = new URL(withScheme);
+  } catch {
+    throw new Error("Not a valid address");
+  }
+  const token = url.searchParams.get("token") ?? undefined;
+  switch (url.protocol) {
+    case "ws:":
+    case "wss:":
+      break;
+    case "http:":
+      url.protocol = "ws:";
+      break;
+    case "https:":
+      url.protocol = "wss:";
+      break;
+    default:
+      throw new Error(
+        "The address must start with ws://, wss://, http:// or https://",
+      );
+  }
+  if (!url.hostname) throw new Error("The address has no host");
+  const path = url.pathname.replace(/\/index\.html$/, "").replace(/\/+$/, "");
+  url.pathname = path.endsWith("/ws") ? path : `${path}/ws`;
+  url.search = "";
+  url.hash = "";
+  return { url: url.toString(), token };
+};
+
+/* The page that joins `config`: a full navigation, so the boot connects. */
+export const sessionLink = (config: SessionConfig): string => {
+  const params = new URLSearchParams({ backend: config.url });
+  if (config.token) params.set("token", config.token);
+  return `${appPath("/project")}?${params.toString()}`;
+};
+
+/* Leaves the remote session for a fresh local start. */
+export const leaveSession = (): void => {
+  forgetSession();
+  window.location.assign(appPath("/"));
+};
+
 /* Drops `backend` and `token` from the address bar once they have been used. */
 export const stripSessionParams = (): void => {
   const url = new URL(window.location.href);

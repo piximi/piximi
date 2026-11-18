@@ -52,7 +52,12 @@ export interface Backend {
 
 export type BackendKind = "local" | "remote";
 
-export type BackendSession = { id: string; protocolVersion: string };
+export type BackendSession = {
+  id: string;
+  protocolVersion: string;
+  /* The engine a remote session is served by; absent for the local backend. */
+  server?: { name: string; version: string; url?: string };
+};
 
 export type ProgressUpdate = {
   /* 0–100, or -1 while indeterminate. */

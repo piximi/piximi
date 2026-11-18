@@ -117,6 +117,7 @@ export class RemoteBackend implements Backend {
 
   readonly #peer: RpcPeer;
   readonly #bus = new EventBus();
+  #url?: string;
 
   static async connect(
     url: string,
@@ -125,6 +126,7 @@ export class RemoteBackend implements Backend {
     const backend = new RemoteBackend(
       new RpcPeer(await WebSocketTransport.connect(url)),
     );
+    backend.#url = url;
     await backend.connect(options.ticket);
     return backend;
   }
@@ -196,6 +198,7 @@ export class RemoteBackend implements Backend {
     this.session = {
       id: result.sessionId,
       protocolVersion: result.protocolVersion,
+      server: { ...result.serverInfo, url: this.#url },
     };
     this.segmentation = hasCapability(this.capabilities, "segmentation")
       ? this.#segmentation()

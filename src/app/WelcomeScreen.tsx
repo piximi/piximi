@@ -9,7 +9,11 @@ import {
   Menu,
   MenuItem,
   Stack,
+  Typography,
 } from "@mui/material";
+
+import { useBackend } from "core/backend";
+import { leaveSession } from "core/backend/bootstrap";
 
 import {
   useDialogHotkey,
@@ -19,7 +23,7 @@ import {
 } from "hooks";
 
 import { Logo } from "components/ui";
-import { ExampleProjectDialog } from "components/dialogs";
+import { ConnectBackendDialog, ExampleProjectDialog } from "components/dialogs";
 
 import { HelpItem } from "help/HelpContent";
 
@@ -37,6 +41,14 @@ export const WelcomeScreen = () => {
     onOpen: handleOpenExampleProjectDialog,
     open: ExampleProjectOpen,
   } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
+
+  const {
+    onClose: handleCloseConnectDialog,
+    onOpen: handleOpenConnectDialog,
+    open: connectDialogOpen,
+  } = useDialogHotkey(HotkeyContext.ConfirmationDialog);
+  const backend = useBackend();
+  const server = backend.kind === "remote" ? backend.session.server : undefined;
 
   const windowSize = useWindowSize();
   const mobileView = useMobileView();
@@ -172,6 +184,8 @@ export const WelcomeScreen = () => {
             </Button>
           </Stack>
           <Stack
+            direction={mobileView ? "column" : "row"}
+            spacing={2}
             sx={{
               justifyContent: "center",
               alignItems: "center",
@@ -190,12 +204,47 @@ export const WelcomeScreen = () => {
             >
               Documentation
             </Button>
+            {server ? (
+              <Button
+                variant="outlined"
+                color="warning"
+                sx={{ width: "210px" }}
+                onClick={leaveSession}
+                data-testid="disconnect-backend"
+              >
+                Disconnect from Backend
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                color="primary"
+                sx={{ width: "210px" }}
+                onClick={handleOpenConnectDialog}
+                data-testid="connect-backend"
+              >
+                Connect to Backend
+              </Button>
+            )}
           </Stack>
+          {server && (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ textAlign: "center" }}
+            >
+              Connected to {server.name} {server.version}
+              {server.url ? ` at ${server.url}` : ""}
+            </Typography>
+          )}
         </Stack>
       </Box>
       <ExampleProjectDialog
         open={ExampleProjectOpen}
         onClose={handleCloseDialog}
+      />
+      <ConnectBackendDialog
+        open={connectDialogOpen}
+        onClose={handleCloseConnectDialog}
       />
     </Box>
   );

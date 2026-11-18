@@ -1,5 +1,9 @@
 export { ItemFilters } from "./ItemFilters";
-export { ImageViewerButton, MeasurementsButton } from "./nav";
+export {
+  BackendStatusChip,
+  ImageViewerButton,
+  MeasurementsButton,
+} from "./nav";
 export { CustomListItemButton } from "./CustomListItemButton";
 export { DropBox } from "./DropBox";
 export { ListItemHoldButton } from "./ListItemHoldButton";
