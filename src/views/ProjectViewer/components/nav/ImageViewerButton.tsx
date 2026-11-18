@@ -30,9 +30,13 @@ export const ImageViewerButton = ({ mobileAlt }: { mobileAlt?: boolean }) => {
     const selectedAnnotationIds = Object.values(kindStates).flatMap(
       (ks) => ks.selectedIds,
     );
-    const annotatedImageIds = selectedAnnotationIds.map(
-      (id) => allAnnotations[id].imageId,
-    );
+    // A remote project's annotations are not mirrored in the store, so a
+    // selected id may have no entity here; the viewer is unavailable then
+    // anyway (no `raw-local`), and the button must not crash the grid.
+    const annotatedImageIds = selectedAnnotationIds.flatMap((id) => {
+      const annotation = allAnnotations[id];
+      return annotation ? [annotation.imageId] : [];
+    });
     const allImageIds = [
       ...new Set([...initialSelectedImageIds, ...annotatedImageIds]),
     ];
