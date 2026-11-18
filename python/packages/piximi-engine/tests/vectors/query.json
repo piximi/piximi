@@ -1,0 +1,1037 @@
+{
+ "dataset": {
+  "series": [
+   {
+    "id": "s-1",
+    "experimentId": "exp",
+    "name": "s-1",
+    "bitDepth": 8,
+    "shape": {
+     "planes": 1,
+     "height": 4,
+     "width": 4,
+     "channels": 1
+    },
+    "timeSeries": false,
+    "activeImageId": "img-1"
+   },
+   {
+    "id": "s-2",
+    "experimentId": "exp",
+    "name": "s-2",
+    "bitDepth": 8,
+    "shape": {
+     "planes": 1,
+     "height": 4,
+     "width": 4,
+     "channels": 1
+    },
+    "timeSeries": false,
+    "activeImageId": "img-6"
+   }
+  ],
+  "images": [
+   {
+    "id": "img-1",
+    "name": "delta",
+    "seriesId": "s-1",
+    "shape": {
+     "planes": 1,
+     "height": 4,
+     "width": 4,
+     "channels": 1
+    },
+    "categoryId": "cat-a",
+    "activePlaneId": "p-1a",
+    "timepoint": 0,
+    "bitDepth": 8,
+    "partition": "Training",
+    "predictionConfidence": 0.9
+   },
+   {
+    "id": "img-2",
+    "name": "Alpha",
+    "seriesId": "s-1",
+    "shape": {
+     "planes": 1,
+     "height": 4,
+     "width": 4,
+     "channels": 1
+    },
+    "categoryId": "cat-b",
+    "activePlaneId": "p-2",
+    "timepoint": 0,
+    "bitDepth": 8,
+    "partition": "Inference",
+    "predictionConfidence": 0.3
+   },
+   {
+    "id": "img-3",
+    "name": "charlie",
+    "seriesId": "s-1",
+    "shape": {
+     "planes": 1,
+     "height": 4,
+     "width": 4,
+     "channels": 1
+    },
+    "categoryId": "cat-unknown",
+    "activePlaneId": "p-3",
+    "timepoint": 0,
+    "bitDepth": 8,
+    "partition": "Unassigned"
+   },
+   {
+    "id": "img-4",
+    "name": "bravo",
+    "seriesId": "s-1",
+    "shape": {
+     "planes": 1,
+     "height": 4,
+     "width": 4,
+     "channels": 1
+    },
+    "categoryId": "cat-a",
+    "activePlaneId": "p-4",
+    "timepoint": 0,
+    "bitDepth": 8,
+    "partition": "Validation",
+    "predictionConfidence": 0.5
+   },
+   {
+    "id": "img-5",
+    "name": "echo",
+    "seriesId": "s-1",
+    "shape": {
+     "planes": 1,
+     "height": 4,
+     "width": 4,
+     "channels": 1
+    },
+    "categoryId": "cat-b",
+    "activePlaneId": "p-5",
+    "timepoint": 0,
+    "bitDepth": 8,
+    "partition": "Inference",
+    "predictionConfidence": 0.75
+   },
+   {
+    "id": "img-6",
+    "name": "alpha",
+    "seriesId": "s-2",
+    "shape": {
+     "planes": 1,
+     "height": 4,
+     "width": 4,
+     "channels": 1
+    },
+    "categoryId": "cat-unknown",
+    "activePlaneId": "p-6",
+    "timepoint": 0,
+    "bitDepth": 8,
+    "partition": "Training"
+   }
+  ],
+  "planes": [
+   {
+    "id": "p-1a",
+    "imageId": "img-1",
+    "zIndex": 0
+   },
+   {
+    "id": "p-1b",
+    "imageId": "img-1",
+    "zIndex": 1
+   },
+   {
+    "id": "p-2",
+    "imageId": "img-2",
+    "zIndex": 0
+   },
+   {
+    "id": "p-3",
+    "imageId": "img-3",
+    "zIndex": 0
+   },
+   {
+    "id": "p-4",
+    "imageId": "img-4",
+    "zIndex": 0
+   },
+   {
+    "id": "p-5",
+    "imageId": "img-5",
+    "zIndex": 0
+   },
+   {
+    "id": "p-6",
+    "imageId": "img-6",
+    "zIndex": 0
+   }
+  ],
+  "kinds": [
+   {
+    "id": "kind-1",
+    "name": "Cell",
+    "unknownCategoryId": "acat-u1"
+   },
+   {
+    "id": "kind-2",
+    "name": "Debris",
+    "unknownCategoryId": "acat-u2"
+   }
+  ],
+  "categories": [
+   {
+    "id": "cat-unknown",
+    "color": "#808080",
+    "name": "Unknown",
+    "isUnknown": true,
+    "type": "image"
+   },
+   {
+    "id": "cat-b",
+    "color": "#808080",
+    "name": "beta",
+    "isUnknown": false,
+    "type": "image"
+   },
+   {
+    "id": "cat-a",
+    "color": "#808080",
+    "name": "Alpha",
+    "isUnknown": false,
+    "type": "image"
+   },
+   {
+    "id": "acat-u1",
+    "color": "#808080",
+    "name": "Unknown",
+    "isUnknown": true,
+    "type": "annotation",
+    "kindId": "kind-1"
+   },
+   {
+    "id": "acat-n",
+    "color": "#808080",
+    "name": "nucleus",
+    "isUnknown": false,
+    "type": "annotation",
+    "kindId": "kind-1"
+   },
+   {
+    "id": "acat-u2",
+    "color": "#808080",
+    "name": "Unknown",
+    "isUnknown": true,
+    "type": "annotation",
+    "kindId": "kind-2"
+   }
+  ],
+  "volumes": [
+   {
+    "id": "v-1",
+    "imageId": "img-1",
+    "kindId": "kind-1",
+    "categoryId": "acat-n",
+    "predictionConfidence": 0.8
+   },
+   {
+    "id": "v-2",
+    "imageId": "img-1",
+    "kindId": "kind-1",
+    "categoryId": "acat-u1"
+   },
+   {
+    "id": "v-3",
+    "imageId": "img-2",
+    "kindId": "kind-2",
+    "categoryId": "acat-u2",
+    "predictionConfidence": 0.2
+   },
+   {
+    "id": "v-4",
+    "imageId": "img-4",
+    "kindId": "kind-1",
+    "categoryId": "acat-n"
+   }
+  ],
+  "annotations": [
+   {
+    "id": "ann-1",
+    "planeId": "p-1b",
+    "imageId": "img-1",
+    "volumeId": "v-1",
+    "partition": "Training",
+    "shape": {
+     "planes": 1,
+     "height": 2,
+     "width": 2,
+     "channels": 1
+    },
+    "boundingBox": [
+     0,
+     0,
+     2,
+     2
+    ],
+    "encodedMask": [
+     0,
+     4
+    ]
+   },
+   {
+    "id": "ann-2",
+    "planeId": "p-1a",
+    "imageId": "img-1",
+    "volumeId": "v-1",
+    "partition": "Training",
+    "shape": {
+     "planes": 1,
+     "height": 2,
+     "width": 2,
+     "channels": 1
+    },
+    "boundingBox": [
+     0,
+     0,
+     2,
+     2
+    ],
+    "encodedMask": [
+     0,
+     4
+    ]
+   },
+   {
+    "id": "ann-3",
+    "planeId": "p-1a",
+    "imageId": "img-1",
+    "volumeId": "v-2",
+    "partition": "Unassigned",
+    "shape": {
+     "planes": 1,
+     "height": 2,
+     "width": 2,
+     "channels": 1
+    },
+    "boundingBox": [
+     0,
+     0,
+     2,
+     2
+    ],
+    "encodedMask": [
+     0,
+     4
+    ]
+   },
+   {
+    "id": "ann-4",
+    "planeId": "p-2",
+    "imageId": "img-2",
+    "volumeId": "v-3",
+    "partition": "Inference",
+    "shape": {
+     "planes": 1,
+     "height": 2,
+     "width": 2,
+     "channels": 1
+    },
+    "boundingBox": [
+     0,
+     0,
+     2,
+     2
+    ],
+    "encodedMask": [
+     0,
+     4
+    ]
+   },
+   {
+    "id": "ann-5",
+    "planeId": "p-4",
+    "imageId": "img-4",
+    "volumeId": "v-4",
+    "partition": "Validation",
+    "shape": {
+     "planes": 1,
+     "height": 2,
+     "width": 2,
+     "channels": 1
+    },
+    "boundingBox": [
+     0,
+     0,
+     2,
+     2
+    ],
+    "encodedMask": [
+     0,
+     4
+    ]
+   }
+  ]
+ },
+ "cases": [
+  {
+   "name": "images: insertion order",
+   "entity": "images",
+   "expect": {
+    "ids": [
+     "img-1",
+     "img-2",
+     "img-3",
+     "img-4",
+     "img-5",
+     "img-6"
+    ],
+    "total": 6
+   }
+  },
+  {
+   "name": "images: by name, case-insensitive, ties by insertion",
+   "entity": "images",
+   "sort": {
+    "key": "name"
+   },
+   "expect": {
+    "ids": [
+     "img-2",
+     "img-6",
+     "img-4",
+     "img-3",
+     "img-1",
+     "img-5"
+    ],
+    "total": 6
+   }
+  },
+  {
+   "name": "images: by name descending reverses ties too",
+   "entity": "images",
+   "sort": {
+    "key": "name",
+    "direction": "desc"
+   },
+   "expect": {
+    "ids": [
+     "img-5",
+     "img-1",
+     "img-3",
+     "img-4",
+     "img-6",
+     "img-2"
+    ],
+    "total": 6
+   }
+  },
+  {
+   "name": "images: by category name",
+   "entity": "images",
+   "sort": {
+    "key": "category"
+   },
+   "expect": {
+    "ids": [
+     "img-1",
+     "img-4",
+     "img-2",
+     "img-5",
+     "img-3",
+     "img-6"
+    ],
+    "total": 6
+   }
+  },
+  {
+   "name": "images: random seed 7",
+   "entity": "images",
+   "sort": {
+    "key": "random",
+    "seed": 7
+   },
+   "expect": {
+    "ids": [
+     "img-2",
+     "img-3",
+     "img-1",
+     "img-6",
+     "img-4",
+     "img-5"
+    ],
+    "total": 6
+   }
+  },
+  {
+   "name": "images: random seed 7 descending",
+   "entity": "images",
+   "sort": {
+    "key": "random",
+    "seed": 7,
+    "direction": "desc"
+   },
+   "expect": {
+    "ids": [
+     "img-5",
+     "img-4",
+     "img-6",
+     "img-1",
+     "img-3",
+     "img-2"
+    ],
+    "total": 6
+   }
+  },
+  {
+   "name": "images: random seed 8 differs",
+   "entity": "images",
+   "sort": {
+    "key": "random",
+    "seed": 8
+   },
+   "expect": {
+    "ids": [
+     "img-1",
+     "img-3",
+     "img-2",
+     "img-5",
+     "img-4",
+     "img-6"
+    ],
+    "total": 6
+   }
+  },
+  {
+   "name": "images: by category ids",
+   "entity": "images",
+   "query": {
+    "categoryIds": [
+     "cat-a",
+     "cat-unknown"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "img-1",
+     "img-3",
+     "img-4",
+     "img-6"
+    ],
+    "total": 4
+   }
+  },
+  {
+   "name": "images: by partition",
+   "entity": "images",
+   "query": {
+    "partitions": [
+     "Training"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "img-1",
+     "img-6"
+    ],
+    "total": 2
+   }
+  },
+  {
+   "name": "images: confidence strictly inside the range",
+   "entity": "images",
+   "query": {
+    "confidence": {
+     "min": 0.4,
+     "max": 0.8
+    }
+   },
+   "expect": {
+    "ids": [
+     "img-4",
+     "img-5"
+    ],
+    "total": 2
+   }
+  },
+  {
+   "name": "images: annotated",
+   "entity": "images",
+   "query": {
+    "annotated": true
+   },
+   "expect": {
+    "ids": [
+     "img-1",
+     "img-2",
+     "img-4"
+    ],
+    "total": 3
+   }
+  },
+  {
+   "name": "images: unannotated",
+   "entity": "images",
+   "query": {
+    "annotated": false
+   },
+   "expect": {
+    "ids": [
+     "img-3",
+     "img-5",
+     "img-6"
+    ],
+    "total": 3
+   }
+  },
+  {
+   "name": "images: by series",
+   "entity": "images",
+   "query": {
+    "seriesIds": [
+     "s-2"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "img-6"
+    ],
+    "total": 1
+   }
+  },
+  {
+   "name": "images: by ids keeps insertion order and drops unknown ids",
+   "entity": "images",
+   "query": {
+    "ids": [
+     "img-5",
+     "img-1",
+     "nope"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "img-1",
+     "img-5"
+    ],
+    "total": 2
+   }
+  },
+  {
+   "name": "images: empty id list matches nothing",
+   "entity": "images",
+   "query": {
+    "ids": []
+   },
+   "expect": {
+    "ids": [],
+    "total": 0
+   }
+  },
+  {
+   "name": "images: filters combine with a sort",
+   "entity": "images",
+   "query": {
+    "partitions": [
+     "Training",
+     "Inference"
+    ]
+   },
+   "sort": {
+    "key": "name"
+   },
+   "expect": {
+    "ids": [
+     "img-2",
+     "img-6",
+     "img-1",
+     "img-5"
+    ],
+    "total": 4
+   }
+  },
+  {
+   "name": "images: a page of a sorted listing",
+   "entity": "images",
+   "sort": {
+    "key": "name"
+   },
+   "page": {
+    "offset": 2,
+    "limit": 2
+   },
+   "expect": {
+    "ids": [
+     "img-4",
+     "img-3"
+    ],
+    "total": 6
+   }
+  },
+  {
+   "name": "images: a page past the end is empty",
+   "entity": "images",
+   "page": {
+    "offset": 6,
+    "limit": 2
+   },
+   "expect": {
+    "ids": [],
+    "total": 6
+   }
+  },
+  {
+   "name": "imageCounts: by category",
+   "entity": "imageCounts",
+   "groupBy": "category",
+   "expect": {
+    "total": 6,
+    "groups": {
+     "cat-a": 2,
+     "cat-b": 2,
+     "cat-unknown": 2
+    }
+   }
+  },
+  {
+   "name": "imageCounts: by partition",
+   "entity": "imageCounts",
+   "groupBy": "partition",
+   "expect": {
+    "total": 6,
+    "groups": {
+     "Inference": 2,
+     "Training": 2,
+     "Unassigned": 1,
+     "Validation": 1
+    }
+   }
+  },
+  {
+   "name": "imageCounts: filtered, by partition",
+   "entity": "imageCounts",
+   "query": {
+    "annotated": true
+   },
+   "groupBy": "partition",
+   "expect": {
+    "total": 3,
+    "groups": {
+     "Inference": 1,
+     "Training": 1,
+     "Validation": 1
+    }
+   }
+  },
+  {
+   "name": "imageCounts: total only",
+   "entity": "imageCounts",
+   "query": {
+    "categoryIds": [
+     "cat-b"
+    ]
+   },
+   "expect": {
+    "total": 2,
+    "groups": null
+   }
+  },
+  {
+   "name": "annotations: insertion order",
+   "entity": "annotations",
+   "expect": {
+    "ids": [
+     "ann-1",
+     "ann-2",
+     "ann-3",
+     "ann-4",
+     "ann-5"
+    ],
+    "total": 5
+   }
+  },
+  {
+   "name": "annotations: by plane z-index",
+   "entity": "annotations",
+   "sort": {
+    "key": "plane"
+   },
+   "expect": {
+    "ids": [
+     "ann-2",
+     "ann-3",
+     "ann-4",
+     "ann-5",
+     "ann-1"
+    ],
+    "total": 5
+   }
+  },
+  {
+   "name": "annotations: by volume descending",
+   "entity": "annotations",
+   "sort": {
+    "key": "volume",
+    "direction": "desc"
+   },
+   "expect": {
+    "ids": [
+     "ann-5",
+     "ann-4",
+     "ann-3",
+     "ann-2",
+     "ann-1"
+    ],
+    "total": 5
+   }
+  },
+  {
+   "name": "annotations: by category name",
+   "entity": "annotations",
+   "sort": {
+    "key": "category"
+   },
+   "expect": {
+    "ids": [
+     "ann-1",
+     "ann-2",
+     "ann-5",
+     "ann-3",
+     "ann-4"
+    ],
+    "total": 5
+   }
+  },
+  {
+   "name": "annotations: by image name",
+   "entity": "annotations",
+   "sort": {
+    "key": "image"
+   },
+   "expect": {
+    "ids": [
+     "ann-4",
+     "ann-5",
+     "ann-1",
+     "ann-2",
+     "ann-3"
+    ],
+    "total": 5
+   }
+  },
+  {
+   "name": "annotations: random seed 3",
+   "entity": "annotations",
+   "sort": {
+    "key": "random",
+    "seed": 3
+   },
+   "expect": {
+    "ids": [
+     "ann-2",
+     "ann-3",
+     "ann-1",
+     "ann-4",
+     "ann-5"
+    ],
+    "total": 5
+   }
+  },
+  {
+   "name": "annotations: by kind",
+   "entity": "annotations",
+   "query": {
+    "kindIds": [
+     "kind-1"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "ann-1",
+     "ann-2",
+     "ann-3",
+     "ann-5"
+    ],
+    "total": 4
+   }
+  },
+  {
+   "name": "annotations: by category ids",
+   "entity": "annotations",
+   "query": {
+    "categoryIds": [
+     "acat-n"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "ann-1",
+     "ann-2",
+     "ann-5"
+    ],
+    "total": 3
+   }
+  },
+  {
+   "name": "annotations: by image ids",
+   "entity": "annotations",
+   "query": {
+    "imageIds": [
+     "img-1"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "ann-1",
+     "ann-2",
+     "ann-3"
+    ],
+    "total": 3
+   }
+  },
+  {
+   "name": "annotations: by plane ids",
+   "entity": "annotations",
+   "query": {
+    "planeIds": [
+     "p-1a"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "ann-2",
+     "ann-3"
+    ],
+    "total": 2
+   }
+  },
+  {
+   "name": "annotations: by volume ids",
+   "entity": "annotations",
+   "query": {
+    "volumeIds": [
+     "v-1"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "ann-1",
+     "ann-2"
+    ],
+    "total": 2
+   }
+  },
+  {
+   "name": "annotations: by partition",
+   "entity": "annotations",
+   "query": {
+    "partitions": [
+     "Training"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "ann-1",
+     "ann-2"
+    ],
+    "total": 2
+   }
+  },
+  {
+   "name": "annotations: confidence from the volume",
+   "entity": "annotations",
+   "query": {
+    "confidence": {
+     "min": 0.1,
+     "max": 0.5
+    }
+   },
+   "expect": {
+    "ids": [
+     "ann-4"
+    ],
+    "total": 1
+   }
+  },
+  {
+   "name": "annotations: by ids",
+   "entity": "annotations",
+   "query": {
+    "ids": [
+     "ann-4",
+     "ann-1"
+    ]
+   },
+   "expect": {
+    "ids": [
+     "ann-1",
+     "ann-4"
+    ],
+    "total": 2
+   }
+  },
+  {
+   "name": "annotations: a page of a sorted listing",
+   "entity": "annotations",
+   "sort": {
+    "key": "image"
+   },
+   "page": {
+    "offset": 1,
+    "limit": 3
+   },
+   "expect": {
+    "ids": [
+     "ann-5",
+     "ann-1",
+     "ann-2"
+    ],
+    "total": 5
+   }
+  },
+  {
+   "name": "annotationCounts: by kind",
+   "entity": "annotationCounts",
+   "groupBy": "kind",
+   "expect": {
+    "total": 5,
+    "groups": {
+     "kind-1": 4,
+     "kind-2": 1
+    }
+   }
+  },
+  {
+   "name": "annotationCounts: by category",
+   "entity": "annotationCounts",
+   "groupBy": "category",
+   "expect": {
+    "total": 5,
+    "groups": {
+     "acat-n": 3,
+     "acat-u1": 1,
+     "acat-u2": 1
+    }
+   }
+  },
+  {
+   "name": "annotationCounts: filtered, by partition",
+   "entity": "annotationCounts",
+   "query": {
+    "kindIds": [
+     "kind-1"
+    ]
+   },
+   "groupBy": "partition",
+   "expect": {
+    "total": 4,
+    "groups": {
+     "Training": 2,
+     "Unassigned": 1,
+     "Validation": 1
+    }
+   }
+  }
+ ]
+}

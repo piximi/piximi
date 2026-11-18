@@ -17,7 +17,11 @@ from pydantic import ValidationError
 from piximi_schema import PROTOCOL_VERSION
 from piximi_schema.base import WireModel
 from piximi_schema.methods import (
+    AnnotationCountsParams,
+    AnnotationIdsParams,
     AnnotationsParams,
+    ImageCountsParams,
+    ImageIdsParams,
     ImagesParams,
     JobsCancelParams,
     JobsListResult,
@@ -28,7 +32,7 @@ from piximi_schema.methods import (
     RenderThumbnailsParams,
     SegmentationRunParams,
 )
-from piximi_schema.query import MasksResult
+from piximi_schema.query import IdsResult, MasksResult
 from piximi_schema.rpc import INVALID_PARAMS
 from piximi_schema.segmentation import SegmentationRunRequest
 from piximi_schema.session import InitializeParams, InitializeResult, PeerInfo
@@ -128,10 +132,22 @@ class SessionHub:
             return None
 
         async def images(params: ImagesParams, _ctx: HandlerContext):
-            return await engine.images(params.query, params.page)
+            return await engine.images(params.query, params.sort, params.page)
+
+        async def image_ids(params: ImageIdsParams, _ctx: HandlerContext):
+            return IdsResult(ids=await engine.image_ids(params.query, params.sort))
+
+        async def image_counts(params: ImageCountsParams, _ctx: HandlerContext):
+            return await engine.image_counts(params.query, params.group_by)
 
         async def annotations(params: AnnotationsParams, _ctx: HandlerContext):
-            return await engine.annotations(params.query, params.page)
+            return await engine.annotations(params.query, params.sort, params.page)
+
+        async def annotation_ids(params: AnnotationIdsParams, _ctx: HandlerContext):
+            return IdsResult(ids=await engine.annotation_ids(params.query, params.sort))
+
+        async def annotation_counts(params: AnnotationCountsParams, _ctx: HandlerContext):
+            return await engine.annotation_counts(params.query, params.group_by)
 
         async def masks(params: MasksParams, _ctx: HandlerContext):
             return MasksResult(masks=await engine.masks(params.annotation_ids))
@@ -166,7 +182,11 @@ class SessionHub:
         peer.on_request("shutdown", typed(None, shutdown))
         peer.on_request("query/project", typed(None, lambda _ctx: engine.project()))
         peer.on_request("query/images", typed(ImagesParams, images))
+        peer.on_request("query/imageIds", typed(ImageIdsParams, image_ids))
+        peer.on_request("query/imageCounts", typed(ImageCountsParams, image_counts))
         peer.on_request("query/annotations", typed(AnnotationsParams, annotations))
+        peer.on_request("query/annotationIds", typed(AnnotationIdsParams, annotation_ids))
+        peer.on_request("query/annotationCounts", typed(AnnotationCountsParams, annotation_counts))
         peer.on_request("query/masks", typed(MasksParams, masks))
         peer.on_request("render/image", typed(RenderImageParams, render_image))
         peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))

@@ -18,10 +18,15 @@ from piximi_schema.events import AnnotationsDidAdd, ImagesDidAdd, JobsDidUpdate,
 from piximi_schema.jobs import Job
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
+    AnnotationCountGroup,
     AnnotationPage,
     AnnotationQuery,
+    AnnotationSort,
+    CountsResult,
+    ImageCountGroup,
     ImagePage,
     ImageQuery,
+    ImageSort,
     PageRequest,
     ProjectSummary,
 )
@@ -55,9 +60,21 @@ class Engine(Protocol):
 
     async def project(self) -> ProjectSummary: ...
 
-    async def images(self, query: ImageQuery, page: PageRequest) -> ImagePage: ...
+    async def images(self, query: ImageQuery, sort: ImageSort | None, page: PageRequest) -> ImagePage: ...
 
-    async def annotations(self, query: AnnotationQuery, page: PageRequest) -> AnnotationPage: ...
+    async def image_ids(self, query: ImageQuery, sort: ImageSort | None) -> list[str]: ...
+
+    async def image_counts(self, query: ImageQuery, group_by: ImageCountGroup | None) -> CountsResult: ...
+
+    async def annotations(
+        self, query: AnnotationQuery, sort: AnnotationSort | None, page: PageRequest
+    ) -> AnnotationPage: ...
+
+    async def annotation_ids(self, query: AnnotationQuery, sort: AnnotationSort | None) -> list[str]: ...
+
+    async def annotation_counts(
+        self, query: AnnotationQuery, group_by: AnnotationCountGroup | None
+    ) -> CountsResult: ...
 
     async def masks(self, annotation_ids: list[str]) -> dict[str, list[int]]: ...
 

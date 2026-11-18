@@ -36,12 +36,18 @@ from piximi_schema.events import AnnotationsDidAdd, ImagesDidAdd, KindsDidAdd, K
 from piximi_schema.jobs import Job, JobKind, JobStatus
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
+    AnnotationCountGroup,
+    AnnotationHeader,
     AnnotationPage,
     AnnotationQuery,
     AnnotationRecord,
+    AnnotationSort,
+    CountsResult,
+    ImageCountGroup,
     ImagePage,
     ImageQuery,
     ImageRecord,
+    ImageSort,
     PageRequest,
     ProjectCounts,
     ProjectSummary,
@@ -75,9 +81,17 @@ from .jobs import JobRegistry
 from .measure import intensity_measurements, object_features
 from .models import SegmentationModel, default_models
 from .models.base import apply_option_defaults
+from .query import (
+    ANNOTATION_COUNT_COLUMNS,
+    IMAGE_COUNT_COLUMNS,
+    annotation_clauses,
+    annotation_order,
+    image_clauses,
+    image_order,
+)
 from .render import composite, encode_png
 from .rle import encode_mask
-from .store import MetaStore, PixelStore
+from .store import MetaStore, PixelStore, annotation_index
 
 log = logging.getLogger(__name__)
 
@@ -94,11 +108,6 @@ DEFAULT_COLORS = [
 
 THUMBNAIL_BATCH = 8
 
-
-def _paginate(ids: list[str], page: PageRequest) -> tuple[list[str], int, str | None]:
-    offset = int(page.cursor) if page.cursor else 0
-    end = min(offset + page.limit, len(ids))
-    return ids[offset:end], len(ids), str(end) if end < len(ids) else None
 
 
 class ReferenceEngine:
@@ -279,49 +288,110 @@ class ReferenceEngine:
         adapter = TypeAdapter(Category)
         return [adapter.validate_python(c) for c in (row.to_wire() for row in self.meta.list("category", _AnyCategory))]
 
-    async def images(self, query: ImageQuery, page: PageRequest) -> ImagePage:
-        ids = self.meta.ids("image")
-        if query.ids is not None:
-            known = set(ids)
-            ids = [id for id in query.ids if id in known]
-        page_ids, total, next_cursor = _paginate(ids, page)
-        return ImagePage(items=[self._image_record(id) for id in page_ids], total=total, next_cursor=next_cursor)
+    async def images(self, query: ImageQuery, sort: ImageSort | None, page: PageRequest) -> ImagePage:
+        where = image_clauses(query)
+        joins, order = image_order(sort)
+        ids = self.meta.select_ids(
+            "image", where=where, joins=joins, order=order, offset=page.offset, limit=page.limit
+        )
+        return ImagePage(items=self._image_records(ids), total=self.meta.count("image", where=where))
+
+    async def image_ids(self, query: ImageQuery, sort: ImageSort | None) -> list[str]:
+        joins, order = image_order(sort)
+        return self.meta.select_ids("image", where=image_clauses(query), joins=joins, order=order)
+
+    async def image_counts(self, query: ImageQuery, group_by: ImageCountGroup | None) -> CountsResult:
+        where = image_clauses(query)
+        return CountsResult(
+            total=self.meta.count("image", where=where),
+            groups=None
+            if group_by is None
+            else self.meta.count_by("image", IMAGE_COUNT_COLUMNS[group_by], where=where),
+        )
 
     def _image_record(self, image_id: str) -> ImageRecord:
-        image = self.meta.get("image", image_id, ImageObject)
-        if image is None:
+        records = self._image_records([image_id])
+        if not records:
             raise BackendError("NOT_FOUND", f"Unknown image {image_id}")
-        series = self.meta.get("series", image.series_id, ImageSeries)
-        if series is None:
-            raise BackendError("NOT_FOUND", f"Image {image_id} has no series")
-        planes = self.meta.list("plane", Plane, parent=image_id)
-        channels = self.meta.list("channel", Channel, parents=[plane.id for plane in planes])
-        return ImageRecord(image=image, series=series, planes=planes, channels=channels)
+        return records[0]
 
-    async def annotations(self, query: AnnotationQuery, page: PageRequest) -> AnnotationPage:
-        ids = (
-            self.meta.ids("annotation", parents=query.image_ids)
-            if query.image_ids is not None
-            else self.meta.ids("annotation")
+    def _image_records(self, ids: list[str]) -> list[ImageRecord]:
+        """Records for ``ids`` in that order, fetched a kind at a time rather
+        than per image; ids with no image are left out."""
+        images = self.meta.get_many("image", ids, ImageObject)
+        series = self.meta.get_many(
+            "series", sorted({image.series_id for image in images.values()}), ImageSeries
         )
-        page_ids, total, next_cursor = _paginate(ids, page)
-        items = []
-        for id in page_ids:
-            annotation = self.meta.get("annotation", id, AnnotationObject)
-            volume = annotation and self.meta.get("volume", annotation.volume_id, AnnotationVolume)
-            if annotation is None or volume is None:
+        planes_by_image: dict[str, list[Plane]] = defaultdict(list)
+        for plane in self.meta.list("plane", Plane, parents=ids):
+            planes_by_image[plane.image_id].append(plane)
+        channels_by_plane: dict[str, list[Channel]] = defaultdict(list)
+        plane_ids = [plane.id for planes in planes_by_image.values() for plane in planes]
+        for channel in self.meta.list("channel", Channel, parents=plane_ids):
+            channels_by_plane[channel.plane_id].append(channel)
+        records = []
+        for id in ids:
+            image = images.get(id)
+            if image is None:
                 continue
-            header = AnnotationHeader.model_validate(annotation.model_dump(exclude={"encoded_mask"}))
-            items.append(AnnotationRecord(volume=volume, annotation=header))
-        return AnnotationPage(items=items, total=total, next_cursor=next_cursor)
+            image_series = series.get(image.series_id)
+            if image_series is None:
+                raise BackendError("NOT_FOUND", f"Image {id} has no series")
+            planes = planes_by_image.get(id, [])
+            records.append(
+                ImageRecord(
+                    image=image,
+                    series=image_series,
+                    planes=planes,
+                    channels=[channel for plane in planes for channel in channels_by_plane.get(plane.id, [])],
+                )
+            )
+        return records
+
+    async def annotations(
+        self, query: AnnotationQuery, sort: AnnotationSort | None, page: PageRequest
+    ) -> AnnotationPage:
+        where = annotation_clauses(query)
+        joins, order = annotation_order(sort)
+        ids = self.meta.select_ids(
+            "annotation", where=where, joins=joins, order=order, offset=page.offset, limit=page.limit
+        )
+        return AnnotationPage(
+            items=self._annotation_records(ids), total=self.meta.count("annotation", where=where)
+        )
+
+    async def annotation_ids(self, query: AnnotationQuery, sort: AnnotationSort | None) -> list[str]:
+        joins, order = annotation_order(sort)
+        return self.meta.select_ids("annotation", where=annotation_clauses(query), joins=joins, order=order)
+
+    async def annotation_counts(
+        self, query: AnnotationQuery, group_by: AnnotationCountGroup | None
+    ) -> CountsResult:
+        where = annotation_clauses(query)
+        return CountsResult(
+            total=self.meta.count("annotation", where=where),
+            groups=None
+            if group_by is None
+            else self.meta.count_by("annotation", ANNOTATION_COUNT_COLUMNS[group_by], where=where),
+        )
+
+    def _annotation_records(self, ids: list[str]) -> list[AnnotationRecord]:
+        headers = self.meta.get_many("annotation", ids, AnnotationHeader)
+        volumes = self.meta.get_many(
+            "volume", sorted({header.volume_id for header in headers.values()}), AnnotationVolume
+        )
+        records = []
+        for id in ids:
+            header = headers.get(id)
+            volume = volumes.get(header.volume_id) if header else None
+            if header is None or volume is None:
+                continue
+            records.append(AnnotationRecord(volume=volume, annotation=header))
+        return records
 
     async def masks(self, annotation_ids: list[str]) -> dict[str, list[int]]:
-        masks: dict[str, list[int]] = {}
-        for id in annotation_ids:
-            annotation = self.meta.get("annotation", id, AnnotationObject)
-            if annotation is not None:
-                masks[id] = annotation.encoded_mask
-        return masks
+        found = self.meta.get_many("annotation", annotation_ids, AnnotationObject)
+        return {id: annotation.encoded_mask for id, annotation in found.items()}
 
     # ── Engine protocol: render ─────────────────────────────────────────────
 
@@ -577,19 +647,11 @@ class ReferenceEngine:
             self._emit(KindsDidAdd(type="kinds/didAdd", kinds=new_kinds))
         if annotations:
             self.meta.put_many("volume", [(volume, volume.image_id) for volume in volumes])
-            # Kind and category live on the volume; copy them onto the
-            # annotation rows so queries filter without a join.
             by_volume = {volume.id: volume for volume in volumes}
             self.meta.put_many(
                 "annotation",
                 [(annotation, annotation.image_id) for annotation in annotations],
-                index={
-                    annotation.id: {
-                        "kind_id": by_volume[annotation.volume_id].kind_id,
-                        "category_id": by_volume[annotation.volume_id].category_id,
-                    }
-                    for annotation in annotations
-                },
+                index={a.id: annotation_index(by_volume[a.volume_id]) for a in annotations},
             )
             self._emit(AnnotationsDidAdd(type="annotations/didAdd", volumes=volumes, annotations=annotations))
         if not was_cancelled:

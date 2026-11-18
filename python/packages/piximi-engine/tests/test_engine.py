@@ -9,7 +9,8 @@ from piximi_engine.models.threshold import ThresholdSegmenter
 from piximi_engine.rle import decode_mask
 from piximi_link.errors import BackendError
 from piximi_link.peer import HandlerContext
-from piximi_schema.query import AnnotationQuery, ImageQuery, PageRequest
+from piximi_schema.entities import ImageObject
+from piximi_schema.query import AnnotationQuery, ImageQuery, ImageSort, PageRequest
 from piximi_schema.render import ChannelDisplay, RenderRequest
 from piximi_schema.segmentation import SegmentationRunRequest
 
@@ -20,8 +21,18 @@ def ctx() -> HandlerContext:
     return HandlerContext(None)
 
 
+def _name_of(engine: ReferenceEngine):
+    return lambda id: engine.meta.get("image", id, ImageObject).name.lower()
+
+
+async def test_softmax_sort_is_not_supported_here(engine: ReferenceEngine):
+    with pytest.raises(BackendError) as info:
+        await engine.images(ImageQuery(), ImageSort(key="softmax"), PageRequest(limit=1))
+    assert info.value.code == "NOT_SUPPORTED"
+
+
 async def all_images(engine: ReferenceEngine):
-    page = await engine.images(ImageQuery(), PageRequest(limit=100))
+    page = await engine.images(ImageQuery(), None, PageRequest(limit=100))
     return {record.image.name: record for record in page.items}
 
 
@@ -67,18 +78,19 @@ async def test_ingest_is_idempotent(images_dir: Path):
 
 async def test_images_page_without_gaps(engine: ReferenceEngine):
     seen = []
-    cursor = None
+    offset = 0
     while True:
-        page = await engine.images(ImageQuery(), PageRequest(cursor=cursor, limit=2))
+        page = await engine.images(ImageQuery(), None, PageRequest(offset=offset, limit=2))
         assert page.total == 3
         seen.extend(record.image.id for record in page.items)
-        if page.next_cursor is None:
+        offset += len(page.items)
+        if offset >= page.total:
             break
-        cursor = page.next_cursor
     assert len(seen) == 3 and len(set(seen)) == 3
 
-    one = await engine.images(ImageQuery(ids=[seen[1], "nope"]), PageRequest(limit=10))
+    one = await engine.images(ImageQuery(ids=[seen[1], "nope"]), None, PageRequest(limit=10))
     assert [r.image.id for r in one.items] == [seen[1]] and one.total == 1
+    assert await engine.image_ids(ImageQuery(), ImageSort(key="name")) == sorted(seen, key=_name_of(engine))
 
 
 async def test_render_composites_to_png(engine: ReferenceEngine):
@@ -145,7 +157,7 @@ async def test_segmentation_adds_objects_and_emits_events(engine: ReferenceEngin
         "mean" in stats for stats in annotation.intensity_measurements.values()
     )
 
-    page = await engine.annotations(AnnotationQuery(image_ids=[a.image.id]), PageRequest(limit=10))
+    page = await engine.annotations(AnnotationQuery(image_ids=[a.image.id]), None, PageRequest(limit=10))
     assert page.total == 2 and not hasattr(page.items[0].annotation, "encoded_mask")
     masks = await engine.masks([annotation.id])
     assert masks[annotation.id] == annotation.encoded_mask

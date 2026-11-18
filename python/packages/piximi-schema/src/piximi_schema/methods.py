@@ -11,10 +11,16 @@ from .base import WireModel
 from .events import EVENT_TYPES
 from .jobs import Job
 from .query import (
+    AnnotationCountGroup,
     AnnotationPage,
     AnnotationQuery,
+    AnnotationSort,
+    CountsResult,
+    IdsResult,
+    ImageCountGroup,
     ImagePage,
     ImageQuery,
+    ImageSort,
     MasksResult,
     PageRequest,
     ProjectSummary,
@@ -36,12 +42,34 @@ Direction = Literal["client->server", "server->client"]
 
 class ImagesParams(WireModel):
     query: ImageQuery
+    sort: ImageSort | None = None
     page: PageRequest
+
+
+class ImageIdsParams(WireModel):
+    query: ImageQuery
+    sort: ImageSort | None = None
+
+
+class ImageCountsParams(WireModel):
+    query: ImageQuery
+    group_by: ImageCountGroup | None = None
 
 
 class AnnotationsParams(WireModel):
     query: AnnotationQuery
+    sort: AnnotationSort | None = None
     page: PageRequest
+
+
+class AnnotationIdsParams(WireModel):
+    query: AnnotationQuery
+    sort: AnnotationSort | None = None
+
+
+class AnnotationCountsParams(WireModel):
+    query: AnnotationQuery
+    group_by: AnnotationCountGroup | None = None
 
 
 class MasksParams(WireModel):
@@ -109,7 +137,11 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("shutdown", None, None),
     MethodSpec("query/project", None, ProjectSummary),
     MethodSpec("query/images", ImagesParams, ImagePage),
+    MethodSpec("query/imageIds", ImageIdsParams, IdsResult),
+    MethodSpec("query/imageCounts", ImageCountsParams, CountsResult),
     MethodSpec("query/annotations", AnnotationsParams, AnnotationPage),
+    MethodSpec("query/annotationIds", AnnotationIdsParams, IdsResult),
+    MethodSpec("query/annotationCounts", AnnotationCountsParams, CountsResult),
     MethodSpec("query/masks", MasksParams, MasksResult),
     MethodSpec("render/image", RenderImageParams, RenderedImage),
     MethodSpec(

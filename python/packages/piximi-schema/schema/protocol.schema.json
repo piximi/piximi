@@ -41,6 +41,31 @@
       "title": "AnnotationCategory",
       "type": "object"
     },
+    "AnnotationCountGroup": {
+      "enum": [
+        "category",
+        "partition",
+        "kind"
+      ],
+      "title": "AnnotationCountGroup",
+      "type": "string"
+    },
+    "AnnotationCountsParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/AnnotationQuery"
+        },
+        "groupBy": {
+          "$ref": "#/$defs/AnnotationCountGroup"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "AnnotationCountsParams",
+      "type": "object"
+    },
     "AnnotationHeader": {
       "additionalProperties": false,
       "description": "An annotation without its mask; masks are fetched separately.",
@@ -115,6 +140,22 @@
         "boundingBox"
       ],
       "title": "AnnotationHeader",
+      "type": "object"
+    },
+    "AnnotationIdsParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/AnnotationQuery"
+        },
+        "sort": {
+          "$ref": "#/$defs/AnnotationSort"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "AnnotationIdsParams",
       "type": "object"
     },
     "AnnotationObject": {
@@ -210,9 +251,6 @@
         },
         "total": {
           "type": "integer"
-        },
-        "nextCursor": {
-          "type": "string"
         }
       },
       "required": [
@@ -225,11 +263,50 @@
     "AnnotationQuery": {
       "additionalProperties": false,
       "properties": {
+        "ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "imageIds": {
           "items": {
             "type": "string"
           },
           "type": "array"
+        },
+        "planeIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "volumeIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "kindIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "categoryIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "partitions": {
+          "items": {
+            "$ref": "#/$defs/Partition"
+          },
+          "type": "array"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceRange"
         }
       },
       "title": "AnnotationQuery",
@@ -251,6 +328,37 @@
       ],
       "title": "AnnotationRecord",
       "type": "object"
+    },
+    "AnnotationSort": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/AnnotationSortKey",
+          "default": "none"
+        },
+        "direction": {
+          "$ref": "#/$defs/SortDirection",
+          "default": "asc"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "title": "AnnotationSort",
+      "type": "object"
+    },
+    "AnnotationSortKey": {
+      "enum": [
+        "none",
+        "plane",
+        "volume",
+        "category",
+        "image",
+        "random",
+        "softmax"
+      ],
+      "title": "AnnotationSortKey",
+      "type": "string"
     },
     "AnnotationVolume": {
       "additionalProperties": false,
@@ -322,6 +430,9 @@
       "properties": {
         "query": {
           "$ref": "#/$defs/AnnotationQuery"
+        },
+        "sort": {
+          "$ref": "#/$defs/AnnotationSort"
         },
         "page": {
           "$ref": "#/$defs/PageRequest"
@@ -731,6 +842,43 @@
       "title": "ChannelPolicyPassthrough",
       "type": "object"
     },
+    "ConfidenceRange": {
+      "additionalProperties": false,
+      "description": "Keeps items whose prediction confidence lies strictly between ``min``\nand ``max``; items without one are left out.",
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "ConfidenceRange",
+      "type": "object"
+    },
+    "CountsResult": {
+      "additionalProperties": false,
+      "properties": {
+        "total": {
+          "type": "integer"
+        },
+        "groups": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "total"
+      ],
+      "title": "CountsResult",
+      "type": "object"
+    },
     "DType": {
       "enum": [
         "uint8",
@@ -809,6 +957,22 @@
       "title": "Experiment",
       "type": "object"
     },
+    "IdsResult": {
+      "additionalProperties": false,
+      "properties": {
+        "ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "title": "IdsResult",
+      "type": "object"
+    },
     "ImageCategory": {
       "additionalProperties": false,
       "properties": {
@@ -837,6 +1001,46 @@
         "isUnknown"
       ],
       "title": "ImageCategory",
+      "type": "object"
+    },
+    "ImageCountGroup": {
+      "enum": [
+        "category",
+        "partition"
+      ],
+      "title": "ImageCountGroup",
+      "type": "string"
+    },
+    "ImageCountsParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/ImageQuery"
+        },
+        "groupBy": {
+          "$ref": "#/$defs/ImageCountGroup"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "ImageCountsParams",
+      "type": "object"
+    },
+    "ImageIdsParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/ImageQuery"
+        },
+        "sort": {
+          "$ref": "#/$defs/ImageSort"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "ImageIdsParams",
       "type": "object"
     },
     "ImageObject": {
@@ -904,9 +1108,6 @@
         },
         "total": {
           "type": "integer"
-        },
-        "nextCursor": {
-          "type": "string"
         }
       },
       "required": [
@@ -918,12 +1119,37 @@
     },
     "ImageQuery": {
       "additionalProperties": false,
+      "description": "Every condition given must hold; an absent one does not restrict.\nTies in any sort fall back to insertion order.",
       "properties": {
         "ids": {
           "items": {
             "type": "string"
           },
           "type": "array"
+        },
+        "seriesIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "categoryIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "partitions": {
+          "items": {
+            "$ref": "#/$defs/Partition"
+          },
+          "type": "array"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceRange"
+        },
+        "annotated": {
+          "type": "boolean"
         }
       },
       "title": "ImageQuery",
@@ -997,6 +1223,35 @@
       "title": "ImageSeries",
       "type": "object"
     },
+    "ImageSort": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/ImageSortKey",
+          "default": "none"
+        },
+        "direction": {
+          "$ref": "#/$defs/SortDirection",
+          "default": "asc"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "title": "ImageSort",
+      "type": "object"
+    },
+    "ImageSortKey": {
+      "enum": [
+        "none",
+        "name",
+        "category",
+        "random",
+        "softmax"
+      ],
+      "title": "ImageSortKey",
+      "type": "string"
+    },
     "ImagesDidAdd": {
       "additionalProperties": false,
       "properties": {
@@ -1030,6 +1285,9 @@
       "properties": {
         "query": {
           "$ref": "#/$defs/ImageQuery"
+        },
+        "sort": {
+          "$ref": "#/$defs/ImageSort"
         },
         "page": {
           "$ref": "#/$defs/PageRequest"
@@ -1595,10 +1853,14 @@
     "PageRequest": {
       "additionalProperties": false,
       "properties": {
-        "cursor": {
-          "type": "string"
+        "offset": {
+          "default": 0,
+          "minimum": 0,
+          "type": "integer"
         },
         "limit": {
+          "maximum": 1000,
+          "minimum": 1,
           "type": "integer"
         }
       },
@@ -2271,6 +2533,14 @@
       "title": "Shape",
       "type": "object"
     },
+    "SortDirection": {
+      "enum": [
+        "asc",
+        "desc"
+      ],
+      "title": "SortDirection",
+      "type": "string"
+    },
     "ThumbnailFailed": {
       "additionalProperties": false,
       "properties": {
@@ -2372,10 +2642,34 @@
       "result": "#/$defs/ImagePage",
       "progress": null
     },
+    "query/imageIds": {
+      "direction": "client->server",
+      "params": "#/$defs/ImageIdsParams",
+      "result": "#/$defs/IdsResult",
+      "progress": null
+    },
+    "query/imageCounts": {
+      "direction": "client->server",
+      "params": "#/$defs/ImageCountsParams",
+      "result": "#/$defs/CountsResult",
+      "progress": null
+    },
     "query/annotations": {
       "direction": "client->server",
       "params": "#/$defs/AnnotationsParams",
       "result": "#/$defs/AnnotationPage",
+      "progress": null
+    },
+    "query/annotationIds": {
+      "direction": "client->server",
+      "params": "#/$defs/AnnotationIdsParams",
+      "result": "#/$defs/IdsResult",
+      "progress": null
+    },
+    "query/annotationCounts": {
+      "direction": "client->server",
+      "params": "#/$defs/AnnotationCountsParams",
+      "result": "#/$defs/CountsResult",
       "progress": null
     },
     "query/masks": {

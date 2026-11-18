@@ -97,6 +97,17 @@ class Clause:
     params: tuple[Any, ...] = ()
 
 
+def annotation_index(volume: Any) -> dict[str, Any]:
+    """The indexed columns an annotation inherits from its ``AnnotationVolume``
+    (kind, category and prediction confidence live on the volume); pass the
+    result as ``index`` when writing the annotation."""
+    return {
+        "kind_id": volume.kind_id,
+        "category_id": volume.category_id,
+        "confidence": volume.prediction_confidence,
+    }
+
+
 def random_key(seed: int, id: str) -> int:
     """A deterministic 32-bit key for ``id`` under ``seed`` (FNV-1a over
     ``"{seed}:{id}"``): random order is a sort on it. The frontend computes
