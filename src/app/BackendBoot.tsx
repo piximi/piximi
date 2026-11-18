@@ -12,6 +12,8 @@ import {
   stripSessionParams,
 } from "core/backend/bootstrap";
 
+import { ConnectBackendDialog } from "components/dialogs";
+
 import type { ReactNode } from "react";
 
 import type { Backend, SessionConfig } from "core/backend";
@@ -51,6 +53,9 @@ export const BackendBoot = ({
       : { status: "local", pending: true };
   });
   const started = useRef(false);
+  // A failed session, remembered or given, may simply have moved: the
+  // engine restarted on another port. Offer the dialog right here.
+  const [connectElsewhere, setConnectElsewhere] = useState(false);
 
   // Promise callbacks rather than awaits: the effect itself must not set
   // state, only what runs once the backend has answered.
@@ -124,10 +129,21 @@ export const BackendBoot = ({
             >
               Try again
             </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setConnectElsewhere(true)}
+              data-testid="connect-elsewhere"
+            >
+              Connect to a different backend
+            </Button>
             <Button variant="outlined" onClick={() => void connectLocal()}>
               Continue locally
             </Button>
           </Box>
+          <ConnectBackendDialog
+            open={connectElsewhere}
+            onClose={() => setConnectElsewhere(false)}
+          />
         </>
       )}
     </Box>
