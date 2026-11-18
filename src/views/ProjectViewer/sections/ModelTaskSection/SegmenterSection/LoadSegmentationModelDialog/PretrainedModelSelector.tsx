@@ -3,14 +3,19 @@ import { Fragment, useMemo, useState } from "react";
 import {
   Autocomplete,
   Box,
+  Chip,
+  CircularProgress,
   FormControl,
   FormHelperText,
   Link,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
 
-import type { SegmentationModelDescriptor } from "core/backend";
+import type { ChipProps } from "@mui/material";
+
+import type { ModelStatus, SegmentationModelDescriptor } from "core/backend";
 import type { ModelDisplayInfo } from "core/dl/segmentation/types";
 
 interface ModelOptionType {
@@ -20,6 +25,51 @@ interface ModelOptionType {
 
 type ModelDetails = Omit<ModelDisplayInfo, "name" | "displayName"> & {
   name: string;
+  framework: string;
+};
+
+const statusChip: Record<
+  ModelStatus,
+  { label: string; color: ChipProps["color"] }
+> = {
+  unavailable: { label: "Not built", color: "default" },
+  building: { label: "Building", color: "info" },
+  ready: { label: "Ready", color: "success" },
+  loaded: { label: "Loaded", color: "success" },
+  failed: { label: "Failed", color: "error" },
+};
+
+/* Where a model is on the way to being usable, and why if it is not. */
+const ModelStatusLine = ({ model }: { model: SegmentationModelDescriptor }) => {
+  const chip = statusChip[model.status];
+  return (
+    <Stack
+      direction="row"
+      spacing={1}
+      sx={{ alignItems: "center", pb: 1.5, maxWidth: "100%" }}
+    >
+      <Chip
+        size="small"
+        variant="outlined"
+        color={chip.color}
+        label={chip.label}
+        icon={
+          model.status === "building" ? (
+            <CircularProgress size={12} color="inherit" />
+          ) : undefined
+        }
+      />
+      {model.statusMessage && (
+        <Typography
+          variant="caption"
+          color={model.status === "failed" ? "error" : "textSecondary"}
+          sx={{ overflowWrap: "anywhere" }}
+        >
+          {model.statusMessage}
+        </Typography>
+      )}
+    </Stack>
+  );
 };
 
 //github.com/twpkevin06222/Gland-Segmentation/tree/main
@@ -53,13 +103,22 @@ export const PretrainedModelSelector = ({
 
   const modelDetails: ModelDetails | undefined = useMemo(() => {
     if (!selectedModel) return undefined;
-    const { displayName, description, use, sources, cite, cloudWarning } =
-      models[selectedModel.id];
+    const {
+      displayName,
+      description,
+      use,
+      sources,
+      cite,
+      cloudWarning,
+      framework,
+      version,
+    } = models[selectedModel.id];
 
     // Every key present is rendered as a row, so leave the optional ones out
     // when a descriptor carries them as undefined.
     return {
       name: displayName,
+      framework: version ? `${framework} ${version}` : framework,
       description,
       use,
       sources,
@@ -90,6 +149,7 @@ export const PretrainedModelSelector = ({
 
         <FormHelperText sx={{ mx: "auto" }}>{errorText ?? " "}</FormHelperText>
       </FormControl>
+      {selectedModel && <ModelStatusLine model={models[selectedModel.id]} />}
       {modelDetails && <PretrainedModelDetails modelDetails={modelDetails} />}
     </Fragment>
   );

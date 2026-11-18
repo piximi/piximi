@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useDispatch } from "react-redux";
 
@@ -25,11 +25,21 @@ import { getStackTraceFromError } from "utils/logUtils";
 import { useSegmenter } from "@ProjectViewer/hooks";
 
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
+import { useSegmentationModels } from "./useSegmentationModels";
 
 import type React from "react";
 
-import type { SegmentationModelDescriptor } from "core/backend";
+import type { ModelStatus, SegmentationModelDescriptor } from "core/backend";
 import type { SegmentationModelDetails } from "core/dl/segmentation/types";
+
+/* What the confirm button offers, given where the model is. */
+const loadLabel: Record<ModelStatus, string> = {
+  unavailable: "Build & Load",
+  building: "Building…",
+  ready: "Load Model",
+  loaded: "Load Model",
+  failed: "Retry",
+};
 
 type LoadSegmentationModelDialogProps = {
   onClose: () => void;
@@ -47,9 +57,12 @@ export const LoadSegmentationModelDialog = ({
   const [selectedModel, setSelectedModel] = useState<
     SegmentationModelDetails | undefined
   >(loadedModel);
-  const [pretrainedModels, setPretrainedModels] = useState<
-    Array<SegmentationModelDescriptor>
-  >([]);
+  const { models: pretrainedModels, refresh } = useSegmentationModels(open);
+  // The live descriptor for the selection: its status moves while the
+  // dialog is open (an environment builds, a load fails).
+  const selected: SegmentationModelDescriptor | undefined = selectedModel
+    ? pretrainedModels.find((model) => model.name === selectedModel.name)
+    : undefined;
 
   const handleModelSelect = (model: SegmentationModelDetails | undefined) => {
     setSelectedModel(model);
@@ -69,6 +82,8 @@ export const LoadSegmentationModelDialog = ({
     try {
       await segmentation.loadModel(selectedModel.name);
     } catch (error) {
+      // The list shows why; a backend without push events needs asking.
+      void refresh();
       if (isTaskCancelledError(error)) return;
       const description = (error as Error).message;
       dispatch(
@@ -103,15 +118,6 @@ export const LoadSegmentationModelDialog = ({
     HotkeyContext.ConfirmationDialog,
   );
 
-  useEffect(() => {
-    backend.segmentation
-      ?.listModels()
-      .then(setPretrainedModels)
-      .catch((error) =>
-        console.error("[LoadSegmentationModelDialog] listModels", error),
-      );
-  }, [backend]);
-
   return (
     <Dialog fullWidth maxWidth="sm" onClose={closeDialog} open={open}>
       <DialogTitleBar
@@ -144,9 +150,9 @@ export const LoadSegmentationModelDialog = ({
         <Button
           onClick={handleLoadModel}
           color="primary"
-          disabled={!selectedModel}
+          disabled={!selectedModel || selected?.status === "building"}
         >
-          Load Model
+          {selected ? loadLabel[selected.status] : "Load Model"}
         </Button>
       </DialogActions>
     </Dialog>
