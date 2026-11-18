@@ -74,6 +74,27 @@ function batchBubbleDeleteAnnotation(
   }
 }
 
+function annotationsByVolume(
+  state: DataStateV2,
+): Map<string, AnnotationObject[]> {
+  const byVolume = new Map<string, AnnotationObject[]>();
+  for (const ann of Object.values(state.annotations.entities)) {
+    const group = byVolume.get(ann.volumeId);
+    if (group) group.push(ann);
+    else byVolume.set(ann.volumeId, [ann]);
+  }
+  return byVolume;
+}
+
+function annotationsOfVolume(
+  state: DataStateV2,
+  volumeId: string,
+): AnnotationObject[] {
+  return Object.values(state.annotations.entities).filter(
+    (ann) => ann.volumeId === volumeId,
+  );
+}
+
 function getNewPartition(
   catId: string,
   currentPartition: Partition,
@@ -151,25 +172,29 @@ function cascadeDeleteAnnotationVolume(
   annotationAdapter.removeMany(state.annotations, annotationIds);
 }
 
-function cascadeDeleteImage(state: DataStateV2, image: ImageObject): void {
-  // cascade: remove all annotation volumes and their child annotations
-  const annVols = Object.values(state.annotationVolumes.entities).filter(
-    (annVol) => annVol.imageId === image.id,
-  );
-  annVols.forEach((annVol) => cascadeDeleteAnnotationVolume(state, annVol));
-
-  annotationVolumeAdapter.removeMany(
-    state.annotationVolumes,
-    annVols.map((vol) => vol.id),
-  );
-  // cascade: remove all planes and their child channels
+/*
+ * Removes everything under a set of images: their volumes and annotations,
+ * their planes and channels. Each table is read once for the whole set, so
+ * deleting many images costs the same as deleting one.
+ */
+function cascadeDeleteImages(state: DataStateV2, images: ImageObject[]): void {
+  if (images.length === 0) return;
+  const imageIds = new Set(images.map((im) => im.id));
+  const volumeIds = Object.values(state.annotationVolumes.entities)
+    .filter((vol) => imageIds.has(vol.imageId))
+    .map((vol) => vol.id);
+  const annotationIds = Object.values(state.annotations.entities)
+    .filter((ann) => imageIds.has(ann.imageId))
+    .map((ann) => ann.id);
   const planeIds = Object.values(state.planes.entities)
-    .filter((pl) => pl.imageId === image.id)
+    .filter((pl) => imageIds.has(pl.imageId))
     .map((pl) => pl.id);
   const planeSet = new Set(planeIds);
   const channelIds = Object.values(state.channels.entities)
     .filter((ch) => planeSet.has(ch.planeId))
     .map((ch) => ch.id);
+  annotationAdapter.removeMany(state.annotations, annotationIds);
+  annotationVolumeAdapter.removeMany(state.annotationVolumes, volumeIds);
   planeAdapter.removeMany(state.planes, planeIds);
   channelAdapter.removeMany(state.channels, channelIds);
 }
@@ -181,7 +206,7 @@ function cascadeDeleteImageSeries(
   const images = Object.values(state.images.entities).filter(
     (im) => im.seriesId === series.id,
   );
-  images.forEach((image) => cascadeDeleteImage(state, image));
+  cascadeDeleteImages(state, images);
   imageAdapter.removeMany(
     state.images,
     images.map((im) => im.id),
@@ -212,10 +237,15 @@ function pruneSeriesAfterImageDeletion(
     if (!bySeriesId.has(im.seriesId)) bySeriesId.set(im.seriesId, new Set());
     bySeriesId.get(im.seriesId)!.add(im.id);
   });
+  const remainingBySeries = new Map<string, ImageObject[]>();
+  for (const im of Object.values(state.images.entities)) {
+    if (!bySeriesId.has(im.seriesId)) continue;
+    const group = remainingBySeries.get(im.seriesId);
+    if (group) group.push(im);
+    else remainingBySeries.set(im.seriesId, [im]);
+  }
   bySeriesId.forEach((deletedIds, seriesId) => {
-    const remaining = Object.values(state.images.entities).filter(
-      (im) => im.seriesId === seriesId,
-    );
+    const remaining = remainingBySeries.get(seriesId) ?? [];
     if (remaining.length === 0) {
       imageSeriesAdapter.removeOne(state.imageSeries, seriesId);
       removeOrphanedChannelMetas(state);
@@ -439,18 +469,18 @@ export const dataSlice = createSlice({
       action: PayloadAction<{ seriesId: string; images: Array<ImageObject> }>,
     ) {
       const { seriesId, images } = action.payload;
-      if (!state.imageSeries.ids.includes(seriesId)) return;
-      const imageNames = Object.values(state.images.entities).map(
-        (im) => im.name,
+      if (!state.imageSeries.entities[seriesId]) return;
+      const imageNames = new Set(
+        Object.values(state.images.entities).map((im) => im.name),
       );
       const namedImages = images.map((im) => {
         let imageName = im.name;
         let count = 1;
-        while (imageNames.includes(imageName)) {
+        while (imageNames.has(imageName)) {
           imageName = im.name + "(" + count + ")";
           count++;
         }
-        imageNames.push(imageName);
+        imageNames.add(imageName);
         return imageName === im.name ? im : { ...im, name: imageName };
       });
       imageAdapter.addMany(state.images, namedImages);
@@ -754,18 +784,19 @@ export const dataSlice = createSlice({
       const volume = state.annotationVolumes.entities[annotation.volumeId];
       if (!volume || volume.categoryId === targetCatId) return;
 
-      const partitionUpdates = Object.values(state.annotations.entities)
-        .filter((ann) => ann.volumeId === annotation.volumeId)
-        .map((ann) => ({
-          id: ann.id,
-          changes: {
-            partition: getNewPartition(
-              targetCatId,
-              ann.partition,
-              !!action.payload.predicted,
-            ),
-          },
-        }));
+      const partitionUpdates = annotationsOfVolume(
+        state,
+        annotation.volumeId,
+      ).map((ann) => ({
+        id: ann.id,
+        changes: {
+          partition: getNewPartition(
+            targetCatId,
+            ann.partition,
+            !!action.payload.predicted,
+          ),
+        },
+      }));
 
       const predictionCorrected = getPredictionCorrection(
         volume.categoryId,
@@ -797,6 +828,7 @@ export const dataSlice = createSlice({
         id: string;
         changes: { partition: Partition };
       }> = [];
+      const byVolume = annotationsByVolume(state);
 
       action.payload.forEach(({ id, categoryId: targetCatId, predicted }) => {
         const ann = state.annotations.entities[id];
@@ -805,9 +837,8 @@ export const dataSlice = createSlice({
         const volume = state.annotationVolumes.entities[ann.volumeId];
         if (!volume || volume.categoryId === targetCatId) return;
 
-        const associatedAnnUpdates = Object.values(state.annotations.entities)
-          .filter((_ann) => _ann.volumeId === ann.volumeId)
-          .map((ann) => {
+        const associatedAnnUpdates = (byVolume.get(ann.volumeId) ?? []).map(
+          (ann) => {
             return {
               id: ann.id,
               changes: {
@@ -818,7 +849,8 @@ export const dataSlice = createSlice({
                 ),
               },
             };
-          });
+          },
+        );
 
         const predictionCorrected = getPredictionCorrection(
           volume.categoryId,
@@ -1039,7 +1071,7 @@ export const dataSlice = createSlice({
     deleteImageObject(state, action: PayloadAction<string>) {
       const image = state.images.entities[action.payload];
       if (!image) return;
-      cascadeDeleteImage(state, image);
+      cascadeDeleteImages(state, [image]);
 
       imageAdapter.removeOne(state.images, image.id);
       pruneSeriesAfterImageDeletion(state, [image]);
@@ -1048,7 +1080,7 @@ export const dataSlice = createSlice({
       const images = action.payload
         .map((id) => state.images.entities[id])
         .filter(Boolean) as ImageObject[];
-      images.forEach((image) => cascadeDeleteImage(state, image));
+      cascadeDeleteImages(state, images);
 
       imageAdapter.removeMany(state.images, action.payload);
 
@@ -1120,7 +1152,7 @@ export const dataSlice = createSlice({
         const categorizedImages = Object.values(state.images.entities).filter(
           (im) => im.categoryId === catId,
         );
-        categorizedImages.forEach((image) => cascadeDeleteImage(state, image));
+        cascadeDeleteImages(state, categorizedImages);
 
         imageAdapter.removeMany(
           state.images,
