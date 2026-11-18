@@ -182,26 +182,27 @@ class ReferenceEngine:
                 log.warning("skipping %s: %s", path.name, error)
         return added
 
-    def ingest_file(self, path: Path) -> list[str]:
-        decoded = read_image(path)
-        height, width = decoded.shape
-        max_intensity = 2**decoded.bit_depth - 1
-        dtype = "uint8" if decoded.bit_depth == 8 else "uint16"
-
+    def ensure_channels(self, count: int) -> Experiment:
+        """Fixes the project's channel count on the first import."""
         experiment = self.experiment
         if experiment.channels is None:
-            experiment = experiment.model_copy(update={"channels": decoded.channels})
+            experiment = experiment.model_copy(update={"channels": count})
             self.meta.put("experiment", _ExperimentRow(id="experiment", experiment=experiment))
-        metas = {meta.id: meta for meta in self.meta.list("channel_meta", ChannelMeta)}
+        return experiment
+
+    def ensure_channel_metas(self, count: int, bit_depth: int, max_intensity: float) -> list[ChannelMeta]:
+        """Creates the display settings for channel indices that have none
+        yet (``channel-meta-<index>``); returns only the new ones."""
+        metas = {meta.id for meta in self.meta.list("channel_meta", ChannelMeta)}
         new_metas: list[ChannelMeta] = []
-        for index in range(decoded.channels):
+        for index in range(count):
             meta_id = f"channel-meta-{index}"
             if meta_id not in metas:
                 new_metas.append(
                     ChannelMeta(
                         id=meta_id,
                         name=f"Channel {index}",
-                        bit_depth=decoded.bit_depth,
+                        bit_depth=bit_depth,
                         color_map=DEFAULT_COLORS[index % len(DEFAULT_COLORS)],
                         visible=True,
                         min_value=0,
@@ -213,6 +214,16 @@ class ReferenceEngine:
                     )
                 )
         self.meta.put_many("channel_meta", [(meta, None) for meta in new_metas])
+        return new_metas
+
+    def ingest_file(self, path: Path) -> list[str]:
+        decoded = read_image(path)
+        height, width = decoded.shape
+        max_intensity = 2**decoded.bit_depth - 1
+        dtype = "uint8" if decoded.bit_depth == 8 else "uint16"
+
+        experiment = self.ensure_channels(decoded.channels)
+        new_metas = self.ensure_channel_metas(decoded.channels, decoded.bit_depth, max_intensity)
 
         series_id, image_id = generate_uuid(), generate_uuid()
         shape = Shape(planes=len(decoded.planes), height=height, width=width, channels=decoded.channels)
@@ -296,11 +307,11 @@ class ReferenceEngine:
         )
         return ImagePage(items=self._image_records(ids), total=self.meta.count("image", where=where))
 
-    async def image_ids(self, query: ImageQuery, sort: ImageSort | None) -> list[str]:
+    async def image_ids(self, query: ImageQuery, sort: ImageSort | None = None) -> list[str]:
         joins, order = image_order(sort)
         return self.meta.select_ids("image", where=image_clauses(query), joins=joins, order=order)
 
-    async def image_counts(self, query: ImageQuery, group_by: ImageCountGroup | None) -> CountsResult:
+    async def image_counts(self, query: ImageQuery, group_by: ImageCountGroup | None = None) -> CountsResult:
         where = image_clauses(query)
         return CountsResult(
             total=self.meta.count("image", where=where),
@@ -360,12 +371,12 @@ class ReferenceEngine:
             items=self._annotation_records(ids), total=self.meta.count("annotation", where=where)
         )
 
-    async def annotation_ids(self, query: AnnotationQuery, sort: AnnotationSort | None) -> list[str]:
+    async def annotation_ids(self, query: AnnotationQuery, sort: AnnotationSort | None = None) -> list[str]:
         joins, order = annotation_order(sort)
         return self.meta.select_ids("annotation", where=annotation_clauses(query), joins=joins, order=order)
 
     async def annotation_counts(
-        self, query: AnnotationQuery, group_by: AnnotationCountGroup | None
+        self, query: AnnotationQuery, group_by: AnnotationCountGroup | None = None
     ) -> CountsResult:
         where = annotation_clauses(query)
         return CountsResult(
