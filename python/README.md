@@ -30,7 +30,10 @@ others, or `--no-auth` to skip the token locally.
 A wheel built after `pnpm engine:frontend` carries the frontend inside the
 package (`piximi_engine/frontend/`), so an installed `piximi serve` needs no
 `--frontend` at all. `uv build --package piximi-engine` writes it to
-`python/dist/`.
+`python/dist/`. The packaged copy leaves out the in-browser model assets
+(ONNX Runtime for Cellpose-SAM, the StarDist/GlaS weights, ~130 MB), since a
+served page runs its models on the engine; `node scripts/packageFrontend.mjs
+--full` keeps them so the "Continue locally" fallback has every model too.
 
 ## From a notebook
 
