@@ -126,6 +126,7 @@ class ReferenceEngine:
         self.pixels = PixelStore(self.data_dir / "pixels.zarr")
         self._models = models if models is not None else default_models(gpu=gpu)
         self._listeners: list[EventListener] = []
+        self._run_contexts: dict[str, HandlerContext] = {}
         self.jobs = JobRegistry(self._emit)
         self._ensure_project()
 
@@ -482,6 +483,10 @@ class ReferenceEngine:
 
     async def jobs_cancel(self, job_id: str) -> None:
         self.jobs.cancel(job_id)
+        # Reaches a model mid-image, not only the loop between images.
+        context = self._run_contexts.get(job_id)
+        if context is not None:
+            context.cancel()
 
     # ── Engine protocol: segmentation ───────────────────────────────────────
 
@@ -501,6 +506,7 @@ class ReferenceEngine:
         job = self.jobs.start(
             JobKind.MODEL_LOAD, f"Loading {model.display_name}", cancellable=model.cancellable_load
         )
+        self._run_contexts[job.id] = ctx
 
         def progress(value: Any) -> None:
             ctx.progress(value)
@@ -515,6 +521,8 @@ class ReferenceEngine:
         except Exception as error:
             self.jobs.finish(job.id, JobStatus.FAILED, error=str(error))
             raise
+        finally:
+            self._run_contexts.pop(job.id, None)
         self.jobs.finish(job.id, JobStatus.SUCCEEDED, message="Model loaded")
 
     async def segmentation_run(
@@ -522,6 +530,7 @@ class ReferenceEngine:
     ) -> SegmentationRunSummary:
         model = self._model(request.model_id)
         job = self.jobs.start(JobKind.SEGMENTATION, "Beginning segmentation")
+        self._run_contexts[job.id] = ctx
         try:
             summary = await self._run(job, model, request, ctx)
         except RequestCancelled:
@@ -530,6 +539,8 @@ class ReferenceEngine:
         except Exception as error:
             self.jobs.finish(job.id, JobStatus.FAILED, error=str(error))
             raise
+        finally:
+            self._run_contexts.pop(job.id, None)
         message = f"Segmentation finished: {summary.added} added"
         if summary.skipped:
             message += f", {summary.skipped} skipped as duplicates"
@@ -598,7 +609,12 @@ class ReferenceEngine:
                 raise BackendError("NOT_FOUND", f"Image {image.name} has none of the requested channels")
             stack = np.stack([self.pixels.get(channel.id) for channel in selected])
 
-            detections = await asyncio.to_thread(model.segment, stack, options, kind_name, ctx)
+            try:
+                detections = await asyncio.to_thread(model.segment, stack, options, kind_name, ctx)
+            except RequestCancelled:
+                # The model noticed mid-image; keep what earlier images added.
+                was_cancelled = True
+                break
 
             # Snapshot the plane's existing objects per kind, for the IoU check.
             existing: dict[str, list[MaskedBox]] = defaultdict(list)

@@ -43,6 +43,11 @@ class HandlerContext:
     def cancelled(self) -> bool:
         return self._cancelled.is_set()
 
+    def cancel(self) -> None:
+        """Marks the request cancelled, as the peer's ``$/cancelRequest``
+        would; for work cancelled another way, e.g. through its job."""
+        self._cancelled.set()
+
     async def wait_cancelled(self) -> None:
         await self._cancelled.wait()
 
