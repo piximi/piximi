@@ -14,6 +14,7 @@ import {
 
 import type {
   AnnotationObject,
+  AnnotationVolume,
   AnnotationVolumeEntities,
   CategoryEntities,
   Channel,
@@ -26,6 +27,7 @@ import type {
   ImageEntities,
   ImageObject,
   PlaneEntities,
+  Plane,
 } from "core/entities";
 
 import type { RootState } from "store/rootReducer";
@@ -63,17 +65,22 @@ const annotationVolumeSelectors = annotationVolumeAdapter.getSelectors(
 /* Every plane's channels at once: the extended entities and the grids look
  * up many planes per pass, and a scan of every channel per entity made the
  * extended selectors quadratic. */
+const groupBy = <T>(items: T[], key: (item: T) => string): Map<string, T[]> => {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const group = groups.get(key(item));
+    if (group) group.push(item);
+    else groups.set(key(item), [item]);
+  }
+  return groups;
+};
+const NO_ANNOTATIONS: AnnotationObject[] = [];
+const NO_VOLUMES: AnnotationVolume[] = [];
+const NO_PLANES: Plane[] = [];
+
 export const selectChannelsByPlane = createSelector(
   channelSelectors.selectAll,
-  (channels) => {
-    const byPlane = new Map<string, Channel[]>();
-    for (const channel of channels) {
-      const group = byPlane.get(channel.planeId);
-      if (group) group.push(channel);
-      else byPlane.set(channel.planeId, [channel]);
-    }
-    return byPlane;
-  },
+  (channels) => groupBy(channels, (channel) => channel.planeId),
 );
 
 /* A plane's channels with their display settings; hidden ones are left out. */
@@ -100,6 +107,8 @@ export const extendPlaneChannels = (
 export const selectImageEntities = imageSelectors.selectEntities;
 export const selectPlaneEntities = planeSelectors.selectEntities;
 export const selectAllImages = imageSelectors.selectAll;
+export const selectImageIds = imageSelectors.selectIds;
+export const selectTotalImages = imageSelectors.selectTotal;
 
 export const selectKindIds = kindSelectors.selectIds;
 export const selectKindEntities = kindSelectors.selectEntities;
@@ -113,6 +122,7 @@ export const selectAllChannelMetas = channelMetaSelectors.selectAll;
 export const selectChannelMetaById = channelMetaSelectors.selectById;
 
 export const selectAnnotationEntities = annotationSelectors.selectEntities;
+export const selectAllAnnotations = annotationSelectors.selectAll;
 
 export const selectAnnotationVolumeEntities =
   annotationVolumeSelectors.selectEntities;
@@ -334,10 +344,17 @@ export const selectAnnotationsByVolumeId = createSelector(
   [annotationSelectors.selectAll, (_: RootState, volumeId: string) => volumeId],
   (annotations, volumeId) => annotations.filter((a) => a.volumeId === volumeId),
 );
-export const selectAnnotationsByImageId = createSelector(
-  [annotationSelectors.selectAll, (_: RootState, imageId: string) => imageId],
-  (annotations, imageId) => annotations.filter((a) => a.imageId === imageId),
+/* Every image's annotations at once; the per-image selector below reads
+ * one group, so a list of images costs one pass rather than one per image. */
+export const selectAnnotationsByImage = createSelector(
+  annotationSelectors.selectAll,
+  (annotations) => groupBy(annotations, (a) => a.imageId),
 );
+export const selectAnnotationsByImageId = (
+  state: RootState,
+  imageId: string,
+): AnnotationObject[] =>
+  selectAnnotationsByImage(state).get(imageId) ?? NO_ANNOTATIONS;
 
 // -- Extended --
 
@@ -577,13 +594,15 @@ export const selectAnnotationVolumesByCategoryId = createSelector(
   ],
   (volumes, categoryId) => volumes.filter((v) => v.categoryId === categoryId),
 );
-export const selectAnnotationVolumesByImageId = createSelector(
-  [
-    annotationVolumeSelectors.selectAll,
-    (_: RootState, imageId: string) => imageId,
-  ],
-  (volumes, imageId) => volumes.filter((v) => v.imageId === imageId),
+export const selectAnnotationVolumesByImage = createSelector(
+  annotationVolumeSelectors.selectAll,
+  (volumes) => groupBy(volumes, (vol) => vol.imageId),
 );
+export const selectAnnotationVolumesByImageId = (
+  state: RootState,
+  imageId: string,
+): AnnotationVolume[] =>
+  selectAnnotationVolumesByImage(state).get(imageId) ?? NO_VOLUMES;
 
 /*
  * ───────────────────────────────────────────────────────────────────────
@@ -591,10 +610,14 @@ export const selectAnnotationVolumesByImageId = createSelector(
  * ───────────────────────────────────────────────────────────────────────
  */
 
-export const selectPlanesByImageId = createSelector(
-  [planeSelectors.selectAll, (_: RootState, imageId: string) => imageId],
-  (planes, imageId) => planes.filter((pl) => pl.imageId === imageId),
+export const selectPlanesByImage = createSelector(
+  planeSelectors.selectAll,
+  (planes) => groupBy(planes, (pl) => pl.imageId),
 );
+export const selectPlanesByImageId = (
+  state: RootState,
+  imageId: string,
+): Plane[] => selectPlanesByImage(state).get(imageId) ?? NO_PLANES;
 export const selectActivePlane = createSelector(
   [
     imageSelectors.selectEntities,
