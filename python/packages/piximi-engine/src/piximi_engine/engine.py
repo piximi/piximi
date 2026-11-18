@@ -577,7 +577,20 @@ class ReferenceEngine:
             self._emit(KindsDidAdd(type="kinds/didAdd", kinds=new_kinds))
         if annotations:
             self.meta.put_many("volume", [(volume, volume.image_id) for volume in volumes])
-            self.meta.put_many("annotation", [(annotation, annotation.image_id) for annotation in annotations])
+            # Kind and category live on the volume; copy them onto the
+            # annotation rows so queries filter without a join.
+            by_volume = {volume.id: volume for volume in volumes}
+            self.meta.put_many(
+                "annotation",
+                [(annotation, annotation.image_id) for annotation in annotations],
+                index={
+                    annotation.id: {
+                        "kind_id": by_volume[annotation.volume_id].kind_id,
+                        "category_id": by_volume[annotation.volume_id].category_id,
+                    }
+                    for annotation in annotations
+                },
+            )
             self._emit(AnnotationsDidAdd(type="annotations/didAdd", volumes=volumes, annotations=annotations))
         if not was_cancelled:
             progress(100, f"Segmentation finished: {len(annotations)} added")
