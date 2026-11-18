@@ -7,7 +7,16 @@
 // tfjs weight shards (.bin) of the bundled StarDist/GlaS models. A served page
 // runs its models on the engine, and those files make up ~130 MB of the
 // ~150 MB build; only the "Continue locally" fallback loses in-browser models.
-import { cpSync, existsSync, readdirSync, rmSync, statSync } from "node:fs";
+import { execSync } from "node:child_process";
+import {
+  cpSync,
+  existsSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { extname, join, relative, resolve, sep } from "node:path";
 
 const full = process.argv.includes("--full");
@@ -38,6 +47,28 @@ cpSync(dist, target, {
   recursive: true,
   filter: (src) => full || !isModelAsset(src),
 });
+// Stamp the copy with the protocol it speaks, so an engine serving an old
+// copy can say so instead of failing on the first request that changed.
+const { protocolVersion } = JSON.parse(
+  readFileSync(
+    resolve("python/packages/piximi-schema/schema/protocol.schema.json"),
+    "utf8",
+  ),
+);
+let commit = null;
+try {
+  commit = execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
+} catch {
+  // Not a checkout; the stamp still carries the protocol version.
+}
+writeFileSync(
+  join(target, "piximi-frontend.json"),
+  JSON.stringify(
+    { protocolVersion, builtAt: new Date().toISOString(), commit },
+    null,
+    2,
+  ) + "\n",
+);
 const mb = (dirSize(target) / 1048576).toFixed(1);
 console.log(
   `copied dist/ -> ${target} (${mb} MB${full ? "" : ", in-browser model assets left out; pass --full to keep them"})`,

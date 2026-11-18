@@ -6,5 +6,8 @@ bundle, from which the frontend generates its TypeScript types, so this
 package is the single source of truth for the protocol.
 """
 
-PROTOCOL_VERSION = "1.0.0"
-"""Semantic version of the wire contract. A major bump breaks older peers."""
+PROTOCOL_VERSION = "2.0.0"
+"""Semantic version of the wire contract. A major bump breaks older peers:
+a server refuses a client of another major at ``initialize``, with a message
+naming both, rather than failing on some later request. 1.x paged by keyset
+cursor; 2.0 pages by offset and adds deletion and model status."""

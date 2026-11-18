@@ -4,7 +4,7 @@
  */
 import type * as P from "./generated";
 
-export const PROTOCOL_VERSION = "1.0.0";
+export const PROTOCOL_VERSION = "2.0.0";
 
 /* Requests, keyed by method name. `progress` is the `$/progress` payload. */
 export type ProtocolMethods = {

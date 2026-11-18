@@ -12,12 +12,13 @@ renders a link for a frontend served elsewhere.
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 
 from piximi_link.notebook import NotebookSession, serve as serve_engine
 
 from .api import Project
-from .cli import find_frontend
+from .cli import find_frontend, frontend_version_warning
 from .engine import ReferenceEngine
 
 
@@ -52,12 +53,16 @@ async def serve(
         )
         if folder is not None:
             engine.ingest_folder(folder)
+    static_dir = find_frontend(str(frontend) if frontend else None)
+    stale = frontend_version_warning(static_dir) if static_dir is not None else None
+    if stale:
+        warnings.warn(stale, stacklevel=2)
     base = await serve_engine(
         engine,
         host=host,
         port=port,
         token=token,
         auth=auth,
-        static_dir=find_frontend(str(frontend) if frontend else None),
+        static_dir=static_dir,
     )
     return ProjectSession(Project(engine), base)

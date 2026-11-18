@@ -5,11 +5,13 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import logging
 import os
 import sys
 from pathlib import Path
 
+from piximi_schema import PROTOCOL_VERSION
 from piximi_link.auth import Auth
 from piximi_link.server import serve
 from piximi_link.session import SessionHub
@@ -29,6 +31,27 @@ def find_frontend(explicit: str | None) -> Path | None:
     return None
 
 
+def frontend_version_warning(frontend: Path) -> str | None:
+    """Why the build at ``frontend`` may not work with this engine: it is
+    stamped with the protocol it was built for (``piximi-frontend.json``,
+    written by ``pnpm engine:frontend``), and a page of another major would
+    fail on the first request whose shape changed."""
+    stamp = frontend / "piximi-frontend.json"
+    refresh = "run `pnpm engine:frontend` to refresh it"
+    if not stamp.is_file():
+        return f"The frontend build at {frontend} carries no protocol stamp, so it may predate this engine; {refresh}."
+    try:
+        version = str(json.loads(stamp.read_text(encoding="utf-8")).get("protocolVersion", ""))
+    except (OSError, ValueError):
+        return f"The frontend build at {frontend} has an unreadable protocol stamp; {refresh}."
+    if version.split(".")[0] != PROTOCOL_VERSION.split(".")[0]:
+        return (
+            f"The frontend build at {frontend} speaks protocol {version} and this engine "
+            f"{PROTOCOL_VERSION}; {refresh}."
+        )
+    return None
+
+
 async def _serve(args: argparse.Namespace) -> None:
     images = Path(args.images).resolve() if args.images else None
     data_dir = Path(args.data_dir) if args.data_dir else (images or Path.cwd()) / ".piximi"
@@ -42,6 +65,9 @@ async def _serve(args: argparse.Namespace) -> None:
 
     auth = Auth(None if args.no_auth else (args.token or Auth.generate_token()))
     frontend = find_frontend(args.frontend)
+    warning = frontend_version_warning(frontend) if frontend is not None else None
+    if warning:
+        print(f"Warning: {warning}", file=sys.stderr, flush=True)
     hub = SessionHub(engine, auth=auth)
     served = await serve(
         hub,
