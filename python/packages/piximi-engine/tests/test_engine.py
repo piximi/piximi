@@ -9,7 +9,7 @@ from piximi_engine.models.threshold import ThresholdSegmenter
 from piximi_engine.rle import decode_mask
 from piximi_link.errors import BackendError
 from piximi_link.peer import HandlerContext
-from piximi_schema.entities import ImageObject
+from piximi_schema.entities import ImageObject, Kind
 from piximi_schema.query import AnnotationQuery, ImageQuery, ImageSort, PageRequest
 from piximi_schema.render import ChannelDisplay, RenderRequest
 from piximi_schema.segmentation import SegmentationRunRequest
@@ -231,3 +231,39 @@ def test_pixels_round_trip_through_zarr(engine: ReferenceEngine):
     full = engine.pixels.get(channel_id)
     region = engine.pixels.get(channel_id, (2, 3, 10, 7))
     assert np.array_equal(region, full[3:7, 2:10])
+
+
+async def test_deleting_annotations_and_images_cascades_and_announces(engine: ReferenceEngine):
+    records = await all_images(engine)
+    a, b = records["a"], records["b"]
+    await engine.segmentation_run(
+        SegmentationRunRequest(model_id="threshold", image_ids=[a.image.id, b.image.id], channel_meta_ids=[], kind_name="Cell"),
+        ctx(),
+    )
+    events = []
+    engine.subscribe(events.append)
+    kind = next(k for k in engine.meta.list("kind", Kind) if k.name == "Cell")
+
+    # Nothing matching: nothing happens.
+    assert await engine.annotations_delete(AnnotationQuery(kind_ids=["nope"])) == 0
+    assert events == []
+
+    # Only `a`'s objects: `b` keeps its two, and their volumes.
+    deleted = await engine.annotations_delete(AnnotationQuery(kind_ids=[kind.id], image_ids=[a.image.id]))
+    assert deleted == 2
+    assert (await engine.annotation_counts(AnnotationQuery())).total == 2
+    assert engine.meta.count("volume") == 2
+    removed = events[-1]
+    assert removed.type == "annotations/didRemove"
+    assert len(removed.annotation_ids) == 2 == len(removed.volume_ids)
+
+    # The image itself: planes, channels, pixels, objects and its series go.
+    channel_ids = [channel.id for channel in b.channels]
+    deleted = await engine.images_delete(ImageQuery(ids=[b.image.id, "nope"]))
+    assert deleted == 1
+    assert events[-1].type == "images/didRemove" and events[-1].image_ids == [b.image.id]
+    assert (await engine.image_counts(ImageQuery())).total == 2
+    assert (await engine.annotation_counts(AnnotationQuery())).total == 0
+    assert engine.meta.count("plane") == 2 and engine.meta.get("series", b.series.id, type(b.series)) is None
+    assert all(channel_id not in engine.pixels for channel_id in channel_ids)
+    assert await engine.images_delete(ImageQuery(ids=[b.image.id])) == 0

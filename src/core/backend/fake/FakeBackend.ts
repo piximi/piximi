@@ -53,6 +53,7 @@ import type {
   BackendSession,
   CallOptions,
   Counts,
+  Deleted,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
@@ -408,6 +409,51 @@ export class FakeBackend implements Backend {
           data: new Uint8Array(stored.data),
         };
       }),
+  };
+
+  // ── Mutations ──────────────────────────────────────────────────────────────
+
+  readonly images = {
+    delete: async (query: ImageQuery): Promise<Deleted> => {
+      const ids = new Set(this.#imageListing(query).map((im) => im.id));
+      if (ids.size === 0) return { deleted: 0 };
+      const planeIds = new Set(
+        this.#planes.filter((p) => ids.has(p.imageId)).map((p) => p.id),
+      );
+      for (const channel of this.#channels) {
+        if (planeIds.has(channel.planeId)) this.#pixels.delete(channel.id);
+      }
+      this.#channels = this.#channels.filter((c) => !planeIds.has(c.planeId));
+      this.#planes = this.#planes.filter((p) => !ids.has(p.imageId));
+      this.#annotations = this.#annotations.filter((a) => !ids.has(a.imageId));
+      this.#volumes = this.#volumes.filter((v) => !ids.has(v.imageId));
+      this.#images = this.#images.filter((im) => !ids.has(im.id));
+      const used = new Set(this.#images.map((im) => im.seriesId));
+      this.#series = this.#series.filter((s) => used.has(s.id));
+      this.#bus.emit({ type: "images/didRemove", imageIds: [...ids] });
+      return { deleted: ids.size };
+    },
+  };
+
+  readonly annotations = {
+    delete: async (query: AnnotationQuery): Promise<Deleted> => {
+      const ids = new Set(
+        this.#annotationListing(query).map((row) => row.annotation.id),
+      );
+      if (ids.size === 0) return { deleted: 0 };
+      this.#annotations = this.#annotations.filter((a) => !ids.has(a.id));
+      const used = new Set(this.#annotations.map((a) => a.volumeId));
+      const volumeIds = this.#volumes
+        .filter((v) => !used.has(v.id))
+        .map((v) => v.id);
+      this.#volumes = this.#volumes.filter((v) => used.has(v.id));
+      this.#bus.emit({
+        type: "annotations/didRemove",
+        annotationIds: [...ids],
+        volumeIds,
+      });
+      return { deleted: ids.size };
+    },
   };
 
   // ── Jobs ───────────────────────────────────────────────────────────────────

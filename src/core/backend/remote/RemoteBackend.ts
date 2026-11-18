@@ -30,6 +30,7 @@ import type {
   BackendSession,
   CallOptions,
   Counts,
+  Deleted,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
@@ -156,6 +157,20 @@ export class RemoteBackend implements Backend {
         type: "images/didAdd",
         records: event.records.map(toImageRecord),
         channelMetas: event.channelMetas,
+      });
+    });
+    peer.onNotification("images/didRemove", (params) =>
+      this.#bus.emit({
+        type: "images/didRemove",
+        imageIds: (params as P.ImagesDidRemove).imageIds,
+      }),
+    );
+    peer.onNotification("annotations/didRemove", (params) => {
+      const event = params as P.AnnotationsDidRemove;
+      this.#bus.emit({
+        type: "annotations/didRemove",
+        annotationIds: event.annotationIds,
+        volumeIds: event.volumeIds,
       });
     });
     peer.onNotification("models/didChange", (params) =>
@@ -363,6 +378,20 @@ export class RemoteBackend implements Backend {
     await finished;
     if (failure && !isTaskCancelledError(failure)) throw failure;
   }
+
+  // ── Mutations ──────────────────────────────────────────────────────────────
+
+  readonly images = {
+    delete: (query: ImageQuery): Promise<Deleted> =>
+      this.#call("images/delete", { query: asWire<P.ImageQuery>(query) }),
+  };
+
+  readonly annotations = {
+    delete: (query: AnnotationQuery): Promise<Deleted> =>
+      this.#call("annotations/delete", {
+        query: asWire<P.AnnotationQuery>(query),
+      }),
+  };
 
   // ── Jobs ───────────────────────────────────────────────────────────────────
 

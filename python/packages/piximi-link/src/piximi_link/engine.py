@@ -16,7 +16,9 @@ from typing import Protocol
 from piximi_schema.capabilities import Capability
 from piximi_schema.events import (
     AnnotationsDidAdd,
+    AnnotationsDidRemove,
     ImagesDidAdd,
+    ImagesDidRemove,
     JobsDidUpdate,
     KindsDidAdd,
     ModelsDidChange,
@@ -45,7 +47,15 @@ from piximi_schema.segmentation import (
 
 from .peer import HandlerContext
 
-BackendEvent = KindsDidAdd | AnnotationsDidAdd | JobsDidUpdate | ImagesDidAdd | ModelsDidChange
+BackendEvent = (
+    KindsDidAdd
+    | AnnotationsDidAdd
+    | JobsDidUpdate
+    | ImagesDidAdd
+    | ModelsDidChange
+    | ImagesDidRemove
+    | AnnotationsDidRemove
+)
 EventListener = Callable[[BackendEvent], None]
 
 
@@ -87,6 +97,18 @@ class Engine(Protocol):
     ) -> CountsResult: ...
 
     async def masks(self, annotation_ids: list[str]) -> dict[str, list[int]]: ...
+
+    # ── Mutations ───────────────────────────────────────────────────────────
+
+    async def images_delete(self, query: ImageQuery) -> int:
+        """Removes every image the query matches, with its planes, channels
+        and objects; announces ``images/didRemove``; returns how many."""
+        ...
+
+    async def annotations_delete(self, query: AnnotationQuery) -> int:
+        """Removes every annotation the query matches and any volume left
+        empty; announces ``annotations/didRemove``; returns how many."""
+        ...
 
     # ── Render ──────────────────────────────────────────────────────────────
 

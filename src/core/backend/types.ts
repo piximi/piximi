@@ -47,6 +47,8 @@ export interface Backend {
   readonly query: BackendQuery;
   readonly render: BackendRender;
   readonly jobs: BackendJobs;
+  readonly images: BackendImages;
+  readonly annotations: BackendAnnotations;
   readonly segmentation?: BackendSegmentation;
 }
 
@@ -242,6 +244,24 @@ export interface BackendRender {
   ): AsyncIterable<RenderResult>;
   /* Only with the `raw-local` capability. */
   raw?(channelIds: string[]): Promise<RawChannelData[]>;
+}
+
+// ── Mutations ────────────────────────────────────────────────────────────────
+//
+// Scoped like the listings: a query says what goes, so "the selection" and
+// "everything in this category" are the same call. The backend announces what
+// went as `images/didRemove` / `annotations/didRemove`.
+
+export type Deleted = { deleted: number };
+
+export interface BackendImages {
+  /* Each image with its planes, channels and objects. */
+  delete(query: ImageQuery): Promise<Deleted>;
+}
+
+export interface BackendAnnotations {
+  /* Each annotation, and any volume left without one. */
+  delete(query: AnnotationQuery): Promise<Deleted>;
 }
 
 // ── Jobs ─────────────────────────────────────────────────────────────────────

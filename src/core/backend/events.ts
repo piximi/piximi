@@ -36,7 +36,15 @@ export type BackendEvent =
    * The model list changed: one was registered, or its status moved (an
    * environment built, weights loaded, a failure). Carries the whole list.
    */
-  | { type: "models/didChange"; models: SegmentationModelDescriptor[] };
+  | { type: "models/didChange"; models: SegmentationModelDescriptor[] }
+  /* Images are gone with everything under them; ids are enough to drop. */
+  | { type: "images/didRemove"; imageIds: string[] }
+  | {
+      type: "annotations/didRemove";
+      annotationIds: string[];
+      /* Volumes left without annotations, removed along with them. */
+      volumeIds: string[];
+    };
 
 export type BackendEventListener = (event: BackendEvent) => void;
 

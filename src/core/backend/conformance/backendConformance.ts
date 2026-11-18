@@ -400,5 +400,67 @@ export const describeBackendConformance = (
         expect(job?.status).toBe("succeeded");
       });
     });
+
+    // Last, since it removes from the project the earlier blocks count.
+    describe("mutations", () => {
+      it("deletes annotations by query and announces what went", async () => {
+        const { backend } = ctx;
+        if (!backend.segmentation) return;
+        const [model] = await backend.segmentation.listModels();
+        const kindName = `Gone-${Date.now()}`;
+        const summary = await backend.segmentation.run({
+          modelId: model.name,
+          imageIds: ctx.images.map((im) => im.id),
+          channelMetaIds: [],
+          kindName,
+        });
+        expect(summary.added).toBeGreaterThan(0);
+        const kind = (await backend.query.project()).kinds.find(
+          (k) => k.name === kindName,
+        );
+        expect(kind).toBeDefined();
+        const scope = { kindIds: [kind!.id] };
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((e) => events.push(e));
+        const { deleted } = await backend.annotations.delete(scope);
+        unsubscribe();
+
+        expect(deleted).toBe(summary.added);
+        expect((await backend.query.annotationCounts(scope)).total).toBe(0);
+        const removed = events.flatMap((e) =>
+          e.type === "annotations/didRemove" ? e.annotationIds : [],
+        );
+        expect(removed.length).toBe(summary.added);
+        expect(await backend.annotations.delete(scope)).toEqual({ deleted: 0 });
+      });
+
+      it("deletes an image with everything under it", async () => {
+        const { backend } = ctx;
+        const before = (await backend.query.imageCounts({})).total;
+        const target = ctx.images[ctx.images.length - 1];
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((e) => events.push(e));
+        const { deleted } = await backend.images.delete({ ids: [target.id] });
+        unsubscribe();
+
+        expect(deleted).toBe(1);
+        expect((await backend.query.imageCounts({})).total).toBe(before - 1);
+        expect(
+          (await backend.query.annotationCounts({ imageIds: [target.id] }))
+            .total,
+        ).toBe(0);
+        expect(
+          (await backend.query.images({ ids: [target.id] }, { limit: 1 }))
+            .items,
+        ).toEqual([]);
+        const removed = events.flatMap((e) =>
+          e.type === "images/didRemove" ? e.imageIds : [],
+        );
+        expect(removed).toContain(target.id);
+        expect(await backend.images.delete({ ids: [target.id] })).toEqual({
+          deleted: 0,
+        });
+      });
+    });
   });
 };

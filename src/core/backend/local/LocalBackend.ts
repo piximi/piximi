@@ -3,6 +3,7 @@ import { generateUUID } from "core/entities";
 import { getSegmenterApi } from "core/dl/segmentation/SegmenterApi";
 
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
+import { dataSlice } from "store/data";
 import {
   selectAllCategories,
   selectAllChannelMetas,
@@ -47,6 +48,7 @@ import type {
   BackendSession,
   CallOptions,
   Counts,
+  Deleted,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
@@ -479,6 +481,42 @@ export class LocalBackend implements Backend {
       yield { ...result, index: items[result.index].index };
     }
   }
+
+  // ── Mutations ──────────────────────────────────────────────────────────────
+  //
+  // The store is the local truth, so deleting is dispatching; the event
+  // follows for anyone listening, as it would from a remote engine.
+
+  readonly images = {
+    delete: async (query: ImageQuery): Promise<Deleted> => {
+      const ids = await this.query.imageIds(query);
+      if (ids.length > 0) {
+        this.#store.dispatch(dataSlice.actions.batchDeleteImageObject(ids));
+        this.#bus.emit({ type: "images/didRemove", imageIds: ids });
+      }
+      return { deleted: ids.length };
+    },
+  };
+
+  readonly annotations = {
+    delete: async (query: AnnotationQuery): Promise<Deleted> => {
+      const ids = await this.query.annotationIds(query);
+      if (ids.length === 0) return { deleted: 0 };
+      const { annotations } = this.#store.getState().data;
+      const candidates = new Set(
+        ids.flatMap((id) => annotations.entities[id]?.volumeId ?? []),
+      );
+      this.#store.dispatch(dataSlice.actions.batchDeleteAnnotation(ids));
+      // The reducer drops a volume with its last annotation.
+      const after = this.#store.getState().data.annotationVolumes.entities;
+      this.#bus.emit({
+        type: "annotations/didRemove",
+        annotationIds: ids,
+        volumeIds: [...candidates].filter((id) => !after[id]),
+      });
+      return { deleted: ids.length };
+    },
+  };
 
   // ── Jobs ───────────────────────────────────────────────────────────────────
 

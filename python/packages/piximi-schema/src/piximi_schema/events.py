@@ -41,6 +41,21 @@ class ImagesDidAdd(WireModel):
     """Channel metas created for these images; existing ones are not repeated."""
 
 
+class ImagesDidRemove(WireModel):
+    """Images are gone, with everything under them; the ids are enough for
+    a client to drop what it mirrors."""
+
+    type: Literal["images/didRemove"]
+    image_ids: list[str]
+
+
+class AnnotationsDidRemove(WireModel):
+    type: Literal["annotations/didRemove"]
+    annotation_ids: list[str]
+    volume_ids: list[str]
+    """Volumes left without annotations, removed along with them."""
+
+
 class ModelsDidChange(WireModel):
     """The model list changed: one was registered, or its status moved (an
     environment built, weights loaded, a failure). Carries the whole list,
@@ -51,7 +66,13 @@ class ModelsDidChange(WireModel):
 
 
 BackendEvent = Annotated[
-    KindsDidAdd | AnnotationsDidAdd | JobsDidUpdate | ImagesDidAdd | ModelsDidChange,
+    KindsDidAdd
+    | AnnotationsDidAdd
+    | JobsDidUpdate
+    | ImagesDidAdd
+    | ModelsDidChange
+    | ImagesDidRemove
+    | AnnotationsDidRemove,
     Field(discriminator="type"),
 ]
 
@@ -61,4 +82,6 @@ EVENT_TYPES: tuple[type[WireModel], ...] = (
     JobsDidUpdate,
     ImagesDidAdd,
     ModelsDidChange,
+    ImagesDidRemove,
+    AnnotationsDidRemove,
 )

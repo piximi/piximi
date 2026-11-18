@@ -35,7 +35,9 @@ from piximi_schema.entities import (
 )
 from piximi_schema.events import (
     AnnotationsDidAdd,
+    AnnotationsDidRemove,
     ImagesDidAdd,
+    ImagesDidRemove,
     KindsDidAdd,
     KindWithCategory,
     ModelsDidChange,
@@ -440,6 +442,50 @@ class ReferenceEngine:
     async def masks(self, annotation_ids: list[str]) -> dict[str, list[int]]:
         found = self.meta.get_many("annotation", annotation_ids, AnnotationObject)
         return {id: annotation.encoded_mask for id, annotation in found.items()}
+
+    # ── Engine protocol: mutations ──────────────────────────────────────────
+
+    async def images_delete(self, query: ImageQuery) -> int:
+        ids = self.meta.select_ids("image", where=image_clauses(query))
+        if not ids:
+            return 0
+        images = self.meta.get_many("image", ids, ImageObject)
+        planes = self.meta.list("plane", Plane, parents=ids)
+        plane_ids = [plane.id for plane in planes]
+        channels = self.meta.list("channel", Channel, parents=plane_ids)
+        for channel in channels:
+            self.pixels.delete(channel.id)
+        self.meta.delete("channel", [channel.id for channel in channels])
+        self.meta.delete("plane", plane_ids)
+        self.meta.delete("annotation", self.meta.ids("annotation", parents=ids))
+        self.meta.delete("volume", self.meta.ids("volume", parents=ids))
+        self.meta.delete("image", ids)
+        # A series is its images; one left without any goes too.
+        for series_id in sorted({image.series_id for image in images.values()}):
+            if not self.meta.ids("image", parents=[series_id]):
+                self.meta.delete("series", [series_id])
+        self._emit(ImagesDidRemove(type="images/didRemove", image_ids=ids))
+        return len(ids)
+
+    async def annotations_delete(self, query: AnnotationQuery) -> int:
+        ids = self.meta.select_ids("annotation", where=annotation_clauses(query))
+        if not ids:
+            return 0
+        headers = self.meta.get_many("annotation", ids, AnnotationHeader)
+        self.meta.delete("annotation", ids)
+        # A volume is its annotations across planes; one left empty goes too.
+        candidates = sorted({header.volume_id for header in headers.values()})
+        image_ids = sorted({header.image_id for header in headers.values()})
+        still_used = {
+            header.volume_id
+            for header in self.meta.list("annotation", AnnotationHeader, parents=image_ids)
+        }
+        empty = [volume_id for volume_id in candidates if volume_id not in still_used]
+        self.meta.delete("volume", empty)
+        self._emit(
+            AnnotationsDidRemove(type="annotations/didRemove", annotation_ids=ids, volume_ids=empty)
+        )
+        return len(ids)
 
     # ── Engine protocol: render ─────────────────────────────────────────────
 

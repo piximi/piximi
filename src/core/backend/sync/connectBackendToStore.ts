@@ -144,6 +144,17 @@ const applyBackendEvent = (
     case "models/didChange":
       // Nothing in the store holds models; the model dialog subscribes.
       return;
+    case "images/didRemove":
+      // The local store already changed; a remote mirror follows the event.
+      if (remote) {
+        store.dispatch(
+          dataSlice.actions.batchDeleteImageObject(event.imageIds),
+        );
+      }
+      break;
+    case "annotations/didRemove":
+      // Not mirrored for a remote project; the revision refreshes the grids.
+      break;
   }
   if (remote) store.dispatch(backendSyncSlice.actions.backendDataChanged());
 };

@@ -159,6 +159,19 @@ type Checks = [
     >
   >,
 
+  Assert<
+    Equivalent<
+      P.ImagesDidRemove,
+      Extract<BackendEvent, { type: "images/didRemove" }>
+    >
+  >,
+  Assert<
+    Equivalent<
+      P.AnnotationsDidRemove,
+      Extract<BackendEvent, { type: "annotations/didRemove" }>
+    >
+  >,
+
   // ── Query and render ──────────────────────────────────────────────────────
   Assert<Equivalent<P.PageRequest, PageRequest>>,
   Assert<Equivalent<P.SortDirection, SortDirection>>,

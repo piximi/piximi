@@ -395,6 +395,19 @@
       "title": "AnnotationVolume",
       "type": "object"
     },
+    "AnnotationsDeleteParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/AnnotationQuery"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "AnnotationsDeleteParams",
+      "type": "object"
+    },
     "AnnotationsDidAdd": {
       "additionalProperties": false,
       "properties": {
@@ -421,6 +434,34 @@
         "annotations"
       ],
       "title": "AnnotationsDidAdd",
+      "type": "object"
+    },
+    "AnnotationsDidRemove": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "annotations/didRemove",
+          "type": "string"
+        },
+        "annotationIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "volumeIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "annotationIds",
+        "volumeIds"
+      ],
+      "title": "AnnotationsDidRemove",
       "type": "object"
     },
     "AnnotationsParams": {
@@ -887,6 +928,19 @@
       "title": "DType",
       "type": "string"
     },
+    "DeletedResult": {
+      "additionalProperties": false,
+      "properties": {
+        "deleted": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "deleted"
+      ],
+      "title": "DeletedResult",
+      "type": "object"
+    },
     "ErrorCode": {
       "enum": [
         "MODEL_NOT_FOUND",
@@ -1248,6 +1302,19 @@
       "title": "ImageSortKey",
       "type": "string"
     },
+    "ImagesDeleteParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/ImageQuery"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "ImagesDeleteParams",
+      "type": "object"
+    },
     "ImagesDidAdd": {
       "additionalProperties": false,
       "properties": {
@@ -1274,6 +1341,28 @@
         "channelMetas"
       ],
       "title": "ImagesDidAdd",
+      "type": "object"
+    },
+    "ImagesDidRemove": {
+      "additionalProperties": false,
+      "description": "Images are gone, with everything under them; the ids are enough for\na client to drop what it mirrors.",
+      "properties": {
+        "type": {
+          "const": "images/didRemove",
+          "type": "string"
+        },
+        "imageIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "imageIds"
+      ],
+      "title": "ImagesDidRemove",
       "type": "object"
     },
     "ImagesParams": {
@@ -2759,6 +2848,18 @@
       "result": "#/$defs/MasksResult",
       "progress": null
     },
+    "images/delete": {
+      "direction": "client->server",
+      "params": "#/$defs/ImagesDeleteParams",
+      "result": "#/$defs/DeletedResult",
+      "progress": null
+    },
+    "annotations/delete": {
+      "direction": "client->server",
+      "params": "#/$defs/AnnotationsDeleteParams",
+      "result": "#/$defs/DeletedResult",
+      "progress": null
+    },
     "render/image": {
       "direction": "client->server",
       "params": "#/$defs/RenderImageParams",
@@ -2838,6 +2939,14 @@
     "models/didChange": {
       "direction": "server->client",
       "params": "#/$defs/ModelsDidChange"
+    },
+    "images/didRemove": {
+      "direction": "server->client",
+      "params": "#/$defs/ImagesDidRemove"
+    },
+    "annotations/didRemove": {
+      "direction": "server->client",
+      "params": "#/$defs/AnnotationsDidRemove"
     }
   }
 }

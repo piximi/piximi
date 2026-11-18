@@ -68,6 +68,18 @@ export type ProtocolMethods = {
     progress: void;
     direction: "client->server";
   };
+  "images/delete": {
+    params: P.ImagesDeleteParams;
+    result: P.DeletedResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "annotations/delete": {
+    params: P.AnnotationsDeleteParams;
+    result: P.DeletedResult;
+    progress: void;
+    direction: "client->server";
+  };
   "render/image": {
     params: P.RenderImageParams;
     result: P.RenderedImage;
@@ -127,6 +139,14 @@ export type ProtocolNotifications = {
   "images/didAdd": { params: P.ImagesDidAdd; direction: "server->client" };
   "models/didChange": {
     params: P.ModelsDidChange;
+    direction: "server->client";
+  };
+  "images/didRemove": {
+    params: P.ImagesDidRemove;
+    direction: "server->client";
+  };
+  "annotations/didRemove": {
+    params: P.AnnotationsDidRemove;
     direction: "server->client";
   };
 };

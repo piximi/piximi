@@ -76,6 +76,20 @@ class MasksParams(WireModel):
     annotation_ids: list[str]
 
 
+class ImagesDeleteParams(WireModel):
+    query: ImageQuery
+    """Every image the query matches goes, with its planes, channels and objects."""
+
+
+class AnnotationsDeleteParams(WireModel):
+    query: AnnotationQuery
+    """Every annotation the query matches goes; a volume left empty goes too."""
+
+
+class DeletedResult(WireModel):
+    deleted: int
+
+
 class RenderImageParams(WireModel):
     request: RenderRequest
 
@@ -143,6 +157,8 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("query/annotationIds", AnnotationIdsParams, IdsResult),
     MethodSpec("query/annotationCounts", AnnotationCountsParams, CountsResult),
     MethodSpec("query/masks", MasksParams, MasksResult),
+    MethodSpec("images/delete", ImagesDeleteParams, DeletedResult),
+    MethodSpec("annotations/delete", AnnotationsDeleteParams, DeletedResult),
     MethodSpec("render/image", RenderImageParams, RenderedImage),
     MethodSpec(
         "render/thumbnails",

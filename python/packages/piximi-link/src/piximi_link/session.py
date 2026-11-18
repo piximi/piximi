@@ -19,9 +19,12 @@ from piximi_schema.base import WireModel
 from piximi_schema.methods import (
     AnnotationCountsParams,
     AnnotationIdsParams,
+    AnnotationsDeleteParams,
     AnnotationsParams,
+    DeletedResult,
     ImageCountsParams,
     ImageIdsParams,
+    ImagesDeleteParams,
     ImagesParams,
     JobsCancelParams,
     JobsListResult,
@@ -152,6 +155,12 @@ class SessionHub:
         async def masks(params: MasksParams, _ctx: HandlerContext):
             return MasksResult(masks=await engine.masks(params.annotation_ids))
 
+        async def images_delete(params: ImagesDeleteParams, _ctx: HandlerContext):
+            return DeletedResult(deleted=await engine.images_delete(params.query))
+
+        async def annotations_delete(params: AnnotationsDeleteParams, _ctx: HandlerContext):
+            return DeletedResult(deleted=await engine.annotations_delete(params.query))
+
         async def render_image(params: RenderImageParams, _ctx: HandlerContext):
             return await engine.render_image(params.request)
 
@@ -188,6 +197,8 @@ class SessionHub:
         peer.on_request("query/annotationIds", typed(AnnotationIdsParams, annotation_ids))
         peer.on_request("query/annotationCounts", typed(AnnotationCountsParams, annotation_counts))
         peer.on_request("query/masks", typed(MasksParams, masks))
+        peer.on_request("images/delete", typed(ImagesDeleteParams, images_delete))
+        peer.on_request("annotations/delete", typed(AnnotationsDeleteParams, annotations_delete))
         peer.on_request("render/image", typed(RenderImageParams, render_image))
         peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
         peer.on_request("jobs/list", typed(None, jobs_list))

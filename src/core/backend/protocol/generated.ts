@@ -334,12 +334,28 @@ export interface PredictionCorrection {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationsDeleteParams".
+ */
+export interface AnnotationsDeleteParams {
+  query: AnnotationQuery;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "AnnotationsDidAdd".
  */
 export interface AnnotationsDidAdd {
   type: "annotations/didAdd";
   volumes: AnnotationVolume[];
   annotations: AnnotationObject[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationsDidRemove".
+ */
+export interface AnnotationsDidRemove {
+  type: "annotations/didRemove";
+  annotationIds: string[];
+  volumeIds: string[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -526,6 +542,13 @@ export interface CountsResult {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "DeletedResult".
+ */
+export interface DeletedResult {
+  deleted: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ErrorResponseMessage".
  */
 export interface ErrorResponseMessage {
@@ -668,12 +691,30 @@ export interface Plane {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImagesDeleteParams".
+ */
+export interface ImagesDeleteParams {
+  query: ImageQuery;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ImagesDidAdd".
  */
 export interface ImagesDidAdd {
   type: "images/didAdd";
   records: ImageRecord[];
   channelMetas: ChannelMeta[];
+}
+/**
+ * Images are gone, with everything under them; the ids are enough for
+ * a client to drop what it mirrors.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImagesDidRemove".
+ */
+export interface ImagesDidRemove {
+  type: "images/didRemove";
+  imageIds: string[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
