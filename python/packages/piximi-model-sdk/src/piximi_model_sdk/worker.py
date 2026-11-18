@@ -25,13 +25,16 @@ from .model import Cancelled, Context, LabelResult, SegmentationModel
 _models: dict[str, SegmentationModel] = {}
 
 
-def instantiate(key: str, module: str, attribute: str) -> dict[str, str]:
+def instantiate(
+    key: str, module: str, attribute: str, settings: Optional[dict[str, Any]] = None
+) -> dict[str, str]:
     """Imports the plugin's entry module and keeps the model it names under
     ``key``; the attribute may be the instance, its class, or a factory."""
     target = getattr(importlib.import_module(module), attribute)
     model = target() if not isinstance(target, SegmentationModel) and callable(target) else target
     if not isinstance(model, SegmentationModel):
         raise TypeError(f"{module}:{attribute} is not a SegmentationModel")
+    model.settings = dict(settings or {})
     _models[key] = model
     return {"python": platform.python_version(), "executable": sys.executable}
 

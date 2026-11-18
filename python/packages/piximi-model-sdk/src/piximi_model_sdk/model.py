@@ -62,6 +62,10 @@ class SegmentationModel:
     use, then :meth:`segment` per image.
     """
 
+    settings: dict[str, Any] = {}
+    """The engine's preferences, set before :meth:`load`: ``gpu`` (bool),
+    whether to use a GPU when there is one."""
+
     def load(self, ctx: Context) -> None:
         """Fetches weights and warms up. A no-op for models with nothing to load."""
 

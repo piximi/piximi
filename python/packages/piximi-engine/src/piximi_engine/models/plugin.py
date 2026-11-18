@@ -53,7 +53,7 @@ UNAVAILABLE_MESSAGE = "Install piximi-engine[appose] to run model plugins"
 Progress = Callable[[str, float], None]
 """``(message, percent)``, percent -1 while indeterminate."""
 
-INSTANTIATE = "from piximi_model_sdk import worker\nworker.instantiate(key, module, attribute)\n"
+INSTANTIATE = "from piximi_model_sdk import worker\nworker.instantiate(key, module, attribute, settings)\n"
 LOAD = "from piximi_model_sdk import worker\nworker.load(task, key)\n"
 SEGMENT = "from piximi_model_sdk import worker\nworker.segment(task, key, image, options)\n"
 UNLOAD = "from piximi_model_sdk import worker\nworker.unload(key)\n"
@@ -370,7 +370,12 @@ class PluginModel(SegmentationModel):
             await asyncio.to_thread(
                 self.service.run,
                 INSTANTIATE,
-                {"key": self.id, "module": module, "attribute": self.spec.attribute},
+                {
+                    "key": self.id,
+                    "module": module,
+                    "attribute": self.spec.attribute,
+                    "settings": {"gpu": self.service.gpu},
+                },
             )
             progress(f"Loading {self.display_name}", -1)
             await asyncio.to_thread(

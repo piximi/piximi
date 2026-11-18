@@ -1,0 +1,81 @@
+# StarDist2D through cellcast (https://github.com/uw-loci/cellcast): the model
+# recast in Rust/Burn on a WebGPU backend, so it runs on the GPU on macOS too,
+# and on the CPU where there is no adapter. numpy is its only dependency.
+
+[plugin]
+id = "cellcast"
+name = "cellcast StarDist2D"
+version = "0.3"
+framework = "cellcast"
+entry = "model.py"
+
+[plugin.env]
+python = "3.12"
+requirements = ["cellcast>=0.3,<0.4", "numpy"]
+
+[plugin.resources]
+gpu = true
+
+[[models]]
+id = "cellcast-stardist-fluo"
+attribute = "FLUO"
+display_name = "StarDist2D fluorescence (cellcast)"
+description = "Star-convex nucleus segmentation, versatile fluorescence weights"
+use = "Nuclei in a single fluorescence channel (e.g. DAPI)"
+output = { mode = "single", default_kind_name = "Nucleus" }
+channels = { mode = "passthrough", max_channels = 1 }
+sources = [
+  { text = "cellcast", url = "https://github.com/uw-loci/cellcast" },
+  { text = "StarDist", url = "https://github.com/stardist/stardist" },
+]
+cite = [
+  { text = "Cell Detection with Star-Convex Polygons", url = "https://doi.org/10.1007/978-3-030-00934-2_30" },
+]
+
+[[models.options.groups]]
+id = "detection"
+label = "Detection"
+fields = [
+  { key = "probThreshold", type = "number", label = "Probability threshold", optional = true, empty_label = "Model default (0.48)", min = 0, max = 1, step = 0.01, tooltip = "Objects with a lower probability are dropped" },
+  { key = "nmsThreshold", type = "number", label = "Overlap threshold", optional = true, empty_label = "Model default (0.3)", min = 0, max = 1, step = 0.01, tooltip = "Overlapping candidates beyond this are merged by non-maximum suppression" },
+]
+
+[[models.options.groups]]
+id = "normalization"
+label = "Normalization"
+fields = [
+  { key = "pmin", type = "number", label = "Low percentile", default = 1.0, min = 0, max = 100, step = 0.1, advanced = true, tooltip = "Intensities below this percentile map to 0" },
+  { key = "pmax", type = "number", label = "High percentile", default = 99.8, min = 0, max = 100, step = 0.1, advanced = true, tooltip = "Intensities above this percentile map to 1" },
+]
+
+[[models]]
+id = "cellcast-stardist-he"
+attribute = "HE"
+display_name = "StarDist2D H&E (cellcast)"
+description = "Star-convex nucleus segmentation, versatile H&E weights"
+use = "Nuclei in brightfield H&E images (RGB)"
+output = { mode = "single", default_kind_name = "Nucleus" }
+channels = { mode = "fixed", count = 3 }
+sources = [
+  { text = "cellcast", url = "https://github.com/uw-loci/cellcast" },
+  { text = "StarDist", url = "https://github.com/stardist/stardist" },
+]
+cite = [
+  { text = "Cell Detection with Star-Convex Polygons", url = "https://doi.org/10.1007/978-3-030-00934-2_30" },
+]
+
+[[models.options.groups]]
+id = "detection"
+label = "Detection"
+fields = [
+  { key = "probThreshold", type = "number", label = "Probability threshold", optional = true, empty_label = "Model default (0.48)", min = 0, max = 1, step = 0.01, tooltip = "Objects with a lower probability are dropped" },
+  { key = "nmsThreshold", type = "number", label = "Overlap threshold", optional = true, empty_label = "Model default (0.3)", min = 0, max = 1, step = 0.01, tooltip = "Overlapping candidates beyond this are merged by non-maximum suppression" },
+]
+
+[[models.options.groups]]
+id = "normalization"
+label = "Normalization"
+fields = [
+  { key = "pmin", type = "number", label = "Low percentile", default = 1.0, min = 0, max = 100, step = 0.1, advanced = true, tooltip = "Intensities below this percentile map to 0" },
+  { key = "pmax", type = "number", label = "High percentile", default = 99.8, min = 0, max = 100, step = 0.1, advanced = true, tooltip = "Intensities above this percentile map to 1" },
+]

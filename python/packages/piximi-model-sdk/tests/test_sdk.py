@@ -58,8 +58,9 @@ def test_instantiate_accepts_instances_classes_and_factories(monkeypatch):
     monkeypatch.setitem(__import__("sys").modules, "fake_plugin", module)
 
     for attribute in ("INSTANCE", "CLASS", "factory"):
-        info = worker.instantiate("m", "fake_plugin", attribute)
+        info = worker.instantiate("m", "fake_plugin", attribute, {"gpu": False})
         assert isinstance(worker._models["m"], Squares)
+        assert worker._models["m"].settings == {"gpu": False}
         assert info["python"]
     with pytest.raises(TypeError):
         module.NOPE = object()

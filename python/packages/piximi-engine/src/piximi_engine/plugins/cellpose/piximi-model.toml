@@ -1,0 +1,70 @@
+# Cellpose 3 (https://github.com/MouseLand/cellpose) on PyTorch: a generalist
+# cell and nucleus segmenter, and a second framework next to cellcast, each
+# in its own environment. PyTorch stopped shipping wheels for Intel Macs
+# after 2.2, which needs Python 3.11, and llvmlite (through numba) after
+# 0.45; other platforms take current releases.
+
+[plugin]
+id = "cellpose"
+name = "Cellpose 3"
+version = "3"
+framework = "pytorch"
+entry = "model.py"
+
+[plugin.env]
+python = "3.11"
+requirements = [
+  "cellpose>=3.1,<4",
+  "numpy<2",
+  "torch==2.2.*; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+  "numba<0.63; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+]
+
+[plugin.resources]
+gpu = true
+memory_hint = "weights: ~25 MB per model, downloaded on first load"
+
+[[models]]
+id = "cellpose-cyto3"
+attribute = "CYTO3"
+display_name = "Cellpose cyto3"
+description = "Generalist cytoplasm segmentation with an estimated cell diameter"
+use = "Whole cells in a cytoplasm channel, optionally with a nucleus channel second"
+output = { mode = "single", default_kind_name = "Cell" }
+channels = { mode = "passthrough", max_channels = 2 }
+sources = [{ text = "Cellpose", url = "https://github.com/MouseLand/cellpose" }]
+cite = [
+  { text = "Cellpose3: one-click image restoration for improved cellular segmentation", url = "https://doi.org/10.1038/s41592-025-02595-5" },
+  { text = "Cellpose: a generalist algorithm for cellular segmentation", url = "https://doi.org/10.1038/s41592-020-01018-x" },
+]
+
+[[models.options.groups]]
+id = "segmentation"
+label = "Segmentation"
+fields = [
+  { key = "diameter", type = "number", label = "Cell diameter (px)", optional = true, empty_label = "Estimate", min = 1, step = 1, tooltip = "Typical object diameter; empty lets the size model estimate it" },
+  { key = "flowThreshold", type = "number", label = "Flow threshold", default = 0.4, min = 0, max = 3, step = 0.1, tooltip = "Maximum allowed error of the flows per mask; raise to keep more masks" },
+  { key = "cellprobThreshold", type = "number", label = "Cell probability threshold", default = 0.0, min = -6, max = 6, step = 0.5, advanced = true, tooltip = "Lower finds more and larger masks" },
+]
+
+[[models]]
+id = "cellpose-nuclei"
+attribute = "NUCLEI"
+display_name = "Cellpose nuclei"
+description = "Nucleus segmentation with an estimated nucleus diameter"
+use = "Nuclei in a single nuclear channel (e.g. DAPI)"
+output = { mode = "single", default_kind_name = "Nucleus" }
+channels = { mode = "passthrough", max_channels = 1 }
+sources = [{ text = "Cellpose", url = "https://github.com/MouseLand/cellpose" }]
+cite = [
+  { text = "Cellpose: a generalist algorithm for cellular segmentation", url = "https://doi.org/10.1038/s41592-020-01018-x" },
+]
+
+[[models.options.groups]]
+id = "segmentation"
+label = "Segmentation"
+fields = [
+  { key = "diameter", type = "number", label = "Nucleus diameter (px)", optional = true, empty_label = "Estimate", min = 1, step = 1, tooltip = "Typical object diameter; empty lets the size model estimate it" },
+  { key = "flowThreshold", type = "number", label = "Flow threshold", default = 0.4, min = 0, max = 3, step = 0.1, tooltip = "Maximum allowed error of the flows per mask; raise to keep more masks" },
+  { key = "cellprobThreshold", type = "number", label = "Cell probability threshold", default = 0.0, min = -6, max = 6, step = 0.5, advanced = true, tooltip = "Lower finds more and larger masks" },
+]

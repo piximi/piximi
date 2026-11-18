@@ -29,6 +29,11 @@ piximi = "piximi_engine.cli:main"
 [project.entry-points.jupyter_serverproxy_servers]
 piximi = "piximi_engine.jupyter:setup_piximi"
 
+# Model plugins the engine ships; each value is its manifest's path.
+[project.entry-points."piximi.models"]
+cellcast = "piximi_engine.plugins:CELLCAST"
+cellpose = "piximi_engine.plugins:CELLPOSE"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
