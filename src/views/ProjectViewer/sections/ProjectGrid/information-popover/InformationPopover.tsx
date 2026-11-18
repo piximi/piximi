@@ -22,9 +22,17 @@ export const InformationPopover = () => {
       }}
     >
       {state.itemType === "image" ? (
-        <ImagePopoverContent itemId={state.itemId} onMissing={close} />
+        <ImagePopoverContent
+          itemId={state.itemId}
+          record={state.item}
+          onMissing={close}
+        />
       ) : (
-        <AnnotationPopoverContent itemId={state.itemId} onMissing={close} />
+        <AnnotationPopoverContent
+          itemId={state.itemId}
+          record={state.item}
+          onMissing={close}
+        />
       )}
     </Popover>
   );

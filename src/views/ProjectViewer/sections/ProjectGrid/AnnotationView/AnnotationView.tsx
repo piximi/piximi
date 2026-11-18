@@ -10,16 +10,13 @@ import { UNKNOWN_KIND_ID } from "core/entities";
 import { useMenu, useMobileView } from "hooks";
 
 import { dataSlice } from "store/data";
-import {
-  selectExtendedAnnotationsByKindId,
-  selectKindEntities,
-} from "store/data/selectors";
-import { useParameterizedSelector } from "store/hooks";
+import { selectKindEntities } from "store/data/selectors";
 import { HelpItem } from "help/HelpContent";
 
 import { DIMENSIONS } from "utils/constants";
 import { findAdjacentItem } from "utils/arrayUtils";
 
+import { useAnnotationCounts } from "@ProjectViewer/hooks";
 import { selectAnnotationGridState } from "@ProjectViewer/state/selectors";
 import { projectSlice } from "@ProjectViewer/state/projectSlice";
 
@@ -27,23 +24,22 @@ import { AddKindMenu } from "../AddKindMenu";
 import { KindTab } from "./KindTab";
 import { AnnotationGrid } from "./AnnotationGrid";
 
+const UNKNOWN_KIND_QUERY = { kindIds: [UNKNOWN_KIND_ID] };
+
 export const AnnotationView = () => {
   const dispatch = useDispatch();
   const gridState = useSelector(selectAnnotationGridState);
   const kinds = useSelector(selectKindEntities);
-  const unknownAnnotations = useParameterizedSelector(
-    selectExtendedAnnotationsByKindId,
-    UNKNOWN_KIND_ID,
-  );
+  const unknownCount = useAnnotationCounts(UNKNOWN_KIND_QUERY)?.total ?? 0;
 
   const visibleKinds = useMemo(
     () =>
       Object.values(gridState.kindStates).filter((state) =>
         state.id === UNKNOWN_KIND_ID
-          ? state.visible === true && unknownAnnotations.length > 0
+          ? state.visible === true && unknownCount > 0
           : state.visible === true,
       ),
-    [gridState.kindStates, unknownAnnotations],
+    [gridState.kindStates, unknownCount],
   );
   const minimizedKinds = useMemo(
     () =>

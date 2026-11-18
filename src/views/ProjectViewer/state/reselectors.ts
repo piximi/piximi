@@ -5,19 +5,13 @@ import { CATEGORY_COLORS, representsUnknown } from "core/entities";
 
 import {
   selectAllCategories,
-  selectAnnotatedImageIds,
   selectExtendedAnnotationsByKindId,
   selectExtendedImages,
 } from "store/data/selectors";
 
-import { isFiltered } from "../utils";
 import {
   selectActiveKindId,
   selectActiveView,
-  selectFilterSelectedImages,
-  selectImageAnnotationStatusFilter,
-  selectImageFilters,
-  selectKindStates,
   selectSelectedImageIds,
 } from "./selectors";
 
@@ -34,11 +28,6 @@ export const selectSelectedImages = createSelector(
     const selectedSet = new Set(selectedIds);
     return images.filter((images) => selectedSet.has(images.id));
   },
-);
-
-const selectSelectedImageIdSet = createSelector(
-  selectSelectedImageIds,
-  (selectedIds) => new Set(selectedIds),
 );
 
 // --- Categories ---
@@ -96,61 +85,6 @@ export const selectActiveItems = createSelector(
     return annotations;
   },
 );
-
-/*
- * The images the grid shows. `annotationStatus` is applied as its own stage
- * because "has annotations" is not a field on the image, so `isFiltered` — which
- * is keyed on entity fields — cannot express it.
- */
-export const selectVisibleImages = createSelector(
-  selectExtendedImages,
-  selectImageFilters,
-  selectImageAnnotationStatusFilter,
-  selectAnnotatedImageIds,
-  (images, filters, annotationStatus, annotatedImageIds) => {
-    const visible = images.filter((image) => !isFiltered(image, filters ?? {}));
-    if (annotationStatus === "all") return visible;
-
-    const wantAnnotated = annotationStatus === "annotated";
-    return visible.filter(
-      (image) => annotatedImageIds.has(image.id) === wantAnnotated,
-    );
-  },
-);
-
-/*
- * The annotations one kind's grid shows: that kind's own filters, plus the
- * cross-kind "only from selected images" filter, which applies to every kind
- * rather than just the active one. An empty image selection with the filter on
- * is read literally and yields nothing.
- */
-export const selectVisibleAnnotationsByKind = createSelector(
-  selectExtendedAnnotationsByKindId,
-  (state: RootState, kindId: string) =>
-    selectKindStates(state)[kindId]?.filters,
-  selectFilterSelectedImages,
-  selectSelectedImageIdSet,
-  (annotations, filters, onlySelectedImages, selectedImageIds) => {
-    const visible = annotations.filter(
-      (annotation) => !isFiltered(annotation, filters ?? {}),
-    );
-    if (!onlySelectedImages) return visible;
-
-    return visible.filter((annotation) =>
-      selectedImageIds.has(annotation.imageId),
-    );
-  },
-);
-
-/*
- * The active view's visible items. Both branches are memoized, so this needs no
- * memoization of its own. Bulk actions read this, which is what keeps their
- * scope identical to what the user can actually see.
- */
-export const selectVisibleItems = (state: RootState) =>
-  selectActiveView(state) === "images"
-    ? selectVisibleImages(state)
-    : selectVisibleAnnotationsByKind(state, selectActiveKindId(state));
 
 export const selectActiveLabeledItems = createSelector(
   selectActiveItems,

@@ -4,43 +4,55 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Typography } from "@mui/material";
 
+import { useBackend } from "core/backend";
+import { useQueryWindow } from "core/backend/query";
+
 import { usePreloadSrcs } from "hooks";
 
-import { useParameterizedSelector } from "store/hooks";
-
-import { useAnnotationSort } from "@ProjectViewer/hooks";
+import { useAnnotationGridQuery, useDataRevision } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
-import { selectVisibleAnnotationsByKind } from "@ProjectViewer/state/reselectors";
 import {
   selectFilterSelectedImages,
   selectSelectedImageIds,
 } from "@ProjectViewer/state/selectors";
 
 import { AnnotationGridItem } from "./AnnotationGridItem";
-import { createGridCell, createItemData } from "../gridUtils";
+import { extendAnnotation } from "../gridItems";
+import { createGridCell } from "../gridUtils";
+import { useGridItems } from "../useGridItems";
 import { useGridLayout } from "../useGridLayout";
 import { VirtualGrid } from "../VirtualGrid";
 
+import type { AnnotationRecord, PageRequest } from "core/backend";
+
 import type { KindState } from "@ProjectViewer/state/types";
 
-const Cell = createGridCell(AnnotationGridItem);
+import type { GridCellData } from "../gridUtils";
+
+const Cell = createGridCell(
+  AnnotationGridItem,
+  (record: AnnotationRecord) => record.annotation.id,
+);
 
 //NOTE: kind is passed as a prop and used internally instead of the kind returned
 // by the active kind selector to keep from rerendering the grid items when switching tabs
 export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
   const dispatch = useDispatch();
-  const visibleAnnotations = useParameterizedSelector(
-    selectVisibleAnnotationsByKind,
-    kindState.id,
-  );
+  const backend = useBackend();
+  const revision = useDataRevision();
+  const { query, sort, key } = useAnnotationGridQuery(kindState);
   const onlySelectedImages = useSelector(selectFilterSelectedImages);
   const selectedImageIds = useSelector(selectSelectedImageIds);
-  const sortFunction = useAnnotationSort(kindState.sortType);
 
-  const visibleAnns = useMemo(
-    () => [...visibleAnnotations].sort(sortFunction),
-    [visibleAnnotations, sortFunction],
+  const source = useMemo(
+    () => ({
+      key,
+      fetch: (page: PageRequest) =>
+        backend.query.annotations(query, page, sort),
+    }),
+    [backend, key, query, sort],
   );
+  const window = useQueryWindow(source, revision);
 
   // An empty image selection filters everything out, which would otherwise
   // render as a blank panel.
@@ -54,9 +66,17 @@ export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
     rowHeight,
     numColumns,
     numRows,
-  } = useGridLayout(visibleAnns.length);
+  } = useGridLayout(window.total);
 
-  usePreloadSrcs(visibleAnns);
+  const { annotationLookups } = useGridItems();
+  const inView = useMemo(
+    () =>
+      window.loaded.flatMap(
+        (record) => extendAnnotation(record, annotationLookups) ?? [],
+      ),
+    [window.loaded, annotationLookups],
+  );
+  usePreloadSrcs(inView);
 
   const handleSelectAnnotation = useCallback(
     (id: string, selected: boolean) => {
@@ -77,6 +97,28 @@ export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
       }
     },
     [dispatch, kindState.id],
+  );
+
+  const itemData = useMemo(
+    (): GridCellData<AnnotationRecord> => ({
+      count: window.total,
+      getItem: window.get,
+      handleSelect: handleSelectAnnotation,
+      selectedIds: new Set(kindState.selectedIds),
+      numColumns,
+    }),
+    [
+      window.total,
+      window.get,
+      handleSelectAnnotation,
+      kindState.selectedIds,
+      numColumns,
+    ],
+  );
+  const { setRange } = window;
+  const handleItemsRendered = useCallback(
+    ({ start, end }: { start: number; end: number }) => setRange(start, end),
+    [setRange],
   );
 
   if (awaitingImageSelection) {
@@ -112,13 +154,9 @@ export const AnnotationGrid = ({ kindState }: { kindState: KindState }) => {
       rowHeight={rowHeight}
       numColumns={numColumns}
       numRows={numRows}
-      itemData={createItemData(
-        visibleAnns,
-        handleSelectAnnotation,
-        kindState.selectedIds,
-        numColumns,
-      )}
+      itemData={itemData}
       Cell={Cell}
+      onItemsRendered={handleItemsRendered}
     />
   );
 };

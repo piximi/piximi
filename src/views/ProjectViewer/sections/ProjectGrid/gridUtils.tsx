@@ -2,35 +2,29 @@ import { memo } from "react";
 
 import { areEqual } from "react-window";
 
-import memoize from "memoize-one";
+import { GridPlaceholder } from "./GridPlaceholder";
 
 import type { GridChildComponentProps } from "react-window";
 
 type SelectHandler = (id: string, selected: boolean) => void;
 
+/* What every cell of a grid reads: records by index, from a query window. */
 export type GridCellData<T> = {
-  items: T[];
+  count: number;
+  getItem: (index: number) => T | undefined;
   handleSelect: SelectHandler;
-  selectedIds: string[];
+  selectedIds: ReadonlySet<string>;
   numColumns: number;
 };
 
-export const createItemData = memoize(
-  <T,>(
-    items: T[],
-    handleSelect: SelectHandler,
-    selectedIds: string[],
-    numColumns: number,
-  ): GridCellData<T> => ({ items, handleSelect, selectedIds, numColumns }),
-);
-
-export function createGridCell<T extends { id: string }>(
+export function createGridCell<T>(
   ItemComponent: React.ComponentType<{
     item: T;
     handleClick: SelectHandler;
     selected: boolean;
     isScrolling?: boolean;
   }>,
+  idOf: (item: T) => string,
 ) {
   return memo(
     ({
@@ -41,8 +35,9 @@ export function createGridCell<T extends { id: string }>(
       data,
     }: GridChildComponentProps<GridCellData<T>>) => {
       const idx = rowIndex * data.numColumns + columnIndex;
-      if (idx >= data.items.length) return <></>;
-      const item = data.items[idx];
+      if (idx >= data.count) return <></>;
+      const item = data.getItem(idx);
+      const id = item === undefined ? undefined : idOf(item);
       return (
         <div
           style={{
@@ -51,14 +46,20 @@ export function createGridCell<T extends { id: string }>(
             justifyContent: "flex-start",
             alignItems: "center",
           }}
-          data-testid={`grid-item-${item.id}`}
+          data-testid={
+            id === undefined ? "grid-item-pending" : `grid-item-${id}`
+          }
         >
-          <ItemComponent
-            item={item}
-            handleClick={data.handleSelect}
-            selected={data.selectedIds.includes(item.id)}
-            isScrolling={isScrolling}
-          />
+          {item === undefined ? (
+            <GridPlaceholder />
+          ) : (
+            <ItemComponent
+              item={item}
+              handleClick={data.handleSelect}
+              selected={data.selectedIds.has(id!)}
+              isScrolling={isScrolling}
+            />
+          )}
         </div>
       );
     },

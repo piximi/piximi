@@ -4,10 +4,9 @@ import { useDialogHotkey } from "hooks";
 
 import { CategoryDialog, ConfirmationDialog } from "components/dialogs";
 
-import { useParameterizedSelector } from "store/hooks";
-import { selectEntityCountByCategoryId } from "store/data/selectors";
-
 import { HotkeyContext } from "utils/enums";
+
+import { useCategoryCount } from "@ProjectViewer/hooks";
 
 import type { Category } from "core/entities";
 
@@ -32,10 +31,7 @@ export const CategoryItemMenu = ({
   deleteCategory,
   clearObjects,
 }: CategoryItemMenuProps) => {
-  const numEntities = useParameterizedSelector(
-    selectEntityCountByCategoryId,
-    category.id,
-  );
+  const numEntities = useCategoryCount(category);
   const {
     onClose: handleCloseEditCategoryDialog,
     onOpen: handleOpenEditCategoryDialog,

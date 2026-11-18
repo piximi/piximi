@@ -7,12 +7,18 @@ import { haloFilter } from "utils/styleUtils";
 
 import { useInformationPopover } from "../information-popover";
 
+import type { AnnotationRecord, ImageRecord } from "core/backend";
+
+import type { PopoverState } from "../information-popover/InformationPopoverProvider";
+
 export const InfoButton = ({
   itemId,
   itemType,
+  item,
 }: {
   itemId: string;
   itemType: "annotation" | "image";
+  item?: ImageRecord | AnnotationRecord;
 }) => {
   const theme = useTheme();
   const infoHalo = haloFilter(
@@ -22,7 +28,7 @@ export const InfoButton = ({
 
   const handleOpenDetails = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    open({ itemId, itemType, anchorEl: e.currentTarget });
+    open({ itemId, itemType, anchorEl: e.currentTarget, item } as PopoverState);
   };
 
   return (

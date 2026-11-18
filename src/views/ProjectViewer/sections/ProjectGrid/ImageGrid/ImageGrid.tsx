@@ -2,34 +2,46 @@ import { useCallback, useMemo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
+import { useBackend } from "core/backend";
+import { useQueryWindow } from "core/backend/query";
+
 import { usePreloadSrcs } from "hooks";
 
-import { useImageSort } from "@ProjectViewer/hooks";
+import { useDataRevision, useImageGridQuery } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
-import {
-  selectImageSortType,
-  selectSelectedImageIds,
-} from "@ProjectViewer/state/selectors";
-import { selectVisibleImages } from "@ProjectViewer/state/reselectors";
+import { selectSelectedImageIds } from "@ProjectViewer/state/selectors";
 
 import { ImageGridItem } from "./ImageGridItem";
-import { createGridCell, createItemData } from "../gridUtils";
+import { extendImage } from "../gridItems";
+import { createGridCell } from "../gridUtils";
+import { useGridItems } from "../useGridItems";
 import { useGridLayout } from "../useGridLayout";
 import { VirtualGrid } from "../VirtualGrid";
 
-const Cell = createGridCell(ImageGridItem);
+import type { ImageRecord, PageRequest } from "core/backend";
+
+import type { GridCellData } from "../gridUtils";
+
+const Cell = createGridCell(
+  ImageGridItem,
+  (record: ImageRecord) => record.image.id,
+);
 
 export const ImageGrid = () => {
   const dispatch = useDispatch();
-  const visibleImages = useSelector(selectVisibleImages);
+  const backend = useBackend();
+  const revision = useDataRevision();
+  const { query, sort, key } = useImageGridQuery();
   const selectedImageIds = useSelector(selectSelectedImageIds);
-  const sortType = useSelector(selectImageSortType);
-  const sortFunction = useImageSort(sortType);
 
-  const sortedImages = useMemo(
-    () => [...visibleImages].sort(sortFunction),
-    [visibleImages, sortFunction],
+  const source = useMemo(
+    () => ({
+      key,
+      fetch: (page: PageRequest) => backend.query.images(query, page, sort),
+    }),
+    [backend, key, query, sort],
   );
+  const window = useQueryWindow(source, revision);
   const {
     gridRef,
     gridWidth,
@@ -38,7 +50,7 @@ export const ImageGrid = () => {
     rowHeight,
     numColumns,
     numRows,
-  } = useGridLayout(sortedImages.length);
+  } = useGridLayout(window.total);
 
   const handleSelectImage = useCallback(
     (id: string, selected: boolean) => {
@@ -50,7 +62,29 @@ export const ImageGrid = () => {
     },
     [dispatch],
   );
-  usePreloadSrcs(sortedImages);
+
+  const { lookups } = useGridItems();
+  const inView = useMemo(
+    () => window.loaded.flatMap((record) => extendImage(record, lookups) ?? []),
+    [window.loaded, lookups],
+  );
+  usePreloadSrcs(inView);
+
+  const itemData = useMemo(
+    (): GridCellData<ImageRecord> => ({
+      count: window.total,
+      getItem: window.get,
+      handleSelect: handleSelectImage,
+      selectedIds: new Set(selectedImageIds),
+      numColumns,
+    }),
+    [window.total, window.get, handleSelectImage, selectedImageIds, numColumns],
+  );
+  const { setRange } = window;
+  const handleItemsRendered = useCallback(
+    ({ start, end }: { start: number; end: number }) => setRange(start, end),
+    [setRange],
+  );
 
   return (
     <VirtualGrid
@@ -61,13 +95,9 @@ export const ImageGrid = () => {
       rowHeight={rowHeight}
       numColumns={numColumns}
       numRows={numRows}
-      itemData={createItemData(
-        sortedImages,
-        handleSelectImage,
-        selectedImageIds,
-        numColumns,
-      )}
+      itemData={itemData}
       Cell={Cell}
+      onItemsRendered={handleItemsRendered}
     />
   );
 };

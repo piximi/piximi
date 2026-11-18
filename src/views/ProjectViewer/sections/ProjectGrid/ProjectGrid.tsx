@@ -2,11 +2,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
-import { selectTotalAnnotations } from "store/data/selectors";
 import { HelpItem } from "help/HelpContent";
 
 import { DIMENSIONS } from "utils/constants";
 
+import { useAnnotationCounts } from "@ProjectViewer/hooks";
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveView } from "@ProjectViewer/state/selectors";
 
@@ -22,10 +22,12 @@ import type React from "react";
 
 import type { ViewState } from "@ProjectViewer/state/types";
 
+const ALL_ANNOTATIONS = {};
+
 export const ProjectGrid = () => {
   const dispatch = useDispatch();
   const activeView = useSelector(selectActiveView);
-  const annotationCount = useSelector(selectTotalAnnotations);
+  const annotationCount = useAnnotationCounts(ALL_ANNOTATIONS)?.total ?? 0;
 
   const handleActiveViewChange = (
     _event: React.MouseEvent<HTMLElement>,

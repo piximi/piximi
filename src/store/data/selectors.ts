@@ -60,7 +60,45 @@ const annotationVolumeSelectors = annotationVolumeAdapter.getSelectors(
   (state: RootState) => state.data.annotationVolumes,
 );
 
+/* Every plane's channels at once: the extended entities and the grids look
+ * up many planes per pass, and a scan of every channel per entity made the
+ * extended selectors quadratic. */
+export const selectChannelsByPlane = createSelector(
+  channelSelectors.selectAll,
+  (channels) => {
+    const byPlane = new Map<string, Channel[]>();
+    for (const channel of channels) {
+      const group = byPlane.get(channel.planeId);
+      if (group) group.push(channel);
+      else byPlane.set(channel.planeId, [channel]);
+    }
+    return byPlane;
+  },
+);
+
+/* A plane's channels with their display settings; hidden ones are left out. */
+export const extendPlaneChannels = (
+  channels: Channel[],
+  chMetaDict: ChannelMetaEntities,
+): ExtendedChannel[] => {
+  const extended: ExtendedChannel[] = [];
+  for (const ch of channels) {
+    const meta = chMetaDict[ch.channelMetaId];
+    if (!meta || !meta.visible) continue;
+    extended.push({
+      ...ch,
+      name: meta.name,
+      colorMap: meta.colorMap,
+      rampMin: meta.rampMin,
+      rampMax: meta.rampMax,
+      visible: meta.visible,
+    });
+  }
+  return extended;
+};
+
 export const selectImageEntities = imageSelectors.selectEntities;
+export const selectPlaneEntities = planeSelectors.selectEntities;
 export const selectAllImages = imageSelectors.selectAll;
 
 export const selectKindIds = kindSelectors.selectIds;
@@ -69,14 +107,12 @@ export const selectAllKinds = kindSelectors.selectAll;
 
 export const selectCategoryEntities = categorySelectors.selectEntities;
 export const selectAllCategories = categorySelectors.selectAll;
-export const selectCategoryById = categorySelectors.selectById;
 
 export const selectChannelMetaEntities = channelMetaSelectors.selectEntities;
 export const selectAllChannelMetas = channelMetaSelectors.selectAll;
 export const selectChannelMetaById = channelMetaSelectors.selectById;
 
 export const selectAnnotationEntities = annotationSelectors.selectEntities;
-export const selectTotalAnnotations = annotationSelectors.selectTotal;
 
 export const selectAnnotationVolumeEntities =
   annotationVolumeSelectors.selectEntities;
@@ -132,7 +168,7 @@ const buildExtendedImage = (
   image: ImageObject | undefined,
   planeDict: PlaneEntities,
   chMetaDict: ChannelMetaEntities,
-  chs: Channel[],
+  channelsByPlane: Map<string, Channel[]>,
   catDict: CategoryEntities,
 ): ExtendedImageObject | null => {
   if (!image) return null;
@@ -140,19 +176,10 @@ const buildExtendedImage = (
   if (!plane) return null;
   const category = catDict[image.categoryId];
   if (!category) return null;
-  const channels = chs.reduce<ExtendedChannel[]>((acc, ch) => {
-    const meta = chMetaDict[ch.channelMetaId];
-    if (ch.planeId !== plane.id || !meta || !meta.visible) return acc;
-    acc.push({
-      ...ch,
-      name: meta.name,
-      colorMap: meta.colorMap,
-      rampMin: meta.rampMin,
-      rampMax: meta.rampMax,
-      visible: meta.visible,
-    });
-    return acc;
-  }, []);
+  const channels = extendPlaneChannels(
+    channelsByPlane.get(plane.id) ?? [],
+    chMetaDict,
+  );
   if (channels.length === 0) return null;
   return {
     ...image,
@@ -166,31 +193,37 @@ export const selectExtendedImageById = createSelector(
   [
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
     imageSelectors.selectEntities,
     (_state: RootState, id: string) => id,
   ],
-  (planeDict, chMetaDict, chs, catDict, imageDict, imageId) =>
-    buildExtendedImage(imageDict[imageId], planeDict, chMetaDict, chs, catDict),
+  (planeDict, chMetaDict, channelsByPlane, catDict, imageDict, imageId) =>
+    buildExtendedImage(
+      imageDict[imageId],
+      planeDict,
+      chMetaDict,
+      channelsByPlane,
+      catDict,
+    ),
 );
 export const selectExtendedImageByIds = createSelector(
   [
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
     imageSelectors.selectEntities,
     (_state: RootState, ids: Array<string>) => ids,
   ],
-  (planeDict, chMetaDict, chs, catDict, imageDict, imageIds) => {
+  (planeDict, chMetaDict, channelsByPlane, catDict, imageDict, imageIds) => {
     const extendedImages: Array<ExtendedImageObject> = [];
     for (const id of imageIds) {
       const extImage = buildExtendedImage(
         imageDict[id],
         planeDict,
         chMetaDict,
-        chs,
+        channelsByPlane,
         catDict,
       );
       if (extImage) extendedImages.push(extImage);
@@ -203,14 +236,14 @@ export const selectExtendedImageEntities = createSelector(
   [
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
     imageSelectors.selectAll,
   ],
   (
     planeDict,
     chMetaDict,
-    chs,
+    channelsByPlane,
     catDict,
     images,
   ): Record<string, ExtendedImageObject> => {
@@ -220,7 +253,7 @@ export const selectExtendedImageEntities = createSelector(
         image,
         planeDict,
         chMetaDict,
-        chs,
+        channelsByPlane,
         catDict,
       );
       if (ext) extIms[ext.id] = ext;
@@ -232,18 +265,24 @@ export const selectExtendedImages = createSelector(
   [
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
     imageSelectors.selectAll,
   ],
-  (planeDict, chMetaDict, chs, catDict, images): ExtendedImageObject[] => {
+  (
+    planeDict,
+    chMetaDict,
+    channelsByPlane,
+    catDict,
+    images,
+  ): ExtendedImageObject[] => {
     const extIms: ExtendedImageObject[] = [];
     images.forEach((image) => {
       const ext = buildExtendedImage(
         image,
         planeDict,
         chMetaDict,
-        chs,
+        channelsByPlane,
         catDict,
       );
       if (ext) extIms.push(ext);
@@ -255,7 +294,7 @@ export const selectRepresentativeImages = createSelector(
   [
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
     imageSelectors.selectEntities,
     imageSeriesSelectors.selectAll,
@@ -263,7 +302,7 @@ export const selectRepresentativeImages = createSelector(
   (
     planeDict,
     chMetaDict,
-    chs,
+    channelsByPlane,
     catDict,
     imageDict,
     series,
@@ -274,7 +313,7 @@ export const selectRepresentativeImages = createSelector(
         imageDict[imSeries.activeImageId],
         planeDict,
         chMetaDict,
-        chs,
+        channelsByPlane,
         catDict,
       );
       if (ext) extIms.push(ext);
@@ -308,7 +347,7 @@ const buildExtendedAnnotation = (
   imageDict: ImageEntities,
   planeDict: PlaneEntities,
   chMetaDict: ChannelMetaEntities,
-  chs: Channel[],
+  channelsByPlane: Map<string, Channel[]>,
   catDict: CategoryEntities,
 ): ExtendedAnnotationObject | null => {
   if (!ann) return null;
@@ -320,19 +359,10 @@ const buildExtendedAnnotation = (
   if (!plane) return null;
   const category = catDict[vol.categoryId];
   if (!category) return null;
-  const channels = chs.reduce((extChs: ExtendedChannel[], ch) => {
-    const meta = chMetaDict[ch.channelMetaId];
-    if (ch.planeId !== plane.id || !meta || !meta.visible) return extChs;
-    extChs.push({
-      ...ch,
-      colorMap: meta.colorMap,
-      rampMin: meta.rampMin,
-      rampMax: meta.rampMax,
-      visible: meta.visible,
-    });
-
-    return extChs;
-  }, []);
+  const channels = extendPlaneChannels(
+    channelsByPlane.get(plane.id) ?? [],
+    chMetaDict,
+  );
   if (channels.length === 0) return null;
   const { id, imageId, ...volProps } = vol;
   return {
@@ -351,7 +381,7 @@ export const selectExtendedAnnotationEntities = createSelector(
     imageSelectors.selectEntities,
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
   ],
   (
@@ -360,7 +390,7 @@ export const selectExtendedAnnotationEntities = createSelector(
     imageDict,
     planeDict,
     chMetaDict,
-    chs,
+    channelsByPlane,
     catDict,
   ): Record<string, ExtendedAnnotationObject> => {
     const exts: Record<string, ExtendedAnnotationObject> = {};
@@ -371,7 +401,7 @@ export const selectExtendedAnnotationEntities = createSelector(
         imageDict,
         planeDict,
         chMetaDict,
-        chs,
+        channelsByPlane,
         catDict,
       );
       if (ext) exts[ext.id] = ext;
@@ -386,7 +416,7 @@ export const selectAllExtendedAnnotations = createSelector(
     imageSelectors.selectEntities,
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
   ],
   (
@@ -395,7 +425,7 @@ export const selectAllExtendedAnnotations = createSelector(
     imageDict,
     planeDict,
     chMetaDict,
-    chs,
+    channelsByPlane,
     catDict,
   ): ExtendedAnnotationObject[] => {
     return anns
@@ -406,7 +436,7 @@ export const selectAllExtendedAnnotations = createSelector(
           imageDict,
           planeDict,
           chMetaDict,
-          chs,
+          channelsByPlane,
           catDict,
         ),
       )
@@ -420,7 +450,7 @@ export const selectExtendedAnnotationById = createSelector(
     imageSelectors.selectEntities,
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
     (_: RootState, id: string) => id,
   ],
@@ -430,7 +460,7 @@ export const selectExtendedAnnotationById = createSelector(
     imageDict,
     planeDict,
     chMetaDict,
-    chs,
+    channelsByPlane,
     catDict,
     annId,
   ): ExtendedAnnotationObject | null => {
@@ -440,7 +470,7 @@ export const selectExtendedAnnotationById = createSelector(
       imageDict,
       planeDict,
       chMetaDict,
-      chs,
+      channelsByPlane,
       catDict,
     );
   },
@@ -452,7 +482,7 @@ export const selectExtendedAnnotationsByKindId = createSelector(
     annotationVolumeSelectors.selectEntities,
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
     imageSelectors.selectEntities,
     (_: RootState, kindId: string) => kindId,
@@ -462,7 +492,7 @@ export const selectExtendedAnnotationsByKindId = createSelector(
     annVols,
     planeDict,
     chMetaDict,
-    chs,
+    channelsByPlane,
     catDict,
     imageDict,
     kindId,
@@ -477,7 +507,7 @@ export const selectExtendedAnnotationsByKindId = createSelector(
         imageDict,
         planeDict,
         chMetaDict,
-        chs,
+        channelsByPlane,
         catDict,
       );
       if (!extAnn) return;
@@ -493,7 +523,7 @@ export const selectExtendedAnnotationsByImageId = createSelector(
     annotationVolumeSelectors.selectEntities,
     planeSelectors.selectEntities,
     channelMetaSelectors.selectEntities,
-    channelSelectors.selectAll,
+    selectChannelsByPlane,
     categorySelectors.selectEntities,
     imageSelectors.selectEntities,
     (_: RootState, imageId: string) => imageId,
@@ -503,7 +533,7 @@ export const selectExtendedAnnotationsByImageId = createSelector(
     annVols,
     planeDict,
     chMetaDict,
-    chs,
+    channelsByPlane,
     catDict,
     imageDict,
     imageId,
@@ -517,7 +547,7 @@ export const selectExtendedAnnotationsByImageId = createSelector(
         imageDict,
         planeDict,
         chMetaDict,
-        chs,
+        channelsByPlane,
         catDict,
       );
       if (!extAnn) return;
@@ -553,20 +583,6 @@ export const selectAnnotationVolumesByImageId = createSelector(
     (_: RootState, imageId: string) => imageId,
   ],
   (volumes, imageId) => volumes.filter((v) => v.imageId === imageId),
-);
-
-/*
- * The ids of every image carrying at least one annotation.
- *
- * Derived from volumes rather than annotations: there is one volume per object
- * against one annotation per plane per object, and `deleteAnnotation` drops a
- * volume once its last annotation goes, so a volume always implies an
- * annotation. Returned as a `Set` so callers can test an image in O(1) instead
- * of reaching for the per-image selectors above.
- */
-export const selectAnnotatedImageIds = createSelector(
-  annotationVolumeSelectors.selectAll,
-  (volumes) => new Set(volumes.map((volume) => volume.imageId)),
 );
 
 /*
@@ -689,10 +705,6 @@ export const selectKindNames = createSelector(selectAllKinds, (kinds) =>
 
 // -- Base --
 
-export const selectChannelsByPlaneId = createSelector(
-  [channelSelectors.selectAll, (_: RootState, planeId: string) => planeId],
-  (channels, planeId) => channels.filter((ch) => ch.planeId === planeId),
-);
 export const selectActiveChannels = createSelector(
   [
     imageSelectors.selectEntities,
@@ -732,34 +744,5 @@ export const selectActiveExtendedChannels = createSelector(
       });
     });
     return extChannels;
-  },
-);
-
-/*
- * ───────────────────────────────────────────────────────────────────────
- * ── Stats ──────────────────────────────────────────────────────────────
- * ───────────────────────────────────────────────────────────────────────
- */
-export const selectEntityCountByCategoryId = createSelector(
-  imageSelectors.selectAll,
-  annotationVolumeSelectors.selectEntities,
-  annotationSelectors.selectAll,
-  categorySelectors.selectEntities,
-  (_: RootState, categoryId: string) => categoryId,
-  (ims, annVolDict, anns, catDict, catId) => {
-    const cat = catDict[catId];
-    if (!cat) {
-      console.error("Invalid category id: " + catId);
-      return 0;
-    }
-    if (cat.type === "image")
-      return ims.reduce((cnt: number, im) => {
-        if (im.categoryId === catId) cnt++;
-        return cnt;
-      }, 0);
-    return anns.reduce((cnt: number, ann) => {
-      if (annVolDict[ann.volumeId]?.categoryId === catId) cnt++;
-      return cnt;
-    }, 0);
   },
 );

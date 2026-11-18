@@ -18,6 +18,8 @@ type VirtualGridProps<T> = {
   numRows: number;
   itemData: GridCellData<T>;
   Cell: React.ComponentType<any>;
+  /* Item indices `[start, end)` in or near view, as they change. */
+  onItemsRendered?: (range: { start: number; end: number }) => void;
 };
 
 export const VirtualGrid = <T,>({
@@ -30,6 +32,7 @@ export const VirtualGrid = <T,>({
   numRows,
   itemData,
   Cell,
+  onItemsRendered,
 }: VirtualGridProps<T>) => {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const prevGridHeight = useRef(gridHeight);
@@ -74,6 +77,14 @@ export const VirtualGrid = <T,>({
           width={gridWidth}
           itemData={itemData}
           style={{ width: gridWidth }}
+          onItemsRendered={
+            onItemsRendered &&
+            (({ overscanRowStartIndex, overscanRowStopIndex }) =>
+              onItemsRendered({
+                start: overscanRowStartIndex * numColumns,
+                end: (overscanRowStopIndex + 1) * numColumns,
+              }))
+          }
         >
           {Cell}
         </Grid>

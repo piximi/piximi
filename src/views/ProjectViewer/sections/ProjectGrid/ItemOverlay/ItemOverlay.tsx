@@ -3,6 +3,8 @@ import { Box } from "@mui/material";
 import { ItemCategoryIcon } from "./ItemCategoryIcon";
 import { InfoButton } from "./InfoButton";
 
+import type { AnnotationRecord, ImageRecord } from "core/backend";
+
 export const ItemOverlay = ({
   position,
   categoryColor,
@@ -10,6 +12,7 @@ export const ItemOverlay = ({
   usePredictedStyle,
   itemId,
   itemType,
+  item,
 }: {
   position: { top: string; left: string };
   categoryColor: string;
@@ -17,6 +20,7 @@ export const ItemOverlay = ({
   usePredictedStyle: number | undefined;
   itemId: string;
   itemType: "annotation" | "image";
+  item?: ImageRecord | AnnotationRecord;
 }) => {
   return (
     <Box
@@ -33,7 +37,7 @@ export const ItemOverlay = ({
         categoryName={categoryName}
         predicted={usePredictedStyle}
       />
-      <InfoButton itemId={itemId} itemType={itemType} />
+      <InfoButton itemId={itemId} itemType={itemType} item={item} />
     </Box>
   );
 };

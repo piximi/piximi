@@ -136,9 +136,6 @@ importers:
       lodash:
         specifier: ^4.17.20
         version: 4.17.21
-      memoize-one:
-        specifier: ^6.0.0
-        version: 6.0.0
       mui-markdown:
         specifier: ^1.2.5
         version: 1.2.6(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.0))(@types/react@19.3.0)(react@19.3.0))(@mui/material@9.4.0(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.0))(@types/react@19.3.0)(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(markdown-to-jsx@7.7.6(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -4291,9 +4288,6 @@ packages:
 
   memoize-one@5.2.1:
     resolution: {integrity: sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==}
-
-  memoize-one@6.0.0:
-    resolution: {integrity: sha512-rkpe71W0N0c0Xz6QD0eJETuWAJGnJ9afsl1srmwPrI+yBCkge5EycXXbYRyvL29zZVUWQCY7InPRCv3GDXuZNw==}
 
   memoizerific@1.11.3:
     resolution: {integrity: sha512-/EuHYwAPdLtXwAwSZkh/Gutery6pD2KYd44oQLhAvQp/50mpyduZh8Q7PYHXTCJ+wuXxt7oij2LXyIJOOYFPog==}
@@ -9906,8 +9900,6 @@ snapshots:
   median-quickselect@1.0.1: {}
 
   memoize-one@5.2.1: {}
-
-  memoize-one@6.0.0: {}
 
   memoizerific@1.11.3:
     dependencies:

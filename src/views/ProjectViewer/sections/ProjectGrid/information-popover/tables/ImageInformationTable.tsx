@@ -19,20 +19,27 @@ import {
   SimpleLabel,
 } from "./cells";
 import { ItemInformationTable } from "./ItemInformationTable";
+import { useImageGridItem } from "../../useGridItems";
 
 import type { ReactElement } from "react";
 
+import type { ImageRecord } from "core/backend";
 import type { ExtendedImageObject } from "core/entities";
 import type { Partition } from "core/dl/enums";
 
 export const ImagePopoverContent = ({
   itemId,
+  record,
   onMissing,
 }: {
   itemId: string;
+  record?: ImageRecord;
   onMissing: () => void;
 }) => {
-  const image = useParameterizedSelector(selectExtendedImageById, itemId);
+  const fromStore = useParameterizedSelector(selectExtendedImageById, itemId);
+  // The grid's record stands in for an image the store has not mirrored yet.
+  const fromRecord = useImageGridItem(record);
+  const image = fromStore ?? fromRecord;
   useEffect(() => {
     if (!image) onMissing();
   }, [image, onMissing]);

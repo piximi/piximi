@@ -40,25 +40,32 @@ import {
 } from "./cells";
 import { ItemInformationTable } from "./ItemInformationTable";
 import { useInformationPopover } from "../InformationPopoverProvider";
+import { useAnnotationGridItem } from "../../useGridItems";
 
 import type { ReactElement } from "react";
 
 import type { SelectChangeEvent } from "@mui/material";
 
+import type { AnnotationRecord } from "core/backend";
 import type { Kind, ExtendedAnnotationObject } from "core/entities";
 import type { Partition } from "core/dl/enums";
 
 export const AnnotationPopoverContent = ({
   itemId,
+  record,
   onMissing,
 }: {
   itemId: string;
+  record?: AnnotationRecord;
   onMissing: () => void;
 }) => {
-  const annotation = useParameterizedSelector(
+  const fromStore = useParameterizedSelector(
     selectExtendedAnnotationById,
     itemId,
   );
+  // The grid's record stands in for an object the store does not mirror.
+  const fromRecord = useAnnotationGridItem(record);
+  const annotation = fromStore ?? fromRecord;
   useEffect(() => {
     if (!annotation) onMissing();
   }, [annotation, onMissing]);

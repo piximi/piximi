@@ -8,9 +8,22 @@ import {
 
 import type { ReactNode } from "react";
 
-type PopoverState =
-  | { itemType: "annotation"; itemId: string; anchorEl: HTMLElement }
-  | { itemType: "image"; itemId: string; anchorEl: HTMLElement }
+import type { AnnotationRecord, ImageRecord } from "core/backend";
+
+/* The record is what the grid holds; the store may not have the item. */
+export type PopoverState =
+  | {
+      itemType: "annotation";
+      itemId: string;
+      anchorEl: HTMLElement;
+      item?: AnnotationRecord;
+    }
+  | {
+      itemType: "image";
+      itemId: string;
+      anchorEl: HTMLElement;
+      item?: ImageRecord;
+    }
   | { itemType: null; itemId: null; anchorEl: null };
 
 const InformationPopoverContext = createContext<{

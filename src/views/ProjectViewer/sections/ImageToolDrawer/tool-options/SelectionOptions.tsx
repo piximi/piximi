@@ -25,7 +25,7 @@ export const SelectionOptions = () => {
     activeCategories,
     handleSelectAll,
     handleDeselectAll,
-    filteredItems,
+    total,
   } = useGridActions();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -50,7 +50,7 @@ export const SelectionOptions = () => {
         alignItems: "flex-end",
       }}
     >
-      <Typography variant="caption">{`${selectedFilteredItemIds.length}/${filteredItems.length} (filtered)`}</Typography>
+      <Typography variant="caption">{`${selectedFilteredItemIds.length}/${total} (filtered)`}</Typography>
       <ButtonGroup
         sx={{ width: "100%", display: "flex", justifyContent: "space-around" }}
       >

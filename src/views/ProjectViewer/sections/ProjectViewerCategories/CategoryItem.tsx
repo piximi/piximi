@@ -9,12 +9,10 @@ import {
   MoreHoriz as MoreIcon,
 } from "@mui/icons-material";
 
-import { useParameterizedSelector } from "store/hooks";
-import { selectEntityCountByCategoryId } from "store/data/selectors";
-
 import { APPLICATION_COLORS } from "utils/constants";
 import { getCategoryIconStyle } from "utils/styleUtils";
 
+import { useCategoryCount } from "@ProjectViewer/hooks";
 import { selectActiveFilters } from "@ProjectViewer/state/selectors";
 import { CustomListItemButton, CountChip } from "@ProjectViewer/components";
 
@@ -44,10 +42,7 @@ export const CategoryItem = ({
 }: CategoryItemProps) => {
   const tipRef = useRef(null);
   const [inView, setInView] = useState(false);
-  const numEntities = useParameterizedSelector(
-    selectEntityCountByCategoryId,
-    category.id,
-  );
+  const numEntities = useCategoryCount(category);
   const activeFilters = useSelector(selectActiveFilters);
 
   const isFiltered = useCallback(

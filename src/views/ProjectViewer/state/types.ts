@@ -23,16 +23,6 @@ export enum AnnotationSortType {
   Softmax = "Softmax",
 }
 
-export type Comparator<T> = (a: T, b: T) => number;
-export type MarginedSoftmax = Record<string, number>;
-export type SortDeps = {
-  margined: Record<string, number> | undefined;
-  seed: number;
-};
-
-export type SortMap<T, S extends string> = {
-  [K in S]: (deps: SortDeps) => Comparator<T>;
-};
 export type ImageFilters = Required<
   Pick<
     FilterType<Required<ExtendedImageObject>>,

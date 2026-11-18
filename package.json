@@ -46,7 +46,6 @@
     "jszip": "^3.7.1",
     "libheif-js": "^1.19.8",
     "lodash": "^4.17.20",
-    "memoize-one": "^6.0.0",
     "mui-markdown": "^1.2.5",
     "ngraph.graph": "^19.1.0",
     "onnxruntime-web": "~1.26.0",
