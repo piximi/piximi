@@ -1,3 +1,5 @@
+import { marginOf } from "core/backend/query";
+
 import { AnnotationSortType, ImageSortType } from "../state/types";
 
 import type {
@@ -59,19 +61,7 @@ const softmaxSort =
 
 export const noopSort = () => 0;
 
-export const marginOf = (softmax: number[]): number => {
-  let top1 = -Infinity,
-    top2 = -Infinity;
-  for (const p of softmax) {
-    if (p > top1) {
-      top2 = top1;
-      top1 = p;
-    } else if (p > top2) {
-      top2 = p;
-    }
-  }
-  return (top1 === -Infinity ? 0 : top1) - (top2 === -Infinity ? 0 : top2);
-};
+export { marginOf };
 
 export const IMAGE_SORT_CASES: SortMap<ExtendedImageObject, ImageSortType> = {
   [ImageSortType.None]: () => noopSort,

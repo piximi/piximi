@@ -15,6 +15,7 @@ describeBackendConformance("FakeBackend", async () => ({
   backend: new FakeBackend({ images: seed }),
   images: seed.map((im) => ({
     ...im,
+    name: im.id,
     channelIds: [`${im.id}-ch0`, `${im.id}-ch1`],
   })),
 }));

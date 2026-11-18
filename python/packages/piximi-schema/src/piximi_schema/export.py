@@ -100,6 +100,10 @@ def _for_typescript(schema: dict[str, Any]) -> None:
     for definition in schema["$defs"].values():
         for prop in definition.get("properties", {}).values():
             prop.pop("title", None)
+            # A `$ref` with a sibling `default` makes the generator inline a
+            # fresh copy of the referenced enum (`SortDirection1`, ...).
+            if "$ref" in prop:
+                prop.pop("default", None)
     for node in _walk(schema):
         if "prefixItems" in node:
             node["items"] = node.pop("prefixItems")

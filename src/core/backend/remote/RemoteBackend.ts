@@ -20,14 +20,20 @@ import type { Job } from "../jobs";
 import type * as P from "../protocol/generated";
 import type { ProtocolMethods } from "../protocol/methods";
 import type {
+  AnnotationCountGroup,
+  AnnotationHeader,
   AnnotationQuery,
   AnnotationRecord,
+  AnnotationSort,
   Backend,
   BackendSegmentation,
   BackendSession,
   CallOptions,
+  Counts,
+  ImageCountGroup,
   ImageQuery,
   ImageRecord,
+  ImageSort,
   Page,
   PageRequest,
   ProjectSummary,
@@ -50,6 +56,7 @@ type Progress<M extends keyof Methods> = Methods[M]["progress"];
  * differences (string enums, index signatures) are identical at runtime.
  */
 const asDomain = <T>(wire: unknown): T => wire as T;
+const asWire = <T>(domain: unknown): T => domain as T;
 
 /* Remote channels have no local pixels; the reference just names them. */
 const withStorageReference = (channel: P.Channel): Channel => ({
@@ -213,31 +220,71 @@ export class RemoteBackend implements Backend {
     images: async (
       query: ImageQuery,
       page: PageRequest,
+      sort?: ImageSort,
     ): Promise<Page<ImageRecord>> => {
-      const result = await this.#call("query/images", { query, page });
-      return {
-        total: result.total,
-        nextCursor: result.nextCursor,
-        items: result.items.map(toImageRecord),
-      };
+      const result = await this.#call("query/images", {
+        query: asWire<P.ImageQuery>(query),
+        sort,
+        page,
+      });
+      return { total: result.total, items: result.items.map(toImageRecord) };
     },
+
+    imageIds: async (query: ImageQuery, sort?: ImageSort): Promise<string[]> =>
+      (
+        await this.#call("query/imageIds", {
+          query: asWire<P.ImageQuery>(query),
+          sort,
+        })
+      ).ids,
+
+    imageCounts: async (
+      query: ImageQuery,
+      groupBy?: ImageCountGroup,
+    ): Promise<Counts> =>
+      this.#call("query/imageCounts", {
+        query: asWire<P.ImageQuery>(query),
+        groupBy,
+      }),
 
     annotations: async (
       query: AnnotationQuery,
       page: PageRequest,
+      sort?: AnnotationSort,
     ): Promise<Page<AnnotationRecord>> => {
-      const result = await this.#call("query/annotations", { query, page });
+      const result = await this.#call("query/annotations", {
+        query: asWire<P.AnnotationQuery>(query),
+        sort,
+        page,
+      });
       return {
         total: result.total,
-        nextCursor: result.nextCursor,
         items: result.items.map((record) => ({
           volume: record.volume,
-          annotation: asDomain<AnnotationRecord["annotation"]>(
-            record.annotation,
-          ),
+          annotation: asDomain<AnnotationHeader>(record.annotation),
         })),
       };
     },
+
+    annotationIds: async (
+      query: AnnotationQuery,
+      sort?: AnnotationSort,
+    ): Promise<string[]> =>
+      (
+        await this.#call("query/annotationIds", {
+          query: asWire<P.AnnotationQuery>(query),
+          sort,
+        })
+      ).ids,
+
+    annotationCounts: async (
+      query: AnnotationQuery,
+      groupBy?: AnnotationCountGroup,
+    ): Promise<Counts> =>
+      this.#call("query/annotationCounts", {
+        query: asWire<P.AnnotationQuery>(query),
+        groupBy,
+      }),
 
     masks: async (annotationIds: string[]): Promise<Record<string, number[]>> =>
       (await this.#call("query/masks", { annotationIds })).masks,

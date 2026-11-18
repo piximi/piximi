@@ -1,12 +1,16 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { Partition } from "core/entities";
+
 import { hasCapability } from "../capabilities";
+import { randomKey } from "../query";
 
 import type { BackendEvent } from "../events";
 import type { Backend, ChannelDisplay, RenderRequest } from "../types";
 
 type ConformanceImage = {
   id: string;
+  name: string;
   width: number;
   height: number;
   channelIds: string[];
@@ -14,7 +18,8 @@ type ConformanceImage = {
 
 type ConformanceContext = {
   backend: Backend;
-  /* Every image the backend holds, so paging can be checked for completeness. */
+  /* Every image the backend holds, in insertion order and with distinct
+   * names, so listings can be checked for completeness and order. */
   images: ConformanceImage[];
   teardown?: () => Promise<void> | void;
 };
@@ -88,17 +93,22 @@ export const describeBackendConformance = (
         expect(summary.experiment.id).toBeTruthy();
       });
 
-      it("pages images without gaps or duplicates", async () => {
+      it("pages images by offset without gaps or duplicates", async () => {
         const seen: string[] = [];
-        let cursor: string | undefined;
-        do {
-          const page = await ctx.backend.query.images({}, { cursor, limit: 1 });
+        for (let offset = 0; ; ) {
+          const page = await ctx.backend.query.images({}, { offset, limit: 1 });
           expect(page.total).toBe(ctx.images.length);
           expect(page.items.length).toBeLessThanOrEqual(1);
           seen.push(...page.items.map((r) => r.image.id));
-          cursor = page.nextCursor;
-        } while (cursor);
-        expect([...seen].sort()).toEqual(ctx.images.map((im) => im.id).sort());
+          offset += page.items.length;
+          if (page.items.length === 0 || offset >= page.total) break;
+        }
+        expect(seen).toEqual(ctx.images.map((im) => im.id));
+        const past = await ctx.backend.query.images(
+          {},
+          { offset: ctx.images.length, limit: 5 },
+        );
+        expect(past).toEqual({ items: [], total: ctx.images.length });
       });
 
       it("returns each image with its planes and channels", async () => {
@@ -114,6 +124,104 @@ export const describeBackendConformance = (
         expect(record.channels.map((c) => c.id).sort()).toEqual(
           [...first.channelIds].sort(),
         );
+      });
+
+      it("filters by ids in insertion order and ignores unknown ones", async () => {
+        const [a, b] = ctx.images;
+        const page = await ctx.backend.query.images(
+          { ids: [b.id, "no-such-image", a.id] },
+          { limit: 10 },
+        );
+        expect(page.items.map((r) => r.image.id)).toEqual([a.id, b.id]);
+        expect(page.total).toBe(2);
+        expect(await ctx.backend.query.imageIds({ ids: [] })).toEqual([]);
+      });
+
+      it("sorts by name, case-insensitively, in both directions", async () => {
+        const fold = (s: string) => s.replace(/[A-Z]/g, (c) => c.toLowerCase());
+        const byName = ctx.images
+          .map((im) => im.id)
+          .sort((x, y) => {
+            const a = fold(ctx.images.find((im) => im.id === x)!.name);
+            const b = fold(ctx.images.find((im) => im.id === y)!.name);
+            return a < b ? -1 : a > b ? 1 : 0;
+          });
+        const { query } = ctx.backend;
+        expect(await query.imageIds({}, { key: "name" })).toEqual(byName);
+        expect(
+          await query.imageIds({}, { key: "name", direction: "desc" }),
+        ).toEqual([...byName].reverse());
+        const page = await query.images({}, { limit: 2 }, { key: "name" });
+        expect(page.items.map((r) => r.image.id)).toEqual(byName.slice(0, 2));
+      });
+
+      it("shuffles by seed the same way every backend does", async () => {
+        const seed = 12345;
+        const expected = ctx.images
+          .map((im) => im.id)
+          .sort((a, b) => randomKey(seed, a) - randomKey(seed, b));
+        const { query } = ctx.backend;
+        expect(await query.imageIds({}, { key: "random", seed })).toEqual(
+          expected,
+        );
+        expect(await query.imageIds({}, { key: "random", seed })).toEqual(
+          expected,
+        );
+      });
+
+      it("filters and counts by partition", async () => {
+        const { query } = ctx.backend;
+        const all = ctx.images.length;
+        const unassigned = await query.images(
+          { partitions: [Partition.Unassigned] },
+          { limit: 1 },
+        );
+        expect(unassigned.total).toBe(all);
+        expect(
+          (
+            await query.images(
+              { partitions: [Partition.Training] },
+              { limit: 1 },
+            )
+          ).total,
+        ).toBe(0);
+        expect(await query.imageCounts({}, "partition")).toEqual({
+          total: all,
+          groups: { [Partition.Unassigned]: all },
+        });
+        expect(
+          await query.imageCounts({ partitions: [Partition.Training] }),
+        ).toEqual({ total: 0 });
+      });
+
+      it("counts by category consistently with the listing", async () => {
+        const { query } = ctx.backend;
+        const counts = await query.imageCounts({}, "category");
+        expect(counts.total).toBe(ctx.images.length);
+        const summed = Object.values(counts.groups ?? {}).reduce(
+          (a, b) => a + b,
+          0,
+        );
+        expect(summed).toBe(ctx.images.length);
+        for (const [categoryId, count] of Object.entries(counts.groups ?? {})) {
+          const page = await query.images(
+            { categoryIds: [categoryId] },
+            { limit: 1 },
+          );
+          expect(page.total).toBe(count);
+        }
+      });
+
+      it("offers the softmax sort exactly when it can classify", async () => {
+        const { backend } = ctx;
+        const listing = backend.query.imageIds({}, { key: "softmax" });
+        if (hasCapability(backend.capabilities, "classification")) {
+          await expect(listing).resolves.toHaveLength(ctx.images.length);
+        } else {
+          await expect(listing).rejects.toMatchObject({
+            code: "NOT_SUPPORTED",
+          });
+        }
       });
     });
 
@@ -230,6 +338,33 @@ export const describeBackendConformance = (
         for (const annotation of annotations) {
           expect(masks[annotation.id]).toEqual(annotation.encodedMask);
         }
+
+        // The new objects are reachable through every scope the grids use.
+        const { query } = backend;
+        const [kind] = added.flatMap((e) => e.volumes).map((v) => v.kindId);
+        const added_ids = annotations.map((a) => a.id).sort();
+        expect((await query.annotationIds({ kindIds: [kind] })).sort()).toEqual(
+          added_ids,
+        );
+        const [first] = ctx.images;
+        const onFirst = annotations.filter((a) => a.imageId === first.id);
+        const page = await query.annotations(
+          { imageIds: [first.id], kindIds: [kind] },
+          { limit: 100 },
+          { key: "image" },
+        );
+        expect(page.total).toBe(onFirst.length);
+        expect(page.items.every((r) => r.volume.kindId === kind)).toBe(true);
+        expect((await query.annotationCounts({}, "kind")).groups?.[kind]).toBe(
+          summary.added,
+        );
+        const annotated = new Set(annotations.map((a) => a.imageId));
+        expect(
+          (await query.images({ annotated: true }, { limit: 1 })).total,
+        ).toBeGreaterThanOrEqual(annotated.size);
+        expect(
+          (await query.imageCounts({ annotated: false })).total,
+        ).toBeLessThanOrEqual(ctx.images.length - annotated.size);
       });
 
       it("resolves a run cancelled before it starts as cancelled with nothing added", async () => {

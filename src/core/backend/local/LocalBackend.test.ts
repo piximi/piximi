@@ -227,6 +227,7 @@ describeBackendConformance("LocalBackend", async () => {
     backend,
     images: seed.map((im) => ({
       ...im,
+      name: im.id,
       channelIds: Array.from({ length: im.channels }, (_, c) =>
         channelId(im.id, c),
       ),

@@ -32,9 +32,33 @@ export type ProtocolMethods = {
     progress: void;
     direction: "client->server";
   };
+  "query/imageIds": {
+    params: P.ImageIdsParams;
+    result: P.IdsResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "query/imageCounts": {
+    params: P.ImageCountsParams;
+    result: P.CountsResult;
+    progress: void;
+    direction: "client->server";
+  };
   "query/annotations": {
     params: P.AnnotationsParams;
     result: P.AnnotationPage;
+    progress: void;
+    direction: "client->server";
+  };
+  "query/annotationIds": {
+    params: P.AnnotationIdsParams;
+    result: P.IdsResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "query/annotationCounts": {
+    params: P.AnnotationCountsParams;
+    result: P.CountsResult;
     progress: void;
     direction: "client->server";
   };

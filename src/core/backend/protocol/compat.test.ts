@@ -28,12 +28,18 @@ import type { Capability } from "../capabilities";
 import type { BackendEvent } from "../events";
 import type { Job } from "../jobs";
 import type {
+  AnnotationCountGroup,
   AnnotationQuery,
+  AnnotationSort,
   ChannelDisplay,
+  Counts,
+  ImageCountGroup,
   ImageQuery,
+  ImageSort,
   Page,
   PageRequest,
   ProjectSummary,
+  SortDirection,
   RenderRequest,
   SegmentationModelDescriptor,
   SegmentationRunRequest,
@@ -71,6 +77,12 @@ type WithPartition<T extends { partition: Partition }> = Omit<
   "partition"
 > & {
   partition: Values<Partition>;
+};
+type WithPartitions<T extends { partitions?: Partition[] }> = Omit<
+  T,
+  "partitions"
+> & {
+  partitions?: Values<Partition>[];
 };
 type Unmeasured<T> = Omit<T, "features" | "intensityMeasurements">;
 
@@ -135,8 +147,15 @@ type Checks = [
 
   // ── Query and render ──────────────────────────────────────────────────────
   Assert<Equivalent<P.PageRequest, PageRequest>>,
-  Assert<Equivalent<P.ImageQuery, ImageQuery>>,
-  Assert<Equivalent<P.AnnotationQuery, AnnotationQuery>>,
+  Assert<Equivalent<P.SortDirection, SortDirection>>,
+  Assert<Equivalent<P.ImageSort, ImageSort>>,
+  Assert<Equivalent<P.AnnotationSort, AnnotationSort>>,
+  Assert<Equivalent<P.ImageQuery, WithPartitions<ImageQuery>>>,
+  Assert<Equivalent<P.AnnotationQuery, WithPartitions<AnnotationQuery>>>,
+  Assert<Equivalent<P.ImageCountGroup, ImageCountGroup>>,
+  Assert<Equivalent<P.AnnotationCountGroup, AnnotationCountGroup>>,
+  Assert<Equivalent<P.CountsResult, Counts>>,
+  Assert<Equivalent<P.IdsResult, { ids: string[] }>>,
   Assert<Equivalent<P.ImagePage, Page<P.ImageRecord>>>,
   Assert<Equivalent<P.AnnotationPage, Page<P.AnnotationRecord>>>,
   Assert<Equivalent<P.ProjectSummary, ProjectSummary>>,

@@ -5,9 +5,31 @@
 
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationCountGroup".
+ */
+export type AnnotationCountGroup = "category" | "partition" | "kind";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "Partition".
  */
 export type Partition = "Training" | "Validation" | "Inference" | "Unassigned";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationSortKey".
+ */
+export type AnnotationSortKey =
+  | "none"
+  | "plane"
+  | "volume"
+  | "category"
+  | "image"
+  | "random"
+  | "softmax";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "SortDirection".
+ */
+export type SortDirection = "asc" | "desc";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ErrorCode".
@@ -60,6 +82,16 @@ export type DType = "uint8" | "uint16" | "int32" | "float32";
  * via the `definition` "ChannelFeature".
  */
 export type ChannelFeature = "entropy" | "contrast" | "snr";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageCountGroup".
+ */
+export type ImageCountGroup = "category" | "partition";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageSortKey".
+ */
+export type ImageSortKey = "none" | "name" | "category" | "random" | "softmax";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "IntensityMeasurement".
@@ -124,6 +156,39 @@ export interface AnnotationCategory {
   kindId: string;
 }
 /**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationCountsParams".
+ */
+export interface AnnotationCountsParams {
+  query: AnnotationQuery;
+  groupBy?: AnnotationCountGroup;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationQuery".
+ */
+export interface AnnotationQuery {
+  ids?: string[];
+  imageIds?: string[];
+  planeIds?: string[];
+  volumeIds?: string[];
+  kindIds?: string[];
+  categoryIds?: string[];
+  partitions?: Partition[];
+  confidence?: ConfidenceRange;
+}
+/**
+ * Keeps items whose prediction confidence lies strictly between ``min``
+ * and ``max``; items without one are left out.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ConfidenceRange".
+ */
+export interface ConfidenceRange {
+  min: number;
+  max: number;
+}
+/**
  * An annotation without its mask; masks are fetched separately.
  *
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -162,6 +227,23 @@ export interface Shape {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationIdsParams".
+ */
+export interface AnnotationIdsParams {
+  query: AnnotationQuery;
+  sort?: AnnotationSort;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationSort".
+ */
+export interface AnnotationSort {
+  key?: AnnotationSortKey;
+  direction?: SortDirection;
+  seed?: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "AnnotationObject".
  */
 export interface AnnotationObject {
@@ -193,7 +275,6 @@ export interface AnnotationObject {
 export interface AnnotationPage {
   items: AnnotationRecord[];
   total: number;
-  nextCursor?: string;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -229,13 +310,6 @@ export interface PredictionCorrection {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
- * via the `definition` "AnnotationQuery".
- */
-export interface AnnotationQuery {
-  imageIds?: string[];
-}
-/**
- * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "AnnotationsDidAdd".
  */
 export interface AnnotationsDidAdd {
@@ -249,6 +323,7 @@ export interface AnnotationsDidAdd {
  */
 export interface AnnotationsParams {
   query: AnnotationQuery;
+  sort?: AnnotationSort;
   page: PageRequest;
 }
 /**
@@ -256,7 +331,7 @@ export interface AnnotationsParams {
  * via the `definition` "PageRequest".
  */
 export interface PageRequest {
-  cursor?: string;
+  offset?: number;
   limit: number;
 }
 /**
@@ -417,6 +492,16 @@ export interface ChannelPolicyPassthrough {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CountsResult".
+ */
+export interface CountsResult {
+  total: number;
+  groups?: {
+    [k: string]: number;
+  };
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ErrorResponseMessage".
  */
 export interface ErrorResponseMessage {
@@ -443,6 +528,13 @@ export interface Experiment {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "IdsResult".
+ */
+export interface IdsResult {
+  ids: string[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ImageCategory".
  */
 export interface ImageCategory {
@@ -451,6 +543,46 @@ export interface ImageCategory {
   color: string;
   name: string;
   isUnknown: boolean;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageCountsParams".
+ */
+export interface ImageCountsParams {
+  query: ImageQuery;
+  groupBy?: ImageCountGroup;
+}
+/**
+ * Every condition given must hold; an absent one does not restrict.
+ * Ties in any sort fall back to insertion order.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageQuery".
+ */
+export interface ImageQuery {
+  ids?: string[];
+  seriesIds?: string[];
+  categoryIds?: string[];
+  partitions?: Partition[];
+  confidence?: ConfidenceRange;
+  annotated?: boolean;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageIdsParams".
+ */
+export interface ImageIdsParams {
+  query: ImageQuery;
+  sort?: ImageSort;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageSort".
+ */
+export interface ImageSort {
+  key?: ImageSortKey;
+  direction?: SortDirection;
+  seed?: number;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -477,7 +609,6 @@ export interface ImageObject {
 export interface ImagePage {
   items: ImageRecord[];
   total: number;
-  nextCursor?: string;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -513,13 +644,6 @@ export interface Plane {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
- * via the `definition` "ImageQuery".
- */
-export interface ImageQuery {
-  ids?: string[];
-}
-/**
- * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ImagesDidAdd".
  */
 export interface ImagesDidAdd {
@@ -533,6 +657,7 @@ export interface ImagesDidAdd {
  */
 export interface ImagesParams {
   query: ImageQuery;
+  sort?: ImageSort;
   page: PageRequest;
 }
 /**

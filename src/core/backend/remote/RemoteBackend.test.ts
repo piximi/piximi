@@ -78,6 +78,7 @@ if (enabled) {
       backend,
       images: page.items.map((record) => ({
         id: record.image.id,
+        name: record.image.name,
         width: record.image.shape.width,
         height: record.image.shape.height,
         channelIds: record.channels.map((c) => c.id),

@@ -16,6 +16,14 @@ import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
 import { BackendError } from "../errors";
 import { EventBus } from "../events";
 import { JobRegistry } from "../jobs";
+import {
+  countBy,
+  filterAnnotations,
+  filterImages,
+  paginate,
+  sortAnnotations,
+  sortImages,
+} from "../query";
 
 import type {
   AnnotationObject,
@@ -35,14 +43,20 @@ import type { StoredPixels } from "utils/image/compositeChannels";
 import type { Capability } from "../capabilities";
 import type { BackendEventListener } from "../events";
 import type { Job } from "../jobs";
+import type { AnnotationContext, AnnotationRow, ImageContext } from "../query";
 import type {
+  AnnotationCountGroup,
   AnnotationQuery,
   AnnotationRecord,
+  AnnotationSort,
   Backend,
   BackendSession,
   CallOptions,
+  Counts,
+  ImageCountGroup,
   ImageQuery,
   ImageRecord,
+  ImageSort,
   Page,
   PageRequest,
   ProjectSummary,
@@ -63,16 +77,6 @@ type FakeImageSeed = {
 };
 
 export const FAKE_MODEL_ID = "fake-whole-image";
-
-const paginate = <T>(items: T[], page: PageRequest): Page<T> => {
-  const offset = page.cursor ? Number(page.cursor) : 0;
-  const end = Math.min(offset + page.limit, items.length);
-  return {
-    items: items.slice(offset, end),
-    total: items.length,
-    nextCursor: end < items.length ? String(end) : undefined,
-  };
-};
 
 /*
  * A complete in-memory backend with no workers, no IndexedDB and no models,
@@ -196,6 +200,60 @@ export class FakeBackend implements Backend {
 
   // ── Query ──────────────────────────────────────────────────────────────────
 
+  #imageContext(): ImageContext {
+    const categories = new Map(this.#categories.map((c) => [c.id, c]));
+    const annotated = new Set(this.#annotations.map((a) => a.imageId));
+    return {
+      categoryName: (id) => categories.get(id)?.name ?? "",
+      isAnnotated: (id) => annotated.has(id),
+    };
+  }
+
+  #annotationContext(): AnnotationContext {
+    const categories = new Map(this.#categories.map((c) => [c.id, c]));
+    const images = new Map(this.#images.map((im) => [im.id, im]));
+    const planes = new Map(this.#planes.map((p) => [p.id, p]));
+    return {
+      categoryName: (id) => categories.get(id)?.name ?? "",
+      imageName: (id) => images.get(id)?.name ?? "",
+      planeZIndex: (id) => planes.get(id)?.zIndex ?? -Infinity,
+    };
+  }
+
+  #imageListing(query: ImageQuery, sort?: ImageSort): ImageObject[] {
+    const ctx = this.#imageContext();
+    return sortImages(filterImages(this.#images, query, ctx), sort, ctx);
+  }
+
+  #annotationListing(
+    query: AnnotationQuery,
+    sort?: AnnotationSort,
+  ): AnnotationRow[] {
+    const volumes = new Map(this.#volumes.map((v) => [v.id, v]));
+    const rows = this.#annotations.map(
+      ({ encodedMask: _mask, decodedMask: _decoded, ...annotation }) => ({
+        annotation,
+        volume: volumes.get(annotation.volumeId)!,
+      }),
+    );
+    return sortAnnotations(
+      filterAnnotations(rows, query),
+      sort,
+      this.#annotationContext(),
+    );
+  }
+
+  #record(image: ImageObject): ImageRecord {
+    const planes = this.#planes.filter((p) => p.imageId === image.id);
+    const planeIds = new Set(planes.map((p) => p.id));
+    return {
+      image,
+      series: this.#series.find((s) => s.id === image.seriesId)!,
+      planes,
+      channels: this.#channels.filter((c) => planeIds.has(c.planeId)),
+    };
+  }
+
   readonly query = {
     project: async (): Promise<ProjectSummary> => ({
       experiment: this.#experiment,
@@ -211,38 +269,60 @@ export class FakeBackend implements Backend {
     images: async (
       query: ImageQuery,
       page: PageRequest,
+      sort?: ImageSort,
     ): Promise<Page<ImageRecord>> => {
-      const wanted = query.ids ? new Set(query.ids) : undefined;
-      const records = this.#images
-        .filter((image) => !wanted || wanted.has(image.id))
-        .map((image) => {
-          const planes = this.#planes.filter((p) => p.imageId === image.id);
-          const planeIds = new Set(planes.map((p) => p.id));
-          return {
-            image,
-            series: this.#series.find((s) => s.id === image.seriesId)!,
-            planes,
-            channels: this.#channels.filter((c) => planeIds.has(c.planeId)),
-          };
-        });
-      return paginate(records, page);
+      const { items, total } = paginate(this.#imageListing(query, sort), page);
+      return { total, items: items.map((im) => this.#record(im)) };
+    },
+
+    imageIds: async (query: ImageQuery, sort?: ImageSort): Promise<string[]> =>
+      this.#imageListing(query, sort).map((im) => im.id),
+
+    imageCounts: async (
+      query: ImageQuery,
+      groupBy?: ImageCountGroup,
+    ): Promise<Counts> => {
+      const rows = this.#imageListing(query);
+      return {
+        total: rows.length,
+        groups:
+          groupBy &&
+          countBy(rows, (im) =>
+            groupBy === "category" ? im.categoryId : im.partition,
+          ),
+      };
     },
 
     annotations: async (
       query: AnnotationQuery,
       page: PageRequest,
-    ): Promise<Page<AnnotationRecord>> => {
-      const wanted = query.imageIds ? new Set(query.imageIds) : undefined;
-      const volumesById = new Map(this.#volumes.map((v) => [v.id, v]));
-      const records = this.#annotations
-        .filter((ann) => !wanted || wanted.has(ann.imageId))
-        .map(
-          ({ encodedMask: _mask, decodedMask: _decoded, ...annotation }) => ({
-            volume: volumesById.get(annotation.volumeId)!,
-            annotation,
-          }),
-        );
-      return paginate(records, page);
+      sort?: AnnotationSort,
+    ): Promise<Page<AnnotationRecord>> =>
+      paginate(this.#annotationListing(query, sort), page),
+
+    annotationIds: async (
+      query: AnnotationQuery,
+      sort?: AnnotationSort,
+    ): Promise<string[]> =>
+      this.#annotationListing(query, sort).map((row) => row.annotation.id),
+
+    annotationCounts: async (
+      query: AnnotationQuery,
+      groupBy?: AnnotationCountGroup,
+    ): Promise<Counts> => {
+      const rows = this.#annotationListing(query);
+      return {
+        total: rows.length,
+        groups:
+          groupBy &&
+          countBy(rows, ({ annotation, volume }) =>
+            groupBy === "kind"
+              ? volume.kindId
+              : groupBy === "category"
+                ? volume.categoryId
+                : annotation.partition,
+          ),
+      };
     },
 
     masks: async (

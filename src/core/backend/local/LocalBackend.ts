@@ -2,6 +2,7 @@ import { DataConnector } from "core/data-connector";
 import { generateUUID } from "core/entities";
 import { getSegmenterApi } from "core/dl/segmentation/SegmenterApi";
 
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import {
   selectAllCategories,
   selectAllChannelMetas,
@@ -15,10 +16,19 @@ import { MeasurementsApi } from "utils/measurements/workers/MeasurementsApi";
 import { BackendError } from "../errors";
 import { EventBus } from "../events";
 import { JobRegistry } from "../jobs";
+import {
+  countBy,
+  filterAnnotations,
+  filterImages,
+  marginOf,
+  paginate,
+  sortAnnotations,
+  sortImages,
+} from "../query";
 import { LocalSegmentation } from "./LocalSegmentation";
 import { ThumbnailWorkerPool } from "./ThumbnailWorkerPool";
 
-import type { StorageReference } from "core/entities";
+import type { ImageObject, StorageReference } from "core/entities";
 import type { ISegmenterApi } from "core/dl/segmentation/types";
 
 import type { CompositeLayer } from "utils/image/compositeChannels";
@@ -26,15 +36,21 @@ import type { CompositeLayer } from "utils/image/compositeChannels";
 import type { Capability } from "../capabilities";
 import type { BackendEventListener } from "../events";
 import type { Job } from "../jobs";
+import type { AnnotationContext, AnnotationRow, ImageContext } from "../query";
 import type {
+  AnnotationCountGroup,
   AnnotationQuery,
   AnnotationRecord,
+  AnnotationSort,
   Backend,
   BackendSegmentation,
   BackendSession,
   CallOptions,
+  Counts,
+  ImageCountGroup,
   ImageQuery,
   ImageRecord,
+  ImageSort,
   Page,
   PageRequest,
   ProjectSummary,
@@ -70,19 +86,28 @@ const groupBy = <T>(
   return groups;
 };
 
-const paginate = <T>(
-  ids: string[],
-  page: PageRequest,
-  toItem: (id: string) => T,
-): Page<T> => {
-  const offset = page.cursor ? Number(page.cursor) : 0;
-  const end = Math.min(offset + page.limit, ids.length);
-  return {
-    items: ids.slice(offset, end).map(toItem),
-    total: ids.length,
-    nextCursor: end < ids.length ? String(end) : undefined,
-  };
-};
+type RootState = ReturnType<StoreHandle["getState"]>;
+type DataState = RootState["data"];
+
+/* A value derived from one slice of state, rebuilt only when that slice is
+ * replaced. */
+class Derived<S, V> {
+  readonly #build: (source: S) => V;
+  #source: S | undefined;
+  #value: V | undefined;
+
+  constructor(build: (source: S) => V) {
+    this.#build = build;
+  }
+
+  get(source: S): V {
+    if (this.#value === undefined || source !== this.#source) {
+      this.#source = source;
+      this.#value = this.#build(source);
+    }
+    return this.#value;
+  }
+}
 
 /*
  * The in-browser backend: metadata lives in the Redux data slice, pixels in
@@ -115,6 +140,39 @@ export class LocalBackend implements Backend {
   readonly #jobs = new JobRegistry(this.#bus);
   readonly segmentation: BackendSegmentation;
 
+  readonly #imageRows = new Derived((images: DataState["images"]) =>
+    images.ids.map((id) => images.entities[id]),
+  );
+  readonly #annotationRows = new Derived((data: DataState): AnnotationRow[] =>
+    data.annotations.ids.map((id) => {
+      const {
+        encodedMask: _mask,
+        decodedMask: _decoded,
+        ...annotation
+      } = data.annotations.entities[id];
+      return {
+        annotation,
+        volume: data.annotationVolumes.entities[annotation.volumeId],
+      };
+    }),
+  );
+  readonly #annotatedImages = new Derived(
+    (annotations: DataState["annotations"]) =>
+      new Set(annotations.ids.map((id) => annotations.entities[id].imageId)),
+  );
+  readonly #planesByImage = new Derived((planes: DataState["planes"]) =>
+    groupBy(planes, (plane) => plane.imageId),
+  );
+  readonly #channelsByPlane = new Derived((channels: DataState["channels"]) =>
+    groupBy(channels, (channel) => channel.planeId),
+  );
+  /* Filtered, sorted listings by query, kept while the state they were
+   * computed from is current. */
+  readonly #listings = new Map<
+    string,
+    { data: DataState; classifier: unknown; rows: unknown[] }
+  >();
+
   constructor(deps: LocalBackendDeps) {
     this.#store = deps.store;
     this.#storage = deps.dataConnector ?? DataConnector.getInstance();
@@ -142,6 +200,93 @@ export class LocalBackend implements Backend {
 
   // ── Query ──────────────────────────────────────────────────────────────────
 
+  #listing<T>(key: string, state: RootState, build: () => T[]): T[] {
+    const classifier = (state as Partial<RootState>).classifier;
+    const cached = this.#listings.get(key);
+    if (
+      cached &&
+      cached.data === state.data &&
+      cached.classifier === classifier
+    )
+      return cached.rows as T[];
+    const rows = build();
+    if (this.#listings.size >= 16) {
+      this.#listings.delete(this.#listings.keys().next().value!);
+    }
+    this.#listings.set(key, { data: state.data, classifier, rows });
+    return rows;
+  }
+
+  #imageContext(state: RootState): ImageContext {
+    const { categories, annotations } = state.data;
+    const softmax = (state as Partial<RootState>).classifier?.kindClassifiers[
+      IMAGE_CLASSIFIER_ID
+    ]?.activeSoftmaxById;
+    return {
+      categoryName: (id) => categories.entities[id]?.name ?? "",
+      isAnnotated: (id) => this.#annotatedImages.get(annotations).has(id),
+      softmaxMargin: (id) => {
+        const probabilities = softmax?.[id];
+        return probabilities && marginOf(probabilities);
+      },
+    };
+  }
+
+  #annotationContext(state: RootState): AnnotationContext {
+    const { categories, images, planes } = state.data;
+    const classifiers = (state as Partial<RootState>).classifier
+      ?.kindClassifiers;
+    return {
+      categoryName: (id) => categories.entities[id]?.name ?? "",
+      imageName: (id) => images.entities[id]?.name ?? "",
+      planeZIndex: (id) => planes.entities[id]?.zIndex ?? -Infinity,
+      softmaxMargin: (id, kindId) => {
+        const probabilities = classifiers?.[kindId]?.activeSoftmaxById?.[id];
+        return probabilities && marginOf(probabilities);
+      },
+    };
+  }
+
+  #images(state: RootState, query: ImageQuery, sort?: ImageSort) {
+    return this.#listing(
+      `images:${JSON.stringify([query, sort])}`,
+      state,
+      () => {
+        const ctx = this.#imageContext(state);
+        const rows = this.#imageRows.get(state.data.images);
+        return sortImages(filterImages(rows, query, ctx), sort, ctx);
+      },
+    );
+  }
+
+  #annotations(
+    state: RootState,
+    query: AnnotationQuery,
+    sort?: AnnotationSort,
+  ) {
+    return this.#listing(
+      `annotations:${JSON.stringify([query, sort])}`,
+      state,
+      () => {
+        const ctx = this.#annotationContext(state);
+        const rows = this.#annotationRows.get(state.data);
+        return sortAnnotations(filterAnnotations(rows, query), sort, ctx);
+      },
+    );
+  }
+
+  #imageRecord(state: RootState, image: ImageObject): ImageRecord {
+    const planes =
+      this.#planesByImage.get(state.data.planes).get(image.id) ?? [];
+    const channelsByPlane = this.#channelsByPlane.get(state.data.channels);
+    return {
+      image,
+      series: state.data.imageSeries.entities[image.seriesId],
+      planes,
+      channels: planes.flatMap((p) => channelsByPlane.get(p.id) ?? []),
+    };
+  }
+
   readonly query = {
     project: async (): Promise<ProjectSummary> => {
       const state = this.#store.getState();
@@ -160,49 +305,63 @@ export class LocalBackend implements Backend {
     images: async (
       query: ImageQuery,
       page: PageRequest,
+      sort?: ImageSort,
     ): Promise<Page<ImageRecord>> => {
-      const { images, imageSeries, planes, channels } =
-        this.#store.getState().data;
-      const ids = query.ids
-        ? query.ids.filter((id) => images.entities[id])
-        : images.ids;
+      const state = this.#store.getState();
+      const { items, total } = paginate(this.#images(state, query, sort), page);
+      return { total, items: items.map((im) => this.#imageRecord(state, im)) };
+    },
 
-      const planesByImage = groupBy(planes, (plane) => plane.imageId);
-      const channelsByPlane = groupBy(channels, (channel) => channel.planeId);
+    imageIds: async (query: ImageQuery, sort?: ImageSort): Promise<string[]> =>
+      this.#images(this.#store.getState(), query, sort).map((im) => im.id),
 
-      return paginate(ids, page, (id) => {
-        const imagePlanes = planesByImage.get(id) ?? [];
-        return {
-          image: images.entities[id],
-          series: imageSeries.entities[images.entities[id].seriesId],
-          planes: imagePlanes,
-          channels: imagePlanes.flatMap((p) => channelsByPlane.get(p.id) ?? []),
-        };
-      });
+    imageCounts: async (
+      query: ImageQuery,
+      groupBy?: ImageCountGroup,
+    ): Promise<Counts> => {
+      const rows = this.#images(this.#store.getState(), query);
+      return {
+        total: rows.length,
+        groups:
+          groupBy &&
+          countBy(rows, (im) =>
+            groupBy === "category" ? im.categoryId : im.partition,
+          ),
+      };
     },
 
     annotations: async (
       query: AnnotationQuery,
       page: PageRequest,
-    ): Promise<Page<AnnotationRecord>> => {
-      const { annotations, annotationVolumes } = this.#store.getState().data;
-      const wanted = query.imageIds ? new Set(query.imageIds) : undefined;
-      const ids = wanted
-        ? annotations.ids.filter((id) =>
-            wanted.has(annotations.entities[id].imageId),
-          )
-        : annotations.ids;
-      return paginate(ids, page, (id) => {
-        const {
-          encodedMask: _mask,
-          decodedMask: _decoded,
-          ...annotation
-        } = annotations.entities[id];
-        return {
-          volume: annotationVolumes.entities[annotation.volumeId],
-          annotation,
-        };
-      });
+      sort?: AnnotationSort,
+    ): Promise<Page<AnnotationRecord>> =>
+      paginate(this.#annotations(this.#store.getState(), query, sort), page),
+
+    annotationIds: async (
+      query: AnnotationQuery,
+      sort?: AnnotationSort,
+    ): Promise<string[]> =>
+      this.#annotations(this.#store.getState(), query, sort).map(
+        (row) => row.annotation.id,
+      ),
+
+    annotationCounts: async (
+      query: AnnotationQuery,
+      groupBy?: AnnotationCountGroup,
+    ): Promise<Counts> => {
+      const rows = this.#annotations(this.#store.getState(), query);
+      return {
+        total: rows.length,
+        groups:
+          groupBy &&
+          countBy(rows, ({ annotation, volume }) =>
+            groupBy === "kind"
+              ? volume.kindId
+              : groupBy === "category"
+                ? volume.categoryId
+                : annotation.partition,
+          ),
+      };
     },
 
     masks: async (

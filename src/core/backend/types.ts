@@ -11,6 +11,7 @@ import type {
   ImageObject,
   ImageSeries,
   Kind,
+  Partition,
   Plane,
 } from "core/entities";
 import type {
@@ -65,12 +66,46 @@ export type CallOptions = {
 };
 
 // ── Query ────────────────────────────────────────────────────────────────────
+//
+// Listings are filtered, sorted and paged by the backend. A page addresses a
+// window of the result by position and carries the result's total, which is
+// what a virtualized grid needs; the backend's events say when a window has
+// to be fetched again. Ties in every sort fall back to insertion order, and
+// `desc` reverses the whole order, ties included.
 
-export type PageRequest = { cursor?: string; limit: number };
+export type PageRequest = { offset?: number; limit: number };
 
-export type Page<T> = { items: T[]; total: number; nextCursor?: string };
+export type Page<T> = { items: T[]; total: number };
 
-export type ImageQuery = { ids?: string[] };
+export type SortDirection = "asc" | "desc";
+
+/* Keeps items whose confidence lies strictly inside the range; items without
+ * one are left out. */
+export type ConfidenceRange = { min: number; max: number };
+
+export type ImageSortKey = "none" | "name" | "category" | "random" | "softmax";
+
+/* `random` shuffles by `seed`, the same way on every backend. `softmax` puts
+ * the least confident classifier prediction first and needs the
+ * `classification` capability. */
+export type ImageSort = {
+  key?: ImageSortKey;
+  direction?: SortDirection;
+  seed?: number;
+};
+
+/* Every condition given must hold; an absent one does not restrict. */
+export type ImageQuery = {
+  ids?: string[];
+  seriesIds?: string[];
+  categoryIds?: string[];
+  partitions?: Partition[];
+  confidence?: ConfidenceRange;
+  /* Only images with (`true`) or without (`false`) any annotation. */
+  annotated?: boolean;
+};
+
+export type ImageCountGroup = "category" | "partition";
 
 export type ImageRecord = {
   image: ImageObject;
@@ -80,12 +115,50 @@ export type ImageRecord = {
   channels: Channel[];
 };
 
-export type AnnotationQuery = { imageIds?: string[] };
+export type AnnotationSortKey =
+  | "none"
+  | "plane"
+  | "volume"
+  | "category"
+  | "image"
+  | "random"
+  | "softmax";
+
+export type AnnotationSort = {
+  key?: AnnotationSortKey;
+  direction?: SortDirection;
+  seed?: number;
+};
+
+export type AnnotationQuery = {
+  ids?: string[];
+  imageIds?: string[];
+  planeIds?: string[];
+  volumeIds?: string[];
+  kindIds?: string[];
+  categoryIds?: string[];
+  partitions?: Partition[];
+  confidence?: ConfidenceRange;
+};
+
+export type AnnotationCountGroup = "category" | "partition" | "kind";
 
 /* Masks are fetched separately (`masks`); they dominate the payload size. */
+export type AnnotationHeader = Omit<
+  AnnotationObject,
+  "encodedMask" | "decodedMask"
+>;
+
 export type AnnotationRecord = {
   volume: AnnotationVolume;
-  annotation: Omit<AnnotationObject, "encodedMask" | "decodedMask">;
+  annotation: AnnotationHeader;
+};
+
+export type Counts = {
+  total: number;
+  /* Matches per category id, partition or kind id, when grouping was asked
+   * for; groups with no match are absent. */
+  groups?: Record<string, number>;
 };
 
 export type ProjectSummary = {
@@ -98,11 +171,27 @@ export type ProjectSummary = {
 
 export interface BackendQuery {
   project(): Promise<ProjectSummary>;
-  images(query: ImageQuery, page: PageRequest): Promise<Page<ImageRecord>>;
+  images(
+    query: ImageQuery,
+    page: PageRequest,
+    sort?: ImageSort,
+  ): Promise<Page<ImageRecord>>;
+  /* Every match, in order: for select-all and for running over a listing. */
+  imageIds(query: ImageQuery, sort?: ImageSort): Promise<string[]>;
+  imageCounts(query: ImageQuery, groupBy?: ImageCountGroup): Promise<Counts>;
   annotations(
     query: AnnotationQuery,
     page: PageRequest,
+    sort?: AnnotationSort,
   ): Promise<Page<AnnotationRecord>>;
+  annotationIds(
+    query: AnnotationQuery,
+    sort?: AnnotationSort,
+  ): Promise<string[]>;
+  annotationCounts(
+    query: AnnotationQuery,
+    groupBy?: AnnotationCountGroup,
+  ): Promise<Counts>;
   masks(annotationIds: string[]): Promise<Record<string, number[]>>;
 }
 

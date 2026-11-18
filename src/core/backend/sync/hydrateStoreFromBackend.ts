@@ -33,32 +33,32 @@ export const hydrateStoreFromBackend = async (
   const images: ImageObject[] = [];
   const planes: Plane[] = [];
   const channels: Channel[] = [];
-  for (let cursor: string | undefined; ; ) {
-    const page = await backend.query.images({}, { cursor, limit: IMAGE_PAGE });
+  for (let offset = 0; ; ) {
+    const page = await backend.query.images({}, { offset, limit: IMAGE_PAGE });
     for (const record of page.items) {
       imageSeries.set(record.series.id, record.series);
       images.push(record.image);
       planes.push(...record.planes);
       channels.push(...record.channels);
     }
-    if (!page.nextCursor) break;
-    cursor = page.nextCursor;
+    offset += page.items.length;
+    if (page.items.length === 0 || offset >= page.total) break;
   }
 
   const annotationVolumes: AnnotationVolume[] = [];
   const annotations: AnnotationObject[] = [];
-  for (let cursor: string | undefined; ; ) {
+  for (let offset = 0; ; ) {
     const page = await backend.query.annotations(
       {},
-      { cursor, limit: ANNOTATION_PAGE },
+      { offset, limit: ANNOTATION_PAGE },
     );
     for (const record of page.items) {
       annotationVolumes.push(record.volume);
       // Masks follow separately; an empty mask marks one not fetched yet.
       annotations.push({ ...record.annotation, encodedMask: [] });
     }
-    if (!page.nextCursor) break;
-    cursor = page.nextCursor;
+    offset += page.items.length;
+    if (page.items.length === 0 || offset >= page.total) break;
   }
 
   // Slices that keep per-kind state learn of kinds through the add actions,
