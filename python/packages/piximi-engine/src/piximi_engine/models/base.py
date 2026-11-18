@@ -19,6 +19,9 @@ from piximi_link.peer import HandlerContext
 from piximi_schema.segmentation import (
     ChannelPolicy,
     ModelLink,
+    ModelResources,
+    ModelStatus,
+    ModelTask,
     OptionSchema,
     OutputPolicy,
     SegmentationModelDescriptor,
@@ -44,6 +47,9 @@ class SegmentationModel(ABC):
     sources: list[ModelLink] = []
     cite: list[ModelLink] | None = None
     cloud_warning: str | None = None
+    framework: str = "python"
+    version: str | None = None
+    resources: ModelResources | None = None
     output_policy: OutputPolicy
     channel_policy: ChannelPolicy
     option_schema: OptionSchema | None = None
@@ -52,6 +58,18 @@ class SegmentationModel(ABC):
     @property
     @abstractmethod
     def loaded(self) -> bool: ...
+
+    @property
+    def status(self) -> ModelStatus:
+        """In-process models need no environment: ready until loaded."""
+        return ModelStatus.LOADED if self.loaded else ModelStatus.READY
+
+    @property
+    def status_message(self) -> str | None:
+        return None
+
+    async def unload(self) -> None:
+        """Frees what ``load`` claimed; a no-op for models that hold nothing."""
 
     async def load(self, ctx: HandlerContext) -> None:
         """Fetches weights and warms up; a no-op for models with nothing to load."""
@@ -71,6 +89,12 @@ class SegmentationModel(ABC):
             name=self.id,
             display_name=self.display_name,
             model_loaded=self.loaded,
+            status=self.status,
+            status_message=self.status_message,
+            framework=self.framework,
+            version=self.version,
+            tasks=[ModelTask.SEGMENTATION],
+            resources=self.resources,
             output_policy=self.output_policy,
             channel_policy=self.channel_policy,
             option_schema=self.option_schema,

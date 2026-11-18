@@ -1620,6 +1620,67 @@
       "title": "ModelLink",
       "type": "object"
     },
+    "ModelResources": {
+      "additionalProperties": false,
+      "properties": {
+        "gpu": {
+          "type": "boolean"
+        },
+        "memoryHint": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "gpu"
+      ],
+      "title": "ModelResources",
+      "type": "object"
+    },
+    "ModelStatus": {
+      "description": "Where a model is on the way to being usable. A model that runs in its\nown environment starts ``unavailable`` until that environment is built.",
+      "enum": [
+        "unavailable",
+        "building",
+        "ready",
+        "loaded",
+        "failed"
+      ],
+      "title": "ModelStatus",
+      "type": "string"
+    },
+    "ModelTask": {
+      "description": "What a model can do, named like the capabilities that expose it.",
+      "enum": [
+        "segmentation",
+        "segmentation.train",
+        "classification",
+        "classification.train"
+      ],
+      "title": "ModelTask",
+      "type": "string"
+    },
+    "ModelsDidChange": {
+      "additionalProperties": false,
+      "description": "The model list changed: one was registered, or its status moved (an\nenvironment built, weights loaded, a failure). Carries the whole list,\nwhich is short, so a client replaces what it shows.",
+      "properties": {
+        "type": {
+          "const": "models/didChange",
+          "type": "string"
+        },
+        "models": {
+          "items": {
+            "$ref": "#/$defs/SegmentationModelDescriptor"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "models"
+      ],
+      "title": "ModelsDidChange",
+      "type": "object"
+    },
     "NotificationMessage": {
       "additionalProperties": false,
       "properties": {
@@ -2235,6 +2296,27 @@
         "modelLoaded": {
           "type": "boolean"
         },
+        "status": {
+          "$ref": "#/$defs/ModelStatus"
+        },
+        "statusMessage": {
+          "type": "string"
+        },
+        "framework": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "tasks": {
+          "items": {
+            "$ref": "#/$defs/ModelTask"
+          },
+          "type": "array"
+        },
+        "resources": {
+          "$ref": "#/$defs/ModelResources"
+        },
         "outputPolicy": {
           "discriminator": {
             "mapping": {
@@ -2301,6 +2383,9 @@
         "name",
         "displayName",
         "modelLoaded",
+        "status",
+        "framework",
+        "tasks",
         "outputPolicy",
         "channelPolicy",
         "cancellableLoad",
@@ -2749,6 +2834,10 @@
     "images/didAdd": {
       "direction": "server->client",
       "params": "#/$defs/ImagesDidAdd"
+    },
+    "models/didChange": {
+      "direction": "server->client",
+      "params": "#/$defs/ModelsDidChange"
     }
   }
 }

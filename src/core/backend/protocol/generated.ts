@@ -123,6 +123,30 @@ export type JobStatus =
   | "failed"
   | "cancelled";
 /**
+ * Where a model is on the way to being usable. A model that runs in its
+ * own environment starts ``unavailable`` until that environment is built.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ModelStatus".
+ */
+export type ModelStatus =
+  | "unavailable"
+  | "building"
+  | "ready"
+  | "loaded"
+  | "failed";
+/**
+ * What a model can do, named like the capabilities that expose it.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ModelTask".
+ */
+export type ModelTask =
+  | "segmentation"
+  | "segmentation.train"
+  | "classification"
+  | "classification.train";
+/**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ObjectFeature".
  */
@@ -767,6 +791,12 @@ export interface SegmentationModelDescriptor {
   name: string;
   displayName: string;
   modelLoaded: boolean;
+  status: ModelStatus;
+  statusMessage?: string;
+  framework: string;
+  version?: string;
+  tasks: ModelTask[];
+  resources?: ModelResources;
   outputPolicy: OutputPolicySingle | OutputPolicyClasses;
   channelPolicy: ChannelPolicyFixed | ChannelPolicyPassthrough;
   optionSchema?: OptionSchema;
@@ -776,6 +806,14 @@ export interface SegmentationModelDescriptor {
   sources: ModelLink[];
   cite?: ModelLink[];
   cloudWarning?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ModelResources".
+ */
+export interface ModelResources {
+  gpu: boolean;
+  memoryHint?: string;
 }
 /**
  * Every annotation lands in one kind, named by the user.
@@ -894,6 +932,18 @@ export interface MasksResult {
   masks: {
     [k: string]: number[];
   };
+}
+/**
+ * The model list changed: one was registered, or its status moved (an
+ * environment built, weights loaded, a failure). Carries the whole list,
+ * which is short, so a client replaces what it shows.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ModelsDidChange".
+ */
+export interface ModelsDidChange {
+  type: "models/didChange";
+  models: SegmentationModelDescriptor[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema

@@ -14,7 +14,13 @@ from collections.abc import Callable
 from typing import Protocol
 
 from piximi_schema.capabilities import Capability
-from piximi_schema.events import AnnotationsDidAdd, ImagesDidAdd, JobsDidUpdate, KindsDidAdd
+from piximi_schema.events import (
+    AnnotationsDidAdd,
+    ImagesDidAdd,
+    JobsDidUpdate,
+    KindsDidAdd,
+    ModelsDidChange,
+)
 from piximi_schema.jobs import Job
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
@@ -39,7 +45,7 @@ from piximi_schema.segmentation import (
 
 from .peer import HandlerContext
 
-BackendEvent = KindsDidAdd | AnnotationsDidAdd | JobsDidUpdate | ImagesDidAdd
+BackendEvent = KindsDidAdd | AnnotationsDidAdd | JobsDidUpdate | ImagesDidAdd | ModelsDidChange
 EventListener = Callable[[BackendEvent], None]
 
 

@@ -141,6 +141,9 @@ const applyBackendEvent = (
     case "images/didAdd":
       applyImagesAdded(event.records, event.channelMetas, store);
       break;
+    case "models/didChange":
+      // Nothing in the store holds models; the model dialog subscribes.
+      return;
   }
   if (remote) store.dispatch(backendSyncSlice.actions.backendDataChanged());
 };

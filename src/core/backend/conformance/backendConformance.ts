@@ -291,6 +291,9 @@ export const describeBackendConformance = (
           expect(model.name).toBeTruthy();
           expect(model.channelPolicy).toBeDefined();
           expect(model.outputPolicy).toBeDefined();
+          expect(model.framework).toBeTruthy();
+          expect(model.tasks).toContain("segmentation");
+          expect(model.modelLoaded).toBe(model.status === "loaded");
         }
       });
 
@@ -306,6 +309,7 @@ export const describeBackendConformance = (
           (m) => m.name === model.name,
         );
         expect(after?.modelLoaded).toBe(true);
+        expect(after?.status).toBe("loaded");
       });
 
       it("emits the annotations it adds and counts them in the summary", async () => {

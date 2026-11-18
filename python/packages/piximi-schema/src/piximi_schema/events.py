@@ -9,6 +9,7 @@ from .base import WireModel
 from .entities import AnnotationCategory, AnnotationObject, AnnotationVolume, ChannelMeta, Kind
 from .jobs import Job
 from .query import ImageRecord
+from .segmentation import SegmentationModelDescriptor
 
 
 class KindWithCategory(WireModel):
@@ -40,8 +41,24 @@ class ImagesDidAdd(WireModel):
     """Channel metas created for these images; existing ones are not repeated."""
 
 
+class ModelsDidChange(WireModel):
+    """The model list changed: one was registered, or its status moved (an
+    environment built, weights loaded, a failure). Carries the whole list,
+    which is short, so a client replaces what it shows."""
+
+    type: Literal["models/didChange"]
+    models: list[SegmentationModelDescriptor]
+
+
 BackendEvent = Annotated[
-    KindsDidAdd | AnnotationsDidAdd | JobsDidUpdate | ImagesDidAdd, Field(discriminator="type")
+    KindsDidAdd | AnnotationsDidAdd | JobsDidUpdate | ImagesDidAdd | ModelsDidChange,
+    Field(discriminator="type"),
 ]
 
-EVENT_TYPES: tuple[type[WireModel], ...] = (KindsDidAdd, AnnotationsDidAdd, JobsDidUpdate, ImagesDidAdd)
+EVENT_TYPES: tuple[type[WireModel], ...] = (
+    KindsDidAdd,
+    AnnotationsDidAdd,
+    JobsDidUpdate,
+    ImagesDidAdd,
+    ModelsDidChange,
+)

@@ -66,6 +66,15 @@ type Deps = {
 const toBackendError = (reason: ErrorReason) =>
   new BackendError(reason.code, reason.message, { cause: reason.cause });
 
+/* What runs each bundled model, inside the segmenter worker. */
+const FRAMEWORKS: Record<BuiltinModelName, string> = {
+  "Cellpose-SAM": "onnxruntime-web",
+  StardistVHE: "tensorflow.js",
+  StardistFluo: "tensorflow.js",
+  GlandSegmentation: "tensorflow.js",
+  "COCO-SSD": "tensorflow.js",
+};
+
 /* The worker's DTO plus the static display info the bundled models carry. */
 const describe = (
   details: SegmentationModelDetails,
@@ -75,6 +84,10 @@ const describe = (
     | undefined;
   return {
     ...details,
+    // Bundled models need no environment: ready until loaded.
+    status: details.modelLoaded ? "loaded" : "ready",
+    framework: FRAMEWORKS[details.name as BuiltinModelName] ?? "unknown",
+    tasks: ["segmentation"],
     description: info?.description ?? "",
     use: info?.use ?? "",
     sources: info?.sources ?? [],

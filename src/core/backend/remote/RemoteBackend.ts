@@ -156,6 +156,14 @@ export class RemoteBackend implements Backend {
         channelMetas: event.channelMetas,
       });
     });
+    peer.onNotification("models/didChange", (params) =>
+      this.#bus.emit({
+        type: "models/didChange",
+        models: asDomain<SegmentationModelDescriptor[]>(
+          (params as P.ModelsDidChange).models,
+        ),
+      }),
+    );
   }
 
   #call<M extends keyof Methods>(

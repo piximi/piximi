@@ -16,6 +16,7 @@ from piximi_schema.segmentation import (
     ChannelPolicyFixed,
     ChannelPolicyPassthrough,
     ModelLink,
+    ModelResources,
     NumberOptionField,
     OptionGroup,
     OptionSchema,
@@ -115,6 +116,7 @@ def _predict_kwargs(options: dict[str, Any]) -> dict[str, Any]:
 
 class CellcastStarDist(SegmentationModel):
     cancellable_load = False
+    framework = "cellcast"
     output_policy = OutputPolicySingle(mode="single", default_kind_name="Nucleus")
     option_schema = OPTION_SCHEMA
     sources = SOURCES
@@ -123,6 +125,7 @@ class CellcastStarDist(SegmentationModel):
     def __init__(self, variant: str, gpu: bool = True) -> None:
         self.variant = variant
         self.gpu = gpu
+        self.resources = ModelResources(gpu=gpu)
         self._model: Any = None
         if variant == "fluo":
             self.id = "cellcast-stardist-fluo"

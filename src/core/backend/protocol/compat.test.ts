@@ -36,6 +36,8 @@ import type {
   ImageCountGroup,
   ImageQuery,
   ImageSort,
+  ModelStatus,
+  ModelTask,
   Page,
   PageRequest,
   ProjectSummary,
@@ -144,6 +146,18 @@ type Checks = [
       Extract<BackendEvent, { type: "jobs/didUpdate" }>
     >
   >,
+  Assert<
+    Equivalent<
+      Omit<
+        P.ModelsDidChange["models"][number],
+        "outputPolicy" | "channelPolicy"
+      >,
+      Omit<
+        Extract<BackendEvent, { type: "models/didChange" }>["models"][number],
+        "outputPolicy" | "channelPolicy"
+      >
+    >
+  >,
 
   // ── Query and render ──────────────────────────────────────────────────────
   Assert<Equivalent<P.PageRequest, PageRequest>>,
@@ -174,6 +188,8 @@ type Checks = [
   >,
   Assert<Equivalent<P.OptionGroup, SegmenterOptionGroup>>,
   Assert<Equivalent<P.OptionSchema, SegmenterOptionSchema>>,
+  Assert<Equivalent<P.ModelStatus, ModelStatus>>,
+  Assert<Equivalent<P.ModelTask, ModelTask>>,
   Assert<
     Equivalent<
       Omit<P.SegmentationModelDescriptor, "outputPolicy" | "channelPolicy">,

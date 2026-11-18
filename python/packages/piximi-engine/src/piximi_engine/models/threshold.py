@@ -31,6 +31,7 @@ class ThresholdSegmenter(SegmentationModel):
     display_name = "Threshold (Otsu)"
     description = "Thresholds the image and labels each connected component as an object"
     use = "A quick baseline for bright objects on a dark background"
+    framework = "scikit-image"
     output_policy = OutputPolicySingle(mode="single", default_kind_name="Object")
     channel_policy = ChannelPolicyPassthrough(mode="passthrough", max_channels=1)
     option_schema = OptionSchema(

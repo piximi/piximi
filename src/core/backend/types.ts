@@ -248,8 +248,43 @@ export interface BackendJobs {
 
 // ── Segmentation ─────────────────────────────────────────────────────────────
 
+/*
+ * Where a model is on the way to being usable. One that runs in its own
+ * environment (a plugin on a remote engine) starts `unavailable` until that
+ * environment is built; `loadModel` builds it as part of the load job.
+ */
+export type ModelStatus =
+  | "unavailable"
+  | "building"
+  | "ready"
+  | "loaded"
+  | "failed";
+
+/* What a model can do, named like the capabilities that expose it. */
+export type ModelTask =
+  | "segmentation"
+  | "segmentation.train"
+  | "classification"
+  | "classification.train";
+
+export type ModelResources = {
+  /* Whether the model uses a GPU when one is available. */
+  gpu: boolean;
+  /* Free text, e.g. "2 GB VRAM". */
+  memoryHint?: string;
+};
+
 export type SegmentationModelDescriptor = SegmentationModelDetails &
-  Omit<ModelDisplayInfo, "name" | "displayName">;
+  Omit<ModelDisplayInfo, "name" | "displayName"> & {
+    status: ModelStatus;
+    /* Why it is `unavailable` or `failed`, or what a build is doing. */
+    statusMessage?: string;
+    /* What runs the model, e.g. "cellcast", "pytorch", "tensorflow.js". */
+    framework: string;
+    version?: string;
+    tasks: ModelTask[];
+    resources?: ModelResources;
+  };
 
 export type SegmentationRunRequest = {
   modelId: string;

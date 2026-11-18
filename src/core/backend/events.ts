@@ -7,7 +7,7 @@ import type {
 } from "core/entities";
 
 import type { Job } from "./jobs";
-import type { ImageRecord } from "./types";
+import type { ImageRecord, SegmentationModelDescriptor } from "./types";
 
 /*
  * Changes a backend announces after the fact. Both backends emit these for
@@ -31,7 +31,12 @@ export type BackendEvent =
       records: ImageRecord[];
       /* Only metas created for these images; existing ones are not repeated. */
       channelMetas: ChannelMeta[];
-    };
+    }
+  /*
+   * The model list changed: one was registered, or its status moved (an
+   * environment built, weights loaded, a failure). Carries the whole list.
+   */
+  | { type: "models/didChange"; models: SegmentationModelDescriptor[] };
 
 export type BackendEventListener = (event: BackendEvent) => void;
 

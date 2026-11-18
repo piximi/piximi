@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import Annotated, Literal
 
 from pydantic import Field
@@ -132,11 +133,47 @@ class ModelLink(WireModel):
     url: str
 
 
+class ModelStatus(StrEnum):
+    """Where a model is on the way to being usable. A model that runs in its
+    own environment starts ``unavailable`` until that environment is built."""
+
+    UNAVAILABLE = "unavailable"
+    BUILDING = "building"
+    READY = "ready"
+    LOADED = "loaded"
+    FAILED = "failed"
+
+
+class ModelTask(StrEnum):
+    """What a model can do, named like the capabilities that expose it."""
+
+    SEGMENTATION = "segmentation"
+    SEGMENTATION_TRAIN = "segmentation.train"
+    CLASSIFICATION = "classification"
+    CLASSIFICATION_TRAIN = "classification.train"
+
+
+class ModelResources(WireModel):
+    gpu: bool
+    """Whether the model uses a GPU when one is available."""
+    memory_hint: str | None = None
+    """Free text, e.g. "2 GB VRAM", shown to the user."""
+
+
 class SegmentationModelDescriptor(WireModel):
     name: str
     """The model's id; what requests refer to."""
     display_name: str
     model_loaded: bool
+    """``status == loaded``; kept for the frontend's model details type."""
+    status: ModelStatus
+    status_message: str | None = None
+    """Why the model is ``unavailable`` or ``failed``, or what a build is doing."""
+    framework: str
+    """What runs the model, e.g. "cellcast", "pytorch", "tensorflow.js"."""
+    version: str | None = None
+    tasks: list[ModelTask]
+    resources: ModelResources | None = None
     output_policy: OutputPolicy
     channel_policy: ChannelPolicy
     option_schema: OptionSchema | None = None
