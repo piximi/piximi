@@ -7,7 +7,8 @@ Piximi's pluggable backends.
 | --- | --- |
 | `packages/piximi-schema` | The wire contract: Pydantic models for every type that crosses between the frontend and a backend, and the JSON Schema bundle generated from them (`schema/protocol.schema.json`). The frontend's `src/core/backend/protocol/` is generated from that bundle. |
 | `packages/piximi-link` | Transport and RPC, independent of what an engine does: msgpack framing that a relay can forward without decoding, a symmetric JSON-RPC peer (requests both ways, progress, cancellation), WebSocket transports, the `Engine` protocol an engine implements, and `SessionHub`, which serves one engine to many peers and broadcasts its events. `piximi-link-echo` serves a test peer; `piximi_link.testing.relay` is a frame-forwarding relay. The frontend's `src/core/backend/remote/` is the same design in TypeScript, and `crossLanguage.test.ts` runs one against the other. |
-| `packages/piximi-engine` | The reference engine: metadata in SQLite, pixels in zarr, compositing, RLE masks and measurements matching the frontend's, and a segmentation model registry (a threshold baseline, plus StarDist2D through [cellcast](https://github.com/uw-loci/cellcast) with `pip install 'piximi-engine[cellcast]'`). `piximi serve <folder>` imports a folder of TIFF/PNG/JPEG files and serves them. |
+| `packages/piximi-engine` | The reference engine: metadata in SQLite, pixels in zarr, compositing, RLE masks and measurements matching the frontend's, and a model registry: a threshold baseline in process, plus model plugins that each run in their own environment (see below). `piximi serve <folder>` imports a folder of TIFF/PNG/JPEG files and serves them. |
+| `packages/piximi-model-sdk` | What a model plugin implements: a `SegmentationModel` base class and a `Context` for progress and cancellation. Depends on numpy alone, so it installs into any plugin environment. |
 
 ## Serving a folder of images
 
@@ -93,6 +94,46 @@ app = Starlette(routes=[
 `piximi serve --base-path /piximi` is the same thing for the CLI behind a
 proxy that strips the prefix without announcing it.
 
+## Model plugins
+
+A model is a plugin: a folder with a `piximi-model.toml` manifest and a
+Python module (see `packages/piximi-model-sdk/README.md` for a complete
+one). The manifest declares the plugin's packages and describes each model
+to the UI; the engine builds the environment the first time a model is
+loaded, through [Appose](https://apposed.org) and uv, and runs the module
+in a worker process there. Images and label images cross as arrays in
+named shared memory, so no pixel is serialized; a cancel reaches the model
+through its context. Nothing the plugin needs is installed next to the
+engine, so plugins with conflicting requirements serve one session.
+
+The engine ships two: StarDist2D through
+[cellcast](https://github.com/uw-loci/cellcast) (numpy-only, GPU on macOS
+through wgpu) and [Cellpose 3](https://github.com/MouseLand/cellpose) on
+PyTorch. Install the runner with `pip install 'piximi-engine[appose]'`
+and both are listed; without it, `'piximi-engine[cellcast]'` runs
+StarDist2D in the engine's own process instead. In the app, a model whose
+environment is not built shows as such, and **Build & Load** builds it
+with the build's phases in the task toast.
+
+```sh
+uv run piximi serve /path/to/images --models-dir ./my-plugins   # one plugin per subfolder
+uv run piximi serve /path/to/images --envs-dir /fast/disk/envs  # where environments are built
+```
+
+Environments live under `APPOSE_ENVS_DIR` (default `~/.local/share/appose`)
+as `piximi-<plugin id>`, keyed by the manifest's requirements, so a changed
+requirement rebuilds on the next load. From a notebook,
+`session.project.register_model("./my-plugin")` registers a plugin on the
+running engine, and registering it again after an edit replaces it; every
+connected tab lists it at once. The Jupyter launcher reads
+`PIXIMI_MODELS_DIR`. Installed packages advertise plugins through the
+`piximi.models` entry point group, whose value is the manifest's path.
+
+Appose is pinned to an upstream commit (see `pyproject.toml`): the PyPI
+release predates the worker handshake and shutdown fixes the runner needs,
+and a plugin environment receives the same pin, since a worker must match
+the service's minor version.
+
 ## Working on the packages
 
 ```sh
@@ -102,6 +143,8 @@ uv run pytest                # all package tests
 cd .. && pnpm protocol:gen   # re-export the bundle and regenerate the TS types
 pnpm engine:frontend         # build the frontend and copy it into the engine package
 PIXIMI_REMOTE_TEST=1 pnpm test --run src/core/backend/remote   # TS ↔ Python, incl. RemoteBackend conformance
+PIXIMI_APPOSE_TEST=1 uv run pytest   # also builds plugin environments (two fixture plugins, cellcast)
+PIXIMI_CELLPOSE_TEST=1 uv run pytest -k cellpose   # builds the Cellpose environment (PyTorch, ~1 GB)
 ```
 
 Both the bundle and the generated TypeScript are checked in; CI regenerates

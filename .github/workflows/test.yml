@@ -55,8 +55,11 @@ jobs:
           enable-cache: true
           working-directory: python
 
+      # Also builds the fixture and cellcast plugin environments (network).
       - name: Python tests
         run: uv run --project python pytest -q
+        env:
+          PIXIMI_APPOSE_TEST: "1"
 
       - name: Regenerate protocol
         run: pnpm protocol:gen
