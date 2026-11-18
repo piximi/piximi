@@ -9,6 +9,7 @@ import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 import { measurementsSlice } from "views/MeasurementViewer/state";
 
 import { appTasksSlice } from "./appTasks/appTasksSlice";
+import { backendSyncSlice } from "./backendSync";
 import { dataSlice } from "./data";
 import { rootReducer } from "./rootReducer";
 import { applicationSettingsSlice } from "./applicationSettings";
@@ -40,6 +41,7 @@ const preloadedState: RootState = {
   measurements: measurementsSlice.getInitialState(),
   data: dataSlice.getInitialState(),
   appTasks: appTasksSlice.getInitialState(),
+  backendSync: backendSyncSlice.getInitialState(),
   project: projectSlice.getInitialState(),
   segmenter: segmenterSlice.getInitialState(),
 };

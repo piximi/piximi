@@ -21,6 +21,7 @@ import type { ImageViewerDataState } from "@ImageViewer/state/types";
 import type { SegmenterSliceState } from "./segmenter/types";
 import type { DataStateV2 } from "./data/types";
 import type { AppTasksState } from "./appTasks/types";
+import type { BackendSyncState } from "./backendSync";
 import type { ClassifierState } from "./classifier/types";
 
 export type AppSettingsState = {
@@ -47,6 +48,7 @@ type AppState = {
   data: DataStateV2;
   measurements: MeasurementsState;
   appTasks: AppTasksState;
+  backendSync: BackendSyncState;
   segmenter: SegmenterSliceState;
 };
 

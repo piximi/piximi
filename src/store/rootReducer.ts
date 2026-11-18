@@ -10,6 +10,7 @@ import { projectSlice } from "views/ProjectViewer/state/projectSlice";
 
 import { dataSlice } from "./data";
 import { appTasksSlice } from "./appTasks/appTasksSlice";
+import { backendSyncSlice } from "./backendSync";
 import { segmenterSlice } from "./segmenter/segmenterSlice";
 
 const reducers = {
@@ -21,6 +22,7 @@ const reducers = {
   data: dataSlice.reducer,
   measurements: measurementsSlice.reducer,
   appTasks: appTasksSlice.reducer,
+  backendSync: backendSyncSlice.reducer,
   segmenter: segmenterSlice.reducer,
 };
 
