@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { selectExtendedImages } from "store/data/selectors";
+import { selectTotalImages } from "store/data/selectors";
 import { segmenterError } from "store/segmenter/segmenterReadiness";
 
 import type {
@@ -63,11 +63,11 @@ export const selectSegmenterOptions = createSelector(
 export const selectSegmentorError = createSelector(
   selectLoadedSegmenter,
   selectSegmenterChannels,
-  selectExtendedImages,
-  (loadedModel, channelSelection, projectImages) =>
+  selectTotalImages,
+  (loadedModel, channelSelection, imageCount) =>
     segmenterError({
       policy: loadedModel?.channelPolicy,
       channelIds: channelSelection,
-      imageCount: projectImages.length,
+      imageCount,
     }),
 );

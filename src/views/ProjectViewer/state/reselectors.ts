@@ -4,7 +4,10 @@ import { difference } from "lodash";
 import { CATEGORY_COLORS, representsUnknown } from "core/entities";
 
 import {
+  selectAllAnnotations,
   selectAllCategories,
+  selectAllImages,
+  selectAnnotationVolumeEntities,
   selectExtendedAnnotationsByKindId,
   selectExtendedImages,
 } from "store/data/selectors";
@@ -15,7 +18,7 @@ import {
   selectSelectedImageIds,
 } from "./selectors";
 
-import type { Partition } from "core/dl/enums";
+import type { Partition } from "core/entities";
 
 import type { RootState } from "store/rootReducer";
 
@@ -75,7 +78,8 @@ export const selectAvaliableCategoryColors = createSelector(
 const selectActiveExtendedAnnotations = (state: RootState) =>
   selectExtendedAnnotationsByKindId(state, selectActiveKindId(state));
 
-/** Every item of the active view, before any filtering. */
+/** Every item of the active view, before any filtering, with everything a
+ * model needs; for fitting and predicting. */
 export const selectActiveItems = createSelector(
   selectActiveView,
   selectActiveExtendedAnnotations,
@@ -86,29 +90,73 @@ export const selectActiveItems = createSelector(
   },
 );
 
-export const selectActiveLabeledItems = createSelector(
-  selectActiveItems,
-  (activeItems) => {
-    return activeItems.filter((item) => !representsUnknown(item.categoryId));
+/*
+ * What the status checks and counts need from an item: no categories,
+ * channels or image names joined in, so a change to the data costs one pass
+ * over a table rather than a rebuild of every extended object.
+ */
+export type ActiveItemSummary = {
+  id: string;
+  categoryId: string;
+  partition: Partition;
+};
+
+const selectImageSummaries = createSelector(
+  selectAllImages,
+  (images): ActiveItemSummary[] =>
+    images.map(({ id, categoryId, partition }) => ({
+      id,
+      categoryId,
+      partition,
+    })),
+);
+
+const selectAnnotationSummariesByKind = createSelector(
+  [
+    selectAllAnnotations,
+    selectAnnotationVolumeEntities,
+    (_: RootState, kindId: string) => kindId,
+  ],
+  (annotations, volumes, kindId): ActiveItemSummary[] => {
+    const summaries: ActiveItemSummary[] = [];
+    for (const annotation of annotations) {
+      const volume = volumes[annotation.volumeId];
+      if (!volume || volume.kindId !== kindId) continue;
+      summaries.push({
+        id: annotation.id,
+        categoryId: volume.categoryId,
+        partition: annotation.partition,
+      });
+    }
+    return summaries;
   },
 );
 
+export const selectActiveItemSummaries = (
+  state: RootState,
+): ActiveItemSummary[] =>
+  selectActiveView(state) === "images"
+    ? selectImageSummaries(state)
+    : selectAnnotationSummariesByKind(state, selectActiveKindId(state));
+
+export const selectActiveLabeledItems = createSelector(
+  selectActiveItemSummaries,
+  (items) => items.filter((item) => !representsUnknown(item.categoryId)),
+);
+
 export const selectActiveItemsByPartition = createSelector(
-  selectActiveItems,
+  selectActiveItemSummaries,
   (_: RootState, partition: Partition) => partition,
-  (activeItems, partition) => {
-    return activeItems.filter((item) => item.partition === partition);
-  },
+  (items, partition) => items.filter((item) => item.partition === partition),
 );
 
 // --- Stats ---
 
 export const selectTotalActiveUnlabeledItems = createSelector(
-  selectActiveItems,
-  (activeItems) => {
-    return activeItems.reduce((total: number, item) => {
+  selectActiveItemSummaries,
+  (items) =>
+    items.reduce((total: number, item) => {
       if (representsUnknown(item.categoryId)) total++;
       return total;
-    }, 0);
-  },
+    }, 0),
 );

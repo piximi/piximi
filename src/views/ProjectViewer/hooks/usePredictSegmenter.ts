@@ -7,12 +7,12 @@ import { sanitizeOptions } from "core/dl/segmentation/optionUtils";
 import { isTaskCancelledError } from "core/dl/cancel";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { selectExtendedImages } from "store/data/selectors";
+import { selectImageEntities, selectImageIds } from "store/data/selectors";
 
 import { getStackTraceFromError } from "utils/logUtils";
 import { AlertType } from "utils/enums";
 
-import { selectSelectedImages } from "@ProjectViewer/state/reselectors";
+import { selectSelectedImageIds } from "@ProjectViewer/state/selectors";
 
 import { useSegmenter } from "./useSegmenter";
 
@@ -26,8 +26,9 @@ import type { AlertState } from "utils/types";
 export const usePredictSegmenter = () => {
   const dispatch = useDispatch();
   const backend = useBackend();
-  const allImages = useSelector(selectExtendedImages);
-  const selectedImages = useSelector(selectSelectedImages);
+  const allImageIds = useSelector(selectImageIds);
+  const imageEntities = useSelector(selectImageEntities);
+  const selectedImageIds = useSelector(selectSelectedImageIds);
 
   const {
     setModelStatus,
@@ -66,9 +67,10 @@ export const usePredictSegmenter = () => {
       );
       return;
     }
-    const inferenceImages =
-      selectedImages.length > 0 ? selectedImages : allImages;
-    if (inferenceImages.length === 0) {
+    // A run covers the selection, or the whole project without one.
+    const selected = selectedImageIds.filter((id) => imageEntities[id]);
+    const inferenceImageIds = selected.length > 0 ? selected : allImageIds;
+    if (inferenceImageIds.length === 0) {
       await alert(
         new Error("Inference set is empty"),
         "There are no images to segment.",
@@ -80,7 +82,7 @@ export const usePredictSegmenter = () => {
     try {
       const summary = await segmentation.run({
         modelId: loadedModel.name,
-        imageIds: inferenceImages.map((image) => image.id),
+        imageIds: inferenceImageIds,
         channelMetaIds: channelSelection,
         options: sanitizeOptions(loadedModel.optionSchema, optionValues),
         kindName,
