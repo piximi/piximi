@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 members = [
     "piximi-engine",
     "piximi-link",
+    "piximi-model-sdk",
     "piximi-schema",
     "piximi-workspace",
 ]
@@ -31,6 +32,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/a1/98/7e457a3b014976887
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a9/16/7757fb84c819accc7d7e9af5291b261e4abb8627ee040f99e7d35ef2457a/anyio-4.16.0-py3-none-any.whl", hash = "sha256:c66ae634e0b8228396b801741beb3294326d4b6102f7bba4041c0dfb58c29026", size = 134521, upload-time = "2026-11-01T11:20:05.59Z" },
 ]
+
+[[package]]
+name = "appose"
+version = "0.13.0.dev0"
+source = { git = "https://github.com/apposed/appose-python?rev=5f5a1b1101e7ca6679f0eee0dc172f92fb84c654#5f5a1b1101e7ca6679f0eee0dc172f92fb84c654" }
 
 [[package]]
 name = "cellcast"
@@ -549,6 +555,7 @@ dependencies = [
     { name = "numpy" },
     { name = "pillow" },
     { name = "piximi-link" },
+    { name = "piximi-model-sdk" },
     { name = "piximi-schema" },
     { name = "scikit-image" },
     { name = "scipy" },
@@ -557,24 +564,29 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+appose = [
+    { name = "appose" },
+]
 cellcast = [
     { name = "cellcast" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "appose", marker = "extra == 'appose'", git = "https://github.com/apposed/appose-python?rev=5f5a1b1101e7ca6679f0eee0dc172f92fb84c654" },
     { name = "cellcast", marker = "extra == 'cellcast'", specifier = ">=0.3" },
     { name = "imageio", specifier = ">=2.34" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "pillow", specifier = ">=10" },
     { name = "piximi-link", editable = "packages/piximi-link" },
+    { name = "piximi-model-sdk", editable = "packages/piximi-model-sdk" },
     { name = "piximi-schema", editable = "packages/piximi-schema" },
     { name = "scikit-image", specifier = ">=0.24" },
     { name = "scipy", specifier = ">=1.12" },
     { name = "tifffile", specifier = ">=2024.2" },
     { name = "zarr", specifier = ">=3.0" },
 ]
-provides-extras = ["cellcast"]
+provides-extras = ["cellcast", "appose"]
 
 [[package]]
 name = "piximi-link"
@@ -598,6 +610,17 @@ requires-dist = [
 ]
 
 [[package]]
+name = "piximi-model-sdk"
+version = "0.1.0"
+source = { editable = "packages/piximi-model-sdk" }
+dependencies = [
+    { name = "numpy" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "numpy", specifier = ">=1.20" }]
+
+[[package]]
 name = "piximi-schema"
 version = "0.1.0"
 source = { editable = "packages/piximi-schema" }
@@ -615,11 +638,13 @@ source = { virtual = "." }
 dependencies = [
     { name = "piximi-engine" },
     { name = "piximi-link" },
+    { name = "piximi-model-sdk" },
     { name = "piximi-schema" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "appose" },
     { name = "cellcast" },
     { name = "httpx" },
     { name = "pytest" },
@@ -630,11 +655,13 @@ dev = [
 requires-dist = [
     { name = "piximi-engine", editable = "packages/piximi-engine" },
     { name = "piximi-link", editable = "packages/piximi-link" },
+    { name = "piximi-model-sdk", editable = "packages/piximi-model-sdk" },
     { name = "piximi-schema", editable = "packages/piximi-schema" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "appose", git = "https://github.com/apposed/appose-python?rev=5f5a1b1101e7ca6679f0eee0dc172f92fb84c654" },
     { name = "cellcast", specifier = ">=0.3" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "pytest", specifier = ">=8.3" },

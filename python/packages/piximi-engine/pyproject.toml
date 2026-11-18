@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
   "piximi-schema",
   "piximi-link",
+  "piximi-model-sdk",
   "numpy>=1.26",
   "zarr>=3.0",
   "tifffile>=2024.2",
@@ -16,7 +17,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# StarDist2D in this process, for an engine without plugin environments.
 cellcast = ["cellcast>=0.3"]
+# Model plugins in their own environments (see piximi_engine.models.plugin).
+appose = ["appose"]
 
 [project.scripts]
 piximi = "piximi_engine.cli:main"
@@ -41,3 +45,4 @@ artifacts = ["src/piximi_engine/frontend/"]
 [tool.uv.sources]
 piximi-schema = { workspace = true }
 piximi-link = { workspace = true }
+piximi-model-sdk = { workspace = true }
