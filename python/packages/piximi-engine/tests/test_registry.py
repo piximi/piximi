@@ -74,3 +74,22 @@ async def test_engine_lists_plugins_and_refuses_to_load_them_without_appose(no_a
     assert events and events[-1].type == "models/didChange"
     assert {d.name for d in events[-1].models} >= {"threshold", "threshold-numpy-two"}
     await engine.close()
+
+
+def test_build_progress_is_coalesced(monkeypatch):
+    from piximi_engine.models.plugin import _coalesced
+
+    clock = [0.0]
+    monkeypatch.setattr("piximi_engine.models.plugin.time.monotonic", lambda: clock[0])
+    reports = []
+    report = _coalesced(lambda message, percent: reports.append((message, percent)), interval=0.25)
+
+    for i in range(100):  # a download, chunk by chunk, within one interval
+        report("Downloading uv", i, 100)
+    assert reports == [("Building environment: Downloading uv (0/100)", 0)]
+    report("Downloading uv", 100, 100)  # done: always passed on
+    clock[0] = 0.3
+    report("Installing packages", 1, 5)  # a new phase: at once
+    report("Installing packages", 2, 5)  # same phase, same interval: dropped
+    assert [p for _, p in reports] == [0, 100, 20]
+    assert reports[-1][0] == "Building environment: Installing packages (1/5)"

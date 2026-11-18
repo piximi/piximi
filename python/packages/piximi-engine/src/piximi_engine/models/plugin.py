@@ -91,6 +91,25 @@ def _percent(current: int | None, maximum: int | None) -> float:
     return min(100.0, round(current / maximum * 100))
 
 
+def _coalesced(progress: Progress, interval: float = 0.25) -> Callable[[str, int, int], None]:
+    """Appose reports a download chunk by chunk, thousands of times for one
+    build; each report would become a job update broadcast to every client.
+    Pass on a new phase at once, and otherwise at most a few times a second."""
+    last: dict[str, Any] = {"title": None, "at": 0.0}
+
+    def report(title: str, current: int, maximum: int) -> None:
+        now = time.monotonic()
+        phase_changed = title != last["title"]
+        finished = maximum > 0 and current >= maximum
+        if not (phase_changed or finished or now - last["at"] >= interval):
+            return
+        last["title"], last["at"] = title, now
+        detail = f" ({current}/{maximum})" if maximum > 0 else ""
+        progress(f"Building environment: {title}{detail}", _percent(current, maximum))
+
+    return report
+
+
 class PluginService:
     """One plugin's environment and worker process, shared by its models."""
 
@@ -191,12 +210,7 @@ class PluginService:
             self._set(ModelStatus.BUILDING, "Building environment")
             progress("Building environment", -1)
             builder = self._builder()
-            builder.subscribe_progress(
-                lambda title, current, maximum: progress(
-                    f"Building environment: {title}" + (f" ({current}/{maximum})" if maximum > 0 else ""),
-                    _percent(current, maximum),
-                )
-            )
+            builder.subscribe_progress(_coalesced(progress))
             builder.subscribe_output(lambda line: log.debug("[%s build] %s", self.id, line.rstrip()))
             builder.subscribe_error(lambda line: log.debug("[%s build] %s", self.id, line.rstrip()))
             try:
