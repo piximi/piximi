@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IconButton, List, Stack } from "@mui/material";
 import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
+import { useBackend } from "core/backend";
 import { generateCategory } from "core/entities";
 
 import { useDialogHotkey, useHotkeys } from "hooks";
@@ -37,6 +38,7 @@ import type { Category } from "core/entities";
 
 export const ProjectViewerCategories = () => {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const categories = useSelector(selectActiveCategories);
   const activeView = useSelector(selectActiveView);
   const activeKindId = useSelector(selectActiveKindId);
@@ -89,8 +91,16 @@ export const ProjectViewerCategories = () => {
       }),
     );
   };
+  // Through the backend, which is where the grids read from.
   const deleteObjects = (category: Category) => {
-    dispatch(dataSlice.actions.deleteEntitiesByCatId(category.id));
+    const scope = { categoryIds: [category.id] };
+    const deletion =
+      category.type === "image"
+        ? backend.images.delete(scope)
+        : backend.annotations.delete(scope);
+    deletion.catch((error: unknown) =>
+      console.error("[ProjectViewerCategories] clear objects", error),
+    );
   };
 
   const onOpenCategoryMenu = (

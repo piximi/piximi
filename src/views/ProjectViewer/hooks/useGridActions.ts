@@ -7,9 +7,10 @@ import { randomKey, useBackendQuery } from "core/backend/query";
 
 import { useHotkeys } from "hooks";
 
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { dataSlice } from "store/data";
 
-import { HotkeyContext } from "utils/enums";
+import { AlertType, HotkeyContext } from "utils/enums";
 
 import { projectSlice } from "@ProjectViewer/state";
 import { selectActiveSelectedIds } from "@ProjectViewer/state/selectors";
@@ -61,15 +62,35 @@ export const useGridActions = () => {
   const allSelected = total > 0 && selectedFilteredItemIds.length >= total;
   const hasItems = total > 0;
 
+  // Deleting goes through the backend, which is where the grid reads from;
+  // the selection is dropped by hand, since a remote project's objects are
+  // not in the store for the stale-selection listener to notice.
   const handleDelete = () => {
-    if (active.view === "images")
+    const ids = selectedFilteredItemIds;
+    const deletion =
+      active.view === "images"
+        ? backend.images.delete({ ids }).then(() => {
+            dispatch(projectSlice.actions.removeSelectedImages(ids));
+          })
+        : backend.annotations.delete({ ids }).then(() => {
+            dispatch(
+              projectSlice.actions.removeSelectedAnnotations({
+                kindId: active.kindId,
+                ids,
+              }),
+            );
+          });
+    deletion.catch((error: unknown) => {
       dispatch(
-        dataSlice.actions.batchDeleteImageObject(selectedFilteredItemIds),
+        applicationSettingsSlice.actions.updateAlertState({
+          alertState: {
+            alertType: AlertType.Error,
+            name: "Could not delete",
+            description: error instanceof Error ? error.message : String(error),
+          },
+        }),
       );
-    else
-      dispatch(
-        dataSlice.actions.batchDeleteAnnotation(selectedFilteredItemIds),
-      );
+    });
   };
 
   const handleSelectAll = useCallback(async () => {
