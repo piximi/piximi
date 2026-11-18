@@ -32,7 +32,10 @@ def find_frontend(explicit: str | None) -> Path | None:
 async def _serve(args: argparse.Namespace) -> None:
     images = Path(args.images).resolve() if args.images else None
     data_dir = Path(args.data_dir) if args.data_dir else (images or Path.cwd()) / ".piximi"
-    engine = ReferenceEngine(data_dir, gpu=not args.no_gpu)
+    if args.envs_dir:
+        # Read by Appose when it is imported, which the model registry defers until here.
+        os.environ["APPOSE_ENVS_DIR"] = str(Path(args.envs_dir).resolve())
+    engine = ReferenceEngine(data_dir, gpu=not args.no_gpu, models_dirs=args.models_dir or [])
     if images is not None:
         added = engine.ingest_folder(images)
         print(f"Imported {len(added)} new image(s) from {images}", flush=True)
@@ -94,6 +97,17 @@ def main(argv: list[str] | None = None) -> int:
         "the X-Forwarded-Prefix header it sends)",
     )
     run.add_argument("--no-gpu", action="store_true", help="Run models on the CPU")
+    run.add_argument(
+        "--models-dir",
+        action="append",
+        metavar="DIR",
+        help="A folder of model plugins (one piximi-model.toml per subfolder); repeatable",
+    )
+    run.add_argument(
+        "--envs-dir",
+        metavar="DIR",
+        help="Where plugin environments are built (default: APPOSE_ENVS_DIR or ~/.local/share/appose)",
+    )
     run.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
 

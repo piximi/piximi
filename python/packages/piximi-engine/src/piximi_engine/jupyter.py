@@ -8,7 +8,8 @@ it; the page learns that prefix from the proxy's ``X-Forwarded-Prefix``.
 Jupyter authenticates the proxied path, so the engine itself runs without
 a launch token, listening on loopback only. Point it at a folder with
 ``PIXIMI_IMAGES`` in the Jupyter server's environment (and optionally
-``PIXIMI_DATA_DIR``); otherwise it serves an empty project.
+``PIXIMI_DATA_DIR`` and ``PIXIMI_MODELS_DIR``); otherwise it serves an
+empty project.
 """
 
 from __future__ import annotations
@@ -24,6 +25,9 @@ def setup_piximi() -> dict:
     data_dir = os.environ.get("PIXIMI_DATA_DIR")
     if data_dir:
         command += ["--data-dir", data_dir]
+    models_dir = os.environ.get("PIXIMI_MODELS_DIR")
+    if models_dir:
+        command += ["--models-dir", models_dir]
     return {
         "command": command,
         "timeout": 60,

@@ -1,0 +1,14 @@
+[plugin]
+id = "broken"
+name = "Broken"
+framework = "none"
+
+[plugin.env]
+requirements = ["numpy"]
+
+[[models]]
+id = "broken"
+display_name = "Broken"
+output = { mode = "single", default_kind_name = "Object" }
+channels = { mode = "passthrough", max_channels = 1 }
+options = { groups = [{ id = "g", label = "G", fields = [{ key = "k", type = "colour", label = "K" }] }] }

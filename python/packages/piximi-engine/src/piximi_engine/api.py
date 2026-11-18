@@ -16,7 +16,11 @@ import numpy as np
 
 from piximi_link.peer import HandlerContext
 from piximi_schema.entities import AnnotationObject, AnnotationVolume, Channel, ImageObject, Kind
-from piximi_schema.segmentation import SegmentationRunRequest, SegmentationRunSummary
+from piximi_schema.segmentation import (
+    SegmentationModelDescriptor,
+    SegmentationRunRequest,
+    SegmentationRunSummary,
+)
 
 from .decode import SUPPORTED_SUFFIXES
 from .engine import ReferenceEngine
@@ -100,8 +104,16 @@ class Project:
     # ── Models ───────────────────────────────────────────────────────────────
 
     @property
-    def models(self) -> list[str]:
-        return list(self.engine._models)
+    def models(self) -> dict[str, SegmentationModelDescriptor]:
+        """Every model by id, with its status."""
+        return {descriptor.name: descriptor for descriptor in self.engine.models.describe_all()}
+
+    def register_model(self, path: str | Path) -> list[str]:
+        """Registers a plugin (a folder with a ``piximi-model.toml``) and
+        returns its model ids; connected tabs list it at once. Registering
+        the same plugin again replaces it, so a plugin can be edited and
+        re-registered from the notebook."""
+        return self.engine.models.register(Path(path))
 
     async def segment(
         self,

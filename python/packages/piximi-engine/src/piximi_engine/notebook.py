@@ -39,13 +39,16 @@ async def serve(
     token: str | None = None,
     auth: bool = True,
     gpu: bool = True,
+    models_dir: str | Path | None = None,
 ) -> ProjectSession:
     """Serves a folder of images (or an existing engine) from the kernel's
     loop; returns a session whose `.project` is the Python API."""
     if engine is None:
         folder = Path(images).resolve() if images else None
         engine = ReferenceEngine(
-            Path(data_dir) if data_dir else (folder or Path.cwd()) / ".piximi", gpu=gpu
+            Path(data_dir) if data_dir else (folder or Path.cwd()) / ".piximi",
+            gpu=gpu,
+            models_dirs=[models_dir] if models_dir else [],
         )
         if folder is not None:
             engine.ingest_folder(folder)

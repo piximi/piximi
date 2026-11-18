@@ -5,8 +5,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import threading
 from collections import defaultdict
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Any
 
@@ -32,7 +33,13 @@ from piximi_schema.entities import (
     Plane,
     Shape,
 )
-from piximi_schema.events import AnnotationsDidAdd, ImagesDidAdd, KindsDidAdd, KindWithCategory
+from piximi_schema.events import (
+    AnnotationsDidAdd,
+    ImagesDidAdd,
+    KindsDidAdd,
+    KindWithCategory,
+    ModelsDidChange,
+)
 from piximi_schema.jobs import Job, JobKind, JobStatus
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
@@ -79,7 +86,7 @@ from .decode import SUPPORTED_SUFFIXES, read_image
 from .dedup import MaskedBox, is_duplicate
 from .jobs import JobRegistry
 from .measure import intensity_measurements, object_features
-from .models import SegmentationModel, default_models
+from .models import ModelRegistry, SegmentationModel, default_registry
 from .models.base import apply_option_defaults
 from .query import (
     ANNOTATION_COUNT_COLUMNS,
@@ -118,14 +125,27 @@ class ReferenceEngine:
         self,
         data_dir: Path | str,
         *,
-        models: dict[str, SegmentationModel] | None = None,
+        models: dict[str, SegmentationModel] | ModelRegistry | None = None,
+        models_dirs: Iterable[Path | str] = (),
         gpu: bool = True,
     ) -> None:
         self.data_dir = Path(data_dir)
         self.meta = MetaStore(self.data_dir / "meta.sqlite")
         self.pixels = PixelStore(self.data_dir / "pixels.zarr")
-        self._models = models if models is not None else default_models(gpu=gpu)
+        if isinstance(models, ModelRegistry):
+            self.models = models
+        elif models is None:
+            self.models = default_registry(gpu=gpu, models_dirs=models_dirs)
+        else:
+            self.models = ModelRegistry(gpu=gpu)
+            for model in models.values():
+                self.models.add(model)
+        self.models.on_change = self._models_changed
+        self._models = self.models.models
+        """The registry's mapping, shared: a test may swap a model in."""
         self._listeners: list[EventListener] = []
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._loop_thread: int | None = None
         self._run_contexts: dict[str, HandlerContext] = {}
         self.jobs = JobRegistry(self._emit)
         self._ensure_project()
@@ -145,6 +165,7 @@ class ReferenceEngine:
         return unsubscribe
 
     async def close(self) -> None:
+        await self.models.close()
         self.meta.close()
 
     def _emit(self, event: BackendEvent) -> None:
@@ -153,6 +174,21 @@ class ReferenceEngine:
                 listener(event)
             except Exception:
                 log.exception("event listener failed")
+
+    def _capture_loop(self) -> None:
+        """Remembers the loop the engine serves on, so that changes made
+        from worker threads (an environment build) reach listeners there."""
+        self._loop = asyncio.get_running_loop()
+        self._loop_thread = threading.get_ident()
+
+    def _models_changed(self) -> None:
+        def emit() -> None:
+            self._emit(ModelsDidChange(type="models/didChange", models=self.models.describe_all()))
+
+        if self._loop is not None and threading.get_ident() != self._loop_thread and not self._loop.is_closed():
+            self._loop.call_soon_threadsafe(emit)
+        else:
+            emit()
 
     # ── Project setup and ingest ────────────────────────────────────────────
 
@@ -497,9 +533,10 @@ class ReferenceEngine:
         return model
 
     async def segmentation_list_models(self) -> list[SegmentationModelDescriptor]:
-        return [model.describe() for model in self._models.values()]
+        return self.models.describe_all()
 
     async def segmentation_load_model(self, model_id: str, ctx: HandlerContext) -> None:
+        self._capture_loop()
         model = self._model(model_id)
         if model.loaded:
             return
@@ -514,7 +551,7 @@ class ReferenceEngine:
                 self.jobs.update(job.id, progress=value.get("percent", -1), message=value.get("message"))
 
         try:
-            await model.load(ctx.with_progress(progress))
+            await self.models.load(model, ctx.with_progress(progress))
         except RequestCancelled:
             self.jobs.finish(job.id, JobStatus.CANCELLED)
             raise
@@ -528,6 +565,7 @@ class ReferenceEngine:
     async def segmentation_run(
         self, request: SegmentationRunRequest, ctx: HandlerContext
     ) -> SegmentationRunSummary:
+        self._capture_loop()
         model = self._model(request.model_id)
         job = self.jobs.start(JobKind.SEGMENTATION, "Beginning segmentation")
         self._run_contexts[job.id] = ctx

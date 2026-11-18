@@ -1,0 +1,29 @@
+# A fixture plugin: the same threshold on a current numpy, to prove two plugins with
+# conflicting requirements run side by side.
+[plugin]
+id = "numpy-two"
+name = "Threshold on numpy 2"
+version = "1.0"
+framework = "numpy"
+entry = "model.py"
+
+[plugin.env]
+python = "3.12"
+requirements = ["numpy>=2"]
+
+[[models]]
+id = "threshold-numpy-two"
+attribute = "MODEL"
+display_name = "Threshold (numpy 2)"
+description = "Labels bright squares, in a kind named after the worker's numpy major version"
+use = "Tests"
+output = { mode = "classes", kind_names = ["numpy1", "numpy2"] }
+channels = { mode = "passthrough", max_channels = 1 }
+
+[[models.options.groups]]
+id = "test"
+label = "Test"
+fields = [
+  { key = "threshold", type = "number", label = "Level", default = 100 },
+  { key = "delay", type = "number", label = "Seconds per row", default = 0, advanced = true },
+]

@@ -1,4 +1,11 @@
 from .base import Detection, SegmentationModel, labels_to_detections
-from .registry import default_models
+from .registry import ModelRegistry, default_models, default_registry
 
-__all__ = ["Detection", "SegmentationModel", "default_models", "labels_to_detections"]
+__all__ = [
+    "Detection",
+    "ModelRegistry",
+    "SegmentationModel",
+    "default_models",
+    "default_registry",
+    "labels_to_detections",
+]

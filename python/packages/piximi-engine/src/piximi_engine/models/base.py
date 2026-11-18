@@ -9,6 +9,7 @@ environment arrives later and plugs in behind the same shape.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -50,6 +51,7 @@ class SegmentationModel(ABC):
     framework: str = "python"
     version: str | None = None
     resources: ModelResources | None = None
+    tasks: list[ModelTask] = [ModelTask.SEGMENTATION]
     output_policy: OutputPolicy
     channel_policy: ChannelPolicy
     option_schema: OptionSchema | None = None
@@ -93,7 +95,7 @@ class SegmentationModel(ABC):
             status_message=self.status_message,
             framework=self.framework,
             version=self.version,
-            tasks=[ModelTask.SEGMENTATION],
+            tasks=self.tasks,
             resources=self.resources,
             output_policy=self.output_policy,
             channel_policy=self.channel_policy,
@@ -121,8 +123,15 @@ def apply_option_defaults(schema: OptionSchema | None, options: dict[str, Any]) 
     return resolved
 
 
-def labels_to_detections(labels: np.ndarray, kind_name: str, min_area: int = 1) -> list[Detection]:
-    """Splits a label image (0 = background) into one detection per label."""
+def labels_to_detections(
+    labels: np.ndarray,
+    kind_name: str,
+    min_area: int = 1,
+    kind_names: Sequence[str] | None = None,
+) -> list[Detection]:
+    """Splits a label image (0 = background) into one detection per label.
+    ``kind_names[i]`` names the kind of label ``i + 1`` for a model that
+    classifies its objects; otherwise every detection is of ``kind_name``."""
     detections: list[Detection] = []
     for index, bounds in enumerate(ndimage.find_objects(labels), start=1):
         if bounds is None:
@@ -131,11 +140,14 @@ def labels_to_detections(labels: np.ndarray, kind_name: str, min_area: int = 1) 
         mask = labels[rows, cols] == index
         if int(mask.sum()) < min_area:
             continue
+        name = kind_name
+        if kind_names is not None and index - 1 < len(kind_names):
+            name = kind_names[index - 1]
         detections.append(
             Detection(
                 bbox=(cols.start, rows.start, cols.stop, rows.stop),
                 mask=mask,
-                kind_name=kind_name,
+                kind_name=name,
             )
         )
     return detections
