@@ -1,5 +1,6 @@
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
+import { backendSyncSlice } from "store/backendSync";
 import { dataSlice } from "store/data";
 
 import { isTerminal } from "../jobs";
@@ -109,30 +110,39 @@ const applyImagesAdded = (
 };
 
 /*
- * Turns a backend event into store updates. The data slice stays the UI's
- * source of truth for metadata; this is how changes the backend originates
- * (segmentation results now, remote edits later) reach it.
+ * Turns a backend event into store updates. For the local backend the data
+ * slice is the source of truth, so everything it announces is written there
+ * and the data revision follows. A remote project is only mirrored in part
+ * (its annotations are never mirrored; the grids page them from the
+ * backend), so every event also moves the revision by hand, which is what
+ * makes open windows and counts fetch again.
  */
 const applyBackendEvent = (
   event: BackendEvent,
   backend: Backend,
   store: StoreHandle,
 ): void => {
+  const remote = backend.kind === "remote";
   switch (event.type) {
     case "kinds/didAdd":
       store.dispatch(dataSlice.actions.batchAddKind(event.kinds));
-      return;
+      break;
     case "annotations/didAdd":
-      store.dispatch(dataSlice.actions.batchAddAnnotationVolume(event.volumes));
-      store.dispatch(dataSlice.actions.batchAddAnnotation(event.annotations));
-      return;
+      if (!remote) {
+        store.dispatch(
+          dataSlice.actions.batchAddAnnotationVolume(event.volumes),
+        );
+        store.dispatch(dataSlice.actions.batchAddAnnotation(event.annotations));
+      }
+      break;
     case "jobs/didUpdate":
       applyJobUpdate(event.job, backend, store);
       return;
     case "images/didAdd":
       applyImagesAdded(event.records, event.channelMetas, store);
-      return;
+      break;
   }
+  if (remote) store.dispatch(backendSyncSlice.actions.backendDataChanged());
 };
 
 export const connectBackendToStore = (

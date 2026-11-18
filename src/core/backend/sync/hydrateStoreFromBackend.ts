@@ -3,63 +3,24 @@ import { dataSlice } from "store/data";
 
 import type { Dispatch } from "@reduxjs/toolkit";
 
-import type {
-  AnnotationObject,
-  AnnotationVolume,
-  Channel,
-  ImageObject,
-  ImageSeries,
-  Plane,
-} from "core/entities";
+import type { Backend, ImageRecord } from "../types";
 
-import type { Backend } from "../types";
-
-const IMAGE_PAGE = 200;
-const ANNOTATION_PAGE = 500;
-const MASK_BATCH = 200;
+const IMAGE_PAGE = 500;
 
 /*
- * Fills the store from a backend that holds the project: everything the
- * grids need up front, then masks in batches behind it. For now the whole
- * project is mirrored; paging the store itself comes with the scale phase.
+ * Fills the store from a backend that holds the project. The summary and
+ * the first page of images land before this resolves; the rest of the
+ * images stream in behind (`mirrored`). The grids read through the backend
+ * and need none of it, but the mirror is what the rest of the app reads:
+ * categories, channel settings, and an image's planes and channels.
+ * Annotations are not mirrored at all; the grids page them on demand and
+ * masks are fetched where they are needed.
  */
 export const hydrateStoreFromBackend = async (
   backend: Backend,
   dispatch: Dispatch,
-): Promise<void> => {
+): Promise<{ mirrored: Promise<void> }> => {
   const summary = await backend.query.project();
-
-  const imageSeries = new Map<string, ImageSeries>();
-  const images: ImageObject[] = [];
-  const planes: Plane[] = [];
-  const channels: Channel[] = [];
-  for (let offset = 0; ; ) {
-    const page = await backend.query.images({}, { offset, limit: IMAGE_PAGE });
-    for (const record of page.items) {
-      imageSeries.set(record.series.id, record.series);
-      images.push(record.image);
-      planes.push(...record.planes);
-      channels.push(...record.channels);
-    }
-    offset += page.items.length;
-    if (page.items.length === 0 || offset >= page.total) break;
-  }
-
-  const annotationVolumes: AnnotationVolume[] = [];
-  const annotations: AnnotationObject[] = [];
-  for (let offset = 0; ; ) {
-    const page = await backend.query.annotations(
-      {},
-      { offset, limit: ANNOTATION_PAGE },
-    );
-    for (const record of page.items) {
-      annotationVolumes.push(record.volume);
-      // Masks follow separately; an empty mask marks one not fetched yet.
-      annotations.push({ ...record.annotation, encodedMask: [] });
-    }
-    offset += page.items.length;
-    if (page.items.length === 0 || offset >= page.total) break;
-  }
 
   // Slices that keep per-kind state learn of kinds through the add actions,
   // which `setState` bypasses; seed them for every kind the backend holds.
@@ -74,31 +35,44 @@ export const hydrateStoreFromBackend = async (
       kinds: summary.kinds,
       categories: summary.categories,
       channelMetas: summary.channelMetas,
-      imageSeries: [...imageSeries.values()],
-      images,
-      planes,
-      channels,
-      annotationVolumes,
-      annotations,
+      imageSeries: [],
+      images: [],
+      planes: [],
+      channels: [],
+      annotationVolumes: [],
+      annotations: [],
     }),
   );
 
-  for (let i = 0; i < annotations.length; i += MASK_BATCH) {
-    const batch = annotations.slice(i, i + MASK_BATCH);
-    const masks = await backend.query.masks(batch.map((a) => a.id));
-    for (const annotation of batch) {
-      const encodedMask = masks[annotation.id];
-      if (encodedMask) {
-        dispatch(
-          dataSlice.actions.updateAnnotationMask({
-            id: annotation.id,
-            boundingBox: annotation.boundingBox,
-            encodedMask,
-            features: annotation.features,
-            intensityMeasurements: annotation.intensityMeasurements ?? {},
-          }),
-        );
-      }
+  const addPage = (records: ImageRecord[]) => {
+    const series = new Map(records.map((r) => [r.series.id, r.series]));
+    dispatch(
+      dataSlice.actions.addImageSeries({
+        imageSeries: [...series.values()],
+        images: records.map((r) => r.image),
+        planes: records.flatMap((r) => r.planes),
+        channels: records.flatMap((r) => r.channels),
+        channelMetas: [],
+      }),
+    );
+  };
+
+  const first = await backend.query.images(
+    {},
+    { offset: 0, limit: IMAGE_PAGE },
+  );
+  addPage(first.items);
+
+  const mirrored = (async () => {
+    for (let offset = first.items.length; offset < first.total; ) {
+      const page = await backend.query.images(
+        {},
+        { offset, limit: IMAGE_PAGE },
+      );
+      if (page.items.length === 0) break;
+      addPage(page.items);
+      offset += page.items.length;
     }
-  }
+  })();
+  return { mirrored };
 };

@@ -13,7 +13,7 @@ const seed = [
 ];
 
 describe("hydrateStoreFromBackend", () => {
-  it("mirrors a backend's project into the store, masks included", async () => {
+  it("mirrors a backend's images and vocabulary, but not its annotations", async () => {
     const backend = new FakeBackend({ images: seed });
     await backend.segmentation.run({
       modelId: FAKE_MODEL_ID,
@@ -26,7 +26,8 @@ describe("hydrateStoreFromBackend", () => {
       middleware: (getDefault) => getDefault({ serializableCheck: false }),
     });
 
-    await hydrateStoreFromBackend(backend, store.dispatch);
+    const { mirrored } = await hydrateStoreFromBackend(backend, store.dispatch);
+    await mirrored;
 
     const { data } = store.getState();
     expect(data.images.ids).toEqual(["img-a", "img-b"]);
@@ -35,12 +36,9 @@ describe("hydrateStoreFromBackend", () => {
     expect(data.channels.ids).toHaveLength(4);
     expect(data.channelMetas.ids).toHaveLength(2);
     expect(data.kinds.ids.length).toBeGreaterThanOrEqual(2);
-    expect(data.annotationVolumes.ids).toHaveLength(2);
-    expect(data.annotations.ids).toHaveLength(2);
-    for (const id of data.annotations.ids) {
-      const annotation = data.annotations.entities[id];
-      expect(annotation.encodedMask.length).toBeGreaterThan(0);
-    }
+    expect(data.categories.ids.length).toBeGreaterThanOrEqual(2);
+    expect(data.annotationVolumes.ids).toHaveLength(0);
+    expect(data.annotations.ids).toHaveLength(0);
     // The classifier keeps state per kind; every hydrated kind must have it.
     const { kindClassifiers } = store.getState().classifier;
     for (const id of data.kinds.ids) {

@@ -1,3 +1,5 @@
+import { backendSyncSlice } from "store/backendSync";
+
 import { logger } from "utils/logUtils";
 
 import { LocalBackend } from "./local/LocalBackend";
@@ -152,8 +154,12 @@ export const installRemoteBackend = async (
       ? await exchangeToken(config.url, config.token)
       : undefined;
   const backend = await RemoteBackend.connect(config.url, { ticket });
+  // The engine decides when its answers change; the mirror filling does not.
+  store.dispatch(backendSyncSlice.actions.setRevisionSource("backend"));
   connectBackendToStore(backend, store);
-  await hydrateStoreFromBackend(backend, store.dispatch);
+  const { mirrored } = await hydrateStoreFromBackend(backend, store.dispatch);
+  // The rest of the images keep streaming in behind the first screen.
+  mirrored.catch((error: unknown) => console.error(error));
   logger(`Connected to backend ${config.url} (session ${backend.session.id})`);
   return backend;
 };
@@ -162,6 +168,7 @@ export const installLocalBackend = async (
   store: StoreHandle,
 ): Promise<Backend> => {
   const backend = new LocalBackend({ store });
+  store.dispatch(backendSyncSlice.actions.setRevisionSource("store"));
   connectBackendToStore(backend, store);
   await backend.connect();
   return backend;
