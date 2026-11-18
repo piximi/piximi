@@ -306,16 +306,21 @@ export class LocalSegmentation implements BackendSegmentation {
     const annotations: AnnotationObject[] = [];
     let skipped = 0;
 
+    // The project's objects, by image, so that a run over many images reads
+    // the annotation table once rather than once per image.
+    const existingByImage = new Map<string, AnnotationObject[]>();
+    for (const ann of Object.values(annotationEntities)) {
+      if (!ann) continue;
+      const group = existingByImage.get(ann.imageId);
+      if (group) group.push(ann);
+      else existingByImage.set(ann.imageId, [ann]);
+    }
+
     for (const [i, imageAnnotations] of predicted.entries()) {
       const image = images[i];
       const existingByKind: Record<string, AnnotationObject[]> = {};
-      for (const ann of Object.values(annotationEntities)) {
-        if (
-          !ann ||
-          ann.imageId !== image.id ||
-          ann.planeId !== image.activePlaneId
-        )
-          continue;
+      for (const ann of existingByImage.get(image.id) ?? []) {
+        if (ann.planeId !== image.activePlaneId) continue;
         const kindId = volumeEntities[ann.volumeId]?.kindId;
         if (kindId) (existingByKind[kindId] ??= []).push(ann);
       }
