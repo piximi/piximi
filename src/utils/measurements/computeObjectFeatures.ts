@@ -77,6 +77,8 @@ export const computeObjectFeatures = (
       let result: number;
       try {
         result = featureOps[feat](roi);
+        if (feat === "comX") result += bbox[0];
+        if (feat === "comY") result += bbox[1];
       } catch (e) {
         console.warn(
           `Could not compute ${feat} for object ${obj.id}: ${e instanceof Error ? e.message : String(e)}`,
