@@ -36,15 +36,14 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
       >
         {children}
       </Box>
-      {import.meta.env.VITE_USE_V2 === "true" &&
-        pendingTiffAnalysis !== null && (
-          <TiffConfigDialog
-            open={tiffDialogOpen}
-            analysisResult={pendingTiffAnalysis}
-            onCancel={handleCancelTiffConfig}
-            onConfirm={handleConfirmTiffConfig}
-          />
-        )}
+      {pendingTiffAnalysis !== null && (
+        <TiffConfigDialog
+          open={tiffDialogOpen}
+          analysisResult={pendingTiffAnalysis}
+          onCancel={handleCancelTiffConfig}
+          onConfirm={handleConfirmTiffConfig}
+        />
+      )}
     </>
   );
 };
