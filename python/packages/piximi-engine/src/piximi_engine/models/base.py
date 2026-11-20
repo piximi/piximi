@@ -25,7 +25,7 @@ from piximi_schema.segmentation import (
     ModelTask,
     OptionSchema,
     OutputPolicy,
-    SegmentationModelDescriptor,
+    ModelDescriptor,
 )
 
 BBox = tuple[int, int, int, int]
@@ -86,8 +86,8 @@ class SegmentationModel(ABC):
     ) -> list[Detection]:
         """Synchronous and CPU/GPU heavy; the engine runs it off the loop."""
 
-    def describe(self) -> SegmentationModelDescriptor:
-        return SegmentationModelDescriptor(
+    def describe(self) -> ModelDescriptor:
+        return ModelDescriptor(
             name=self.id,
             display_name=self.display_name,
             model_loaded=self.loaded,

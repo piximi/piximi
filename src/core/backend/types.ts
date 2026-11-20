@@ -16,6 +16,7 @@ import type {
 } from "core/entities";
 import type {
   ModelDisplayInfo,
+  OutputPolicy,
   SegmentationModelDetails,
   SegmenterOptionValues,
 } from "core/dl/segmentation/types";
@@ -299,8 +300,14 @@ export type ModelResources = {
   memoryHint?: string;
 };
 
-export type SegmentationModelDescriptor = SegmentationModelDetails &
+/*
+ * Any model a backend lists: a segmenter, or an architecture a classifier
+ * can be built from. `tasks` says which; `outputPolicy` is present for
+ * models that segment, and `channelPolicy` says what the model is fed.
+ */
+export type ModelDescriptor = Omit<SegmentationModelDetails, "outputPolicy"> &
   Omit<ModelDisplayInfo, "name" | "displayName"> & {
+    outputPolicy?: OutputPolicy;
     status: ModelStatus;
     /* Why it is `unavailable` or `failed`, or what a build is doing. */
     statusMessage?: string;
@@ -310,6 +317,10 @@ export type SegmentationModelDescriptor = SegmentationModelDetails &
     tasks: ModelTask[];
     resources?: ModelResources;
   };
+
+export type SegmentationModelDescriptor = ModelDescriptor & {
+  outputPolicy: OutputPolicy;
+};
 
 export type SegmentationRunRequest = {
   modelId: string;

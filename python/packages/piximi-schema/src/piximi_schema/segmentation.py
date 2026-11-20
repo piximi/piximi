@@ -160,7 +160,11 @@ class ModelResources(WireModel):
     """Free text, e.g. "2 GB VRAM", shown to the user."""
 
 
-class SegmentationModelDescriptor(WireModel):
+class ModelDescriptor(WireModel):
+    """Any model a backend lists: a segmenter, or an architecture a classifier
+    can be built from. ``tasks`` says which; ``output_policy`` is present for
+    models that segment."""
+
     name: str
     """The model's id; what requests refer to."""
     display_name: str
@@ -174,8 +178,11 @@ class SegmentationModelDescriptor(WireModel):
     version: str | None = None
     tasks: list[ModelTask]
     resources: ModelResources | None = None
-    output_policy: OutputPolicy
+    output_policy: OutputPolicy | None = None
+    """How a segmenter's detections are kinded; absent for other tasks."""
     channel_policy: ChannelPolicy
+    """How the model consumes image channels: what a segmenter is fed, or
+    what a classifier architecture is built to take."""
     option_schema: OptionSchema | None = None
     cancellable_load: bool
     description: str

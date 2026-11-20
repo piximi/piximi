@@ -40,7 +40,7 @@ from piximi_schema.query import (
 )
 from piximi_schema.render import RenderedImage, RenderRequest
 from piximi_schema.segmentation import (
-    SegmentationModelDescriptor,
+    ModelDescriptor,
     SegmentationRunRequest,
     SegmentationRunSummary,
 )
@@ -129,7 +129,7 @@ class Engine(Protocol):
 
     # ── Segmentation ────────────────────────────────────────────────────────
 
-    async def segmentation_list_models(self) -> list[SegmentationModelDescriptor]: ...
+    async def segmentation_list_models(self) -> list[ModelDescriptor]: ...
 
     async def segmentation_load_model(self, model_id: str, ctx: HandlerContext) -> None: ...
 

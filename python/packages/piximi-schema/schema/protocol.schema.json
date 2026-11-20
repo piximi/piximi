@@ -1630,7 +1630,7 @@
       "properties": {
         "models": {
           "items": {
-            "$ref": "#/$defs/SegmentationModelDescriptor"
+            "$ref": "#/$defs/ModelDescriptor"
           },
           "type": "array"
         }
@@ -1690,6 +1690,118 @@
         "masks"
       ],
       "title": "MasksResult",
+      "type": "object"
+    },
+    "ModelDescriptor": {
+      "additionalProperties": false,
+      "description": "Any model a backend lists: a segmenter, or an architecture a classifier\ncan be built from. ``tasks`` says which; ``output_policy`` is present for\nmodels that segment.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "modelLoaded": {
+          "type": "boolean"
+        },
+        "status": {
+          "$ref": "#/$defs/ModelStatus"
+        },
+        "statusMessage": {
+          "type": "string"
+        },
+        "framework": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "tasks": {
+          "items": {
+            "$ref": "#/$defs/ModelTask"
+          },
+          "type": "array"
+        },
+        "resources": {
+          "$ref": "#/$defs/ModelResources"
+        },
+        "outputPolicy": {
+          "discriminator": {
+            "mapping": {
+              "classes": "#/$defs/OutputPolicyClasses",
+              "single": "#/$defs/OutputPolicySingle"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/OutputPolicySingle"
+            },
+            {
+              "$ref": "#/$defs/OutputPolicyClasses"
+            }
+          ]
+        },
+        "channelPolicy": {
+          "discriminator": {
+            "mapping": {
+              "fixed": "#/$defs/ChannelPolicyFixed",
+              "passthrough": "#/$defs/ChannelPolicyPassthrough"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ChannelPolicyFixed"
+            },
+            {
+              "$ref": "#/$defs/ChannelPolicyPassthrough"
+            }
+          ]
+        },
+        "optionSchema": {
+          "$ref": "#/$defs/OptionSchema"
+        },
+        "cancellableLoad": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "use": {
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/ModelLink"
+          },
+          "type": "array"
+        },
+        "cite": {
+          "items": {
+            "$ref": "#/$defs/ModelLink"
+          },
+          "type": "array"
+        },
+        "cloudWarning": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "displayName",
+        "modelLoaded",
+        "status",
+        "framework",
+        "tasks",
+        "channelPolicy",
+        "cancellableLoad",
+        "description",
+        "use",
+        "sources"
+      ],
+      "title": "ModelDescriptor",
       "type": "object"
     },
     "ModelLink": {
@@ -1758,7 +1870,7 @@
         },
         "models": {
           "items": {
-            "$ref": "#/$defs/SegmentationModelDescriptor"
+            "$ref": "#/$defs/ModelDescriptor"
           },
           "type": "array"
         }
@@ -2371,118 +2483,6 @@
         "message"
       ],
       "title": "RpcError",
-      "type": "object"
-    },
-    "SegmentationModelDescriptor": {
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "displayName": {
-          "type": "string"
-        },
-        "modelLoaded": {
-          "type": "boolean"
-        },
-        "status": {
-          "$ref": "#/$defs/ModelStatus"
-        },
-        "statusMessage": {
-          "type": "string"
-        },
-        "framework": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "tasks": {
-          "items": {
-            "$ref": "#/$defs/ModelTask"
-          },
-          "type": "array"
-        },
-        "resources": {
-          "$ref": "#/$defs/ModelResources"
-        },
-        "outputPolicy": {
-          "discriminator": {
-            "mapping": {
-              "classes": "#/$defs/OutputPolicyClasses",
-              "single": "#/$defs/OutputPolicySingle"
-            },
-            "propertyName": "mode"
-          },
-          "oneOf": [
-            {
-              "$ref": "#/$defs/OutputPolicySingle"
-            },
-            {
-              "$ref": "#/$defs/OutputPolicyClasses"
-            }
-          ]
-        },
-        "channelPolicy": {
-          "discriminator": {
-            "mapping": {
-              "fixed": "#/$defs/ChannelPolicyFixed",
-              "passthrough": "#/$defs/ChannelPolicyPassthrough"
-            },
-            "propertyName": "mode"
-          },
-          "oneOf": [
-            {
-              "$ref": "#/$defs/ChannelPolicyFixed"
-            },
-            {
-              "$ref": "#/$defs/ChannelPolicyPassthrough"
-            }
-          ]
-        },
-        "optionSchema": {
-          "$ref": "#/$defs/OptionSchema"
-        },
-        "cancellableLoad": {
-          "type": "boolean"
-        },
-        "description": {
-          "type": "string"
-        },
-        "use": {
-          "type": "string"
-        },
-        "sources": {
-          "items": {
-            "$ref": "#/$defs/ModelLink"
-          },
-          "type": "array"
-        },
-        "cite": {
-          "items": {
-            "$ref": "#/$defs/ModelLink"
-          },
-          "type": "array"
-        },
-        "cloudWarning": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "displayName",
-        "modelLoaded",
-        "status",
-        "framework",
-        "tasks",
-        "outputPolicy",
-        "channelPolicy",
-        "cancellableLoad",
-        "description",
-        "use",
-        "sources"
-      ],
-      "title": "SegmentationModelDescriptor",
       "type": "object"
     },
     "SegmentationRunParams": {

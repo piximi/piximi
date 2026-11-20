@@ -9,7 +9,7 @@ from piximi_schema.events import BackendEvent
 from piximi_schema.export import BUNDLE_PATH, build_bundle
 from piximi_schema.methods import METHODS, NOTIFICATIONS
 from piximi_schema.render import RenderedImage
-from piximi_schema.segmentation import SegmentationModelDescriptor
+from piximi_schema.segmentation import ModelDescriptor
 
 
 @pytest.fixture(scope="module")
@@ -93,7 +93,7 @@ def test_discriminated_unions_parse_by_tag():
 
 
 def test_descriptor_with_option_schema():
-    descriptor = SegmentationModelDescriptor.model_validate(
+    descriptor = ModelDescriptor.model_validate(
         {
             "name": "fake",
             "displayName": "Fake",

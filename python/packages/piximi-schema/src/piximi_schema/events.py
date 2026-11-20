@@ -9,7 +9,7 @@ from .base import WireModel
 from .entities import AnnotationCategory, AnnotationObject, AnnotationVolume, ChannelMeta, Kind
 from .jobs import Job
 from .query import ImageRecord
-from .segmentation import SegmentationModelDescriptor
+from .segmentation import ModelDescriptor
 
 
 class KindWithCategory(WireModel):
@@ -62,7 +62,7 @@ class ModelsDidChange(WireModel):
     which is short, so a client replaces what it shows."""
 
     type: Literal["models/didChange"]
-    models: list[SegmentationModelDescriptor]
+    models: list[ModelDescriptor]
 
 
 BackendEvent = Annotated[

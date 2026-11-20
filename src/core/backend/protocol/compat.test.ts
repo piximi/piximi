@@ -36,6 +36,7 @@ import type {
   ImageCountGroup,
   ImageQuery,
   ImageSort,
+  ModelDescriptor,
   ModelStatus,
   ModelTask,
   Page,
@@ -43,7 +44,6 @@ import type {
   ProjectSummary,
   SortDirection,
   RenderRequest,
-  SegmentationModelDescriptor,
   SegmentationRunRequest,
   SegmentationRunSummary,
 } from "../types";
@@ -205,8 +205,8 @@ type Checks = [
   Assert<Equivalent<P.ModelTask, ModelTask>>,
   Assert<
     Equivalent<
-      Omit<P.SegmentationModelDescriptor, "outputPolicy" | "channelPolicy">,
-      Omit<SegmentationModelDescriptor, "outputPolicy" | "channelPolicy">
+      Omit<P.ModelDescriptor, "outputPolicy" | "channelPolicy">,
+      Omit<ModelDescriptor, "outputPolicy" | "channelPolicy">
     >
   >,
   Assert<

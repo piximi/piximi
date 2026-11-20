@@ -28,7 +28,7 @@ from .query import (
 from .render import RenderedImage, RenderRequest, ThumbnailsPartial
 from .rpc import CancelParams, ProgressParams, ProgressValue
 from .segmentation import (
-    SegmentationModelDescriptor,
+    ModelDescriptor,
     SegmentationRunRequest,
     SegmentationRunSummary,
 )
@@ -114,7 +114,7 @@ class JobsCancelParams(WireModel):
 
 
 class ListModelsResult(WireModel):
-    models: list[SegmentationModelDescriptor]
+    models: list[ModelDescriptor]
 
 
 class LoadModelParams(WireModel):

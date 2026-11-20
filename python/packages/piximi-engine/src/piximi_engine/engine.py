@@ -71,7 +71,7 @@ from piximi_schema.render import (
 from piximi_schema.errors import BackendErrorData
 from piximi_schema.rpc import ProgressValue
 from piximi_schema.segmentation import (
-    SegmentationModelDescriptor,
+    ModelDescriptor,
     SegmentationRunRequest,
     SegmentationRunSummary,
 )
@@ -578,7 +578,7 @@ class ReferenceEngine:
             raise BackendError("MODEL_NOT_FOUND", f'No model "{model_id}"')
         return model
 
-    async def segmentation_list_models(self) -> list[SegmentationModelDescriptor]:
+    async def segmentation_list_models(self) -> list[ModelDescriptor]:
         return self.models.describe_all()
 
     async def segmentation_load_model(self, model_id: str, ctx: HandlerContext) -> None:

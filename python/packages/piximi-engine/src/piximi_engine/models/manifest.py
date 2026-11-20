@@ -24,7 +24,7 @@ from piximi_schema.segmentation import (
     ModelTask,
     OptionSchema,
     OutputPolicy,
-    SegmentationModelDescriptor,
+    ModelDescriptor,
 )
 
 MANIFEST_NAME = "piximi-model.toml"
@@ -131,9 +131,9 @@ class PluginManifest(_Strict):
         *,
         status: ModelStatus,
         status_message: str | None = None,
-    ) -> SegmentationModelDescriptor:
+    ) -> ModelDescriptor:
         plugin = self.plugin
-        return SegmentationModelDescriptor(
+        return ModelDescriptor(
             name=spec.id,
             display_name=spec.display_name,
             model_loaded=status == ModelStatus.LOADED,

@@ -7,7 +7,7 @@ import type {
 } from "core/entities";
 
 import type { Job } from "./jobs";
-import type { ImageRecord, SegmentationModelDescriptor } from "./types";
+import type { ImageRecord, ModelDescriptor } from "./types";
 
 /*
  * Changes a backend announces after the fact. Both backends emit these for
@@ -36,7 +36,7 @@ export type BackendEvent =
    * The model list changed: one was registered, or its status moved (an
    * environment built, weights loaded, a failure). Carries the whole list.
    */
-  | { type: "models/didChange"; models: SegmentationModelDescriptor[] }
+  | { type: "models/didChange"; models: ModelDescriptor[] }
   /* Images are gone with everything under them; ids are enough to drop. */
   | { type: "images/didRemove"; imageIds: string[] }
   | {

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useBackend } from "core/backend";
+import { isSegmentationModel, useBackend } from "core/backend";
 
-import type { SegmentationModelDescriptor } from "core/backend";
+import type { ModelDescriptor } from "core/backend";
 
 /*
  * The backend's segmentation models, kept current: a plugin registered from a
@@ -12,7 +12,7 @@ import type { SegmentationModelDescriptor } from "core/backend";
  */
 export const useSegmentationModels = (enabled: boolean) => {
   const backend = useBackend();
-  const [models, setModels] = useState<SegmentationModelDescriptor[]>([]);
+  const [models, setModels] = useState<ModelDescriptor[]>([]);
   const [error, setError] = useState<string | undefined>();
 
   const refresh = useCallback(async () => {
@@ -51,7 +51,7 @@ export const useSegmentationModels = (enabled: boolean) => {
   }, [backend, enabled]);
 
   return {
-    models: models.filter((model) => model.tasks.includes("segmentation")),
+    models: models.filter(isSegmentationModel),
     error,
     refresh,
   };

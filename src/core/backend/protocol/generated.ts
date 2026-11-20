@@ -822,13 +822,17 @@ export interface KindsDidAdd {
  * via the `definition` "ListModelsResult".
  */
 export interface ListModelsResult {
-  models: SegmentationModelDescriptor[];
+  models: ModelDescriptor[];
 }
 /**
+ * Any model a backend lists: a segmenter, or an architecture a classifier
+ * can be built from. ``tasks`` says which; ``output_policy`` is present for
+ * models that segment.
+ *
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
- * via the `definition` "SegmentationModelDescriptor".
+ * via the `definition` "ModelDescriptor".
  */
-export interface SegmentationModelDescriptor {
+export interface ModelDescriptor {
   name: string;
   displayName: string;
   modelLoaded: boolean;
@@ -838,7 +842,7 @@ export interface SegmentationModelDescriptor {
   version?: string;
   tasks: ModelTask[];
   resources?: ModelResources;
-  outputPolicy: OutputPolicySingle | OutputPolicyClasses;
+  outputPolicy?: OutputPolicySingle | OutputPolicyClasses;
   channelPolicy: ChannelPolicyFixed | ChannelPolicyPassthrough;
   optionSchema?: OptionSchema;
   cancellableLoad: boolean;
@@ -984,7 +988,7 @@ export interface MasksResult {
  */
 export interface ModelsDidChange {
   type: "models/didChange";
-  models: SegmentationModelDescriptor[];
+  models: ModelDescriptor[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema

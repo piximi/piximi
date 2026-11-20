@@ -4,6 +4,7 @@ import { isTaskCancelledError } from "core/dl/cancel";
 import { hasCapability } from "../capabilities";
 import { EventBus } from "../events";
 import { PROTOCOL_VERSION } from "../protocol/methods";
+import { isSegmentationModel } from "../models";
 import { RpcPeer } from "./rpc/peer";
 import { WebSocketTransport } from "./transports/websocket";
 
@@ -35,6 +36,7 @@ import type {
   ImageQuery,
   ImageRecord,
   ImageSort,
+  ModelDescriptor,
   Page,
   PageRequest,
   ProjectSummary,
@@ -176,7 +178,7 @@ export class RemoteBackend implements Backend {
     peer.onNotification("models/didChange", (params) =>
       this.#bus.emit({
         type: "models/didChange",
-        models: asDomain<SegmentationModelDescriptor[]>(
+        models: asDomain<ModelDescriptor[]>(
           (params as P.ModelsDidChange).models,
         ),
       }),
@@ -408,9 +410,9 @@ export class RemoteBackend implements Backend {
   #segmentation(): BackendSegmentation {
     return {
       listModels: async (): Promise<SegmentationModelDescriptor[]> =>
-        asDomain<SegmentationModelDescriptor[]>(
+        asDomain<ModelDescriptor[]>(
           (await this.#call("segmentation/listModels", undefined)).models,
-        ),
+        ).filter(isSegmentationModel),
 
       loadModel: async (
         modelId: string,

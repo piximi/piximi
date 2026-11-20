@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from piximi_link.peer import HandlerContext
-from piximi_schema.segmentation import SegmentationModelDescriptor
+from piximi_schema.segmentation import ModelDescriptor
 
 from .base import SegmentationModel
 from .manifest import MANIFEST_NAME, ManifestError, PluginManifest, load_manifest
@@ -114,7 +114,7 @@ class ModelRegistry:
     def get(self, model_id: str) -> SegmentationModel | None:
         return self.models.get(model_id)
 
-    def describe_all(self) -> list[SegmentationModelDescriptor]:
+    def describe_all(self) -> list[ModelDescriptor]:
         return [model.describe() for model in self.models.values()]
 
     @property

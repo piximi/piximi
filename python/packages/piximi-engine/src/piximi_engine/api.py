@@ -17,7 +17,7 @@ import numpy as np
 from piximi_link.peer import HandlerContext
 from piximi_schema.entities import AnnotationObject, AnnotationVolume, Channel, ImageObject, Kind
 from piximi_schema.segmentation import (
-    SegmentationModelDescriptor,
+    ModelDescriptor,
     SegmentationRunRequest,
     SegmentationRunSummary,
 )
@@ -104,7 +104,7 @@ class Project:
     # ── Models ───────────────────────────────────────────────────────────────
 
     @property
-    def models(self) -> dict[str, SegmentationModelDescriptor]:
+    def models(self) -> dict[str, ModelDescriptor]:
         """Every model by id, with its status."""
         return {descriptor.name: descriptor for descriptor in self.engine.models.describe_all()}
 
