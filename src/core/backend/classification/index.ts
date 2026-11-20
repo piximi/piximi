@@ -1,3 +1,3 @@
-export { fingerprintItems, hashCategorySet, hashLines } from "./fingerprint";
-export { splitForTraining, splitUnassigned } from "./split";
-export type { LabeledItem, SplitOptions, TrainingSplit } from "./split";
+export { fingerprintItems, hashCategorySet } from "./fingerprint";
+export { splitForTraining } from "./split";
+export type { LabeledItem, SplitOptions } from "./split";

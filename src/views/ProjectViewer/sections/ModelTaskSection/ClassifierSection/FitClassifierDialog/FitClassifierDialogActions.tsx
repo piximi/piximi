@@ -16,7 +16,8 @@ import {
 } from "@mui/material";
 import { PlayCircleOutlined, Stop, ErrorOutlined } from "@mui/icons-material";
 
-import { useClassifierApi } from "core/dl/classification";
+import { useBackend } from "core/backend";
+import { isTerminal } from "core/backend/jobs";
 
 import { useDialog } from "hooks";
 
@@ -99,7 +100,7 @@ export const FitClassifierDialogActions = () => {
     selectShowClearPredictionsWarning,
   );
 
-  const cfApi = useClassifierApi();
+  const backend = useBackend();
   const modelConfig = useClassificationModel();
   const { currentEpoch, totalEpochs } = useClassifierHistory();
   const { isReady, shouldWarnClearPredictions, error } = useClassifierStatus();
@@ -119,10 +120,14 @@ export const FitClassifierDialogActions = () => {
     }
   }, [modelStatus]);
 
+  // Training is a job; stopping it is cancelling that job, from here or
+  // from its toast.
   const onStopFitting = async () => {
     if (modelStatus !== "training" || !modelConfig) return;
-
-    await cfApi.cancelTraining(modelConfig.name);
+    const running = (await backend.jobs.list()).find(
+      (job) => job.kind === "classifier-fit" && !isTerminal(job.status),
+    );
+    if (running) await backend.jobs.cancel(running.id);
 
     dispatch(
       classifierSlice.actions.setModelStatus({
@@ -132,9 +137,9 @@ export const FitClassifierDialogActions = () => {
     );
   };
 
-  const clearAndFit = () => {
-    clearPredictions();
-    fitClassifier();
+  const clearAndFit = async () => {
+    await clearPredictions();
+    await fitClassifier();
   };
   const handleFit = async () => {
     if (shouldWarnClearPredictions) {

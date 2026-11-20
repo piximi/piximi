@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useClassifierApi } from "core/dl/classification";
+import { useBackend } from "core/backend";
 import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
 
 import { WithLabel, TextFieldWithBlur, StyledSelect } from "components/inputs";
@@ -20,8 +20,6 @@ import { classifierSlice } from "store/classifier";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 import { HelpItem } from "help/HelpContent";
-
-import { logger } from "utils/logUtils";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {
@@ -33,7 +31,7 @@ import { useClassificationModel } from "@ProjectViewer/hooks";
 
 import type { SelectChangeEvent } from "@mui/material";
 
-import type { ModelInfoDTO } from "core/dl/classification/types";
+import type { Classifier } from "core/dl/classification/types";
 
 export const ModelPicker = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
@@ -175,37 +173,23 @@ const ModelArchiitectureOptions = ({
 const PretrainedModelOptions = ({
   activeModel,
 }: {
-  activeModel: ModelInfoDTO | undefined;
+  activeModel: Classifier | undefined;
 }) => {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const { shouldWarnClearPredictions } = useClassifierStatus();
-  const cfApi = useClassifierApi();
   const handleDisposeModel = async () => {
-    if (!activeModel) return;
-
-    const result = await cfApi.removeModel(activeModel.name);
-    if (result.success) {
-      logger(`Successfully removed ${activeModel.name}`);
-    } else {
-      console.error(
-        `[dispose model: ${activeModel.name}] ${result.reason.code}: ${result.reason.message}`,
-        result.reason.cause,
-      );
+    if (!activeModel || !backend.classification) return;
+    try {
+      await backend.classification.delete(activeModel.id);
+    } catch (error) {
+      console.error(`[dispose model: ${activeModel.name}]`, error);
     }
-    /*
-     * Even if dispose fails in the worker, still want to remove model as an option for selection
-     * TODO: Determine if this is the best course of action
-     * */
     dispatch(
       classifierSlice.actions.setActiveModel({
         targetId: modelTarget,
         modelName: undefined,
-      }),
-    );
-    dispatch(
-      classifierSlice.actions.removeModelInfo({
-        modelName: activeModel.name,
       }),
     );
   };

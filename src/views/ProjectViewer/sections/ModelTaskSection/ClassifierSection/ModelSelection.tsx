@@ -7,7 +7,7 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 
-import { useClassifierApi } from "core/dl/classification";
+import { useBackend } from "core/backend";
 import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
 
 import { useDialog, useDialogHotkey } from "hooks";
@@ -15,11 +15,10 @@ import { useDialog, useDialogHotkey } from "hooks";
 import { StyledSelect, TooltipTextButton } from "components/inputs";
 
 import { classifierSlice } from "store/classifier";
-import { selectKindModelNames } from "store/classifier/selectors";
+import { selectKindClassifiers } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { HelpItem } from "help/HelpContent";
 
-import { logger } from "utils/logUtils";
 import { HotkeyContext } from "utils/enums";
 
 import { SaveFittedModelDialog } from "views/ProjectViewer/components/dialogs";
@@ -31,21 +30,21 @@ import { ImportTensorflowClassificationModelDialog } from "../ImportTensorflowMo
 
 import type { SelectChangeEvent } from "@mui/material";
 
-import type { ModelInfoDTO } from "core/dl/classification/types";
+import type { Classifier } from "core/dl/classification/types";
 
 export const ModelSelection = ({
   selectedModelConfig,
 }: {
-  selectedModelConfig: ModelInfoDTO | undefined;
+  selectedModelConfig: Classifier | undefined;
 }) => {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const selectedModelName = selectedModelConfig?.name ?? "new";
-  const kindModelNames = useParameterizedSelector(
-    selectKindModelNames,
+  const selectedModelId = selectedModelConfig?.id ?? "new";
+  const kindClassifiers = useParameterizedSelector(
+    selectKindClassifiers,
     modelTarget,
   );
-  const cfApi = useClassifierApi();
   const {
     onClose: handleCloseImportClassifierDialog,
     onOpen: handleOpenImportClassifierDialog,
@@ -82,30 +81,18 @@ export const ModelSelection = ({
       );
     }
   };
+  // The backend drops the record and announces it; the slice follows.
   const handleDisposeModel = async () => {
-    if (!selectedModelConfig) return;
-    const result = await cfApi.removeModel(selectedModelConfig.name);
-    if (result.success) {
-      logger(`Successfully removed ${selectedModelConfig.name}`);
-    } else {
-      console.error(
-        `[dispose model: ${selectedModelConfig.name}] ${result.reason.code}: ${result.reason.message}`,
-        result.reason.cause,
-      );
+    if (!selectedModelConfig || !backend.classification) return;
+    try {
+      await backend.classification.delete(selectedModelConfig.id);
+    } catch (error) {
+      console.error(`[dispose model: ${selectedModelConfig.name}]`, error);
     }
-    /*
-     * Even if dispose fails in the worker, still want to remove model as an option for selection
-     * TODO: Determine if this is the best course of action
-     * */
     dispatch(
       classifierSlice.actions.setActiveModel({
         targetId: modelTarget,
         modelName: undefined,
-      }),
-    );
-    dispatch(
-      classifierSlice.actions.removeModelInfo({
-        modelName: selectedModelConfig.name,
       }),
     );
   };
@@ -179,10 +166,10 @@ export const ModelSelection = ({
         }}
       >
         <StyledSelect
-          value={selectedModelName}
+          value={selectedModelId}
           onChange={handleModelChange}
           variant="standard"
-          disabled={kindModelNames.length === 0}
+          disabled={kindClassifiers.length === 0}
           data-help={HelpItem.ClassificationModelSelect}
         >
           <MenuItem
@@ -195,17 +182,17 @@ export const ModelSelection = ({
           >
             New Model
           </MenuItem>
-          {kindModelNames.map((modelName, idx) => (
+          {kindClassifiers.map((classifier) => (
             <MenuItem
-              key={modelName + idx}
+              key={classifier.id}
               dense
-              value={modelName}
+              value={classifier.id}
               sx={{
                 borderRadius: 0,
                 minHeight: "1rem",
               }}
             >
-              {modelName}
+              {classifier.name}
             </MenuItem>
           ))}
         </StyledSelect>

@@ -108,7 +108,7 @@ type FakeImageSeed = {
 };
 
 export const FAKE_MODEL_ID = "fake-whole-image";
-export const FAKE_ARCHITECTURE_ID = "fake-majority";
+const FAKE_ARCHITECTURE_ID = "fake-majority";
 
 /* An item as the fake's classifier sees it, whatever the target. */
 type Labeled = { id: string; categoryId: string; partition: Partition };

@@ -2,183 +2,77 @@ import { useCallback } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { toInferenceInput } from "core/dl/utils";
-import { useClassifierApi } from "core/dl/classification";
-import { representsUnknown } from "core/entities";
+import { useBackend } from "core/backend";
 
-import { dataSlice } from "store/data";
 import { classifierSlice } from "store/classifier";
-import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { useParameterizedSelector } from "store/hooks";
 import { selectKindClassifier } from "store/classifier/selectors";
 
-import { logger } from "utils/logUtils";
-
 import { useClassMapDialog } from "@ProjectViewer/contexts/class-map";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import {
-  selectActiveItems,
-  selectActiveKnownCategories,
-} from "@ProjectViewer/state/reselectors";
+import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
-import type { PredictionResult } from "core/dl/classification/types";
-
+/*
+ * Labels the target's unlabeled items with the active classifier. The
+ * backend writes the predictions and keeps them in the inference partition
+ * until they are accepted or cleared.
+ */
 export const usePredictClassifier = () => {
   const dispatch = useDispatch();
-  const activeItems = useSelector(selectActiveItems);
+  const backend = useBackend();
   const activeCategories = useSelector(selectActiveKnownCategories);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const kindClassifier = useParameterizedSelector(
     selectKindClassifier,
     modelTarget,
   );
-
-  const cfApi = useClassifierApi();
-
   const { getClassMap } = useClassMapDialog();
-
   const handleError = useClassifierErrorHandler();
 
   const predictClassifier = useCallback(async () => {
-    if (!kindClassifier || !kindClassifier.activeModel) return;
-    const modelTargetId = kindClassifier.modelTargetId;
-    const modelName = kindClassifier.activeModel;
-    const model = await cfApi.getModelInfo(modelName).then((result) => {
-      if (result.success) {
-        return result.data;
-      } else {
-        console.error(
-          `[predictClassifier: ${modelName}] ${result.reason.code}: ${result.reason.message}`,
-          result.reason.cause,
-        );
-        return undefined;
-      }
-    });
-    const modelInfo = kindClassifier.modelInfoDict[modelName];
-    const activeRun = modelInfo.runs.at(-1);
+    const { classification } = backend;
+    const activeId = kindClassifier.activeModel;
+    if (!classification || !activeId) return;
+    let record = kindClassifier.modelInfoDict[activeId];
+    if (!record) return;
 
-    if (!model) {
-      handleError(
-        new Error(
-          "Cannot predict: no trained classifier is selected for this kind.",
-        ),
-        "Prediction Error",
-      );
-      return;
+    if (!record.classMap) {
+      if (record.classes.length === 0) return;
+      const mapping = await getClassMap({
+        projectCategories: activeCategories,
+        modelClasses: record.classes,
+      });
+      if (!mapping) return;
+      record = await classification.update({
+        classifierId: record.id,
+        classMap: mapping,
+      });
     }
 
-    let classMap = modelInfo.classMap;
-    if (!classMap) {
-      if (!model.classes) return;
-      const setMapping = await getClassMap({
-        projectCategories: activeCategories,
-        modelClasses: model.classes,
-      });
-      if (!setMapping) return;
-      classMap = setMapping;
+    const setStatus = (status: "predicting" | "waiting" | "idle") =>
       dispatch(
-        classifierSlice.actions.addModelClassMapping({
-          targetId: modelTargetId,
-          modelName,
-          classMapping: classMap,
+        classifierSlice.actions.setModelStatus({
+          targetId: modelTarget,
+          status,
         }),
       );
-    }
-
-    const unlabeledItems = activeItems.filter((item) =>
-      representsUnknown(item.categoryId),
-    );
-
-    dispatch(
-      classifierSlice.actions.setModelStatus({
-        targetId: kindClassifier.modelTargetId,
-        status: "predicting",
-      }),
-    );
-
+    setStatus("predicting");
     try {
-      const result = await cfApi.loadInference(
-        modelName,
-        unlabeledItems.map((item) => toInferenceInput(item)),
-        [],
-      );
-      if (!result.success) {
-        throw new Error(
-          `[predictClassifier: loadInference] ${result.reason.code}: ${result.reason.message}`,
-          { cause: result.reason.cause },
-        );
-      }
-    } catch (error) {
-      handleError(error as Error, "Data Preparation Error");
-      return;
-    }
-
-    const itemIds = unlabeledItems.map((item) => item.id);
-    let results: PredictionResult;
-    logger("before predict");
-    try {
-      const predictResults = await cfApi.predict(
-        modelName,
-        Object.values(classMap).map((id) => ({ id })),
-      );
-      if (predictResults.success) {
-        results = predictResults.data;
-      } else {
-        console.error(
-          `[predictClassifier: ${modelName}] ${predictResults.reason.code}: ${predictResults.reason.message}`,
-          predictResults.reason.cause,
-        );
-        throw new Error("PredictionError", {
-          cause: predictResults.reason.cause,
-        });
-      }
+      await classification.predict({ classifierId: record.id });
+      setStatus("waiting");
     } catch (error) {
       handleError(error as Error, "Error during prediction");
-      return;
+      setStatus("idle");
     }
-
-    const updates = itemIds.map((id, idx) => ({
-      id,
-      categoryId: results[idx].categoryId,
-      predicted: {
-        predictionConfidence: results[idx].maxProb,
-        predictedAtRunId: activeRun!.id,
-      },
-    }));
-    if (modelTarget === IMAGE_CLASSIFIER_ID) {
-      dispatch(dataSlice.actions.batchUpdateImageCategory(updates));
-    } else {
-      dispatch(dataSlice.actions.batchBubbleUpdateAnnotationCategory(updates));
-    }
-
-    // Stash full softmax map in context (volatile)
-    const softmaxMap: Record<string, number[]> = {};
-    itemIds.forEach((id, i) => {
-      softmaxMap[id] = results[i].softmax;
-    });
-    dispatch(
-      classifierSlice.actions.setActiveSoftmax({
-        targetId: modelTarget,
-        softmax: softmaxMap,
-      }),
-    );
-
-    dispatch(
-      classifierSlice.actions.setModelStatus({
-        targetId: kindClassifier.modelTargetId,
-        status: "waiting",
-      }),
-    );
   }, [
+    backend,
     dispatch,
     handleError,
-    activeItems,
     activeCategories,
     kindClassifier,
     getClassMap,
-    cfApi,
     modelTarget,
   ]);
 

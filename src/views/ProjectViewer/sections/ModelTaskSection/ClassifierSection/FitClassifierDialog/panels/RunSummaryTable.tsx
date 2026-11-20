@@ -22,7 +22,7 @@ import {
 import { buildModelRunsCsv } from "core/file-io/export";
 
 import {
-  selectActiveModelName,
+  selectActiveClassifierName,
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
@@ -36,7 +36,7 @@ import type { RunHyperparameterSnapshot } from "core/dl/classification/types";
 export const RunSummaryTable = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
   const modelName = useParameterizedSelector(
-    selectActiveModelName,
+    selectActiveClassifierName,
     modelTarget,
   );
   const runs = useParameterizedSelector(selectRunsForActiveModel, modelTarget);

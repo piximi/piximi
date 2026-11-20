@@ -8,7 +8,6 @@ import {
   selectAllCategories,
   selectAllImages,
   selectAnnotationVolumeEntities,
-  selectExtendedAnnotationsByKindId,
   selectExtendedImages,
 } from "store/data/selectors";
 
@@ -74,21 +73,6 @@ export const selectAvaliableCategoryColors = createSelector(
 );
 
 // --- Items pipeline ---
-
-const selectActiveExtendedAnnotations = (state: RootState) =>
-  selectExtendedAnnotationsByKindId(state, selectActiveKindId(state));
-
-/** Every item of the active view, before any filtering, with everything a
- * model needs; for fitting and predicting. */
-export const selectActiveItems = createSelector(
-  selectActiveView,
-  selectActiveExtendedAnnotations,
-  selectExtendedImages,
-  (view, annotations, images) => {
-    if (view === "images") return images;
-    return annotations;
-  },
-);
 
 /*
  * What the status checks and counts need from an item: no categories,

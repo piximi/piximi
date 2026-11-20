@@ -6,16 +6,18 @@ import {
   useState,
 } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { useImmer } from "use-immer";
 
+import { useBackend } from "core/backend";
 import { Partition } from "core/dl/enums";
 import { ARCHITECTURE_LABELS } from "core/dl/classification/types";
 import { getDefaultModelParams } from "core/dl/classification/utils";
 import { representsUnknown, type Shape } from "core/entities";
 
 import {
+  selectActiveClassifier,
   selectActiveModelName,
   selectAllCreatedModelNames,
   selectIsModelTrained,
@@ -28,9 +30,9 @@ import {
 } from "store/classifier/selectors";
 import { useParameterizedSelector } from "store/hooks";
 import { selectShowClearPredictionsWarning } from "store/applicationSettings/selectors";
-import { classifierSlice } from "store/classifier";
 import { selectVisibleChannelCount } from "store/data/selectors";
 
+import { recursiveAssign } from "utils/objectUtils";
 import { getUniqueName } from "utils/stringUtils";
 
 import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
@@ -127,9 +129,13 @@ const ClassifierStatusContext = createContext<ClassifierStateContextProp>({
 });
 
 const useModelParams = () => {
-  const dispatch = useDispatch();
+  const backend = useBackend();
   const visibleChannels = useSelector(selectVisibleChannelCount);
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
+  const activeClassifier = useParameterizedSelector(
+    selectActiveClassifier,
+    modelTarget,
+  );
   const restrictedClassifierNames = useSelector(selectAllCreatedModelNames);
   const activeModelName = useParameterizedSelector(
     selectActiveModelName,
@@ -198,53 +204,63 @@ const useModelParams = () => {
     return newModelParams;
   }, [modelPreprocessingSettings, modelOptimizerSettings, newModelParams]);
 
+  // An existing classifier's settings belong to the backend; a new one's
+  // are a draft here until it is created.
+  const updateExisting = useCallback(
+    (change: (draft: ClassifierModelParams) => void) => {
+      if (!activeClassifier || !backend.classification) return;
+      const draft: ClassifierModelParams = {
+        preprocessSettings: structuredClone(
+          activeClassifier.hyperparameters.preprocess,
+        ),
+        optimizerSettings: structuredClone(
+          activeClassifier.hyperparameters.optimizer,
+        ),
+      };
+      change(draft);
+      backend.classification
+        .update({
+          classifierId: activeClassifier.id,
+          hyperparameters: {
+            preprocess: draft.preprocessSettings,
+            optimizer: draft.optimizerSettings,
+          },
+        })
+        .catch((error: unknown) =>
+          console.error("[ClassifierStatusProvider] update", error),
+        );
+    },
+    [activeClassifier, backend],
+  );
   const handleUpdateOptimizerSettings = useCallback(
     (settings: Partial<OptimizerSettings>) => {
-      if (modelOptimizerSettings)
-        dispatch(
-          classifierSlice.actions.updateModelOptimizerSettings({
-            settings,
-            targetId: modelTarget,
-          }),
-        );
-      else
-        updateNewModelParams((draft) => {
-          Object.assign(draft.optimizerSettings, settings);
-        });
+      const change = (draft: ClassifierModelParams) => {
+        Object.assign(draft.optimizerSettings, settings);
+      };
+      if (modelOptimizerSettings) updateExisting(change);
+      else updateNewModelParams(change);
     },
-    [modelOptimizerSettings, modelTarget, dispatch, updateNewModelParams],
+    [modelOptimizerSettings, updateExisting, updateNewModelParams],
   );
   const handleUpdatePreprocessSettings = useCallback(
     (settings: RecursivePartial<PreprocessSettings>) => {
-      if (modelPreprocessingSettings)
-        dispatch(
-          classifierSlice.actions.updateModelPreprocessSettings({
-            settings,
-            targetId: modelTarget,
-          }),
-        );
-      else
-        updateNewModelParams((draft) => {
-          Object.assign(draft.preprocessSettings, settings);
-        });
+      const change = (draft: ClassifierModelParams) => {
+        recursiveAssign(draft.preprocessSettings, settings);
+      };
+      if (modelPreprocessingSettings) updateExisting(change);
+      else updateNewModelParams(change);
     },
-    [modelPreprocessingSettings, modelTarget, dispatch, updateNewModelParams],
+    [modelPreprocessingSettings, updateExisting, updateNewModelParams],
   );
   const handleUpdateInputShape = useCallback(
     (inputShape: Partial<Shape>) => {
-      if (modelPreprocessingSettings)
-        dispatch(
-          classifierSlice.actions.updateInputShape({
-            inputShape,
-            targetId: modelTarget,
-          }),
-        );
-      else
-        updateNewModelParams((draft) => {
-          Object.assign(draft.preprocessSettings.inputShape, inputShape);
-        });
+      const change = (draft: ClassifierModelParams) => {
+        Object.assign(draft.preprocessSettings.inputShape, inputShape);
+      };
+      if (modelPreprocessingSettings) updateExisting(change);
+      else updateNewModelParams(change);
     },
-    [modelPreprocessingSettings, modelTarget, dispatch, updateNewModelParams],
+    [modelPreprocessingSettings, updateExisting, updateNewModelParams],
   );
   return {
     modelParams,
@@ -317,9 +333,9 @@ export const ClassifierStatusProvider = ({
 
   const modelChannels = useMemo(
     () =>
-      modelConfig?.preprocessingSettings?.inputShape.channels ??
+      modelConfig?.hyperparameters.preprocess.inputShape.channels ??
       modelParams.preprocessSettings.inputShape.channels,
-    [modelConfig?.preprocessingSettings, modelParams],
+    [modelConfig?.hyperparameters, modelParams],
   );
   const precheck: Precheck = useMemo(
     () => ({

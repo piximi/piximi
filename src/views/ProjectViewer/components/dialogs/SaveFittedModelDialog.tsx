@@ -1,58 +1,43 @@
 import { useState } from "react";
 
-import { useSelector } from "react-redux";
-
 import { saveAs } from "file-saver";
 
 import { Grid, TextField } from "@mui/material";
 
-import { useClassifierApi } from "core/dl/classification";
-import { buildClassifierZip } from "core/file-io/export/exportFittedModel";
+import { useBackend } from "core/backend";
 
 import { ConfirmationDialog } from "components/dialogs/ConfirmationDialog";
 
-import { useParameterizedSelector } from "store/hooks";
-import { selectRunsForActiveModel } from "store/classifier/selectors";
-
-import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-
 import type { ChangeEvent } from "react";
 
-import type { ModelInfoDTO } from "core/dl/classification/types";
+import type { Classifier } from "core/dl/classification/types";
 
 type SaveFittedModelDialogProps = {
-  model: ModelInfoDTO;
+  model: Classifier;
   onClose: () => void;
   open: boolean;
 };
 
+/* Downloads the backend's archive of the model: weights, runs and a manifest. */
 export const SaveFittedModelDialog = ({
   model,
   onClose,
   open,
 }: SaveFittedModelDialogProps) => {
+  const backend = useBackend();
   const [name, setName] = useState<string>(model.name);
   const noNameError = name.length === 0;
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const runs = useParameterizedSelector(selectRunsForActiveModel, modelTarget);
 
-  const cfApi = useClassifierApi();
   const onSaveClassifierClick = async () => {
-    const result = await cfApi.getSavedModelData(name);
-    if (result.success) {
-      const { modelJson, modelWeights } = result.data;
-      const zipBlob = await buildClassifierZip(
-        { modelJson: modelJson.blob, modelWeights: modelWeights.blob },
-        runs,
-        { modelName: noNameError ? model.name : name },
+    try {
+      const archive = await backend.classification!.export(model.id);
+      const fileName = `${noNameError ? model.name : name}.zip`;
+      saveAs(
+        new Blob([new Uint8Array(archive.data)], { type: archive.mime }),
+        fileName,
       );
-
-      saveAs(zipBlob, `${noNameError ? model.name : name}.zip`);
-    } else {
-      console.error(
-        `[SaveFittedModelDialog] ${result.reason.code}: ${result.reason.message}`,
-        result.reason.cause,
-      );
+    } catch (error) {
+      console.error("[SaveFittedModelDialog]", error);
     }
     onClose();
   };

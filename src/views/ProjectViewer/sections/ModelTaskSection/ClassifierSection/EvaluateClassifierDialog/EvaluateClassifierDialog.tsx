@@ -18,7 +18,7 @@ import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { useParameterizedSelector } from "store/hooks";
 import {
-  selectActiveModelName,
+  selectActiveClassifierName,
   selectRunsForActiveModel,
 } from "store/classifier/selectors";
 
@@ -48,7 +48,7 @@ export const EvaluateClassifierDialog = ({
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
 
   const modelName = useParameterizedSelector(
-    selectActiveModelName,
+    selectActiveClassifierName,
     modelTarget,
   );
 

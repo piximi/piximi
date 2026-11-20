@@ -108,10 +108,6 @@ export type RunHistoryEpoch = {
   valAccuracy: number;
 };
 
-export type DatasetFingerprint = {
-  trainingFingerprint: string;
-  validationFingerprint: string;
-};
 export type RunTrigger = "fresh" | "continue" | "hitl-correction" | "import";
 
 // Distinct from src/utils/modelsV2/enums.ts ModelStatus (which tracks runtime

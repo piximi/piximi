@@ -173,15 +173,6 @@ async function parseManifest(
   }
 }
 
-async function parseManifestFromFile(
-  file: File,
-): Promise<PiximiManifest | null> {
-  try {
-    return parseManifestFromText(await file.text());
-  } catch {
-    return null;
-  }
-}
 async function parseRunHistory(buffer: ArrayBuffer): Promise<Run[] | null> {
   try {
     const text = new TextDecoder().decode(buffer);
@@ -333,26 +324,4 @@ export const importFittedModelFromZip = async (
   }
 
   return loadModelFromParts(parts);
-};
-
-export const importFittedModelFromFiles = async (input: {
-  modelJson: File;
-  modelWeights: File[];
-  modelRuns?: File;
-  manifest?: File;
-}): Promise<{ modelDetails: ModelInfoDTO; runs: Run[] }> => {
-  const parsedManifest = input.manifest
-    ? await parseManifestFromFile(input.manifest)
-    : null;
-  const modelName =
-    parsedManifest?.modelName ?? input.modelJson.name.replace(/\..+$/, "");
-  const modelRuns = input.modelRuns
-    ? await input.modelRuns.arrayBuffer()
-    : undefined;
-  return loadModelFromParts({
-    modelName,
-    modelJson: input.modelJson,
-    modelWeights: input.modelWeights,
-    modelRuns,
-  });
 };

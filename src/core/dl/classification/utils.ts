@@ -5,26 +5,15 @@ import {
   LossFunction,
   Metric,
   OptimizationAlgorithm,
-  Partition,
 } from "core/dl/enums";
-import { representsUnknown } from "core/entities";
-import {
-  fingerprintItems,
-  hashCategorySet,
-} from "core/backend/classification/fingerprint";
-
-import { seededShuffle } from "utils/arrayUtils";
 
 import { ARCHITECTURE_IDS } from "./types";
 
 import type { ModelCompileArgs, LayersModel } from "@tensorflow/tfjs";
 
-import type { TrainingInput } from "core/dl/types";
-
 import type {
   Classifier,
   ClassifierModelParams,
-  DatasetFingerprint,
   ModelLayerData,
   OptimizerSettings,
   PreprocessSettings,
@@ -85,75 +74,6 @@ export const defaultClassifier = (
   valid: true,
   runs: [],
 });
-
-export const partitionTrainingData = (items: TrainingInput[]) => {
-  const inference: TrainingInput[] = [];
-  const labeledTraining: TrainingInput[] = [];
-  const labeledValidation: TrainingInput[] = [];
-  const labeledUnassigned: TrainingInput[] = [];
-
-  items.forEach((item) => {
-    if (representsUnknown(item.categoryId)) {
-      inference.push(item);
-    } else {
-      switch (item.partition) {
-        case Partition.Unassigned:
-          labeledUnassigned.push(item);
-          break;
-        case Partition.Training:
-          labeledTraining.push(item);
-          break;
-        case Partition.Validation:
-          labeledValidation.push(item);
-          break;
-        default:
-      }
-    }
-  });
-  return {
-    inference,
-    labeledTraining,
-    labeledUnassigned,
-    labeledValidation,
-  };
-};
-
-export const applySplitAndShuffle = (
-  labeledUnassigned: TrainingInput[],
-  trainingPercentage: number,
-  options: { shuffle: false } | { shuffle: true; seed: number },
-) => {
-  const categoryCounts = labeledUnassigned.reduce(
-    (counts: Record<string, { total: number; count: number }>, input) => {
-      const cat = input.categoryId;
-      counts[cat] = { total: (counts[cat]?.total ?? 0) + 1, count: 0 };
-      return counts;
-    },
-    {},
-  );
-  const preparedLabeledUnassigned = options.shuffle
-    ? seededShuffle(labeledUnassigned, options.seed)
-    : labeledUnassigned;
-
-  const splitTrainingItems: TrainingInput[] = [];
-  const splitValidationItems: TrainingInput[] = [];
-
-  preparedLabeledUnassigned.forEach((input) => {
-    const cat = input.categoryId;
-    const { total, count } = categoryCounts[cat];
-    if (count < Math.round(total * trainingPercentage)) {
-      splitTrainingItems.push(input);
-      categoryCounts[cat].count++;
-    } else {
-      splitValidationItems.push(input);
-    }
-  });
-
-  return {
-    splitTrainingItems,
-    splitValidationItems,
-  };
-};
 
 export const evaluateConfusionMatrix = (
   nClasses: number,
@@ -326,20 +246,6 @@ export const createCompileArgs = (options: OptimizerSettings) => {
     optimizer: optimizer(),
   };
 };
-
-type FingerprintInput = { id: string; categoryId: string };
-
-export async function fingerprintDataset(
-  trainingData: FingerprintInput[],
-  validationData: FingerprintInput[],
-): Promise<DatasetFingerprint> {
-  return {
-    trainingFingerprint: await fingerprintItems(trainingData),
-    validationFingerprint: await fingerprintItems(validationData),
-  };
-}
-
-export { hashCategorySet };
 
 /* The record for a model the worker loaded from files. */
 export function classifierFromDTO(

@@ -6,8 +6,6 @@ import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
 import { dataSlice } from "store/data";
 import { projectReset } from "store/actions";
 
-import { recursiveAssign } from "utils/objectUtils";
-
 import { IMAGE_CLASSIFIER_ID, IMAGE_CLASSIFIER_NAME } from "./constants";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
@@ -15,17 +13,8 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import type {
   Classifier,
   ModelLifecycleStatus,
-  ModelClassMap,
-  OptimizerSettings,
-  PreprocessSettings,
-  Run,
   RunHistoryEpoch,
-  RunStatus,
-  EvaluationResult,
 } from "core/dl/classification/types";
-import type { Shape } from "core/entities";
-
-import type { RecursivePartial } from "utils/types";
 
 import type { ClassifierState, KindClassifier, SoftmaxById } from "./types";
 
@@ -138,98 +127,6 @@ export const classifierSlice = createSlice({
         if (run) run.history.push(action.payload.epoch);
       }
     },
-    addModelInfo(
-      state,
-      action: PayloadAction<{
-        targetId: string;
-        modelName: string;
-        modelInfo: Classifier;
-      }>,
-    ) {
-      const { targetId, modelName, modelInfo } = action.payload;
-      if (modelName in state.kindClassifiers[targetId].modelInfoDict) {
-        throw new Error(
-          `Info for model with name "${modelName}" already exists`,
-        );
-      }
-      state.kindClassifiers[targetId].modelInfoDict[modelName] = modelInfo;
-    },
-    removeModelInfo(
-      state,
-      action: PayloadAction<{
-        modelName: string;
-      }>,
-    ) {
-      const { modelName } = action.payload;
-      Object.keys(state.kindClassifiers).forEach((kindId) => {
-        delete state.kindClassifiers[kindId].modelInfoDict[modelName];
-      });
-    },
-    addModelClassMapping(
-      state,
-      action: PayloadAction<{
-        targetId: string;
-        modelName: string;
-        classMapping: ModelClassMap;
-      }>,
-    ) {
-      const { targetId, modelName, classMapping } = action.payload;
-      if (!(modelName in state.kindClassifiers[targetId].modelInfoDict)) {
-        throw new Error(
-          `Info for model with name "${modelName}" does not exists`,
-        );
-      }
-      state.kindClassifiers[targetId].modelInfoDict[modelName].classMap =
-        classMapping;
-    },
-    updateModelOptimizerSettings(
-      state,
-      action: PayloadAction<{
-        settings: Partial<OptimizerSettings>;
-        targetId: string;
-      }>,
-    ) {
-      const { settings, targetId } = action.payload;
-      const kc = state.kindClassifiers[targetId];
-
-      const activeModel = kc.activeModel;
-      if (activeModel)
-        Object.assign(
-          kc.modelInfoDict[activeModel].hyperparameters.optimizer,
-          settings,
-        );
-    },
-    updateModelPreprocessSettings(
-      state,
-      action: PayloadAction<{
-        settings: RecursivePartial<PreprocessSettings>;
-        targetId: string;
-      }>,
-    ) {
-      const { settings, targetId } = action.payload;
-      const kc = state.kindClassifiers[targetId];
-
-      const activeModel = kc.activeModel;
-      if (activeModel)
-        recursiveAssign(
-          kc.modelInfoDict[activeModel].hyperparameters.preprocess,
-          settings,
-        );
-    },
-    updateInputShape(
-      state,
-      action: PayloadAction<{ inputShape: Partial<Shape>; targetId: string }>,
-    ) {
-      const { targetId, inputShape } = action.payload;
-      const kc = state.kindClassifiers[targetId];
-
-      const activeModel = kc.activeModel;
-      if (activeModel)
-        Object.assign(
-          kc.modelInfoDict[activeModel].hyperparameters.preprocess.inputShape,
-          inputShape,
-        );
-    },
     setActiveModel(
       state,
       action: PayloadAction<{
@@ -252,68 +149,6 @@ export const classifierSlice = createSlice({
       classifier.newModelArch = modelArch;
     },
 
-    appendRun(
-      state,
-      action: PayloadAction<{ targetId: string; modelName: string; run: Run }>,
-    ) {
-      const { targetId, modelName, run } = action.payload;
-      const kc = state.kindClassifiers[targetId];
-      if (!kc) return;
-      const info = kc.modelInfoDict[modelName];
-      if (!info) return;
-      info.runs.push(run);
-    },
-    appendEpochToActiveRun(
-      state,
-      action: PayloadAction<{
-        targetId: string;
-        modelName: string;
-        epoch: RunHistoryEpoch;
-      }>,
-    ) {
-      const info =
-        state.kindClassifiers[action.payload.targetId]?.modelInfoDict[
-          action.payload.modelName
-        ];
-      const run = info?.runs.at(-1);
-      if (!run || run.status !== "in-progress") return;
-      run.history.push(action.payload.epoch);
-    },
-    finalizeActiveRun(
-      state,
-      action: PayloadAction<{
-        targetId: string;
-        modelName: string;
-        finishedAt: string;
-        status: RunStatus;
-        evalResults?: EvaluationResult;
-        weightsRef?: string;
-      }>,
-    ) {
-      const kc = state.kindClassifiers[action.payload.targetId];
-      const info = kc?.modelInfoDict[action.payload.modelName];
-      const run = info?.runs.at(-1);
-      if (!kc || !run || run.status !== "in-progress") return;
-      run.finishedAt = action.payload.finishedAt;
-      run.status = action.payload.status;
-      run.evalResults = action.payload.evalResults;
-      run.weightsRef = action.payload.weightsRef;
-      kc.status = "idle";
-    },
-    setModelTrained(
-      state,
-      action: PayloadAction<{
-        targetId: string;
-        modelName: string;
-      }>,
-    ) {
-      const { targetId, modelName } = action.payload;
-      const kc = state.kindClassifiers[targetId];
-      if (!kc) return;
-      const model = kc.modelInfoDict[modelName];
-      if (!model) return;
-      model.trained = true;
-    },
     setModelStatus(
       state,
       action: PayloadAction<{
@@ -333,40 +168,6 @@ export const classifierSlice = createSlice({
     ) {
       const kc = state.kindClassifiers[action.payload.targetId];
       if (kc) kc.activeSoftmaxById = action.payload.softmax;
-    },
-    setConfidenceThreshold(
-      state,
-      action: PayloadAction<{
-        targetId: string;
-        modelName: string;
-        threshold: number;
-      }>,
-    ) {
-      const info =
-        state.kindClassifiers[action.payload.targetId]?.modelInfoDict[
-          action.payload.modelName
-        ];
-      if (info)
-        info.confidenceThreshold = Math.min(
-          1,
-          Math.max(0, action.payload.threshold),
-        );
-    },
-    recordEvalForRun(
-      state,
-      action: PayloadAction<{
-        targetId: string;
-        modelName: string;
-        runId: string;
-        evalResult: EvaluationResult;
-      }>,
-    ) {
-      const info =
-        state.kindClassifiers[action.payload.targetId]?.modelInfoDict[
-          action.payload.modelName
-        ];
-      const run = info?.runs.find((r) => r.id === action.payload.runId);
-      if (run) run.evalResults = action.payload.evalResult;
     },
   },
   extraReducers(builder) {

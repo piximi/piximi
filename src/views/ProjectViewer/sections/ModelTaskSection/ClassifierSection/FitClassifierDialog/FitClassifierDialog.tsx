@@ -57,7 +57,7 @@ export const FitClassifierDialog = ({
 
   const tabUnavailable =
     ((tabVal === "2" || tabVal === "4") && !showPlots) ||
-    (tabVal === "3" && !modelConfig?.modelSummary);
+    (tabVal === "3" && !modelConfig?.summary);
   const visibleTab =
     modelStatus !== "training" && tabUnavailable ? "1" : tabVal;
   const onTabSelect = (_event: React.SyntheticEvent, newValue: string) => {
@@ -110,7 +110,7 @@ export const FitClassifierDialog = ({
           value="3"
           disabledMessage="No Trained Model"
           placement="top"
-          disabled={!modelConfig?.modelSummary}
+          disabled={!modelConfig?.summary}
         />
         <ToolTipTab
           label="Model Runs Summary"
@@ -130,13 +130,13 @@ export const FitClassifierDialog = ({
         </Box>
         <Box hidden={visibleTab !== "3"}>
           {/* TODO: implement model summary for graph models */}
-          {modelConfig?.modelSummary && (
-            <ModelSummaryTable modelSummary={modelConfig.modelSummary} />
+          {modelConfig?.summary && (
+            <ModelSummaryTable modelSummary={modelConfig.summary} />
           )}
         </Box>
         <Box hidden={visibleTab !== "4"}>
           {/* TODO: implement model summary for graph models */}
-          {modelConfig?.modelSummary && <RunSummaryTable />}
+          {modelConfig?.summary && <RunSummaryTable />}
         </Box>
       </DialogContent>
       <DialogActions>

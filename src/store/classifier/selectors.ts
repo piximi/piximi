@@ -54,9 +54,12 @@ export const selectKindClassifier = createSelector(
     return kc;
   },
 );
+/* What the backend is doing with the active classifier wins over what this
+ * session set, so another client's training shows here too. */
 export const selectModelLifecycleStatus = createSelector(
   selectKindClassifier,
-  (kc): ModelLifecycleStatus => kc.status,
+  (kc): ModelLifecycleStatus =>
+    (kc.activeModel && kc.modelInfoDict[kc.activeModel]?.busy) || kc.status,
 );
 export const selectIsModelTrained = createSelector(
   selectKindClassifier,
@@ -70,16 +73,19 @@ export const selectActiveSoftmaxById = createSelector(
   selectKindClassifier,
   (kc): SoftmaxById | undefined => kc.activeSoftmaxById,
 );
+/* The active classifier's id (a name, for the local backend). */
 export const selectActiveModelName = createSelector(
   selectKindClassifier,
   (kc): string | undefined => {
     return kc.activeModel;
   },
 );
-
-export const selectKindModelNames = createSelector(selectKindClassifier, (kc) =>
-  Object.keys(kc.modelInfoDict),
+export const selectActiveClassifierName = createSelector(
+  selectKindClassifier,
+  (kc): string | undefined =>
+    kc.activeModel ? kc.modelInfoDict[kc.activeModel]?.name : undefined,
 );
+
 export const selectKindClassifiers = createSelector(
   selectKindClassifier,
   (kc): Classifier[] => Object.values(kc.modelInfoDict),

@@ -10,6 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 
+import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
+
 import { useNumberField } from "hooks";
 
 import { HelpItem } from "help/HelpContent";
@@ -68,8 +70,11 @@ export const InputShape = () => {
     error: inputChannelsError,
   } = useNumberField(inputShape.channels);
 
+  // MobileNet's graph takes three channels; other architectures take what
+  // the images have.
   const fixedChannels = useMemo(
-    () => modelConfig && !!modelConfig.requiredChannels,
+    () =>
+      modelConfig?.architectureId === ARCHITECTURE_IDS[ModelArch.MOBILE_NET],
     [modelConfig],
   );
 

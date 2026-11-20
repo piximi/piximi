@@ -1,90 +1,47 @@
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Partition } from "core/dl/enums";
-import { representsUnknown } from "core/entities";
+import { useBackend } from "core/backend";
 
 import { classifierSlice } from "store/classifier";
-import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
-import { dataSlice } from "store/data";
-import { useParameterizedSelector } from "store/hooks";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import {
-  selectActiveItemsByPartition,
-  selectActiveUnknownCategory,
-} from "@ProjectViewer/state/reselectors";
 
+import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
+
+/*
+ * Settles the target's pending predictions through the backend: accepting
+ * keeps the categories and unassigns the items; clearing returns them to
+ * unknown. Either way the classifier is idle afterwards.
+ */
 export const useAcceptClearPredictions = () => {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const unknowCategory = useSelector(selectActiveUnknownCategory);
-  const inferenceItems = useParameterizedSelector(
-    selectActiveItemsByPartition,
-    Partition.Inference,
-  );
-  const clearPredictions = () => {
-    if (!unknowCategory) throw new Error(`Invalid Unknown Category.`);
-    const updates = inferenceItems.reduce(
-      (updates: { id: string; categoryId: string }[], items) => {
-        updates.push({
-          id: items.id,
-          categoryId: unknowCategory.id,
-        });
-        return updates;
-      },
-      [],
-    );
-    batch(() => {
-      if (modelTarget === IMAGE_CLASSIFIER_ID)
-        dispatch(dataSlice.actions.batchUpdateImageCategory(updates));
-      else
-        dispatch(
-          dataSlice.actions.batchBubbleUpdateAnnotationCategory(updates),
-        );
+  const handleError = useClassifierErrorHandler();
+
+  const settle = async (
+    action: "acceptPredictions" | "clearPredictions",
+    name: string,
+  ) => {
+    const { classification } = backend;
+    if (!classification) return;
+    try {
+      await classification[action](modelTarget);
       dispatch(
         classifierSlice.actions.setModelStatus({
           targetId: modelTarget,
           status: "idle",
         }),
       );
-      dispatch(
-        classifierSlice.actions.setActiveSoftmax({
-          targetId: modelTarget,
-          softmax: undefined,
-        }),
-      );
-    });
+    } catch (error) {
+      handleError(error as Error, name);
+    }
   };
 
-  const acceptPredictions = () => {
-    const updates = inferenceItems.reduce(
-      (updates: { id: string; partition: Partition }[], item) => {
-        if (representsUnknown(item.categoryId)) return updates;
-        updates.push({
-          id: item.id,
-          partition: Partition.Unassigned,
-        });
-        return updates;
-      },
-      [],
-    );
-    batch(() => {
-      if (modelTarget === IMAGE_CLASSIFIER_ID)
-        dispatch(dataSlice.actions.batchUpdateImagePartition(updates));
-      else dispatch(dataSlice.actions.batchUpdateAnnotationPartition(updates));
-      dispatch(
-        classifierSlice.actions.setModelStatus({
-          targetId: modelTarget,
-          status: "idle",
-        }),
-      );
-      dispatch(
-        classifierSlice.actions.setActiveSoftmax({
-          targetId: modelTarget,
-          softmax: undefined,
-        }),
-      );
-    });
+  return {
+    acceptPredictions: () =>
+      settle("acceptPredictions", "Could not accept the predictions"),
+    clearPredictions: () =>
+      settle("clearPredictions", "Could not clear the predictions"),
   };
-  return { acceptPredictions, clearPredictions };
 };
