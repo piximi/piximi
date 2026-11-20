@@ -28,8 +28,8 @@ import {
   ErrorReason,
 } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
-import { selectTotalActiveUnlabeledItems } from "@ProjectViewer/state/reselectors";
 import {
+  useClassifierCounts,
   usePredictClassifier,
   useEvaluateClassifier,
 } from "@ProjectViewer/hooks";
@@ -118,7 +118,7 @@ const PredictClassifierButton = ({
     modelTarget,
   );
 
-  const totalUnlabeledItems = useSelector(selectTotalActiveUnlabeledItems);
+  const totalUnlabeledItems = useClassifierCounts().unlabeled;
   const predictClassifier = usePredictClassifier();
   const handlePredict = async () => {
     await predictClassifier();

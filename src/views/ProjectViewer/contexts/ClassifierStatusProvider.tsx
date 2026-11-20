@@ -11,10 +11,9 @@ import { useSelector } from "react-redux";
 import { useImmer } from "use-immer";
 
 import { useBackend } from "core/backend";
-import { Partition } from "core/dl/enums";
 import { ARCHITECTURE_LABELS } from "core/dl/classification/types";
 import { getDefaultModelParams } from "core/dl/classification/utils";
-import { representsUnknown, type Shape } from "core/entities";
+import { type Shape } from "core/entities";
 
 import {
   selectActiveClassifier,
@@ -36,11 +35,8 @@ import { recursiveAssign } from "utils/objectUtils";
 import { getUniqueName } from "utils/stringUtils";
 
 import { useClassificationModel } from "@ProjectViewer/hooks/useClassificationModel";
-import {
-  selectActiveLabeledItems,
-  selectActiveItemsByPartition,
-  selectActiveKnownCategories,
-} from "@ProjectViewer/state/reselectors";
+import { useClassifierCounts } from "@ProjectViewer/hooks/useClassifierCounts";
+import { selectActiveKnownCategories } from "@ProjectViewer/state/reselectors";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import type React from "react";
@@ -286,10 +282,6 @@ export const ClassifierStatusProvider = ({
     selectModelIsValid,
     modelTarget,
   );
-  const inferenceItems = useParameterizedSelector(
-    selectActiveItemsByPartition,
-    Partition.Inference,
-  );
   const modelIsTrained = useParameterizedSelector(
     selectIsModelTrained,
     modelTarget,
@@ -298,19 +290,10 @@ export const ClassifierStatusProvider = ({
     selectModelLifecycleStatus,
     modelTarget,
   );
-  const activeLabeledItems = useSelector(selectActiveLabeledItems);
   const knownCategories = useSelector(selectActiveKnownCategories);
-  // Categories that will actually reach training. Labeled items in the
-  // inference partition are predictions, which `partitionTrainingData` drops.
-  const labeledCategoryCount = useMemo(
-    () =>
-      new Set(
-        activeLabeledItems
-          .filter((item) => item.partition !== Partition.Inference)
-          .map((item) => item.categoryId),
-      ).size,
-    [activeLabeledItems],
-  );
+  // Counted by the backend, which is what trains; pending predictions are
+  // labeled but take no part.
+  const counts = useClassifierCounts();
   const visibleChannels = useSelector(selectVisibleChannelCount);
   const showClearPredictionsWarning = useSelector(
     selectShowClearPredictionsWarning,
@@ -341,13 +324,11 @@ export const ClassifierStatusProvider = ({
     () => ({
       modelTrainable: !modelConfig || modelConfig.trainable,
       modelValid: modelIsValid === undefined ? true : modelIsValid,
-      labeledImages: activeLabeledItems.length > 0,
+      labeledImages: counts.labeled > 0,
       // A classifier needs at least two output classes to learn anything.
       multipleCategories: knownCategories.length >= 2,
-      multipleLabeledCategories: labeledCategoryCount >= 2,
-      noPendingPredictions: inferenceItems.every((item) =>
-        representsUnknown(item.categoryId),
-      ),
+      multipleLabeledCategories: counts.labeledCategories >= 2,
+      noPendingPredictions: counts.pendingPredictions === 0,
       channelsValid:
         modelChannels && visibleChannels
           ? visibleChannels === modelChannels
@@ -363,11 +344,9 @@ export const ClassifierStatusProvider = ({
       newModelName,
       restrictedClassifierNames,
       modelIsValid,
-      activeLabeledItems,
+      counts,
       knownCategories,
-      labeledCategoryCount,
       isFitting,
-      inferenceItems,
       modelChannels,
     ],
   );

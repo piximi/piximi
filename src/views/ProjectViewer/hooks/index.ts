@@ -13,6 +13,7 @@ export {
 } from "./useCounts";
 export { useReactWindow } from "./useReactWindow";
 export { useAcceptClearPredictions } from "./useAcceptClearPredictions";
+export { useClassifierCounts } from "./useClassifierCounts";
 export { useClassificationModel } from "./useClassificationModel";
 export { useFitClassifier } from "./useFitClassifier";
 export { usePredictClassifier } from "./usePredictClassifier";

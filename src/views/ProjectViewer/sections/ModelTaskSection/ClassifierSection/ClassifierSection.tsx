@@ -5,7 +5,10 @@ import { Box, Divider } from "@mui/material";
 import { useParameterizedSelector } from "store/hooks";
 import { selectModelLifecycleStatus } from "store/classifier/selectors";
 
-import { useClassificationModel } from "@ProjectViewer/hooks";
+import {
+  useClassificationModel,
+  useClassifierCounts,
+} from "@ProjectViewer/hooks";
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 
 import { PredictionListItems } from "../PredictionListItems";
@@ -20,6 +23,8 @@ export const ClassifierSection = () => {
     modelTarget,
   );
   const modelConfig = useClassificationModel();
+  // Pending predictions may come from another client of the session.
+  const { pendingPredictions } = useClassifierCounts();
 
   return (
     <>
@@ -37,7 +42,9 @@ export const ClassifierSection = () => {
         <Divider flexItem />
         <ModelActions />
       </Box>
-      {modelStatus === "waiting" && <PredictionListItems />}
+      {(modelStatus === "waiting" || pendingPredictions > 0) && (
+        <PredictionListItems />
+      )}
     </>
   );
 };

@@ -2,16 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, MenuItem, Tooltip } from "@mui/material";
 
+import { useCapability } from "core/backend";
+
 import { StyledSelect } from "components/inputs";
 
-import { useParameterizedSelector } from "store/hooks";
-import { selectActiveSoftmaxById } from "store/classifier/selectors";
-
 import { projectSlice } from "@ProjectViewer/state";
-import {
-  selectActiveClassifierModelTarget,
-  selectActiveViewState,
-} from "@ProjectViewer/state/selectors";
+import { useClassifierCounts } from "@ProjectViewer/hooks";
+import { selectActiveViewState } from "@ProjectViewer/state/selectors";
 import { AnnotationSortType, ImageSortType } from "@ProjectViewer/state/types";
 
 import { FunctionalDivider } from "../FunctionalDivider";
@@ -21,11 +18,10 @@ import type { SelectChangeEvent } from "@mui/material";
 export const SortSelect = () => {
   const dispatch = useDispatch();
   const activeViewState = useSelector(selectActiveViewState);
-  const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const softmaxByItemId = useParameterizedSelector(
-    selectActiveSoftmaxById,
-    modelTarget,
-  );
+  // The backend keeps the distributions behind pending predictions.
+  const canClassify = useCapability("classification");
+  const { pendingPredictions } = useClassifierCounts();
+  const softmaxByItemId = canClassify && pendingPredictions > 0;
 
   const onSortKeyChange = (event: SelectChangeEvent<unknown>) => {
     if (activeViewState.view === "images")
