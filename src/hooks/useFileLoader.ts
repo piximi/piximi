@@ -76,12 +76,18 @@ export function useFileLoader(): UseFileLoaderReturn {
     async (files: FileList): Promise<void> => {
       setIsUploading(true);
       const taskId = generateUUID();
+
+      const uploadLabel = (processed: number) =>
+        files.length === 1
+          ? `Processing ${files[0].name}`
+          : `Processed ${processed} of ${files.length} files`;
+
       const newTask: AppTask = {
         id: taskId,
         type: "file-upload",
         status: "running",
         progress: 0,
-        label: "Uploading Files",
+        label: uploadLabel(0),
         startedAt: Date.now(),
       };
       dispatch(appTasksSlice.actions.taskRegistered(newTask));
@@ -127,11 +133,19 @@ export function useFileLoader(): UseFileLoaderReturn {
           experiment.channels,
         );
         taskCancelRegistry.register(taskId, () => fileLoader.cancel());
+
+        // Only dispatch when the displayed percentage or label changes
+        let lastKey = "";
         fileLoader.onProgress((progress) => {
+          const label = uploadLabel(progress.processedCount);
+          const key = `${progress.overallProgress}:${label}`;
+          if (key === lastKey) return;
+          lastKey = key;
           dispatch(
             appTasksSlice.actions.taskUpdated({
               id: taskId,
               progress: progress.overallProgress,
+              label,
             }),
           );
         });

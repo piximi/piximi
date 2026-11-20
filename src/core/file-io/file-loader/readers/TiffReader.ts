@@ -212,9 +212,6 @@ async function analyzeTiffs(
   const errors: Array<TaskError> = [];
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    updateProgress({
-      overallProgress: overallProgress("analyze", i / files.length),
-    });
 
     try {
       const fileData = await file.arrayBuffer();
@@ -231,6 +228,11 @@ async function analyzeTiffs(
         recoverable: true,
       });
     }
+
+    // Report after the file, so the last one lands on the end of the stage.
+    updateProgress({
+      overallProgress: overallProgress("analyze", (i + 1) / files.length),
+    });
   }
 
   return { analyses: results, buffers, errors };

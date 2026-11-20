@@ -30,7 +30,7 @@ import type {
   UploadStage,
 } from "./types";
 
-const INITIAL_PROGRESS: Progress = {
+const initialProgress = (): Progress => ({
   stage: "idle",
   stageProgress: 0,
   overallProgress: 0,
@@ -38,7 +38,7 @@ const INITIAL_PROGRESS: Progress = {
   totalCount: 0,
   errors: new Map<string, TaskError[]>(),
   warnings: [],
-};
+});
 
 type OnProgressCallback = (args: { value: number; stage: StageName }) => void;
 interface LoadImageWorkerAPI {
@@ -65,7 +65,7 @@ interface LoadImageWorkerAPI {
 export class FileLoader implements IFileLoader {
   private activeWorkers: Worker[] = [];
   private storage: DataConnector;
-  private progress: Progress = { ...INITIAL_PROGRESS };
+  private progress: Progress = initialProgress();
   private progressListeners: Set<(progress: Progress) => void> = new Set();
   private abortController: AbortController | null = null;
   private tiffConfigs?: Map<string, TiffImportConfig>;
@@ -104,15 +104,12 @@ export class FileLoader implements IFileLoader {
     this.resetProgress();
 
     try {
-      // -- Stage 1: Analyze
+      // Analysis (the TIFF pre-pass) has already run in the caller, so start
+      // at the load stage — reporting analyze(0) here would drop the bar back
+      // to 0 after the pre-pass filled it.
       this.updateProgress({
         stage: "Loading Images",
         totalCount: files.length,
-        overallProgress: overallProgress("analyze", 0),
-      });
-
-      // Single dispatch path for ALL formats
-      this.updateProgress({
         overallProgress: overallProgress("load", 0),
       });
       const imageResults = await this.dispatchFiles(
@@ -188,7 +185,20 @@ export class FileLoader implements IFileLoader {
       fileName: string;
       promise: Promise<LoadAndPrepareOutput>;
     }> = [];
+    let completed = 0;
+    const inFlight = new Map<number, number>(); // file index → worker fraction 0..1
 
+    const reportLoad = () => {
+      let partial = 0;
+      for (const f of inFlight.values()) partial += f;
+      this.updateProgress({
+        processedCount: completed,
+        overallProgress: overallProgress(
+          "load",
+          (completed + partial) / files.length,
+        ),
+      });
+    };
     for (let i = 0; i < files.length; i++) {
       if (this.abortController?.signal.aborted) {
         return { success: false, cancelled: true };
@@ -219,18 +229,17 @@ export class FileLoader implements IFileLoader {
               },
             },
             Comlink.proxy(({ value, stage }) => {
-              this.updateProgress({
-                stageProgress: overallProgress(stage, value),
-              });
+              inFlight.set(i, overallProgress(stage, value) / 100);
+              reportLoad();
             }),
             this.requiredChannels,
           )
           .finally(() => {
             worker.terminate();
             this.activeWorkers = this.activeWorkers.filter((w) => w !== worker);
-            this.updateProgress({
-              overallProgress: overallProgress("load", i / files.length),
-            });
+            inFlight.delete(i);
+            completed++;
+            reportLoad();
           });
 
         workerTasks.push({ fileName: file.name, promise });
@@ -439,7 +448,7 @@ export class FileLoader implements IFileLoader {
   }
 
   private resetProgress(): void {
-    this.progress = { ...INITIAL_PROGRESS };
+    this.progress = initialProgress();
     this.abortController = new AbortController();
   }
 

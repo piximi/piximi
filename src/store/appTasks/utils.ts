@@ -1,7 +1,7 @@
 import type { AppTaskType } from "./types";
 
 export const taskTypeDisplayLookup: Record<AppTaskType, string> = {
-  "file-upload": "Uploading File",
+  "file-upload": "Image Upload",
   "project-load": "Uploading Project",
   "project-download": "Downloading Project",
   "classifier-download": "Downloading Classifiers",

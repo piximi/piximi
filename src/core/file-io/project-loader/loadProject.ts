@@ -84,7 +84,7 @@ export async function loadProject(
       );
       const v11 = convertV02ToV11(
         v02,
-        subProgress(updateProgress, { start: 0.35, end: 0.15 }),
+        subProgress(updateProgress, { start: 0.35, end: 0.5 }),
       );
       v2 = convertV11ToV2(
         v11,
