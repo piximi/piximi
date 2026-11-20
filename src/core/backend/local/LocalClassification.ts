@@ -592,10 +592,12 @@ export class LocalClassification implements BackendClassification {
     const finalize = (
       status: Run["status"],
       details: Partial<Pick<Run, "evalResults" | "weightsRef">> = {},
+      summary?: Classifier["summary"],
     ): Classifier => {
       const latest = this.#record(record.id);
       current = this.#write({
         ...latest,
+        ...(summary && { summary }),
         busy: undefined,
         trained: latest.trained || status !== "failed",
         runs: latest.runs.map((r) =>
@@ -619,7 +621,10 @@ export class LocalClassification implements BackendClassification {
       );
       status = result.status;
       evalResults = result.evalResults;
-      finalize(status, { evalResults, weightsRef: result.weightsRef });
+      // The layer table exists once the worker has built the graph.
+      const built = await cfApi.getModelInfo(record.id);
+      const summary = built.success ? built.data.modelSummary : undefined;
+      finalize(status, { evalResults, weightsRef: result.weightsRef }, summary);
     } catch (error) {
       finalize("failed");
       throw error;
