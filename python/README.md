@@ -59,10 +59,17 @@ or `mo.iframe(session.url)` embeds it.
 
 With [jupyter-server-proxy](https://jupyter-server-proxy.readthedocs.io/)
 installed next to `piximi-engine`, JupyterLab shows a **Piximi** tile that
-starts `piximi serve` and proxies it under `<jupyter>/piximi/`. Set
-`PIXIMI_IMAGES` (and optionally `PIXIMI_DATA_DIR`) in the Jupyter server's
-environment to choose the folder; Jupyter authenticates the path, so the
-engine itself runs without a token, on loopback.
+starts the engine (through the server's own interpreter, so nothing has to
+be on `PATH`) and proxies it under `<jupyter>/piximi/`. Set `PIXIMI_IMAGES`
+(and optionally `PIXIMI_DATA_DIR`, `PIXIMI_MODELS_DIR`) in the Jupyter
+server's environment to choose the folder; Jupyter authenticates the path,
+so the engine itself runs without a token, on loopback. From this
+workspace, without installing anything permanently:
+
+```sh
+cd python
+PIXIMI_IMAGES=/path/to/images uv run --with jupyterlab --with jupyter-server-proxy jupyter lab
+```
 
 A session started from a kernel on JupyterHub is reached the same way:
 `session.url` becomes the hub-relative `…/proxy/<port>/` path, and the

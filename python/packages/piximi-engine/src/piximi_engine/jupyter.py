@@ -15,13 +15,18 @@ empty project.
 from __future__ import annotations
 
 import os
+import sys
 
 
 def setup_piximi() -> dict:
-    command = ["piximi", "serve", "--port", "{port}", "--no-auth"]
+    # The proxy runs this in the Jupyter server's interpreter, which imports
+    # the engine; going through it rather than a `piximi` on PATH works
+    # whatever environment layering (uv run --with, a kernel's venv) is in
+    # play.
+    command = [sys.executable, "-m", "piximi_engine.cli", "serve", "--port", "{port}", "--no-auth"]
     images = os.environ.get("PIXIMI_IMAGES")
     if images:
-        command.insert(2, images)
+        command.insert(4, images)
     data_dir = os.environ.get("PIXIMI_DATA_DIR")
     if data_dir:
         command += ["--data-dir", data_dir]
