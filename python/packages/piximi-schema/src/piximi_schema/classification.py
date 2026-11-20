@@ -249,9 +249,9 @@ class ClassifierFitSummary(WireModel):
 
 
 class ClassifierPredictRequest(WireModel):
-    """Labels the target's unlabeled items, or just ``ids``, with the
-    classifier's predictions; they stay in the inference partition until
-    accepted or cleared."""
+    """Labels the target's unlabeled items, or those of ``ids`` that are
+    unlabeled, with the classifier's predictions; they stay in the inference
+    partition until accepted or cleared."""
 
     classifier_id: str
     ids: list[str] | None = None

@@ -8,7 +8,6 @@ directions are mirror images.
 
 from __future__ import annotations
 
-from piximi_link.errors import BackendError
 from piximi_schema.query import (
     AnnotationCountGroup,
     AnnotationQuery,
@@ -29,6 +28,7 @@ _CATEGORY_JOIN = "LEFT JOIN entities c ON c.kind = 'category' AND c.id = e.categ
 _IMAGE_JOIN = "LEFT JOIN entities i ON i.kind = 'image' AND i.id = e.image_id"
 _PLANE_JOIN = "LEFT JOIN entities p ON p.kind = 'plane' AND p.id = e.plane_id"
 _HAS_ANNOTATION = "EXISTS (SELECT 1 FROM entities a WHERE a.kind = 'annotation' AND a.image_id = e.id)"
+_MARGIN = "COALESCE(e.margin, 1)"
 
 IMAGE_COUNT_COLUMNS = {ImageCountGroup.CATEGORY: "category_id", ImageCountGroup.PARTITION: "partition"}
 ANNOTATION_COUNT_COLUMNS = {
@@ -96,7 +96,9 @@ def image_order(sort: ImageSort | None) -> tuple[str, Clause]:
         case ImageSortKey.RANDOM:
             return "", _order(["piximi_rand(?, e.id)"], sort.direction, (sort.seed or 0,))
         case ImageSortKey.SOFTMAX:
-            raise BackendError("NOT_SUPPORTED", "This backend holds no classifier predictions to sort by")
+            # Least confident first; items without a pending prediction last,
+            # as the frontend orders them (a missing margin counts as 1).
+            return "", _order([_MARGIN], sort.direction)
 
 
 def annotation_order(sort: AnnotationSort | None) -> tuple[str, Clause]:
@@ -115,4 +117,4 @@ def annotation_order(sort: AnnotationSort | None) -> tuple[str, Clause]:
         case AnnotationSortKey.RANDOM:
             return "", _order(["piximi_rand(?, e.id)"], sort.direction, (sort.seed or 0,))
         case AnnotationSortKey.SOFTMAX:
-            raise BackendError("NOT_SUPPORTED", "This backend holds no classifier predictions to sort by")
+            return "", _order([_MARGIN], sort.direction)

@@ -44,7 +44,7 @@ async def test_add_images_reaches_a_connected_peer(engine: ReferenceEngine, tmp_
 async def test_project_api_round_trip(engine: ReferenceEngine):
     project = Project(engine)
     names = sorted(image.name for image in project.images)
-    assert names == ["a", "b", "c"]
+    assert names == ["a", "b", "c", "d", "e"]
     assert project.pixels("a").shape == (1, 32, 40)
     assert project.pixels("b").shape == (2, 24, 24)
     assert "threshold" in project.models
@@ -62,7 +62,7 @@ async def test_notebook_session_renders_and_serves(images_dir: Path):
     try:
         assert session.url.endswith("token=t0k") or "token=t0k" in session.url
         assert "t0k" in session._repr_html_()
-        assert session.project.engine.meta.count("image") == 3
+        assert session.project.engine.meta.count("image") == 5
         assert session.port > 0
     finally:
         await session.stop()

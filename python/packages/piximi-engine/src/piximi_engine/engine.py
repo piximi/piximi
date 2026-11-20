@@ -346,7 +346,13 @@ class ReferenceEngine:
         adapter = TypeAdapter(Category)
         return [adapter.validate_python(c) for c in (row.to_wire() for row in self.meta.list("category", _AnyCategory))]
 
+    def _check_sort(self, sort: ImageSort | AnnotationSort | None) -> None:
+        """The softmax order exists only where predictions can be made."""
+        if sort is not None and sort.key == "softmax" and Capability.CLASSIFICATION not in self.capabilities():
+            raise BackendError("NOT_SUPPORTED", "This backend holds no classifier predictions to sort by")
+
     async def images(self, query: ImageQuery, sort: ImageSort | None, page: PageRequest) -> ImagePage:
+        self._check_sort(sort)
         where = image_clauses(query)
         joins, order = image_order(sort)
         ids = self.meta.select_ids(
@@ -355,6 +361,7 @@ class ReferenceEngine:
         return ImagePage(items=self._image_records(ids), total=self.meta.count("image", where=where))
 
     async def image_ids(self, query: ImageQuery, sort: ImageSort | None = None) -> list[str]:
+        self._check_sort(sort)
         joins, order = image_order(sort)
         return self.meta.select_ids("image", where=image_clauses(query), joins=joins, order=order)
 
@@ -409,6 +416,7 @@ class ReferenceEngine:
     async def annotations(
         self, query: AnnotationQuery, sort: AnnotationSort | None, page: PageRequest
     ) -> AnnotationPage:
+        self._check_sort(sort)
         where = annotation_clauses(query)
         joins, order = annotation_order(sort)
         ids = self.meta.select_ids(
@@ -419,6 +427,7 @@ class ReferenceEngine:
         )
 
     async def annotation_ids(self, query: AnnotationQuery, sort: AnnotationSort | None = None) -> list[str]:
+        self._check_sort(sort)
         joins, order = annotation_order(sort)
         return self.meta.select_ids("annotation", where=annotation_clauses(query), joins=joins, order=order)
 

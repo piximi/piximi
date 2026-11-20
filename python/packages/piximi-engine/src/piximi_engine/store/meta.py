@@ -21,8 +21,9 @@ from piximi_schema.base import WireModel
 
 M = TypeVar("M", bound=WireModel)
 
-SCHEMA_VERSION = 2
-"""Bumped whenever the layout changes; older stores are refused, not migrated."""
+SCHEMA_VERSION = 3
+"""Bumped whenever the layout changes; older stores are refused, not migrated.
+3 adds the ``margin`` column behind the softmax sort."""
 
 _INDEXED: dict[str, str] = {
     # wire field -> column
@@ -37,7 +38,10 @@ _INDEXED: dict[str, str] = {
     "predictionConfidence": "confidence",
     "zIndex": "z_index",
 }
-_COLUMNS = ("parent", "data", "mask", *_INDEXED.values())
+_EXTRA = ("margin",)
+"""Indexed columns no wire field carries; written through ``index``: the gap
+between the top two class probabilities of a pending prediction."""
+_COLUMNS = ("parent", "data", "mask", *_INDEXED.values(), *_EXTRA)
 
 _SCHEMA = f"""
 CREATE TABLE IF NOT EXISTS entities (
@@ -56,6 +60,7 @@ CREATE TABLE IF NOT EXISTS entities (
   partition   TEXT,
   confidence  REAL,
   z_index     INTEGER,
+  margin      REAL,
   PRIMARY KEY (kind, id)
 );
 CREATE INDEX IF NOT EXISTS entities_parent ON entities (kind, parent);
@@ -67,6 +72,7 @@ CREATE INDEX IF NOT EXISTS entities_volume ON entities (kind, volume_id);
 CREATE INDEX IF NOT EXISTS entities_kind_id ON entities (kind, kind_id);
 CREATE INDEX IF NOT EXISTS entities_category ON entities (kind, category_id);
 CREATE INDEX IF NOT EXISTS entities_partition ON entities (kind, partition);
+CREATE INDEX IF NOT EXISTS entities_margin ON entities (kind, margin);
 CREATE TABLE IF NOT EXISTS sources (
   path TEXT PRIMARY KEY,
   image_ids TEXT NOT NULL
@@ -83,7 +89,7 @@ _UPSERT = (
 
 _UPDATE = (
     "UPDATE entities SET data = ?, "
-    + ", ".join(f"{column} = ?" for column in _INDEXED.values())
+    + ", ".join(f"{column} = ?" for column in (*_INDEXED.values(), *_EXTRA))
     + " WHERE kind = ? AND id = ?"
 )
 
@@ -182,6 +188,7 @@ class MetaStore:
             id = wire["id"]
             mask = wire.pop("encodedMask", None)
             columns: dict[str, Any] = {column: wire.get(field) for field, column in _INDEXED.items()}
+            columns.update({column: None for column in _EXTRA})
             if index and id in index:
                 columns.update(index[id])
             rows.append(
@@ -191,7 +198,7 @@ class MetaStore:
                     parent,
                     json.dumps(wire),
                     None if mask is None else json.dumps(mask),
-                    *(columns[column] for column in _INDEXED.values()),
+                    *(columns[column] for column in (*_INDEXED.values(), *_EXTRA)),
                 )
             )
         with self._db:
@@ -206,15 +213,25 @@ class MetaStore:
     ) -> None:
         """Rewrites existing rows' data and indexed columns, leaving their
         parent and mask as they are: what a change to an annotation's
-        partition needs, read and written as a header without its mask."""
+        partition needs, read and written as a header without its mask.
+        Columns given only through ``index`` (the margin) are cleared
+        unless passed again."""
         rows = []
         for model in items:
             wire = model.to_wire()
             wire.pop("encodedMask", None)
             columns: dict[str, Any] = {column: wire.get(field) for field, column in _INDEXED.items()}
+            columns.update({column: None for column in _EXTRA})
             if index and wire["id"] in index:
                 columns.update(index[wire["id"]])
-            rows.append((json.dumps(wire), *(columns[column] for column in _INDEXED.values()), kind, wire["id"]))
+            rows.append(
+                (
+                    json.dumps(wire),
+                    *(columns[column] for column in (*_INDEXED.values(), *_EXTRA)),
+                    kind,
+                    wire["id"],
+                )
+            )
         with self._db:
             self._db.executemany(_UPDATE, rows)
 

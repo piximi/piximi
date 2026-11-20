@@ -36,10 +36,10 @@ async def test_initialize_then_query_render_and_segment(session):
     client.notify("initialized")
 
     project = await client.request("query/project")
-    assert project["counts"]["images"] == 3 and project["experiment"]["channels"] == 1
+    assert project["counts"]["images"] == 5 and project["experiment"]["channels"] == 1
 
     page = await client.request("query/images", {"query": {}, "page": {"limit": 10}})
-    assert page["total"] == 3
+    assert page["total"] == 5
     record = page["items"][0]
     assert "storageReference" not in record["channels"][0]
 

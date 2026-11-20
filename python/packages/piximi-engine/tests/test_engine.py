@@ -54,7 +54,7 @@ def display(record, **overrides) -> list[ChannelDisplay]:
 
 async def test_ingest_builds_the_project(engine: ReferenceEngine):
     summary = await engine.project()
-    assert summary.counts.images == 3
+    assert summary.counts.images == 5
     assert summary.counts.annotations == 0
     assert [kind.name for kind in summary.kinds] == ["Unknown"]
     assert len(summary.channel_metas) == 3  # the RGB image has the most channels
@@ -72,8 +72,8 @@ async def test_ingest_is_idempotent(images_dir: Path):
     engine = ReferenceEngine(images_dir / ".piximi", models={})
     first = engine.ingest_folder(images_dir)
     second = engine.ingest_folder(images_dir)
-    assert len(first) == 3 and second == []
-    assert engine.meta.count("image") == 3
+    assert len(first) == 5 and second == []
+    assert engine.meta.count("image") == 5
 
 
 async def test_images_page_without_gaps(engine: ReferenceEngine):
@@ -81,12 +81,12 @@ async def test_images_page_without_gaps(engine: ReferenceEngine):
     offset = 0
     while True:
         page = await engine.images(ImageQuery(), None, PageRequest(offset=offset, limit=2))
-        assert page.total == 3
+        assert page.total == 5
         seen.extend(record.image.id for record in page.items)
         offset += len(page.items)
         if offset >= page.total:
             break
-    assert len(seen) == 3 and len(set(seen)) == 3
+    assert len(seen) == 5 and len(set(seen)) == 5
 
     one = await engine.images(ImageQuery(ids=[seen[1], "nope"]), None, PageRequest(limit=10))
     assert [r.image.id for r in one.items] == [seen[1]] and one.total == 1
@@ -117,9 +117,9 @@ async def test_thumbnails_stream_in_batches(engine: ReferenceEngine):
 
     result = await engine.render_thumbnails([*requests, bad], context)
 
-    assert (result.rendered, result.failed) == (3, 1)
+    assert (result.rendered, result.failed) == (5, 1)
     results = [r for partial in partials for r in partial["results"]]
-    assert sorted(r["index"] for r in results) == [0, 1, 2, 3]
+    assert sorted(r["index"] for r in results) == [0, 1, 2, 3, 4, 5]
     assert results[-1]["status"] == "failed" and results[-1]["error"]["code"] == "NOT_FOUND"
 
 
@@ -262,9 +262,9 @@ async def test_deleting_annotations_and_images_cascades_and_announces(engine: Re
     deleted = await engine.images_delete(ImageQuery(ids=[b.image.id, "nope"]))
     assert deleted == 1
     assert events[-1].type == "images/didRemove" and events[-1].image_ids == [b.image.id]
-    assert (await engine.image_counts(ImageQuery())).total == 2
+    assert (await engine.image_counts(ImageQuery())).total == 4
     assert (await engine.annotation_counts(AnnotationQuery())).total == 0
-    assert engine.meta.count("plane") == 2 and engine.meta.get("series", b.series.id, type(b.series)) is None
+    assert engine.meta.count("plane") == 4 and engine.meta.get("series", b.series.id, type(b.series)) is None
     assert all(channel_id not in engine.pixels for channel_id in channel_ids)
     assert await engine.images_delete(ImageQuery(ids=[b.image.id])) == 0
 

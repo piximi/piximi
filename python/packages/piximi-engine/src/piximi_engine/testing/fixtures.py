@@ -33,7 +33,14 @@ def write_fixture_images(folder: Path) -> dict[str, np.ndarray]:
     c[..., 2] = 30
     iio.imwrite(folder / "c.png", c)
 
-    return {"a": a, "b": b, "c": c}
+    # Two more flat grayscale PNGs (nothing for a threshold to find), so a
+    # classifier has two labeled items per category and one left to predict.
+    d = np.full((24, 24), 10, dtype=np.uint8)
+    iio.imwrite(folder / "d.png", d)
+    e = np.full((20, 28), 110, dtype=np.uint8)
+    iio.imwrite(folder / "e.png", e)
+
+    return {"a": a, "b": b, "c": c, "d": d, "e": e}
 
 
 if __name__ == "__main__":
