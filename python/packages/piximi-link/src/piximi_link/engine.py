@@ -14,6 +14,19 @@ from collections.abc import Callable
 from typing import Protocol
 
 from piximi_schema.capabilities import Capability
+from piximi_schema.classification import (
+    ChangedResult,
+    Classifier,
+    ClassifierCreateRequest,
+    ClassifierExportResult,
+    ClassifierFitRequest,
+    ClassifierFitSummary,
+    ClassifierImportRequest,
+    ClassifierPredictRequest,
+    ClassifierPredictSummary,
+    ClassifierUpdateRequest,
+    EvaluationResult,
+)
 from piximi_schema.entities import Category
 from piximi_schema.events import (
     AnnotationsDidAdd,
@@ -173,3 +186,42 @@ class Engine(Protocol):
         """Runs, announces the results as events, and resolves with a summary;
         a cancelled run resolves with ``cancelled=True`` and what it added."""
         ...
+
+    # ── Classification ──────────────────────────────────────────────────────
+    #
+    # Present when ``classification`` is among the capabilities. A classifier
+    # belongs to a target: the project's images, or one kind's objects.
+
+    async def classification_list_architectures(self) -> list[ModelDescriptor]:
+        """Listed models with a classification task."""
+        ...
+
+    async def classification_list(self) -> list[Classifier]: ...
+
+    async def classification_create(self, request: ClassifierCreateRequest) -> Classifier: ...
+
+    async def classification_update(self, request: ClassifierUpdateRequest) -> Classifier: ...
+
+    async def classification_delete(self, classifier_id: str) -> None: ...
+
+    async def classification_fit(self, request: ClassifierFitRequest, ctx: HandlerContext) -> ClassifierFitSummary:
+        """Splits the target's labeled items, writes their partitions, trains
+        with each epoch announced, evaluates, and records the run."""
+        ...
+
+    async def classification_predict(
+        self, request: ClassifierPredictRequest, ctx: HandlerContext
+    ) -> ClassifierPredictSummary:
+        """Writes predictions for the target's unlabeled items; they stay in
+        the inference partition until accepted or cleared."""
+        ...
+
+    async def classification_evaluate(self, classifier_id: str) -> EvaluationResult: ...
+
+    async def classification_accept_predictions(self, target_id: str) -> ChangedResult: ...
+
+    async def classification_clear_predictions(self, target_id: str) -> ChangedResult: ...
+
+    async def classification_export(self, classifier_id: str) -> ClassifierExportResult: ...
+
+    async def classification_import(self, request: ClassifierImportRequest) -> Classifier: ...

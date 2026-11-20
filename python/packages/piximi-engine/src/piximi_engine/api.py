@@ -15,7 +15,25 @@ from typing import Any
 import numpy as np
 
 from piximi_link.peer import HandlerContext
-from piximi_schema.entities import AnnotationObject, AnnotationVolume, Channel, ImageObject, Kind
+from piximi_schema.classification import (
+    IMAGE_TARGET_ID,
+    Classifier,
+    ClassifierCreateRequest,
+    ClassifierFitRequest,
+    ClassifierFitSummary,
+    ClassifierHyperparameters,
+    ClassifierPredictRequest,
+    ClassifierPredictSummary,
+    CropOptions,
+    CropSchema,
+    LossFunction,
+    Metric,
+    NormalizeOptions,
+    OptimizationAlgorithm,
+    OptimizerSettings,
+    PreprocessSettings,
+)
+from piximi_schema.entities import AnnotationObject, AnnotationVolume, Channel, ImageObject, Kind, Shape
 from piximi_schema.segmentation import (
     ModelDescriptor,
     SegmentationRunRequest,
@@ -143,3 +161,80 @@ class Project:
     def segment_sync(self, *args: Any, **kwargs: Any) -> SegmentationRunSummary:
         """`segment` for a plain script, where no event loop is running."""
         return asyncio.run(self.segment(*args, **kwargs))
+
+    # ── Classifiers ──────────────────────────────────────────────────────────
+
+    @property
+    def classifiers(self) -> list[Classifier]:
+        return self.engine.classification.list()
+
+    def classifier(self, name_or_id: str) -> Classifier:
+        for classifier in self.classifiers:
+            if name_or_id in (classifier.id, classifier.name):
+                return classifier
+        raise KeyError(f"No classifier {name_or_id!r}")
+
+    def create_classifier(
+        self,
+        name: str,
+        *,
+        architecture: str = "logistic",
+        kind: str | None = None,
+        input_shape: tuple[int, int, int] = (1, 28, 28),
+        epochs: int = 10,
+        batch_size: int = 32,
+        learning_rate: float = 0.01,
+        training_percentage: float = 0.8,
+        seed: int | None = None,
+    ) -> Classifier:
+        """A classifier for the project's images, or for a kind's objects
+        (by kind name), with ``input_shape`` as ``(channels, height, width)``."""
+        target_id = IMAGE_TARGET_ID
+        if kind is not None:
+            target_id = next((k.id for k in self.kinds if k.name == kind), None) or kind
+        channels, height, width = input_shape
+        hyperparameters = ClassifierHyperparameters(
+            preprocess=PreprocessSettings(
+                shuffle=True,
+                input_shape=Shape(planes=1, height=height, width=width, channels=channels),
+                normalize_options=NormalizeOptions(normalize=True, center=False),
+                crop_options=CropOptions(num_crops=1, crop_schema=CropSchema.NONE),
+                training_percentage=training_percentage,
+            ),
+            optimizer=OptimizerSettings(
+                learning_rate=learning_rate,
+                loss_function=LossFunction.CATEGORICAL_CROSS_ENTROPY,
+                metrics=[Metric.CATEGORICAL_ACCURACY],
+                optimization_algorithm=OptimizationAlgorithm.ADAM,
+                epochs=epochs,
+                batch_size=batch_size,
+            ),
+        )
+        return self.engine.classification.create(
+            ClassifierCreateRequest(
+                target_id=target_id, name=name, architecture_id=architecture, hyperparameters=hyperparameters, seed=seed
+            )
+        )
+
+    async def fit(self, classifier: str | Classifier, *, seed: int | None = None) -> ClassifierFitSummary:
+        """Trains on the target's labeled items; connected tabs follow the
+        epochs. Await it in a notebook cell."""
+        record = self.classifier(classifier) if isinstance(classifier, str) else classifier
+        return await self.engine.classification_fit(
+            ClassifierFitRequest(classifier_id=record.id, seed=seed), HandlerContext(None)
+        )
+
+    async def predict(self, classifier: str | Classifier) -> ClassifierPredictSummary:
+        """Labels the target's unlabeled items; accept or clear them after."""
+        record = self.classifier(classifier) if isinstance(classifier, str) else classifier
+        return await self.engine.classification_predict(
+            ClassifierPredictRequest(classifier_id=record.id), HandlerContext(None)
+        )
+
+    async def accept_predictions(self, kind: str | None = None) -> int:
+        target_id = IMAGE_TARGET_ID if kind is None else next(k.id for k in self.kinds if k.name == kind)
+        return (await self.engine.classification_accept_predictions(target_id)).changed
+
+    async def clear_predictions(self, kind: str | None = None) -> int:
+        target_id = IMAGE_TARGET_ID if kind is None else next(k.id for k in self.kinds if k.name == kind)
+        return (await self.engine.classification_clear_predictions(target_id)).changed

@@ -34,7 +34,22 @@ from piximi_schema.entities import (
     Plane,
     Shape,
 )
-from piximi_schema.classification import AnnotationUpdate, ImageUpdate, VolumeUpdate
+from piximi_schema.classification import (
+    AnnotationUpdate,
+    ChangedResult,
+    Classifier,
+    ClassifierCreateRequest,
+    ClassifierExportResult,
+    ClassifierFitRequest,
+    ClassifierFitSummary,
+    ClassifierImportRequest,
+    ClassifierPredictRequest,
+    ClassifierPredictSummary,
+    ClassifierUpdateRequest,
+    EvaluationResult,
+    ImageUpdate,
+    VolumeUpdate,
+)
 from piximi_schema.events import (
     AnnotationsDidAdd,
     AnnotationsDidRemove,
@@ -91,6 +106,7 @@ from piximi_schema.unknown import (
 )
 
 from .classification import next_partition, prediction_correction
+from .classification.service import ClassificationService
 
 from .decode import SUPPORTED_SUFFIXES, read_image
 from .dedup import MaskedBox, is_duplicate
@@ -158,12 +174,16 @@ class ReferenceEngine:
         self._loop_thread: int | None = None
         self._run_contexts: dict[str, HandlerContext] = {}
         self.jobs = JobRegistry(self._emit)
+        self.classification = ClassificationService(self)
         self._ensure_project()
 
     # ── Engine protocol: session ────────────────────────────────────────────
 
     def capabilities(self) -> list[Capability]:
-        return [Capability.SEGMENTATION, Capability.EVENTS_PUSH]
+        capabilities = [Capability.SEGMENTATION, Capability.EVENTS_PUSH]
+        if self.models.classifiers:
+            capabilities += [Capability.CLASSIFICATION, Capability.CLASSIFICATION_TRAIN]
+        return capabilities
 
     def subscribe(self, listener: EventListener) -> Callable[[], None]:
         self._listeners.append(listener)
@@ -699,6 +719,52 @@ class ReferenceEngine:
             )
         )
         return sum(1 for header in headers.values() if header.volume_id in changed)
+
+    # ── Engine protocol: classification ─────────────────────────────────────
+    #
+    # The service owns the records and jobs; these are the wire's names for it.
+
+    async def classification_list_architectures(self) -> list[ModelDescriptor]:
+        return self.classification.list_architectures()
+
+    async def classification_list(self) -> list[Classifier]:
+        return self.classification.list()
+
+    async def classification_create(self, request: ClassifierCreateRequest) -> Classifier:
+        return self.classification.create(request)
+
+    async def classification_update(self, request: ClassifierUpdateRequest) -> Classifier:
+        return self.classification.update(request)
+
+    async def classification_delete(self, classifier_id: str) -> None:
+        self.classification.delete(classifier_id)
+
+    async def classification_fit(self, request: ClassifierFitRequest, ctx: HandlerContext) -> ClassifierFitSummary:
+        return await self.classification.fit(request, ctx)
+
+    async def classification_predict(
+        self, request: ClassifierPredictRequest, ctx: HandlerContext
+    ) -> ClassifierPredictSummary:
+        return await self.classification.predict(request, ctx)
+
+    async def classification_evaluate(self, classifier_id: str) -> EvaluationResult:
+        return await self.classification.evaluate(classifier_id)
+
+    async def classification_accept_predictions(self, target_id: str) -> ChangedResult:
+        return await self.classification.accept_predictions(target_id)
+
+    async def classification_clear_predictions(self, target_id: str) -> ChangedResult:
+        return await self.classification.clear_predictions(target_id)
+
+    async def classification_export(self, classifier_id: str) -> ClassifierExportResult:
+        return self.classification.export(classifier_id)
+
+    async def classification_import(self, request: ClassifierImportRequest) -> Classifier:
+        return self.classification.import_(request)
+
+    # What the service announces about items it changed.
+    _image_update = staticmethod(lambda image: _image_update(image))
+    _volume_update = staticmethod(lambda volume: _volume_update(volume))
 
     # ── Engine protocol: render ─────────────────────────────────────────────
 

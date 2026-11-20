@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 from piximi_link.peer import HandlerContext
 from piximi_schema.segmentation import ModelDescriptor
 
+from ..classification.models import ClassificationArchitecture, LogisticArchitecture
 from .base import SegmentationModel
 from .manifest import MANIFEST_NAME, ManifestError, PluginManifest, load_manifest
 from .threshold import ThresholdSegmenter
@@ -40,6 +41,8 @@ class ModelRegistry:
         on_change: Callable[[], None] | None = None,
     ) -> None:
         self.models: dict[str, SegmentationModel] = {}
+        self.classifiers: dict[str, ClassificationArchitecture] = {}
+        """Architectures a classifier can be built from, by model id."""
         self.gpu = gpu
         self.max_loaded_plugins = max_loaded_plugins
         """Plugin models kept loaded at once; the least recently used is
@@ -50,11 +53,15 @@ class ModelRegistry:
 
     # ── Registration ─────────────────────────────────────────────────────────
 
-    def add(self, model: SegmentationModel) -> None:
-        """Registers a model that runs in this process."""
-        if model.id in self.models:
+    def add(self, model: SegmentationModel | ClassificationArchitecture) -> None:
+        """Registers a model that runs in this process: a segmenter, or an
+        architecture classifiers are built from."""
+        if model.id in self.models or model.id in self.classifiers:
             raise ValueError(f'A model "{model.id}" is already registered')
-        self.models[model.id] = model
+        if isinstance(model, ClassificationArchitecture):
+            self.classifiers[model.id] = model
+        else:
+            self.models[model.id] = model
         self._changed()
 
     def register(self, source: Path | str | PluginManifest) -> list[str]:
@@ -115,7 +122,10 @@ class ModelRegistry:
         return self.models.get(model_id)
 
     def describe_all(self) -> list[ModelDescriptor]:
-        return [model.describe() for model in self.models.values()]
+        return [
+            *(model.describe() for model in self.models.values()),
+            *(architecture.describe() for architecture in self.classifiers.values()),
+        ]
 
     @property
     def plugins(self) -> dict[str, PluginService]:
@@ -158,12 +168,13 @@ class ModelRegistry:
 
 
 def default_registry(*, gpu: bool = True, models_dirs: Iterable[Path | str] = ()) -> ModelRegistry:
-    """The models this engine serves: the threshold baseline always; StarDist2D
+    """The models this engine serves: the threshold and logistic baselines always; StarDist2D
     through cellcast in this process when that package is installed but the
     plugin runner is not (plugins supersede it otherwise); then every plugin
     advertised by an installed package or found in ``models_dirs``."""
     registry = ModelRegistry(gpu=gpu)
     registry.add(ThresholdSegmenter())
+    registry.add(LogisticArchitecture())
     if importlib.util.find_spec("cellcast") is not None and not appose_available():
         from .cellcast import CellcastStarDist  # noqa: PLC0415
 

@@ -16,7 +16,17 @@ from typing import Any
 from pydantic import ValidationError
 from piximi_schema import PROTOCOL_VERSION
 from piximi_schema.base import WireModel
-from piximi_schema.classification import ChangedResult
+from piximi_schema.classification import (
+    ChangedResult,
+    ClassificationTargetRequest,
+    ClassifierCreateRequest,
+    ClassifierFitRequest,
+    ClassifierImportRequest,
+    ClassifierPredictRequest,
+    ClassifierRequest,
+    ClassifiersResult,
+    ClassifierUpdateRequest,
+)
 from piximi_schema.methods import (
     AnnotationCountsParams,
     AnnotationIdsParams,
@@ -27,6 +37,8 @@ from piximi_schema.methods import (
     CategoriesDeleteParams,
     CategoriesResult,
     CategoryUpdateParams,
+    ClassifierFitParams,
+    ClassifierPredictParams,
     DeletedResult,
     ImageCountsParams,
     ImageIdsParams,
@@ -213,6 +225,36 @@ class SessionHub:
             )
             return await engine.segmentation_run(request, ctx)
 
+        async def list_architectures(_ctx: HandlerContext):
+            return ListModelsResult(models=await engine.classification_list_architectures())
+
+        async def list_classifiers(_ctx: HandlerContext):
+            return ClassifiersResult(classifiers=await engine.classification_list())
+
+        async def classifier_delete(params: ClassifierRequest, _ctx: HandlerContext):
+            await engine.classification_delete(params.classifier_id)
+            return None
+
+        async def classifier_fit(params: ClassifierFitParams, ctx: HandlerContext):
+            request = ClassifierFitRequest.model_validate(params.model_dump(exclude={"progress_token"}))
+            return await engine.classification_fit(request, ctx)
+
+        async def classifier_predict(params: ClassifierPredictParams, ctx: HandlerContext):
+            request = ClassifierPredictRequest.model_validate(params.model_dump(exclude={"progress_token"}))
+            return await engine.classification_predict(request, ctx)
+
+        async def classifier_evaluate(params: ClassifierRequest, _ctx: HandlerContext):
+            return await engine.classification_evaluate(params.classifier_id)
+
+        async def accept_predictions(params: ClassificationTargetRequest, _ctx: HandlerContext):
+            return await engine.classification_accept_predictions(params.target_id)
+
+        async def clear_predictions(params: ClassificationTargetRequest, _ctx: HandlerContext):
+            return await engine.classification_clear_predictions(params.target_id)
+
+        async def classifier_export(params: ClassifierRequest, _ctx: HandlerContext):
+            return await engine.classification_export(params.classifier_id)
+
         peer.on_request("initialize", typed(InitializeParams, initialize))
         peer.on_request("shutdown", typed(None, shutdown))
         peer.on_request("query/project", typed(None, lambda _ctx: engine.project()))
@@ -237,3 +279,28 @@ class SessionHub:
         peer.on_request("segmentation/listModels", typed(None, list_models))
         peer.on_request("segmentation/loadModel", typed(LoadModelParams, load_model))
         peer.on_request("segmentation/run", typed(SegmentationRunParams, run))
+        peer.on_request("classification/listArchitectures", typed(None, list_architectures))
+        peer.on_request("classification/list", typed(None, list_classifiers))
+        peer.on_request(
+            "classification/create",
+            typed(ClassifierCreateRequest, lambda p, _ctx: engine.classification_create(p)),
+        )
+        peer.on_request(
+            "classification/update",
+            typed(ClassifierUpdateRequest, lambda p, _ctx: engine.classification_update(p)),
+        )
+        peer.on_request("classification/delete", typed(ClassifierRequest, classifier_delete))
+        peer.on_request("classification/fit", typed(ClassifierFitParams, classifier_fit))
+        peer.on_request("classification/predict", typed(ClassifierPredictParams, classifier_predict))
+        peer.on_request("classification/evaluate", typed(ClassifierRequest, classifier_evaluate))
+        peer.on_request(
+            "classification/acceptPredictions", typed(ClassificationTargetRequest, accept_predictions)
+        )
+        peer.on_request(
+            "classification/clearPredictions", typed(ClassificationTargetRequest, clear_predictions)
+        )
+        peer.on_request("classification/export", typed(ClassifierRequest, classifier_export))
+        peer.on_request(
+            "classification/import",
+            typed(ClassifierImportRequest, lambda p, _ctx: engine.classification_import(p)),
+        )
