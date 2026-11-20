@@ -8,7 +8,6 @@ import { randomKey, useBackendQuery } from "core/backend/query";
 import { useHotkeys } from "hooks";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
-import { dataSlice } from "store/data";
 
 import { AlertType, HotkeyContext } from "utils/enums";
 
@@ -62,6 +61,18 @@ export const useGridActions = () => {
   const allSelected = total > 0 && selectedFilteredItemIds.length >= total;
   const hasItems = total > 0;
 
+  const reportFailure = (name: string, error: unknown) => {
+    dispatch(
+      applicationSettingsSlice.actions.updateAlertState({
+        alertState: {
+          alertType: AlertType.Error,
+          name,
+          description: error instanceof Error ? error.message : String(error),
+        },
+      }),
+    );
+  };
+
   // Deleting goes through the backend, which is where the grid reads from;
   // the selection is dropped by hand, since a remote project's objects are
   // not in the store for the stale-selection listener to notice.
@@ -80,17 +91,9 @@ export const useGridActions = () => {
               }),
             );
           });
-    deletion.catch((error: unknown) => {
-      dispatch(
-        applicationSettingsSlice.actions.updateAlertState({
-          alertState: {
-            alertType: AlertType.Error,
-            name: "Could not delete",
-            description: error instanceof Error ? error.message : String(error),
-          },
-        }),
-      );
-    });
+    deletion.catch((error: unknown) =>
+      reportFailure("Could not delete", error),
+    );
   };
 
   const handleSelectAll = useCallback(async () => {
@@ -122,13 +125,16 @@ export const useGridActions = () => {
     }
   }, [active, dispatch, selectedFilteredItemIds]);
 
+  // Like deleting: the backend applies the change and announces it.
   const handleCategorize = (categoryId: string) => {
-    const payload = selectedFilteredItemIds.map((id) => ({ id, categoryId }));
-    if (active.view === "images") {
-      dispatch(dataSlice.actions.batchUpdateImageCategory(payload));
-    } else {
-      dispatch(dataSlice.actions.batchBubbleUpdateAnnotationCategory(payload));
-    }
+    const ids = selectedFilteredItemIds;
+    const change =
+      active.view === "images"
+        ? backend.images.categorize({ ids }, categoryId)
+        : backend.annotations.categorize({ ids }, categoryId);
+    change.catch((error: unknown) =>
+      reportFailure("Could not categorize", error),
+    );
   };
 
   useHotkeys(

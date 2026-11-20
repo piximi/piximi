@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import {
   Box,
@@ -18,12 +18,12 @@ import {
   Typography,
 } from "@mui/material";
 
+import { useBackend } from "core/backend";
 import { generateCategory } from "core/entities";
 
 import { StyledSelect } from "components/inputs";
 import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
-import { dataSlice } from "store/data";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { getRestrictedRandomHex } from "utils/colorUtils";
@@ -48,7 +48,7 @@ export const ClassMapDialog = ({
   onConfirm: (catMap: ModelClassMap) => void;
   onDismiss: () => void;
 }) => {
-  const dispatch = useDispatch();
+  const backend = useBackend();
   const [catMap, setCatMap] = useState<ModelClassMap>(() =>
     Object.fromEntries(modelClasses.map((_, idx) => [idx, ""])),
   );
@@ -58,7 +58,7 @@ export const ClassMapDialog = ({
   );
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
 
-  const handleConfirmation = () => {
+  const handleConfirmation = async () => {
     if (shouldCreateCategories) {
       const newCategories: Category[] = [];
       const confirmedCatMap: ModelClassMap = {};
@@ -78,7 +78,8 @@ export const ClassMapDialog = ({
         newCategories.push(cat);
         confirmedCatMap[idx] = cat.id;
       });
-      dispatch(dataSlice.actions.batchAddCategory(newCategories));
+      // The categories must exist before the map that names them is used.
+      await backend.categories.create(newCategories);
       onConfirm(confirmedCatMap);
     } else {
       onConfirm(catMap);

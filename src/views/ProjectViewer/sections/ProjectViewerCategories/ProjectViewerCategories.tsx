@@ -12,7 +12,6 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { ConfirmationDialog, CategoryDialog } from "components/dialogs";
 
-import { dataSlice } from "store/data";
 import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
@@ -70,37 +69,28 @@ export const ProjectViewerCategories = () => {
         : { type: "annotation", kindId: activeKindId },
     [activeView, activeKindId],
   );
+  // Every change goes through the backend, which owns the categories and
+  // is where the grids read from; the store follows its announcements.
+  const report = (what: string) => (error: unknown) =>
+    console.error(`[ProjectViewerCategories] ${what}`, error);
   const createCategory = (name: string, color: string) => {
     const category = generateCategory(name, color, categoryOptions);
-    dispatch(dataSlice.actions.addCategory(category));
+    backend.categories.create([category]).catch(report("create"));
   };
 
   const editCategory = (id: string, name: string, color: string) => {
-    dispatch(
-      dataSlice.actions.updateCategoryDisplayProps({
-        id,
-        changes: { name, color },
-      }),
-    );
+    backend.categories.update(id, { name, color }).catch(report("edit"));
   };
   const deleteCategory = (category: Category) => {
-    dispatch(
-      dataSlice.actions.deleteCategory({
-        id: category.id,
-        details: categoryOptions,
-      }),
-    );
+    backend.categories.delete([category.id]).catch(report("delete"));
   };
-  // Through the backend, which is where the grids read from.
   const deleteObjects = (category: Category) => {
     const scope = { categoryIds: [category.id] };
     const deletion =
       category.type === "image"
         ? backend.images.delete(scope)
         : backend.annotations.delete(scope);
-    deletion.catch((error: unknown) =>
-      console.error("[ProjectViewerCategories] clear objects", error),
-    );
+    deletion.catch(report("clear objects"));
   };
 
   const onOpenCategoryMenu = (
@@ -115,12 +105,11 @@ export const ProjectViewerCategories = () => {
     setMenuCategory(undefined);
     setCategoryMenuAnchorEl(null);
   };
+  // The backend keeps the unknown category whatever the list holds.
   const handleRemoveAllCategories = () => {
-    dispatch(
-      dataSlice.actions.batchDeleteCategory(
-        categories.map((c) => ({ id: c.id, details: categoryOptions })),
-      ),
-    );
+    backend.categories
+      .delete(categories.map((c) => c.id))
+      .catch(report("delete all"));
   };
 
   useHotkeys(
@@ -153,20 +142,13 @@ export const ProjectViewerCategories = () => {
       setShowHK(false);
       if (categoryIndex.length === 0 && Number.isNaN(+categoryIndex)) return;
       const currentCategory = categories[+categoryIndex];
-      if (currentCategory) {
-        if (selectedEntityIds.length > 0) {
-          const updates = selectedEntityIds.map((id) => ({
-            id,
-            categoryId: currentCategory.id,
-          }));
-          if (activeView === "images") {
-            dispatch(dataSlice.actions.batchUpdateImageCategory(updates));
-            return;
-          }
-          dispatch(
-            dataSlice.actions.batchBubbleUpdateAnnotationCategory(updates),
-          );
-        }
+      if (currentCategory && selectedEntityIds.length > 0) {
+        const scope = { ids: selectedEntityIds };
+        const change =
+          activeView === "images"
+            ? backend.images.categorize(scope, currentCategory.id)
+            : backend.annotations.categorize(scope, currentCategory.id);
+        change.catch(report("categorize"));
       }
 
       setCategoryIndex("");
