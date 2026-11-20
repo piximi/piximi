@@ -8,6 +8,10 @@ import {
   Partition,
 } from "core/dl/enums";
 import { representsUnknown } from "core/entities";
+import {
+  fingerprintItems,
+  hashCategorySet,
+} from "core/backend/classification/fingerprint";
 
 import { seededShuffle } from "utils/arrayUtils";
 
@@ -308,29 +312,19 @@ export const createCompileArgs = (options: OptimizerSettings) => {
   };
 };
 
-async function hashIds(ids: string[]): Promise<string> {
-  const sorted = [...ids].sort();
-  const data = new TextEncoder().encode(sorted.join("\n"));
-  const buf = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
 type FingerprintInput = { id: string; categoryId: string };
 
 export async function fingerprintDataset(
   trainingData: FingerprintInput[],
   validationData: FingerprintInput[],
 ): Promise<DatasetFingerprint> {
-  const toDesc = (item: FingerprintInput) => `${item.id}:${item.categoryId}`;
   return {
-    trainingFingerprint: await hashIds(trainingData.map(toDesc)),
-    validationFingerprint: await hashIds(validationData.map(toDesc)),
+    trainingFingerprint: await fingerprintItems(trainingData),
+    validationFingerprint: await fingerprintItems(validationData),
   };
 }
 
-export const hashCategorySet = hashIds; // semantic alias
+export { hashCategorySet };
 
 export function modelInfoDTOToModelInfo(
   dto: ModelInfoDTO,

@@ -1,0 +1,956 @@
+{
+  "mulberry32": [
+    {
+      "seed": 0,
+      "count": 8,
+      "expect": [
+        0.26642920868471265,
+        0.0003297457005828619,
+        0.2232720274478197,
+        0.1462021479383111,
+        0.46732782293111086,
+        0.5450490827206522,
+        0.6152513844426721,
+        0.6489853798411787
+      ]
+    },
+    {
+      "seed": 1,
+      "count": 8,
+      "expect": [
+        0.6270739405881613,
+        0.002735721180215478,
+        0.5274470399599522,
+        0.9810509674716741,
+        0.9683778982143849,
+        0.281103502959013,
+        0.6128388606011868,
+        0.7207431411370635
+      ]
+    },
+    {
+      "seed": 7,
+      "count": 8,
+      "expect": [
+        0.011704753153026104,
+        0.06195825757458806,
+        0.97690763277933,
+        0.6990287057124078,
+        0.5214452685322613,
+        0.4055216880515218,
+        0.4662326325196773,
+        0.23992518591694534
+      ]
+    },
+    {
+      "seed": 42,
+      "count": 8,
+      "expect": [
+        0.6011037519201636,
+        0.44829055899754167,
+        0.8524657934904099,
+        0.6697340414393693,
+        0.17481389874592423,
+        0.5265925421845168,
+        0.2732279943302274,
+        0.6247446539346129
+      ]
+    },
+    {
+      "seed": 123456789,
+      "count": 8,
+      "expect": [
+        0.2577907438389957,
+        0.9707721115555614,
+        0.7853280142880976,
+        0.20616457983851433,
+        0.30307188746519387,
+        0.7470660470426083,
+        0.7787336520850658,
+        0.2845096290111542
+      ]
+    },
+    {
+      "seed": -5,
+      "count": 8,
+      "expect": [
+        0.48384718922898173,
+        0.05296749505214393,
+        0.9390332337934524,
+        0.7963776015676558,
+        0.9763057488016784,
+        0.847053894540295,
+        0.5056252481881529,
+        0.5977867702022195
+      ]
+    },
+    {
+      "seed": 2147483648,
+      "count": 8,
+      "expect": [
+        0.8205775609239936,
+        0.4481089550536126,
+        0.7836112855002284,
+        0.5120457962621003,
+        0.8388098266441375,
+        0.4205148529727012,
+        0.8944806265644729,
+        0.9326926763169467
+      ]
+    }
+  ],
+  "shuffle": [
+    {
+      "seed": 7,
+      "items": [
+        "item-a",
+        "item-b",
+        "item-c",
+        "item-d",
+        "item-e",
+        "item-f",
+        "item-g",
+        "item-h",
+        "item-i",
+        "item-j"
+      ],
+      "expect": [
+        "item-g",
+        "item-f",
+        "item-i",
+        "item-b",
+        "item-c",
+        "item-d",
+        "item-e",
+        "item-h",
+        "item-j",
+        "item-a"
+      ]
+    },
+    {
+      "seed": 0,
+      "items": [
+        "n0",
+        "n1",
+        "n2",
+        "n3",
+        "n4",
+        "n5",
+        "n6",
+        "n7",
+        "n8",
+        "n9",
+        "n10",
+        "n11",
+        "n12",
+        "n13",
+        "n14",
+        "n15",
+        "n16",
+        "n17",
+        "n18",
+        "n19",
+        "n20",
+        "n21",
+        "n22",
+        "n23",
+        "n24"
+      ],
+      "expect": [
+        "n12",
+        "n2",
+        "n8",
+        "n15",
+        "n13",
+        "n23",
+        "n14",
+        "n22",
+        "n19",
+        "n24",
+        "n16",
+        "n4",
+        "n17",
+        "n1",
+        "n21",
+        "n20",
+        "n7",
+        "n18",
+        "n11",
+        "n10",
+        "n9",
+        "n3",
+        "n5",
+        "n0",
+        "n6"
+      ]
+    },
+    {
+      "seed": 99,
+      "items": [],
+      "expect": []
+    },
+    {
+      "seed": 3,
+      "items": [
+        "only"
+      ],
+      "expect": [
+        "only"
+      ]
+    },
+    {
+      "seed": -1,
+      "items": [
+        "item-a",
+        "item-b",
+        "item-c",
+        "item-d"
+      ],
+      "expect": [
+        "item-c",
+        "item-b",
+        "item-a",
+        "item-d"
+      ]
+    }
+  ],
+  "split": [
+    {
+      "name": "fresh, shuffled",
+      "items": [
+        {
+          "id": "i1",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i2",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i3",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i4",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i5",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i6",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i7",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i8",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i9",
+          "categoryId": "13-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i10",
+          "categoryId": "0-unknown",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i11",
+          "categoryId": "0-unknown",
+          "partition": "Inference"
+        },
+        {
+          "id": "i12",
+          "categoryId": "11-cat",
+          "partition": "Training"
+        },
+        {
+          "id": "i13",
+          "categoryId": "12-cat",
+          "partition": "Validation"
+        },
+        {
+          "id": "i14",
+          "categoryId": "13-cat",
+          "partition": "Inference"
+        }
+      ],
+      "options": {
+        "trainingPercentage": 0.8,
+        "shuffle": true,
+        "seed": 11,
+        "continued": false
+      },
+      "expect": {
+        "training": [
+          "i12",
+          "i6",
+          "i2",
+          "i1",
+          "i3",
+          "i7",
+          "i4",
+          "i9"
+        ],
+        "validation": [
+          "i13",
+          "i8",
+          "i5"
+        ],
+        "inference": [
+          "i10",
+          "i11"
+        ],
+        "assignments": [
+          {
+            "id": "i6",
+            "partition": "Training"
+          },
+          {
+            "id": "i2",
+            "partition": "Training"
+          },
+          {
+            "id": "i1",
+            "partition": "Training"
+          },
+          {
+            "id": "i3",
+            "partition": "Training"
+          },
+          {
+            "id": "i7",
+            "partition": "Training"
+          },
+          {
+            "id": "i4",
+            "partition": "Training"
+          },
+          {
+            "id": "i9",
+            "partition": "Training"
+          },
+          {
+            "id": "i8",
+            "partition": "Validation"
+          },
+          {
+            "id": "i5",
+            "partition": "Validation"
+          },
+          {
+            "id": "i10",
+            "partition": "Inference"
+          }
+        ]
+      }
+    },
+    {
+      "name": "fresh, in order",
+      "items": [
+        {
+          "id": "i1",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i2",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i3",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i4",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i5",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i6",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i7",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i8",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i9",
+          "categoryId": "13-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i10",
+          "categoryId": "0-unknown",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i11",
+          "categoryId": "0-unknown",
+          "partition": "Inference"
+        },
+        {
+          "id": "i12",
+          "categoryId": "11-cat",
+          "partition": "Training"
+        },
+        {
+          "id": "i13",
+          "categoryId": "12-cat",
+          "partition": "Validation"
+        },
+        {
+          "id": "i14",
+          "categoryId": "13-cat",
+          "partition": "Inference"
+        }
+      ],
+      "options": {
+        "trainingPercentage": 0.5,
+        "shuffle": false,
+        "seed": 0,
+        "continued": false
+      },
+      "expect": {
+        "training": [
+          "i12",
+          "i1",
+          "i2",
+          "i3",
+          "i6",
+          "i7",
+          "i9"
+        ],
+        "validation": [
+          "i13",
+          "i4",
+          "i5",
+          "i8"
+        ],
+        "inference": [
+          "i10",
+          "i11"
+        ],
+        "assignments": [
+          {
+            "id": "i1",
+            "partition": "Training"
+          },
+          {
+            "id": "i2",
+            "partition": "Training"
+          },
+          {
+            "id": "i3",
+            "partition": "Training"
+          },
+          {
+            "id": "i6",
+            "partition": "Training"
+          },
+          {
+            "id": "i7",
+            "partition": "Training"
+          },
+          {
+            "id": "i9",
+            "partition": "Training"
+          },
+          {
+            "id": "i4",
+            "partition": "Validation"
+          },
+          {
+            "id": "i5",
+            "partition": "Validation"
+          },
+          {
+            "id": "i8",
+            "partition": "Validation"
+          },
+          {
+            "id": "i10",
+            "partition": "Inference"
+          }
+        ]
+      }
+    },
+    {
+      "name": "continued",
+      "items": [
+        {
+          "id": "i1",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i2",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i3",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i4",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i5",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i6",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i7",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i8",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i9",
+          "categoryId": "13-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i10",
+          "categoryId": "0-unknown",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "i11",
+          "categoryId": "0-unknown",
+          "partition": "Inference"
+        },
+        {
+          "id": "i12",
+          "categoryId": "11-cat",
+          "partition": "Training"
+        },
+        {
+          "id": "i13",
+          "categoryId": "12-cat",
+          "partition": "Validation"
+        },
+        {
+          "id": "i14",
+          "categoryId": "13-cat",
+          "partition": "Inference"
+        }
+      ],
+      "options": {
+        "trainingPercentage": 0.8,
+        "shuffle": true,
+        "seed": 11,
+        "continued": true
+      },
+      "expect": {
+        "training": [
+          "i12",
+          "i1",
+          "i2",
+          "i3",
+          "i4",
+          "i5",
+          "i6",
+          "i7",
+          "i8",
+          "i9"
+        ],
+        "validation": [
+          "i13"
+        ],
+        "inference": [
+          "i10",
+          "i11"
+        ],
+        "assignments": [
+          {
+            "id": "i1",
+            "partition": "Training"
+          },
+          {
+            "id": "i2",
+            "partition": "Training"
+          },
+          {
+            "id": "i3",
+            "partition": "Training"
+          },
+          {
+            "id": "i4",
+            "partition": "Training"
+          },
+          {
+            "id": "i5",
+            "partition": "Training"
+          },
+          {
+            "id": "i6",
+            "partition": "Training"
+          },
+          {
+            "id": "i7",
+            "partition": "Training"
+          },
+          {
+            "id": "i8",
+            "partition": "Training"
+          },
+          {
+            "id": "i9",
+            "partition": "Training"
+          },
+          {
+            "id": "i10",
+            "partition": "Inference"
+          }
+        ]
+      }
+    },
+    {
+      "name": "nothing unassigned",
+      "items": [
+        {
+          "id": "i11",
+          "categoryId": "0-unknown",
+          "partition": "Inference"
+        },
+        {
+          "id": "i12",
+          "categoryId": "11-cat",
+          "partition": "Training"
+        },
+        {
+          "id": "i13",
+          "categoryId": "12-cat",
+          "partition": "Validation"
+        },
+        {
+          "id": "i14",
+          "categoryId": "13-cat",
+          "partition": "Inference"
+        }
+      ],
+      "options": {
+        "trainingPercentage": 0.8,
+        "shuffle": true,
+        "seed": 5,
+        "continued": false
+      },
+      "expect": {
+        "training": [
+          "i12"
+        ],
+        "validation": [
+          "i13"
+        ],
+        "inference": [
+          "i11"
+        ],
+        "assignments": []
+      }
+    },
+    {
+      "name": "single item per category",
+      "items": [
+        {
+          "id": "s1",
+          "categoryId": "11-cat",
+          "partition": "Unassigned"
+        },
+        {
+          "id": "s2",
+          "categoryId": "12-cat",
+          "partition": "Unassigned"
+        }
+      ],
+      "options": {
+        "trainingPercentage": 0.8,
+        "shuffle": true,
+        "seed": 1,
+        "continued": false
+      },
+      "expect": {
+        "training": [
+          "s1",
+          "s2"
+        ],
+        "validation": [],
+        "inference": [],
+        "assignments": [
+          {
+            "id": "s1",
+            "partition": "Training"
+          },
+          {
+            "id": "s2",
+            "partition": "Training"
+          }
+        ]
+      }
+    }
+  ],
+  "fingerprint": [
+    {
+      "items": [],
+      "expect": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "items": [
+        {
+          "id": "b",
+          "categoryId": "12-cat"
+        },
+        {
+          "id": "a",
+          "categoryId": "11-cat"
+        }
+      ],
+      "expect": "6eb785a6af82cdff72fa913d95fa1fce1c57f2d44e81ae99b9d53e08d12afb2e"
+    },
+    {
+      "items": [
+        {
+          "id": "a",
+          "categoryId": "11-cat"
+        },
+        {
+          "id": "b",
+          "categoryId": "12-cat"
+        }
+      ],
+      "expect": "6eb785a6af82cdff72fa913d95fa1fce1c57f2d44e81ae99b9d53e08d12afb2e"
+    },
+    {
+      "items": [
+        {
+          "id": "a",
+          "categoryId": "12-cat"
+        },
+        {
+          "id": "b",
+          "categoryId": "11-cat"
+        }
+      ],
+      "expect": "433664a1cacab765b49ff7672699ea2cbfdd4904e1a97b7ee17084c376859011"
+    }
+  ],
+  "categorySetHash": [
+    {
+      "ids": [],
+      "expect": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "ids": [
+        "12-cat",
+        "11-cat"
+      ],
+      "expect": "6399406bf4c9aa3922b1d1b1ad97ea39799be924e70d2688f2d6223d9c30072f"
+    }
+  ],
+  "partition": [
+    {
+      "categoryId": "11-cat",
+      "current": "Training",
+      "predicted": false,
+      "expect": "Training"
+    },
+    {
+      "categoryId": "11-cat",
+      "current": "Training",
+      "predicted": true,
+      "expect": "Training"
+    },
+    {
+      "categoryId": "11-cat",
+      "current": "Validation",
+      "predicted": false,
+      "expect": "Validation"
+    },
+    {
+      "categoryId": "11-cat",
+      "current": "Validation",
+      "predicted": true,
+      "expect": "Validation"
+    },
+    {
+      "categoryId": "11-cat",
+      "current": "Inference",
+      "predicted": false,
+      "expect": "Unassigned"
+    },
+    {
+      "categoryId": "11-cat",
+      "current": "Inference",
+      "predicted": true,
+      "expect": "Inference"
+    },
+    {
+      "categoryId": "11-cat",
+      "current": "Unassigned",
+      "predicted": false,
+      "expect": "Unassigned"
+    },
+    {
+      "categoryId": "11-cat",
+      "current": "Unassigned",
+      "predicted": true,
+      "expect": "Unassigned"
+    },
+    {
+      "categoryId": "0-unknown",
+      "current": "Training",
+      "predicted": false,
+      "expect": "Inference"
+    },
+    {
+      "categoryId": "0-unknown",
+      "current": "Training",
+      "predicted": true,
+      "expect": "Training"
+    },
+    {
+      "categoryId": "0-unknown",
+      "current": "Validation",
+      "predicted": false,
+      "expect": "Inference"
+    },
+    {
+      "categoryId": "0-unknown",
+      "current": "Validation",
+      "predicted": true,
+      "expect": "Validation"
+    },
+    {
+      "categoryId": "0-unknown",
+      "current": "Inference",
+      "predicted": false,
+      "expect": "Inference"
+    },
+    {
+      "categoryId": "0-unknown",
+      "current": "Inference",
+      "predicted": true,
+      "expect": "Inference"
+    },
+    {
+      "categoryId": "0-unknown",
+      "current": "Unassigned",
+      "predicted": false,
+      "expect": "Inference"
+    },
+    {
+      "categoryId": "0-unknown",
+      "current": "Unassigned",
+      "predicted": true,
+      "expect": "Unassigned"
+    }
+  ],
+  "correction": [
+    {
+      "name": "a corrected prediction",
+      "existing": "11-cat",
+      "next": "12-cat",
+      "prediction": {
+        "predictedAtRunId": "run-1",
+        "predictionConfidence": 0.9
+      },
+      "existingCorrection": null,
+      "correctedAt": "2026-01-01T00:00:00.000Z",
+      "expect": {
+        "correctedFromRunId": "run-1",
+        "predictedCategoryId": "11-cat",
+        "predictionConfidence": 0.9,
+        "correctedAt": "2026-01-01T00:00:00.000Z"
+      }
+    },
+    {
+      "name": "back to unknown",
+      "existing": "11-cat",
+      "next": "0-unknown",
+      "prediction": {
+        "predictedAtRunId": "run-1",
+        "predictionConfidence": 0.9
+      },
+      "existingCorrection": {
+        "correctedFromRunId": "run-0",
+        "predictedCategoryId": "13-cat",
+        "predictionConfidence": 0.4,
+        "correctedAt": "2025-12-31T00:00:00.000Z"
+      },
+      "correctedAt": "2026-01-01T00:00:00.000Z",
+      "expect": null
+    },
+    {
+      "name": "same category keeps the old correction",
+      "existing": "11-cat",
+      "next": "11-cat",
+      "prediction": {
+        "predictedAtRunId": "run-1",
+        "predictionConfidence": 0.9
+      },
+      "existingCorrection": {
+        "correctedFromRunId": "run-0",
+        "predictedCategoryId": "13-cat",
+        "predictionConfidence": 0.4,
+        "correctedAt": "2025-12-31T00:00:00.000Z"
+      },
+      "correctedAt": "2026-01-01T00:00:00.000Z",
+      "expect": {
+        "correctedFromRunId": "run-0",
+        "predictedCategoryId": "13-cat",
+        "predictionConfidence": 0.4,
+        "correctedAt": "2025-12-31T00:00:00.000Z"
+      }
+    },
+    {
+      "name": "no prediction to correct",
+      "existing": "11-cat",
+      "next": "12-cat",
+      "prediction": {},
+      "existingCorrection": null,
+      "correctedAt": "2026-01-01T00:00:00.000Z",
+      "expect": null
+    }
+  ]
+}

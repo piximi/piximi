@@ -8,14 +8,16 @@ import {
   UNKNOWN_KIND_CATEGORY_ID,
   UNKNOWN_KIND_ID,
   UNKNOWN_IMAGE_CATEGORY,
+  nextPartition,
+  predictionCorrection,
   representsUnknown,
 } from "core/entities";
-import { Partition } from "core/dl/enums";
 
 import { projectReset } from "store/actions";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 
+import type { Partition } from "core/dl/enums";
 import type {
   AnnotationCategory,
   BBox,
@@ -30,7 +32,6 @@ import type {
   Category,
   AnnotationObject,
   AnnotationVolume,
-  PredictionCorrection,
   IntensityMeasurement,
 } from "core/entities";
 
@@ -95,53 +96,10 @@ function annotationsOfVolume(
   );
 }
 
-function getNewPartition(
-  catId: string,
-  currentPartition: Partition,
-  predicted: boolean,
-) {
-  if (predicted) return currentPartition;
-  if (representsUnknown(catId)) return Partition.Inference;
-
-  switch (currentPartition) {
-    case Partition.Training:
-    case Partition.Validation:
-      return currentPartition;
-    default:
-      return Partition.Unassigned;
-  }
-}
-
-function getPredictionCorrection(
-  existingCatId: string,
-  newCatId: string,
-  prediction: {
-    predictedAtRunId: string | undefined;
-    predictionConfidence: number | undefined;
-  },
-  existingCorrection?: PredictionCorrection,
-): PredictionCorrection | undefined {
-  const becomingUnknown = representsUnknown(newCatId);
-  const isCorrection =
-    !!prediction?.predictedAtRunId &&
-    !becomingUnknown &&
-    newCatId !== existingCatId;
-
-  const predictionCorrection = isCorrection
-    ? {
-        correctedFromRunId: prediction.predictedAtRunId!,
-        predictedCategoryId: existingCatId,
-        // "Safe" non-null assertion because `predictionConfidence` is always
-        // set along with with `predictedAtRunId`, so unless something changes
-        // either both exist or neither exist
-        predictionConfidence: prediction.predictionConfidence!,
-        correctedAt: new Date().toISOString(),
-      }
-    : becomingUnknown
-      ? undefined
-      : existingCorrection; // preserve prior correction history
-  return predictionCorrection;
-}
+// The partition and correction rules are shared with every backend; see
+// `core/entities/prediction.ts`.
+const getNewPartition = nextPartition;
+const getPredictionCorrection = predictionCorrection;
 
 function bubbleDeleteAnnotation(
   state: DataStateV2,
