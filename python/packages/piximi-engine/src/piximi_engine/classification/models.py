@@ -38,6 +38,10 @@ class ClassificationModel(ABC):
     """One classifier's weights. ``build`` sizes it to the categories; ``fit``
     reports each epoch and stops early when asked."""
 
+    def prepare(self, progress: Callable[[str, float], None]) -> None:
+        """Whatever must happen before the first use, such as building a
+        plugin's environment; reports ``(message, percent)`` phases."""
+
     @abstractmethod
     def build(self, num_classes: int, input_shape: Shape, seed: int) -> None: ...
 

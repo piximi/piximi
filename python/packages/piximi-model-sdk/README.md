@@ -66,6 +66,17 @@ fields = [{ key = "threshold", type = "number", label = "Level", default = 128 }
 (or a `LabelResult` naming a kind per object). `ctx.progress()` reports
 progress and `ctx.check_cancelled()` stops cooperatively.
 
+A plugin can also offer a classifier architecture, with
+`tasks = ["classification", "classification.train"]` and no `output`
+policy. The module then provides a `ClassificationModel`: `build` makes
+fresh weights for the project's categories, `fit` trains on `(N, C, H, W)`
+arrays the engine prepared (calling `ctx.epoch(...)` after each epoch and
+returning early once `ctx.cancelled`), `predict` returns `(N, classes)`
+probabilities, and `save`/`load` carry the weights as bytes. `options`
+holds the user's optimizer settings (`learningRate`, `epochs`, `batchSize`,
+`optimizationAlgorithm`, `lossFunction`). The engine's
+`tests/plugins/logistic-numpy` is a complete example.
+
 Register the folder with `piximi serve --models-dir`, from a notebook with
 `session.project.register_model("my-plugin")`, or from an installed package
 through a `piximi.models` entry point whose value is the manifest's path.

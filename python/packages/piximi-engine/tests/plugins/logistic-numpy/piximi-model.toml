@@ -1,0 +1,21 @@
+# A fixture plugin: a classifier architecture in its own (numpy 2)
+# environment, to prove training crosses into a plugin worker.
+[plugin]
+id = "logistic-numpy"
+name = "Logistic regression (plugin)"
+version = "1.0"
+framework = "numpy"
+entry = "model.py"
+
+[plugin.env]
+python = "3.12"
+requirements = ["numpy>=2"]
+
+[[models]]
+id = "logistic-plugin"
+attribute = "MODEL"
+display_name = "Logistic regression (plugin)"
+description = "Softmax regression over the pixels, trained inside the plugin's environment"
+use = "Tests"
+tasks = ["classification", "classification.train"]
+channels = { mode = "passthrough", max_channels = 16 }

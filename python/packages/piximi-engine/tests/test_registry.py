@@ -27,10 +27,13 @@ def test_discovering_a_directory_skips_the_broken_plugin(no_appose, caplog):
     changes = []
     registry = ModelRegistry(on_change=lambda: changes.append(len(registry.models)))
     added = registry.discover_dir(PLUGINS)
-    assert added == ["threshold-numpy-one", "threshold-numpy-two"]
-    assert set(registry.plugins) == {"numpy-one", "numpy-two"}
+    assert added == ["logistic-plugin", "threshold-numpy-one", "threshold-numpy-two"]
+    assert set(registry.plugins) == {"logistic-numpy", "numpy-one", "numpy-two"}
     assert any("broken" in record.message for record in caplog.records)
-    assert changes == [1, 2]
+    # The classifier plugin registers first and adds no segmenter.
+    assert changes == [0, 1, 2]
+    assert list(registry.classifiers) == ["logistic-plugin"]
+    assert registry.classifiers["logistic-plugin"].describe().output_policy is None
 
     descriptors = {d.name: d for d in registry.describe_all()}
     one = descriptors["threshold-numpy-one"]

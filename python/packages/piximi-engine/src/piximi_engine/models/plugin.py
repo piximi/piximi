@@ -17,11 +17,14 @@ holds: the network split sits in front of the engine, never here.
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import logging
 import os
+import tempfile
 import threading
 import time
+import uuid
 from collections.abc import Callable
 from importlib.metadata import PackageNotFoundError, distribution
 from typing import TYPE_CHECKING, Any
@@ -32,6 +35,10 @@ from piximi_link.errors import BackendError, RequestCancelled
 from piximi_link.peer import HandlerContext
 from piximi_schema.segmentation import ModelStatus
 
+from piximi_schema.classification import ModelLayer, OptimizerSettings, RunHistoryEpoch, RunStatus
+from piximi_schema.entities import Shape
+
+from ..classification.models import Cancelled, ClassificationArchitecture, ClassificationModel, EpochReport
 from .base import Detection, SegmentationModel, labels_to_detections
 from .manifest import ModelSpec, PluginManifest
 from .registry import appose_available
@@ -57,6 +64,11 @@ INSTANTIATE = "from piximi_model_sdk import worker\nworker.instantiate(key, modu
 LOAD = "from piximi_model_sdk import worker\nworker.load(task, key)\n"
 SEGMENT = "from piximi_model_sdk import worker\nworker.segment(task, key, image, options)\n"
 UNLOAD = "from piximi_model_sdk import worker\nworker.unload(key)\n"
+BUILD = "from piximi_model_sdk import worker\nworker.build(key, num_classes, input_shape, seed)\n"
+FIT = "from piximi_model_sdk import worker\nworker.fit(task, key, x, y, val_x, val_y, options)\n"
+PREDICT = "from piximi_model_sdk import worker\nworker.predict(key, x)\n"
+SAVE = "from piximi_model_sdk import worker\nworker.save_weights(key)\n"
+LOAD_WEIGHTS = "from piximi_model_sdk import worker\nworker.load_weights(key, data)\n"
 
 # macOS `pythonw` exports PYTHONEXECUTABLE, which a virtualenv interpreter
 # started with it inherits and then ignores its own site-packages. It only
@@ -258,18 +270,23 @@ class PluginService:
         *,
         progress: Progress | None = None,
         cancelled: Callable[[], bool] = lambda: False,
+        on_update: Callable[[Any], None] | None = None,
     ) -> dict[str, Any]:
         """Runs one task to completion, blocking; run it off the loop.
         Raises ``RequestCancelled`` once ``cancelled()`` turns true, after
-        asking the task to stop and killing the worker if it does not."""
+        asking the task to stop and killing the worker if it does not.
+        ``on_update`` sees every update event, structured ``info`` included."""
         from appose.service import ResponseType, TaskStatus  # noqa: PLC0415
 
         task = self.service().task(script, inputs)
         done = threading.Event()
 
         def listen(event: Any) -> None:
-            if event.response_type is ResponseType.UPDATE and progress is not None:
-                progress(event.message or "", _percent(event.current, event.maximum))
+            if event.response_type is ResponseType.UPDATE:
+                if progress is not None:
+                    progress(event.message or "", _percent(event.current, event.maximum))
+                if on_update is not None:
+                    on_update(event)
             if event.response_type.is_terminal():
                 done.set()
 
@@ -448,3 +465,168 @@ class PluginModel(SegmentationModel):
     def _changed(self) -> None:
         if self.service.on_change is not None:
             self.service.on_change()
+
+
+# ── Classifiers ─────────────────────────────────────────────────────────────
+
+
+def _layers(summary: Any) -> list[ModelLayer] | None:
+    if not summary:
+        return None
+    return [
+        ModelLayer(
+            layer_name=str(layer.get("layerName", "")),
+            output_shape=str(layer.get("outputShape", "")),
+            parameters=int(layer.get("parameters", 0)),
+            trainable=bool(layer.get("trainable", True)),
+        )
+        for layer in summary
+    ]
+
+
+class PluginClassifier(ClassificationModel):
+    """One classifier's weights, living in the plugin's worker under a key
+    of their own; arrays reach the worker as ``.npy`` files it maps."""
+
+    def __init__(self, architecture: PluginClassifierArchitecture) -> None:
+        self.architecture = architecture
+        self.key = f"{architecture.id}:{uuid.uuid4()}"
+        self._instantiated = False
+        self._summary: list[ModelLayer] | None = None
+        self._device = "cpu"
+        self._framework_version = ""
+
+    @property
+    def service(self) -> PluginService:
+        return self.architecture.service
+
+    def prepare(self, progress: Callable[[str, float], None]) -> None:
+        """Builds the environment if needed and puts the model in the worker."""
+        self.service.build(progress)
+        if self._instantiated and self.service.alive:
+            return
+        module, _dir = self.architecture.manifest.entry_module
+        progress(f"Starting {self.architecture.manifest.plugin.name}", -1)
+        self.service.run(
+            INSTANTIATE,
+            {
+                "key": self.key,
+                "module": module,
+                "attribute": self.architecture.spec.attribute,
+                "settings": {"gpu": self.service.gpu},
+            },
+        )
+        self._instantiated = True
+
+    def _about(self, outputs: dict[str, Any]) -> None:
+        self._device = str(outputs.get("device") or "cpu")
+        self._framework_version = str(outputs.get("frameworkVersion") or "")
+        self._summary = _layers(outputs.get("summary"))
+
+    def build(self, num_classes: int, input_shape: Shape, seed: int) -> None:
+        self.prepare(lambda _message, _percent: None)
+        self._about(
+            self.service.run(
+                BUILD,
+                {
+                    "key": self.key,
+                    "num_classes": num_classes,
+                    "input_shape": [input_shape.channels, input_shape.height, input_shape.width],
+                    "seed": seed,
+                },
+            )
+        )
+
+    def fit(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        val_x: np.ndarray,
+        val_y: np.ndarray,
+        options: OptimizerSettings,
+        report: EpochReport,
+        cancelled: Cancelled,
+    ) -> RunStatus:
+        with tempfile.TemporaryDirectory(prefix="piximi-fit-") as folder:
+            paths = {}
+            for name, array in (("x", x), ("y", y), ("val_x", val_x), ("val_y", val_y)):
+                paths[name] = os.path.join(folder, f"{name}.npy")
+                np.save(paths[name], np.ascontiguousarray(array))
+
+            def on_update(event: Any) -> None:
+                epoch = (event.info or {}).get("epoch") if event.info else None
+                if epoch:
+                    report(RunHistoryEpoch.model_validate(epoch))
+
+            outputs = self.service.run(
+                FIT,
+                {"key": self.key, **paths, "options": options.to_wire()},
+                cancelled=cancelled,
+                on_update=on_update,
+            )
+        self._about(outputs)
+        return RunStatus(outputs.get("status", "completed"))
+
+    def predict(self, x: np.ndarray) -> np.ndarray:
+        with tempfile.TemporaryDirectory(prefix="piximi-predict-") as folder:
+            path = os.path.join(folder, "x.npy")
+            np.save(path, np.ascontiguousarray(x))
+            outputs = self.service.run(PREDICT, {"key": self.key, "x": path})
+        result = outputs["probabilities"]
+        probabilities = np.array(result)
+        result.shm.unlink_on_dispose(True)
+        result.shm.dispose()
+        return probabilities
+
+    def save(self) -> bytes:
+        return base64.b64decode(self.service.run(SAVE, {"key": self.key})["data"])
+
+    def load(self, data: bytes) -> None:
+        self.prepare(lambda _message, _percent: None)
+        self._about(
+            self.service.run(LOAD_WEIGHTS, {"key": self.key, "data": base64.b64encode(data).decode("ascii")})
+        )
+
+    def summary(self) -> list[ModelLayer] | None:
+        return self._summary
+
+    @property
+    def device(self) -> str:
+        return self._device
+
+    @property
+    def framework_version(self) -> str:
+        return self._framework_version
+
+
+class PluginClassifierArchitecture(ClassificationArchitecture):
+    """A manifest's classifier: listed with its environment's status, and
+    the maker of ``PluginClassifier`` instances in that environment."""
+
+    def __init__(self, spec: ModelSpec, manifest: PluginManifest, service: PluginService) -> None:
+        self.spec = spec
+        self.manifest = manifest
+        self.service = service
+        self.id = spec.id
+        self.display_name = spec.display_name
+        self.description = spec.description
+        self.use = spec.use
+        self.framework = manifest.plugin.framework
+        self.version = manifest.plugin.version
+        self.sources = spec.sources
+        self.resources = manifest.plugin.resources
+        self.channel_policy = spec.channels
+        self.tasks = spec.tasks
+
+    @property
+    def status(self) -> ModelStatus:
+        return self.service.status
+
+    @property
+    def status_message(self) -> str | None:
+        return self.service.message
+
+    def create(self) -> ClassificationModel:
+        if not appose_available():
+            raise BackendError("NOT_SUPPORTED", UNAVAILABLE_MESSAGE)
+        return PluginClassifier(self)

@@ -83,12 +83,30 @@ class ModelSpec(_Strict):
     use: str = ""
     tasks: list[ModelTask] = [ModelTask.SEGMENTATION]
     cancellable_load: bool = False
-    output: OutputPolicy
+    output: OutputPolicy | None = None
+    """How detections are kinded; required for a model that segments, absent
+    for a classifier architecture."""
     channels: ChannelPolicy
     options: OptionSchema | None = None
     sources: list[ModelLink] = []
     cite: list[ModelLink] | None = None
     cloud_warning: str | None = None
+
+    @property
+    def segments(self) -> bool:
+        return ModelTask.SEGMENTATION in self.tasks
+
+    @property
+    def classifies(self) -> bool:
+        return ModelTask.CLASSIFICATION in self.tasks or ModelTask.CLASSIFICATION_TRAIN in self.tasks
+
+    @model_validator(mode="after")
+    def _output_for_segmenters(self) -> ModelSpec:
+        if self.segments and self.output is None:
+            raise ValueError("a model that segments needs an `output` policy")
+        if not self.segments and not self.classifies:
+            raise ValueError("a model must segment or classify")
+        return self
 
 
 class PluginManifest(_Strict):

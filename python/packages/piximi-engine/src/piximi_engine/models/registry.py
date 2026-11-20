@@ -68,7 +68,7 @@ class ModelRegistry:
         """Registers a plugin from its manifest (or the directory holding
         one); returns the ids of the models it added. Registering a plugin
         again replaces it, so a notebook can iterate on one."""
-        from .plugin import PluginModel, PluginService  # noqa: PLC0415
+        from .plugin import PluginClassifierArchitecture, PluginModel, PluginService  # noqa: PLC0415
 
         manifest = source if isinstance(source, PluginManifest) else load_manifest(source)
         plugin_id = manifest.plugin.id
@@ -78,14 +78,20 @@ class ModelRegistry:
             for model in previous.models:
                 if self.models.get(model.id) is model:
                     del self.models[model.id]
+            for model_id, architecture in list(self.classifiers.items()):
+                if getattr(architecture, "service", None) is previous:
+                    del self.classifiers[model_id]
 
         service = PluginService(manifest, gpu=self.gpu, on_change=self._changed)
         added: list[str] = []
         for spec in manifest.models:
-            if spec.id in self.models:
+            if spec.id in self.models or spec.id in self.classifiers:
                 log.warning('Plugin %s: a model "%s" is already registered; skipping it', plugin_id, spec.id)
                 continue
-            self.models[spec.id] = PluginModel(spec, manifest, service)
+            if spec.segments:
+                self.models[spec.id] = PluginModel(spec, manifest, service)
+            else:
+                self.classifiers[spec.id] = PluginClassifierArchitecture(spec, manifest, service)
             added.append(spec.id)
         self._plugins[plugin_id] = service
         self._changed()

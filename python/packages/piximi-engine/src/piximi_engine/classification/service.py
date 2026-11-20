@@ -512,7 +512,11 @@ class ClassificationService:
 
         if model is None:
             model = self._architecture(record.architecture_id).create()
-            model.build(len(class_ids), preprocess.input_shape, seed)
+            # A plugin's environment may still have to be built; its phases
+            # show in the job, and a cancel is honoured once it is done.
+            await asyncio.to_thread(model.prepare, lambda message, percent: progress(percent, message))
+            ctx.check_cancelled()
+            await asyncio.to_thread(model.build, len(class_ids), preprocess.input_shape, seed)
             self._models[record.id] = model
 
         trained_ids = {it.id for it in split.training}

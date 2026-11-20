@@ -13,6 +13,7 @@ progress back (``update``) and the caller's cancellation
 
 from __future__ import annotations
 
+import base64
 import importlib
 import platform
 import sys
@@ -20,9 +21,9 @@ from typing import Any, Optional
 
 import numpy as np
 
-from .model import Cancelled, Context, LabelResult, SegmentationModel
+from .model import Cancelled, ClassificationModel, Context, LabelResult, SegmentationModel
 
-_models: dict[str, SegmentationModel] = {}
+_models: dict[str, SegmentationModel | ClassificationModel] = {}
 
 
 def instantiate(
@@ -31,9 +32,10 @@ def instantiate(
     """Imports the plugin's entry module and keeps the model it names under
     ``key``; the attribute may be the instance, its class, or a factory."""
     target = getattr(importlib.import_module(module), attribute)
-    model = target() if not isinstance(target, SegmentationModel) and callable(target) else target
-    if not isinstance(model, SegmentationModel):
-        raise TypeError(f"{module}:{attribute} is not a SegmentationModel")
+    kinds = (SegmentationModel, ClassificationModel)
+    model = target() if not isinstance(target, kinds) and callable(target) else target
+    if not isinstance(model, kinds):
+        raise TypeError(f"{module}:{attribute} is not a SegmentationModel or ClassificationModel")
     model.settings = dict(settings or {})
     _models[key] = model
     return {"python": platform.python_version(), "executable": sys.executable}
@@ -46,7 +48,18 @@ def _context(task: Any) -> Context:
         else:
             task.update(message=message, current=int(round(percent)), maximum=100)
 
-    return Context(report, lambda: bool(task.cancel_requested))
+    def report_epoch(epoch: dict) -> None:
+        # Structured, so the engine records it rather than parsing a message.
+        task.update(message=f"Epoch {epoch['epoch'] + 1}", info={"epoch": epoch})
+
+    return Context(report, lambda: bool(task.cancel_requested), report_epoch)
+
+
+def _classifier(key: str) -> ClassificationModel:
+    model = _models[key]
+    if not isinstance(model, ClassificationModel):
+        raise TypeError(f"{key} is not a ClassificationModel")
+    return model
 
 
 def load(task: Any, key: str) -> None:
@@ -92,3 +105,69 @@ def segment(task: Any, key: str, image: Any, options: Optional[dict[str, Any]]) 
     if classes is not None:
         outputs["classes"] = [str(name) for name in classes]
     return outputs
+
+
+# ── Classifiers ─────────────────────────────────────────────────────────────
+#
+# Training sets can exceed what one shared-memory block should hold, so the
+# engine writes them as ``.npy`` files beside its data and sends the paths;
+# the worker maps them without copying. Probabilities come back in shared
+# memory, like labels do.
+
+
+def _about(model: ClassificationModel) -> dict[str, Any]:
+    return {
+        "device": model.device,
+        "frameworkVersion": model.framework_version,
+        "summary": model.summary(),
+    }
+
+
+def build(key: str, num_classes: int, input_shape: list[int], seed: int) -> dict[str, Any]:
+    model = _classifier(key)
+    model.build(int(num_classes), tuple(int(v) for v in input_shape), int(seed))
+    return _about(model)
+
+
+def fit(
+    task: Any,
+    key: str,
+    x: str,
+    y: str,
+    val_x: str,
+    val_y: str,
+    options: Optional[dict[str, Any]],
+) -> dict[str, Any]:
+    model = _classifier(key)
+    ctx = _context(task)
+    try:
+        model.fit(
+            np.load(x, mmap_mode="r"),
+            np.load(y, mmap_mode="r"),
+            np.load(val_x, mmap_mode="r"),
+            np.load(val_y, mmap_mode="r"),
+            dict(options or {}),
+            ctx,
+        )
+    except Cancelled:
+        return {"status": "stopped", **_about(model)}
+    return {"status": "stopped" if ctx.cancelled else "completed", **_about(model)}
+
+
+def predict(key: str, x: str) -> dict[str, Any]:
+    from appose import NDArray  # the plugin environment's appose
+
+    probabilities = np.asarray(_classifier(key).predict(np.load(x, mmap_mode="r")), dtype=np.float32)
+    if probabilities.ndim != 2:
+        raise ValueError(f"predict() must return (N, classes) probabilities, got shape {probabilities.shape}")
+    return {"probabilities": NDArray.copy_of(np.ascontiguousarray(probabilities))}
+
+
+def save_weights(key: str) -> dict[str, str]:
+    return {"data": base64.b64encode(_classifier(key).save()).decode("ascii")}
+
+
+def load_weights(key: str, data: str) -> dict[str, Any]:
+    model = _classifier(key)
+    model.load(base64.b64decode(data))
+    return _about(model)

@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from piximi_model_sdk import Cancelled, Context, LabelResult, SegmentationModel
+from piximi_model_sdk import Cancelled, ClassificationModel, Context, LabelResult, SegmentationModel
 from piximi_model_sdk import worker
 
 
@@ -107,3 +107,64 @@ def test_segment_passes_arrays_through_shared_memory():
 
     worker.unload("m")
     assert "m" not in worker._models
+
+
+class Counting(ClassificationModel):
+    """Predicts the class seen most in training, enough to drive the tasks."""
+
+    framework_version = "fake 1"
+    device = "none"
+
+    def __init__(self) -> None:
+        self.counts = None
+
+    def build(self, num_classes, input_shape, seed):
+        self.counts = np.zeros(num_classes)
+
+    def fit(self, x, y, val_x, val_y, options, ctx):
+        for epoch in range(int(options["epochs"])):
+            if ctx.cancelled:
+                return
+            for label in y:
+                self.counts[label] += 1
+            ctx.epoch(epoch, 1 / (epoch + 1), 1, 0.5, 0.5)
+
+    def predict(self, x):
+        probabilities = self.counts / max(1, self.counts.sum())
+        return np.tile(probabilities, (len(x), 1))
+
+    def save(self):
+        return self.counts.astype(np.int64).tobytes()
+
+    def load(self, data):
+        self.counts = np.frombuffer(data, dtype=np.int64).astype(float)
+
+    def summary(self):
+        return [{"layerName": "counts", "outputShape": str(len(self.counts)), "parameters": 0, "trainable": False}]
+
+
+def test_classifier_tasks_round_trip(tmp_path):
+    worker._models["c"] = Counting()
+    about = worker.build("c", 2, [1, 2, 2], 0)
+    assert about["device"] == "none" and about["summary"][0]["layerName"] == "counts"
+
+    x = np.zeros((4, 1, 2, 2), dtype=np.float32)
+    y = np.array([0, 1, 1, 1])
+    paths = {}
+    for name, array in (("x", x), ("y", y), ("val_x", x[:1]), ("val_y", y[:1])):
+        paths[name] = str(tmp_path / f"{name}.npy")
+        np.save(paths[name], array)
+    task = FakeTask()
+    result = worker.fit(task, "c", paths["x"], paths["y"], paths["val_x"], paths["val_y"], {"epochs": 2})
+    assert result["status"] == "completed"
+    epochs = [u for u in task.updates if u["message"].startswith("Epoch")]
+    assert len(epochs) == 2
+
+    saved = worker.save_weights("c")["data"]
+    worker._models["d"] = Counting()
+    worker.load_weights("d", saved)
+    assert list(worker._models["d"].counts) == [2, 6]
+
+    # Cancellation between epochs ends the run as stopped.
+    cancelled = FakeTask(cancel_requested=True)
+    assert worker.fit(cancelled, "c", paths["x"], paths["y"], paths["val_x"], paths["val_y"], {"epochs": 2})["status"] == "stopped"

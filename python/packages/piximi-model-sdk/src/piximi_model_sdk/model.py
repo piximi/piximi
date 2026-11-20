@@ -23,14 +23,32 @@ class Context:
         self,
         report: Optional[Callable[[Optional[str], Optional[float]], None]] = None,
         cancelled: Optional[Callable[[], bool]] = None,
+        report_epoch: Optional[Callable[[dict], None]] = None,
     ) -> None:
         self._report = report
         self._cancelled = cancelled
+        self._report_epoch = report_epoch
 
     def progress(self, message: Optional[str] = None, percent: Optional[float] = None) -> None:
         """Reports progress: ``percent`` is 0..100, or None while indeterminate."""
         if self._report is not None:
             self._report(message, percent)
+
+    def epoch(
+        self, epoch: int, loss: float, val_loss: float, accuracy: float, val_accuracy: float
+    ) -> None:
+        """Reports one finished training epoch; the engine records it on the
+        run and every connected client plots it."""
+        if self._report_epoch is not None:
+            self._report_epoch(
+                {
+                    "epoch": int(epoch),
+                    "loss": float(loss),
+                    "valLoss": float(val_loss),
+                    "accuracy": float(accuracy),
+                    "valAccuracy": float(val_accuracy),
+                }
+            )
 
     @property
     def cancelled(self) -> bool:
@@ -85,3 +103,61 @@ class SegmentationModel:
 
     def unload(self) -> None:
         """Frees what :meth:`load` claimed, e.g. GPU memory."""
+
+
+class ClassificationModel:
+    """A classifier architecture of a plugin: the engine builds one instance
+    per classifier the user creates, trains it on arrays it prepared, and
+    keeps its weights through ``save``/``load``.
+
+    Arrays are ``(N, C, H, W)`` float32 (already scaled to 0..1 when the
+    user asked for normalization); labels are ``(N,)`` class indices.
+    ``options`` carries the user's optimizer settings as the frontend names
+    them: ``learningRate``, ``epochs``, ``batchSize``, ``optimizationAlgorithm``,
+    ``lossFunction``.
+    """
+
+    settings: dict[str, Any] = {}
+    """The engine's preferences, set before :meth:`build`: ``gpu`` (bool)."""
+    device: str = "cpu"
+    """Where the model trains, e.g. ``cuda:0``; shown on each run."""
+    framework_version: str = ""
+
+    def build(self, num_classes: int, input_shape: tuple[int, int, int], seed: int) -> None:
+        """Creates fresh weights for ``num_classes`` outputs over
+        ``(channels, height, width)`` inputs; ``seed`` makes them repeatable."""
+        raise NotImplementedError
+
+    def fit(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        val_x: np.ndarray,
+        val_y: np.ndarray,
+        options: dict[str, Any],
+        ctx: Context,
+    ) -> None:
+        """Trains for ``options["epochs"]`` more epochs, calling
+        :meth:`Context.epoch` after each and returning early once
+        ``ctx.cancelled`` is set (a run stopped by the user keeps the epochs
+        so far)."""
+        raise NotImplementedError
+
+    def predict(self, x: np.ndarray) -> np.ndarray:
+        """``(N, num_classes)`` class probabilities."""
+        raise NotImplementedError
+
+    def save(self) -> bytes:
+        """The weights, in whatever form :meth:`load` reads back."""
+        raise NotImplementedError
+
+    def load(self, data: bytes) -> None:
+        raise NotImplementedError
+
+    def summary(self) -> Optional[list[dict[str, Any]]]:
+        """The layer table shown in the app: dicts with ``layerName``,
+        ``outputShape``, ``parameters`` and ``trainable``; None for none."""
+        return None
+
+    def unload(self) -> None:
+        """Frees what :meth:`build` or :meth:`load` claimed."""

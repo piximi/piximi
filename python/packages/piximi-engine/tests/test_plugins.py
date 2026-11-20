@@ -167,3 +167,98 @@ async def test_plugin_registered_from_a_notebook_appears_live(engine: ReferenceE
     finally:
         await session.stop()
         await engine.close()
+
+
+async def test_classifier_trains_in_its_own_environment(plugin_engine: ReferenceEngine):
+    """A classifier plugin: the environment builds on first fit, epochs come
+    back as structured updates, and the weights round-trip through the worker."""
+    from piximi_schema.classification import (
+        IMAGE_TARGET_ID,
+        ClassifierCreateRequest,
+        ClassifierFitRequest,
+        ClassifierHyperparameters,
+        ClassifierImportRequest,
+        ClassifierPredictRequest,
+        CropOptions,
+        CropSchema,
+        LossFunction,
+        Metric,
+        NormalizeOptions,
+        OptimizationAlgorithm,
+        OptimizerSettings,
+        PreprocessSettings,
+    )
+    from piximi_schema.entities import ImageCategory, Partition, Shape
+    from piximi_schema.unknown import generate_uuid
+
+    def hyperparameters(epochs: int) -> ClassifierHyperparameters:
+        return ClassifierHyperparameters(
+            preprocess=PreprocessSettings(
+                shuffle=True,
+                input_shape=Shape(planes=1, height=8, width=8, channels=1),
+                normalize_options=NormalizeOptions(normalize=True, center=False),
+                crop_options=CropOptions(num_crops=1, crop_schema=CropSchema.NONE),
+                training_percentage=0.5,
+            ),
+            optimizer=OptimizerSettings(
+                learning_rate=0.1,
+                loss_function=LossFunction.CATEGORICAL_CROSS_ENTROPY,
+                metrics=[Metric.CATEGORICAL_ACCURACY],
+                optimization_algorithm=OptimizationAlgorithm.SGD,
+                epochs=epochs,
+                batch_size=2,
+            ),
+        )
+
+    engine = plugin_engine
+    try:
+        listed = {m.name: m for m in await engine.classification_list_architectures()}
+        assert "logistic-plugin" in listed and listed["logistic-plugin"].framework == "numpy"
+
+        first = ImageCategory(type="image", id=generate_uuid(), color="#f00", name="First", is_unknown=False)
+        second = ImageCategory(type="image", id=generate_uuid(), color="#0f0", name="Second", is_unknown=False)
+        await engine.categories_create([first, second])
+        page = await engine.images(ImageQuery(), None, PageRequest(limit=10))
+        by_name = {record.image.name: record.image.id for record in page.items}
+        await engine.images_categorize(ImageQuery(ids=[by_name["a"], by_name["b"]]), first.id)
+        await engine.images_categorize(ImageQuery(ids=[by_name["c"], by_name["d"]]), second.id)
+
+        events = []
+        engine.subscribe(events.append)
+        record = await engine.classification_create(
+            ClassifierCreateRequest(
+                target_id=IMAGE_TARGET_ID,
+                name="Plugin shades",
+                architecture_id="logistic-plugin",
+                hyperparameters=hyperparameters(epochs=3),
+                seed=3,
+            )
+        )
+        progress = []
+        summary = await engine.classification_fit(
+            ClassifierFitRequest(classifier_id=record.id, seed=3), HandlerContext(progress.append)
+        )
+        assert summary.status == "completed" and summary.eval_results is not None
+        epochs = [e for e in events if e.type == "classifiers/didEpoch"]
+        assert len(epochs) == 3
+        assert any("environment" in p["message"].lower() or "starting" in p["message"].lower() for p in progress)
+        trained = next(c for c in await engine.classification_list() if c.id == record.id)
+        assert trained.trained and trained.summary and trained.runs[-1].framework_version.startswith("2.")
+        counts = await engine.image_counts(ImageQuery(), "partition")
+        assert counts.groups == {Partition.TRAINING: 2, Partition.VALIDATION: 2, Partition.INFERENCE: 1}
+
+        predicted = await engine.classification_predict(ClassifierPredictRequest(classifier_id=record.id), HandlerContext(None))
+        assert predicted.predicted == 1
+
+        archive = await engine.classification_export(record.id)
+        imported = await engine.classification_import(
+            ClassifierImportRequest(target_id=IMAGE_TARGET_ID, data=archive.data, name="Plugin copy")
+        )
+        assert imported.trained and imported.architecture_id == "logistic-plugin"
+        # The copy predicts from the worker too, after loading the saved weights.
+        await engine.classification_clear_predictions(IMAGE_TARGET_ID)
+        assert (
+            await engine.classification_predict(ClassifierPredictRequest(classifier_id=imported.id), HandlerContext(None))
+        ).predicted == 1
+    finally:
+        await engine.close()

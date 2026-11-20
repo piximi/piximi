@@ -106,7 +106,16 @@ named shared memory, so no pixel is serialized; a cancel reaches the model
 through its context. Nothing the plugin needs is installed next to the
 engine, so plugins with conflicting requirements serve one session.
 
-The engine ships two: StarDist2D through
+A plugin may also provide classifier architectures: models with the
+`classification.train` task and no output policy, implementing the SDK's
+`ClassificationModel`. The engine prepares the training set from the
+project's labeled items the way the browser does (crop, resize, scale),
+writes it as `.npy` files the worker maps without copying, and records each
+epoch the model reports; weights round-trip through the worker for the
+project's archives. The engine always lists a numpy logistic regression
+built in, so a project can be classified without any plugin.
+
+The engine ships two segmenters: StarDist2D through
 [cellcast](https://github.com/uw-loci/cellcast) (numpy-only, GPU on macOS
 through wgpu) and [Cellpose 3](https://github.com/MouseLand/cellpose) on
 PyTorch. Install the runner with `pip install 'piximi-engine[appose]'`
