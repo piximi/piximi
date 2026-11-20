@@ -81,6 +81,12 @@ _UPSERT = (
     + ", ".join(f"{column} = excluded.{column}" for column in _COLUMNS)
 )
 
+_UPDATE = (
+    "UPDATE entities SET data = ?, "
+    + ", ".join(f"{column} = ?" for column in _INDEXED.values())
+    + " WHERE kind = ? AND id = ?"
+)
+
 _IN_CHUNK = 900
 """Values per ``IN (...)``, under SQLite's default variable limit."""
 
@@ -190,6 +196,27 @@ class MetaStore:
             )
         with self._db:
             self._db.executemany(_UPSERT, rows)
+
+    def update_many(
+        self,
+        kind: str,
+        items: Iterable[WireModel],
+        *,
+        index: dict[str, dict[str, Any]] | None = None,
+    ) -> None:
+        """Rewrites existing rows' data and indexed columns, leaving their
+        parent and mask as they are: what a change to an annotation's
+        partition needs, read and written as a header without its mask."""
+        rows = []
+        for model in items:
+            wire = model.to_wire()
+            wire.pop("encodedMask", None)
+            columns: dict[str, Any] = {column: wire.get(field) for field, column in _INDEXED.items()}
+            if index and wire["id"] in index:
+                columns.update(index[wire["id"]])
+            rows.append((json.dumps(wire), *(columns[column] for column in _INDEXED.values()), kind, wire["id"]))
+        with self._db:
+            self._db.executemany(_UPDATE, rows)
 
     @staticmethod
     def _load(model: type[M], data: str, mask: str | None) -> M:

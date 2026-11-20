@@ -1,5 +1,5 @@
 import { DataConnector } from "core/data-connector";
-import { generateUUID } from "core/entities";
+import { generateUUID, representsUnknown } from "core/entities";
 import { getSegmenterApi } from "core/dl/segmentation/SegmenterApi";
 
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
@@ -29,7 +29,12 @@ import {
 import { LocalSegmentation } from "./LocalSegmentation";
 import { ThumbnailWorkerPool } from "./ThumbnailWorkerPool";
 
-import type { ImageObject, StorageReference } from "core/entities";
+import type {
+  AnnotationVolume,
+  Category,
+  ImageObject,
+  StorageReference,
+} from "core/entities";
 import type { ISegmenterApi } from "core/dl/segmentation/types";
 
 import type { CompositeLayer } from "utils/image/compositeChannels";
@@ -47,16 +52,19 @@ import type {
   BackendSegmentation,
   BackendSession,
   CallOptions,
+  Changed,
   Counts,
   Deleted,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
   ImageSort,
+  ImageUpdate,
   Page,
   PageRequest,
   ProjectSummary,
   RawChannelData,
+  VolumeUpdate,
   RenderRequest,
   RenderResult,
   RenderedImage,
@@ -90,6 +98,37 @@ const groupBy = <T>(
 
 type RootState = ReturnType<StoreHandle["getState"]>;
 type DataState = RootState["data"];
+
+/* The fields a category change rewrites, as the store holds them now. */
+const imageUpdate = (image: ImageObject): ImageUpdate => ({
+  id: image.id,
+  categoryId: image.categoryId,
+  partition: image.partition,
+  ...(image.predictionConfidence !== undefined && {
+    predictionConfidence: image.predictionConfidence,
+  }),
+  ...(image.predictedAtRunId !== undefined && {
+    predictedAtRunId: image.predictedAtRunId,
+  }),
+  ...(image.predictionCorrected !== undefined && {
+    predictionCorrected: image.predictionCorrected,
+  }),
+});
+
+const volumeUpdate = (volume: AnnotationVolume): VolumeUpdate => ({
+  id: volume.id,
+  kindId: volume.kindId,
+  categoryId: volume.categoryId,
+  ...(volume.predictionConfidence !== undefined && {
+    predictionConfidence: volume.predictionConfidence,
+  }),
+  ...(volume.predictedAtRunId !== undefined && {
+    predictedAtRunId: volume.predictedAtRunId,
+  }),
+  ...(volume.predictionCorrected !== undefined && {
+    predictionCorrected: volume.predictionCorrected,
+  }),
+});
 
 /* A value derived from one slice of state, rebuilt only when that slice is
  * replaced. */
@@ -496,6 +535,33 @@ export class LocalBackend implements Backend {
       }
       return { deleted: ids.length };
     },
+
+    categorize: async (
+      query: ImageQuery,
+      categoryId: string,
+    ): Promise<Changed> => {
+      const ids = await this.query.imageIds(query);
+      const before = this.#store.getState().data.images.entities;
+      const changing = ids.filter(
+        (id) => before[id] && before[id].categoryId !== categoryId,
+      );
+      if (changing.length === 0) return { changed: 0 };
+      this.#store.dispatch(
+        dataSlice.actions.batchUpdateImageCategory(
+          changing.map((id) => ({ id, categoryId })),
+        ),
+      );
+      // The reducer applies the partition and correction rules; the event
+      // carries what they produced.
+      const after = this.#store.getState().data.images.entities;
+      const updates = changing
+        .filter((id) => after[id]?.categoryId === categoryId)
+        .map((id) => imageUpdate(after[id]));
+      if (updates.length > 0) {
+        this.#bus.emit({ type: "images/didUpdate", updates });
+      }
+      return { changed: updates.length };
+    },
   };
 
   readonly annotations = {
@@ -515,6 +581,140 @@ export class LocalBackend implements Backend {
         volumeIds: [...candidates].filter((id) => !after[id]),
       });
       return { deleted: ids.length };
+    },
+
+    categorize: async (
+      query: AnnotationQuery,
+      categoryId: string,
+    ): Promise<Changed> => {
+      const ids = await this.query.annotationIds(query);
+      const { annotations, annotationVolumes } = this.#store.getState().data;
+      const volumeOf = (id: string) => annotations.entities[id]?.volumeId;
+      const candidates = new Set(
+        ids
+          .map(volumeOf)
+          .filter(
+            (volumeId): volumeId is string =>
+              !!volumeId &&
+              annotationVolumes.entities[volumeId]?.categoryId !== categoryId,
+          ),
+      );
+      if (candidates.size === 0) return { changed: 0 };
+      this.#store.dispatch(
+        dataSlice.actions.batchBubbleUpdateAnnotationCategory(
+          ids.map((id) => ({ id, categoryId })),
+        ),
+      );
+      const after = this.#store.getState().data;
+      const moved = new Set(
+        [...candidates].filter(
+          (volumeId) =>
+            after.annotationVolumes.entities[volumeId]?.categoryId ===
+            categoryId,
+        ),
+      );
+      if (moved.size === 0) return { changed: 0 };
+      this.#bus.emit({
+        type: "annotations/didUpdate",
+        volumes: [...moved].map((volumeId) =>
+          volumeUpdate(after.annotationVolumes.entities[volumeId]),
+        ),
+        // Every annotation of a moved volume followed the partition rule.
+        annotations: after.annotations.ids
+          .filter((id) => moved.has(after.annotations.entities[id].volumeId))
+          .map((id) => ({
+            id,
+            partition: after.annotations.entities[id].partition,
+          })),
+      });
+      return {
+        changed: ids.filter((id) => moved.has(volumeOf(id) ?? "")).length,
+      };
+    },
+  };
+
+  #categoriesChanged(): void {
+    this.#bus.emit({
+      type: "categories/didChange",
+      categories: selectAllCategories(this.#store.getState()),
+    });
+  }
+
+  readonly categories = {
+    create: async (categories: Category[]): Promise<Category[]> => {
+      if (categories.length > 0) {
+        this.#store.dispatch(dataSlice.actions.batchAddCategory(categories));
+        this.#categoriesChanged();
+      }
+      return categories;
+    },
+
+    update: async (
+      id: string,
+      changes: { name?: string; color?: string },
+    ): Promise<Category> => {
+      const current = this.#store.getState().data.categories.entities[id];
+      if (!current) {
+        throw new BackendError("NOT_FOUND", `Unknown category ${id}`);
+      }
+      if (changes.name !== undefined || changes.color !== undefined) {
+        this.#store.dispatch(
+          dataSlice.actions.updateCategoryDisplayProps({
+            id,
+            changes: {
+              ...(changes.name !== undefined && { name: changes.name }),
+              ...(changes.color !== undefined && { color: changes.color }),
+            } as { name: string } | { color: string },
+          }),
+        );
+        this.#categoriesChanged();
+      }
+      return this.#store.getState().data.categories.entities[id];
+    },
+
+    delete: async (ids: string[]): Promise<Deleted> => {
+      const { data } = this.#store.getState();
+      const gone = ids
+        .map((id) => data.categories.entities[id])
+        .filter((category) => category && !representsUnknown(category.id));
+      if (gone.length === 0) return { deleted: 0 };
+      const goneIds = new Set(gone.map((category) => category.id));
+      const imageIds = data.images.ids.filter((id) =>
+        goneIds.has(data.images.entities[id].categoryId),
+      );
+      const volumeIds = data.annotationVolumes.ids.filter((id) =>
+        goneIds.has(data.annotationVolumes.entities[id].categoryId),
+      );
+      this.#store.dispatch(
+        dataSlice.actions.batchDeleteCategory(
+          gone.map((category) => ({
+            id: category.id,
+            details:
+              category.type === "image"
+                ? { type: "image" }
+                : { type: "annotation", kindId: category.kindId },
+          })),
+        ),
+      );
+      // The reducer returned their items to the unknown categories.
+      const after = this.#store.getState().data;
+      if (imageIds.length > 0) {
+        this.#bus.emit({
+          type: "images/didUpdate",
+          updates: imageIds.map((id) => imageUpdate(after.images.entities[id])),
+        });
+      }
+      if (volumeIds.length > 0) {
+        this.#bus.emit({
+          type: "annotations/didUpdate",
+          volumes: volumeIds.map((id) =>
+            volumeUpdate(after.annotationVolumes.entities[id]),
+          ),
+          annotations: [],
+        });
+      }
+      this.#categoriesChanged();
+      return { deleted: gone.length };
     },
   };
 

@@ -7,6 +7,7 @@ import asyncio
 import logging
 import threading
 from collections import defaultdict
+from datetime import UTC, datetime
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Any
@@ -33,11 +34,15 @@ from piximi_schema.entities import (
     Plane,
     Shape,
 )
+from piximi_schema.classification import AnnotationUpdate, ImageUpdate, VolumeUpdate
 from piximi_schema.events import (
     AnnotationsDidAdd,
     AnnotationsDidRemove,
+    AnnotationsDidUpdate,
+    CategoriesDidChange,
     ImagesDidAdd,
     ImagesDidRemove,
+    ImagesDidUpdate,
     KindsDidAdd,
     KindWithCategory,
     ModelsDidChange,
@@ -82,7 +87,10 @@ from piximi_schema.unknown import (
     UNKNOWN_KIND_CATEGORY,
     generate_kind,
     generate_uuid,
+    represents_unknown,
 )
+
+from .classification import next_partition, prediction_correction
 
 from .decode import SUPPORTED_SUFFIXES, read_image
 from .dedup import MaskedBox, is_duplicate
@@ -487,6 +495,202 @@ class ReferenceEngine:
         )
         return len(ids)
 
+    # ── Engine protocol: categories ─────────────────────────────────────────
+
+    def _category(self, category_id: str) -> Category:
+        row = self.meta.get("category", category_id, _AnyCategory)
+        if row is None:
+            raise BackendError("NOT_FOUND", f"Unknown category {category_id}")
+        from pydantic import TypeAdapter  # noqa: PLC0415
+
+        return TypeAdapter(Category).validate_python(row.to_wire())
+
+    def _categories_changed(self) -> None:
+        self._emit(CategoriesDidChange(type="categories/didChange", categories=self._categories()))
+
+    async def categories_create(self, categories: list[Category]) -> list[Category]:
+        kinds = {kind.id for kind in self.meta.list("kind", Kind)}
+        for category in categories:
+            if self.meta.get("category", category.id, _AnyCategory) is not None:
+                raise BackendError("NOT_SUPPORTED", f"A category {category.id} already exists")
+            if category.type == "annotation" and category.kind_id not in kinds:
+                raise BackendError("NOT_FOUND", f"Unknown kind {category.kind_id}")
+        if categories:
+            self.meta.put_many("category", [(category, None) for category in categories])
+            self._categories_changed()
+        return categories
+
+    async def categories_update(self, id: str, name: str | None, color: str | None) -> Category:
+        category = self._category(id)
+        changes = {key: value for key, value in (("name", name), ("color", color)) if value is not None}
+        if changes:
+            category = category.model_copy(update=changes)
+            self.meta.put("category", category)
+            self._categories_changed()
+        return category
+
+    async def categories_delete(self, ids: list[str]) -> int:
+        """Items return to the unknown category; their partitions and
+        prediction records stay, as the frontend's own cascade leaves them."""
+        gone: list[Category] = []
+        for id in ids:
+            if represents_unknown(id):
+                continue
+            row = self.meta.get("category", id, _AnyCategory)
+            if row is not None:
+                gone.append(self._category(id))
+        if not gone:
+            return 0
+        image_categories = [c.id for c in gone if c.type == "image"]
+        annotation_categories = [c for c in gone if c.type == "annotation"]
+
+        image_updates: list[ImageUpdate] = []
+        if image_categories:
+            ids_ = self.meta.select_ids("image", where=[MetaStore.in_clause("category_id", image_categories)])
+            images = self.meta.get_many("image", ids_, ImageObject)
+            rows = []
+            for image in images.values():
+                updated = image.model_copy(update={"category_id": UNKNOWN_IMAGE_CATEGORY_ID})
+                rows.append((updated, updated.series_id))
+                image_updates.append(_image_update(updated))
+            self.meta.put_many("image", rows)
+
+        volume_updates: list[VolumeUpdate] = []
+        if annotation_categories:
+            unknown_of = {kind.id: kind.unknown_category_id for kind in self.meta.list("kind", Kind)}
+            volume_ids = self.meta.select_ids(
+                "volume", where=[MetaStore.in_clause("category_id", [c.id for c in annotation_categories])]
+            )
+            volumes = self.meta.get_many("volume", volume_ids, AnnotationVolume)
+            rows = []
+            for volume in volumes.values():
+                updated = volume.model_copy(update={"category_id": unknown_of[volume.kind_id]})
+                rows.append((updated, updated.image_id))
+                volume_updates.append(_volume_update(updated))
+            self.meta.put_many("volume", rows)
+            self._reindex_annotations({volume.id: volume for volume, _ in rows})
+
+        self.meta.delete("category", [c.id for c in gone])
+        if image_updates:
+            self._emit(ImagesDidUpdate(type="images/didUpdate", updates=image_updates))
+        if volume_updates:
+            self._emit(AnnotationsDidUpdate(type="annotations/didUpdate", volumes=volume_updates, annotations=[]))
+        self._categories_changed()
+        return len(gone)
+
+    def _reindex_annotations(
+        self, volumes: dict[str, AnnotationVolume], partitions: dict[str, Partition] | None = None
+    ) -> list[AnnotationUpdate]:
+        """Rewrites the annotations of ``volumes`` so their indexed columns
+        follow the volume again, with new partitions where given; returns
+        the partition of every annotation whose volume moved, so a client
+        can apply them without knowing the rule."""
+        image_ids = sorted({volume.image_id for volume in volumes.values()})
+        headers = [
+            header
+            for header in self.meta.list("annotation", AnnotationHeader, parents=image_ids)
+            if header.volume_id in volumes
+        ]
+        updates: list[AnnotationUpdate] = []
+        rewritten: list[AnnotationHeader] = []
+        for header in headers:
+            if partitions is not None:
+                partition = partitions.get(header.id, header.partition)
+                if partition != header.partition:
+                    header = header.model_copy(update={"partition": partition})
+                updates.append(AnnotationUpdate(id=header.id, partition=partition))
+            rewritten.append(header)
+        self.meta.update_many(
+            "annotation", rewritten, index={h.id: annotation_index(volumes[h.volume_id]) for h in rewritten}
+        )
+        return updates
+
+    async def images_categorize(self, query: ImageQuery, category_id: str) -> int:
+        category = self._category(category_id)
+        if category.type != "image":
+            raise BackendError("NOT_FOUND", f"{category_id} is not an image category")
+        ids = self.meta.select_ids("image", where=image_clauses(query))
+        images = self.meta.get_many("image", ids, ImageObject)
+        now = _now()
+        rows = []
+        updates: list[ImageUpdate] = []
+        for id in ids:
+            image = images.get(id)
+            if image is None or image.category_id == category_id:
+                continue
+            updated = image.model_copy(
+                update={
+                    "category_id": category_id,
+                    "partition": next_partition(category_id, image.partition, False),
+                    "prediction_confidence": None,
+                    "predicted_at_run_id": None,
+                    "prediction_corrected": prediction_correction(
+                        image.category_id,
+                        category_id,
+                        image.predicted_at_run_id,
+                        image.prediction_confidence,
+                        image.prediction_corrected,
+                        now,
+                    ),
+                }
+            )
+            rows.append((updated, updated.series_id))
+            updates.append(_image_update(updated))
+        if rows:
+            self.meta.put_many("image", rows)
+            self._emit(ImagesDidUpdate(type="images/didUpdate", updates=updates))
+        return len(updates)
+
+    async def annotations_categorize(self, query: AnnotationQuery, category_id: str) -> int:
+        category = self._category(category_id)
+        if category.type != "annotation":
+            raise BackendError("NOT_FOUND", f"{category_id} is not an object category")
+        ids = self.meta.select_ids("annotation", where=annotation_clauses(query))
+        headers = self.meta.get_many("annotation", ids, AnnotationHeader)
+        volumes = self.meta.get_many(
+            "volume", sorted({header.volume_id for header in headers.values()}), AnnotationVolume
+        )
+        now = _now()
+        changed: dict[str, AnnotationVolume] = {}
+        for volume in volumes.values():
+            if volume.category_id == category_id:
+                continue
+            changed[volume.id] = volume.model_copy(
+                update={
+                    "kind_id": category.kind_id,
+                    "category_id": category_id,
+                    "prediction_confidence": None,
+                    "predicted_at_run_id": None,
+                    "prediction_corrected": prediction_correction(
+                        volume.category_id,
+                        category_id,
+                        volume.predicted_at_run_id,
+                        volume.prediction_confidence,
+                        volume.prediction_corrected,
+                        now,
+                    ),
+                }
+            )
+        if not changed:
+            return 0
+        self.meta.put_many("volume", [(volume, volume.image_id) for volume in changed.values()])
+        # Every annotation of a moved volume follows the partition rule.
+        image_ids = sorted({volume.image_id for volume in changed.values()})
+        partitions = {
+            header.id: next_partition(category_id, header.partition, False)
+            for header in self.meta.list("annotation", AnnotationHeader, parents=image_ids)
+            if header.volume_id in changed
+        }
+        annotation_updates = self._reindex_annotations(changed, partitions)
+        self._emit(
+            AnnotationsDidUpdate(
+                type="annotations/didUpdate",
+                volumes=[_volume_update(volume) for volume in changed.values()],
+                annotations=annotation_updates,
+            )
+        )
+        return sum(1 for header in headers.values() if header.volume_id in changed)
+
     # ── Engine protocol: render ─────────────────────────────────────────────
 
     def _layers(self, request: RenderRequest) -> list[tuple[np.ndarray, int, tuple[float, float, float], float, float]]:
@@ -768,6 +972,32 @@ class ReferenceEngine:
         if not was_cancelled:
             progress(100, f"Segmentation finished: {len(annotations)} added")
         return summary(len(annotations), skipped, was_cancelled)
+
+
+def _now() -> str:
+    return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def _image_update(image: ImageObject) -> ImageUpdate:
+    return ImageUpdate(
+        id=image.id,
+        category_id=image.category_id,
+        partition=image.partition,
+        prediction_confidence=image.prediction_confidence,
+        predicted_at_run_id=image.predicted_at_run_id,
+        prediction_corrected=image.prediction_corrected,
+    )
+
+
+def _volume_update(volume: AnnotationVolume) -> VolumeUpdate:
+    return VolumeUpdate(
+        id=volume.id,
+        kind_id=volume.kind_id,
+        category_id=volume.category_id,
+        prediction_confidence=volume.prediction_confidence,
+        predicted_at_run_id=volume.predicted_at_run_id,
+        prediction_corrected=volume.prediction_corrected,
+    )
 
 
 # ── Storage rows that are not wire models themselves ─────────────────────────

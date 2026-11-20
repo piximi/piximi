@@ -1,6 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { Partition } from "core/entities";
+import {
+  Partition,
+  UNKNOWN_IMAGE_CATEGORY_ID,
+  generateCategory,
+} from "core/entities";
 
 import { hasCapability } from "../capabilities";
 import { randomKey } from "../query";
@@ -398,6 +402,189 @@ export const describeBackendConformance = (
         );
         expect(job?.kind).toBe("segmentation");
         expect(job?.status).toBe("succeeded");
+      });
+    });
+
+    describe("categories", () => {
+      it("creates, edits and deletes categories, announcing the list", async () => {
+        const { backend } = ctx;
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((e) => events.push(e));
+        const category = generateCategory(
+          `Conformance-${Date.now()}`,
+          "#123456",
+          {
+            type: "image",
+          },
+        );
+
+        expect(await backend.categories.create([category])).toEqual([category]);
+        expect((await backend.query.project()).categories).toContainEqual(
+          category,
+        );
+        const renamed = await backend.categories.update(category.id, {
+          name: "Renamed",
+        });
+        expect(renamed).toMatchObject({
+          id: category.id,
+          name: "Renamed",
+          color: "#123456",
+        });
+        // The reserved unknown category is never deleted.
+        expect(
+          await backend.categories.delete([
+            category.id,
+            UNKNOWN_IMAGE_CATEGORY_ID,
+            "no-such-category",
+          ]),
+        ).toEqual({ deleted: 1 });
+        unsubscribe();
+
+        const remaining = (await backend.query.project()).categories;
+        expect(remaining.map((c) => c.id)).not.toContain(category.id);
+        expect(remaining.map((c) => c.id)).toContain(UNKNOWN_IMAGE_CATEGORY_ID);
+        const lists = events.filter((e) => e.type === "categories/didChange");
+        expect(lists.length).toBeGreaterThanOrEqual(3);
+        expect(lists[0].categories).toContainEqual(category);
+        expect(lists[1].categories).toContainEqual(renamed);
+        expect(lists.at(-1)!.categories.map((c) => c.id)).not.toContain(
+          category.id,
+        );
+      });
+
+      it("categorizes images by query, following the partition rules", async () => {
+        const { backend } = ctx;
+        const [a, b] = ctx.images;
+        const category = generateCategory("Cells", "#00ff00", {
+          type: "image",
+        });
+        await backend.categories.create([category]);
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((e) => events.push(e));
+
+        expect(
+          await backend.images.categorize({ ids: [a.id, b.id] }, category.id),
+        ).toEqual({ changed: 2 });
+        const update = events.find((e) => e.type === "images/didUpdate");
+        expect(update?.updates.map((u) => u.id).sort()).toEqual(
+          [a.id, b.id].sort(),
+        );
+        // A hand-made change leaves an unassigned item unassigned.
+        expect(
+          update?.updates.every(
+            (u) =>
+              u.categoryId === category.id &&
+              u.partition === Partition.Unassigned,
+          ),
+        ).toBe(true);
+        expect(
+          (await backend.query.imageCounts({}, "category")).groups?.[
+            category.id
+          ],
+        ).toBe(2);
+        const [record] = (
+          await backend.query.images({ ids: [a.id] }, { limit: 1 })
+        ).items;
+        expect(record.image.categoryId).toBe(category.id);
+        expect(
+          await backend.images.categorize({ ids: [a.id] }, category.id),
+        ).toEqual({ changed: 0 });
+
+        // Back to unknown sends an item to inference.
+        expect(
+          await backend.images.categorize(
+            { ids: [a.id] },
+            UNKNOWN_IMAGE_CATEGORY_ID,
+          ),
+        ).toEqual({ changed: 1 });
+        expect(
+          (
+            await backend.query.imageCounts({
+              partitions: [Partition.Inference],
+            })
+          ).total,
+        ).toBe(1);
+
+        // Deleting the category returns `b` to unknown, keeping its partition.
+        await backend.categories.delete([category.id]);
+        unsubscribe();
+        expect(
+          (await backend.query.imageCounts({ categoryIds: [category.id] }))
+            .total,
+        ).toBe(0);
+        const last = events
+          .filter((e) => e.type === "images/didUpdate")
+          .at(-1)!;
+        expect(last.updates).toContainEqual(
+          expect.objectContaining({
+            id: b.id,
+            categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
+            partition: Partition.Unassigned,
+          }),
+        );
+      });
+
+      it("categorizes objects through their volume", async () => {
+        const { backend } = ctx;
+        if (!backend.segmentation) return;
+        const [model] = await backend.segmentation.listModels();
+        const kindName = `Categorized-${Date.now()}`;
+        const summary = await backend.segmentation.run({
+          modelId: model.name,
+          imageIds: ctx.images.map((im) => im.id),
+          channelMetaIds: [],
+          kindName,
+        });
+        expect(summary.added).toBeGreaterThan(0);
+        const kind = (await backend.query.project()).kinds.find(
+          (k) => k.name === kindName,
+        )!;
+        const category = generateCategory("Round", "#0000ff", {
+          type: "annotation",
+          kindId: kind.id,
+        });
+        await backend.categories.create([category]);
+        const [first] = (
+          await backend.query.annotations({ kindIds: [kind.id] }, { limit: 1 })
+        ).items;
+        const mask = (await backend.query.masks([first.annotation.id]))[
+          first.annotation.id
+        ];
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((e) => events.push(e));
+
+        expect(
+          await backend.annotations.categorize(
+            { ids: [first.annotation.id] },
+            category.id,
+          ),
+        ).toEqual({ changed: 1 });
+        unsubscribe();
+
+        const update = events.find((e) => e.type === "annotations/didUpdate");
+        expect(update?.volumes).toContainEqual(
+          expect.objectContaining({
+            id: first.volume.id,
+            categoryId: category.id,
+            kindId: kind.id,
+          }),
+        );
+        expect(update?.annotations).toContainEqual({
+          id: first.annotation.id,
+          partition: Partition.Unassigned,
+        });
+        const { query } = backend;
+        expect(
+          (await query.annotationCounts({ kindIds: [kind.id] }, "category"))
+            .groups?.[category.id],
+        ).toBe(1);
+        expect(
+          await query.annotationIds({ categoryIds: [category.id] }),
+        ).toEqual([first.annotation.id]);
+        // The rewrite left the mask alone.
+        expect(
+          (await query.masks([first.annotation.id]))[first.annotation.id],
+        ).toEqual(mask);
       });
     });
 

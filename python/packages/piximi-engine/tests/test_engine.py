@@ -267,3 +267,63 @@ async def test_deleting_annotations_and_images_cascades_and_announces(engine: Re
     assert engine.meta.count("plane") == 2 and engine.meta.get("series", b.series.id, type(b.series)) is None
     assert all(channel_id not in engine.pixels for channel_id in channel_ids)
     assert await engine.images_delete(ImageQuery(ids=[b.image.id])) == 0
+
+
+async def test_categories_and_categorizing(engine: ReferenceEngine):
+    from piximi_schema.entities import AnnotationCategory, ImageCategory, Partition
+    from piximi_schema.unknown import UNKNOWN_IMAGE_CATEGORY_ID, generate_uuid
+
+    records = await all_images(engine)
+    a, b = records["a"], records["b"]
+    events = []
+    engine.subscribe(events.append)
+
+    cells = ImageCategory(type="image", id=generate_uuid(), color="#ff0000", name="Cells", is_unknown=False)
+    assert await engine.categories_create([cells]) == [cells]
+    assert events[-1].type == "categories/didChange"
+    assert any(category.id == cells.id for category in events[-1].categories)
+
+    # Categorizing by query: a hand-made change, so unassigned items stay so.
+    assert await engine.images_categorize(ImageQuery(ids=[a.image.id, b.image.id]), cells.id) == 2
+    update = events[-1]
+    assert update.type == "images/didUpdate"
+    assert {u.id for u in update.updates} == {a.image.id, b.image.id}
+    assert all(u.category_id == cells.id and u.partition == Partition.UNASSIGNED for u in update.updates)
+    assert (await engine.image_counts(ImageQuery(), "category")).groups[cells.id] == 2
+    assert await engine.images_categorize(ImageQuery(ids=[a.image.id]), cells.id) == 0
+
+    # Back to unknown sends an item to inference.
+    assert await engine.images_categorize(ImageQuery(ids=[a.image.id]), UNKNOWN_IMAGE_CATEGORY_ID) == 1
+    assert events[-1].updates[0].partition == Partition.INFERENCE
+
+    renamed = await engine.categories_update(cells.id, "Nuclei", None)
+    assert (renamed.name, renamed.color) == ("Nuclei", "#ff0000")
+
+    # Objects move through their volume, every plane's annotation with it.
+    await engine.segmentation_run(
+        SegmentationRunRequest(model_id="threshold", image_ids=[a.image.id], channel_meta_ids=[], kind_name="Cell"),
+        ctx(),
+    )
+    kind = next(k for k in engine.meta.list("kind", Kind) if k.name == "Cell")
+    round_ = AnnotationCategory(
+        type="annotation", id=generate_uuid(), color="#00ff00", name="Round", is_unknown=False, kind_id=kind.id
+    )
+    await engine.categories_create([round_])
+    first = (await engine.annotations(AnnotationQuery(kind_ids=[kind.id]), None, PageRequest(limit=1))).items[0]
+    assert await engine.annotations_categorize(AnnotationQuery(ids=[first.annotation.id]), round_.id) == 1
+    moved = events[-1]
+    assert moved.type == "annotations/didUpdate"
+    assert moved.volumes[0].id == first.volume.id and moved.volumes[0].category_id == round_.id
+    assert (await engine.annotation_counts(AnnotationQuery(kind_ids=[kind.id]), "category")).groups[round_.id] == 1
+    page = await engine.annotations(AnnotationQuery(category_ids=[round_.id]), None, PageRequest(limit=10))
+    assert [record.annotation.id for record in page.items] == [first.annotation.id]
+    # The mask survived the rewrite.
+    assert (await engine.masks([first.annotation.id]))[first.annotation.id]
+
+    # Deleting returns items to unknown; the reserved unknown stays.
+    assert await engine.categories_delete([cells.id, round_.id, UNKNOWN_IMAGE_CATEGORY_ID, "nope"]) == 2
+    assert (await engine.image_counts(ImageQuery(category_ids=[cells.id]))).total == 0
+    assert (await engine.annotation_counts(AnnotationQuery(category_ids=[round_.id]))).total == 0
+    assert all(c.id not in (cells.id, round_.id) for c in (await engine.project()).categories)
+    kept = engine.meta.get("image", b.image.id, ImageObject)
+    assert kept.category_id == UNKNOWN_IMAGE_CATEGORY_ID and kept.partition == Partition.UNASSIGNED

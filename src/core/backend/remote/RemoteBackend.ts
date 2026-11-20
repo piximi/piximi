@@ -14,6 +14,7 @@ import type {
   Channel,
   Partition,
 } from "core/entities";
+import type { Classifier } from "core/dl/classification/types";
 
 import type { Capability } from "../capabilities";
 import type { BackendEventListener } from "../events";
@@ -26,16 +27,19 @@ import type {
   AnnotationQuery,
   AnnotationRecord,
   AnnotationSort,
+  AnnotationUpdate,
   Backend,
   BackendSegmentation,
   BackendSession,
   CallOptions,
+  Changed,
   Counts,
   Deleted,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
   ImageSort,
+  ImageUpdate,
   ModelDescriptor,
   Page,
   PageRequest,
@@ -183,6 +187,45 @@ export class RemoteBackend implements Backend {
         ),
       }),
     );
+    peer.onNotification("images/didUpdate", (params) =>
+      this.#bus.emit({
+        type: "images/didUpdate",
+        updates: asDomain<ImageUpdate[]>((params as P.ImagesDidUpdate).updates),
+      }),
+    );
+    peer.onNotification("annotations/didUpdate", (params) => {
+      const event = params as P.AnnotationsDidUpdate;
+      this.#bus.emit({
+        type: "annotations/didUpdate",
+        volumes: event.volumes,
+        annotations: asDomain<AnnotationUpdate[]>(event.annotations),
+      });
+    });
+    peer.onNotification("categories/didChange", (params) =>
+      this.#bus.emit({
+        type: "categories/didChange",
+        categories: asDomain<Category[]>(
+          (params as P.CategoriesDidChange).categories,
+        ),
+      }),
+    );
+    peer.onNotification("classifiers/didChange", (params) =>
+      this.#bus.emit({
+        type: "classifiers/didChange",
+        classifiers: asDomain<Classifier[]>(
+          (params as P.ClassifiersDidChange).classifiers,
+        ),
+      }),
+    );
+    peer.onNotification("classifiers/didEpoch", (params) => {
+      const event = params as P.ClassifiersDidEpoch;
+      this.#bus.emit({
+        type: "classifiers/didEpoch",
+        classifierId: event.classifierId,
+        runId: event.runId,
+        epoch: event.epoch,
+      });
+    });
   }
 
   #call<M extends keyof Methods>(
@@ -386,6 +429,11 @@ export class RemoteBackend implements Backend {
   readonly images = {
     delete: (query: ImageQuery): Promise<Deleted> =>
       this.#call("images/delete", { query: asWire<P.ImageQuery>(query) }),
+    categorize: (query: ImageQuery, categoryId: string): Promise<Changed> =>
+      this.#call("images/categorize", {
+        query: asWire<P.ImageQuery>(query),
+        categoryId,
+      }),
   };
 
   readonly annotations = {
@@ -393,6 +441,36 @@ export class RemoteBackend implements Backend {
       this.#call("annotations/delete", {
         query: asWire<P.AnnotationQuery>(query),
       }),
+    categorize: (
+      query: AnnotationQuery,
+      categoryId: string,
+    ): Promise<Changed> =>
+      this.#call("annotations/categorize", {
+        query: asWire<P.AnnotationQuery>(query),
+        categoryId,
+      }),
+  };
+
+  readonly categories = {
+    create: async (categories: Category[]): Promise<Category[]> =>
+      asDomain<Category[]>(
+        (
+          await this.#call("categories/create", {
+            categories:
+              asWire<P.CategoriesCreateParams["categories"]>(categories),
+          })
+        ).categories,
+      ),
+    update: async (
+      id: string,
+      changes: { name?: string; color?: string },
+    ): Promise<Category> =>
+      asDomain<Category>(
+        (await this.#call("categories/update", { id, ...changes }))
+          .categories[0],
+      ),
+    delete: (ids: string[]): Promise<Deleted> =>
+      this.#call("categories/delete", { ids }),
   };
 
   // ── Jobs ───────────────────────────────────────────────────────────────────

@@ -157,6 +157,24 @@ const applyBackendEvent = (
     case "annotations/didRemove":
       // Not mirrored for a remote project; the revision refreshes the grids.
       break;
+    case "images/didUpdate":
+      if (remote) {
+        store.dispatch(dataSlice.actions.applyImageUpdates(event.updates));
+      }
+      break;
+    case "annotations/didUpdate":
+      // Not mirrored for a remote project; the revision refreshes the grids.
+      break;
+    case "categories/didChange":
+      if (remote) {
+        store.dispatch(dataSlice.actions.setCategories(event.categories));
+      }
+      break;
+    case "classifiers/didChange":
+    case "classifiers/didEpoch":
+      // The classifier slice follows these once classification is behind
+      // the backend; nothing a query answers changed.
+      return;
   }
   if (remote) store.dispatch(backendSyncSlice.actions.backendDataChanged());
 };

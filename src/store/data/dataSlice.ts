@@ -33,6 +33,7 @@ import type {
   AnnotationObject,
   AnnotationVolume,
   IntensityMeasurement,
+  Predictable,
 } from "core/entities";
 
 import type { AtLeastOne } from "utils/types";
@@ -467,6 +468,33 @@ export const dataSlice = createSlice({
     },
     addCategory(state, action: PayloadAction<Category>) {
       categoryAdapter.addOne(state.categories, action.payload);
+    },
+    /* The whole list, as a backend announces it. */
+    setCategories(state, action: PayloadAction<Array<Category>>) {
+      categoryAdapter.setAll(state.categories, action.payload);
+    },
+    /* Fields a backend rewrote on images it holds; unknown ids are skipped. */
+    applyImageUpdates(
+      state,
+      action: PayloadAction<
+        Array<Predictable & { id: string; categoryId: string }>
+      >,
+    ) {
+      imageAdapter.updateMany(
+        state.images,
+        action.payload
+          .filter((update) => state.images.entities[update.id])
+          .map(({ id, ...changes }) => ({
+            id,
+            changes: {
+              categoryId: changes.categoryId,
+              partition: changes.partition,
+              predictionConfidence: changes.predictionConfidence,
+              predictedAtRunId: changes.predictedAtRunId,
+              predictionCorrected: changes.predictionCorrected,
+            },
+          })),
+      );
     },
     batchAddCategory(state, action: PayloadAction<Array<Category>>) {
       categoryAdapter.addMany(state.categories, action.payload);

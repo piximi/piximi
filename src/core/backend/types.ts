@@ -58,6 +58,7 @@ export interface Backend {
   readonly jobs: BackendJobs;
   readonly images: BackendImages;
   readonly annotations: BackendAnnotations;
+  readonly categories: BackendCategories;
   readonly segmentation?: BackendSegmentation;
   readonly classification?: BackendClassification;
 }
@@ -286,11 +287,29 @@ export type AnnotationUpdate = { id: string; partition: Partition };
 export interface BackendImages {
   /* Each image with its planes, channels and objects. */
   delete(query: ImageQuery): Promise<Deleted>;
+  /* Moves every match to the category. A hand-made change: the shared
+   * partition and correction rules apply (`core/entities/prediction.ts`). */
+  categorize(query: ImageQuery, categoryId: string): Promise<Changed>;
 }
 
 export interface BackendAnnotations {
   /* Each annotation, and any volume left without one. */
   delete(query: AnnotationQuery): Promise<Deleted>;
+  /* Moves the volume of every match to the category, which also sets its
+   * kind; every annotation of the volume follows the partition rule. */
+  categorize(query: AnnotationQuery, categoryId: string): Promise<Changed>;
+}
+
+export interface BackendCategories {
+  /* Made by the caller with fresh ids; kept as given. */
+  create(categories: Category[]): Promise<Category[]>;
+  update(
+    id: string,
+    changes: { name?: string; color?: string },
+  ): Promise<Category>;
+  /* Items of a deleted category return to the unknown one of their kind,
+   * keeping their partitions; the reserved unknown categories stay. */
+  delete(ids: string[]): Promise<Deleted>;
 }
 
 // ── Jobs ─────────────────────────────────────────────────────────────────────

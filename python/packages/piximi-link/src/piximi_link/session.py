@@ -16,14 +16,21 @@ from typing import Any
 from pydantic import ValidationError
 from piximi_schema import PROTOCOL_VERSION
 from piximi_schema.base import WireModel
+from piximi_schema.classification import ChangedResult
 from piximi_schema.methods import (
     AnnotationCountsParams,
     AnnotationIdsParams,
+    AnnotationsCategorizeParams,
     AnnotationsDeleteParams,
     AnnotationsParams,
+    CategoriesCreateParams,
+    CategoriesDeleteParams,
+    CategoriesResult,
+    CategoryUpdateParams,
     DeletedResult,
     ImageCountsParams,
     ImageIdsParams,
+    ImagesCategorizeParams,
     ImagesDeleteParams,
     ImagesParams,
     JobsCancelParams,
@@ -161,6 +168,25 @@ class SessionHub:
         async def annotations_delete(params: AnnotationsDeleteParams, _ctx: HandlerContext):
             return DeletedResult(deleted=await engine.annotations_delete(params.query))
 
+        async def images_categorize(params: ImagesCategorizeParams, _ctx: HandlerContext):
+            return ChangedResult(changed=await engine.images_categorize(params.query, params.category_id))
+
+        async def annotations_categorize(params: AnnotationsCategorizeParams, _ctx: HandlerContext):
+            return ChangedResult(
+                changed=await engine.annotations_categorize(params.query, params.category_id)
+            )
+
+        async def categories_create(params: CategoriesCreateParams, _ctx: HandlerContext):
+            return CategoriesResult(categories=await engine.categories_create(params.categories))
+
+        async def categories_update(params: CategoryUpdateParams, _ctx: HandlerContext):
+            return CategoriesResult(
+                categories=[await engine.categories_update(params.id, params.name, params.color)]
+            )
+
+        async def categories_delete(params: CategoriesDeleteParams, _ctx: HandlerContext):
+            return DeletedResult(deleted=await engine.categories_delete(params.ids))
+
         async def render_image(params: RenderImageParams, _ctx: HandlerContext):
             return await engine.render_image(params.request)
 
@@ -199,6 +225,11 @@ class SessionHub:
         peer.on_request("query/masks", typed(MasksParams, masks))
         peer.on_request("images/delete", typed(ImagesDeleteParams, images_delete))
         peer.on_request("annotations/delete", typed(AnnotationsDeleteParams, annotations_delete))
+        peer.on_request("images/categorize", typed(ImagesCategorizeParams, images_categorize))
+        peer.on_request("annotations/categorize", typed(AnnotationsCategorizeParams, annotations_categorize))
+        peer.on_request("categories/create", typed(CategoriesCreateParams, categories_create))
+        peer.on_request("categories/update", typed(CategoryUpdateParams, categories_update))
+        peer.on_request("categories/delete", typed(CategoriesDeleteParams, categories_delete))
         peer.on_request("render/image", typed(RenderImageParams, render_image))
         peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
         peer.on_request("jobs/list", typed(None, jobs_list))

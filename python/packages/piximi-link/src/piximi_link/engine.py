@@ -14,11 +14,17 @@ from collections.abc import Callable
 from typing import Protocol
 
 from piximi_schema.capabilities import Capability
+from piximi_schema.entities import Category
 from piximi_schema.events import (
     AnnotationsDidAdd,
     AnnotationsDidRemove,
+    AnnotationsDidUpdate,
+    CategoriesDidChange,
+    ClassifiersDidChange,
+    ClassifiersDidEpoch,
     ImagesDidAdd,
     ImagesDidRemove,
+    ImagesDidUpdate,
     JobsDidUpdate,
     KindsDidAdd,
     ModelsDidChange,
@@ -55,6 +61,11 @@ BackendEvent = (
     | ModelsDidChange
     | ImagesDidRemove
     | AnnotationsDidRemove
+    | ImagesDidUpdate
+    | AnnotationsDidUpdate
+    | CategoriesDidChange
+    | ClassifiersDidChange
+    | ClassifiersDidEpoch
 )
 EventListener = Callable[[BackendEvent], None]
 
@@ -108,6 +119,29 @@ class Engine(Protocol):
     async def annotations_delete(self, query: AnnotationQuery) -> int:
         """Removes every annotation the query matches and any volume left
         empty; announces ``annotations/didRemove``; returns how many."""
+        ...
+
+    async def images_categorize(self, query: ImageQuery, category_id: str) -> int:
+        """Moves every match to the category, as a hand-made change (the
+        shared partition and correction rules apply); announces
+        ``images/didUpdate``; returns how many changed."""
+        ...
+
+    async def annotations_categorize(self, query: AnnotationQuery, category_id: str) -> int:
+        """Moves the volume of every match to the category, which also sets
+        its kind; announces ``annotations/didUpdate``; returns how many of
+        the matches changed."""
+        ...
+
+    async def categories_create(self, categories: list[Category]) -> list[Category]:
+        """Adds categories made by the client; announces ``categories/didChange``."""
+        ...
+
+    async def categories_update(self, id: str, name: str | None, color: str | None) -> Category: ...
+
+    async def categories_delete(self, ids: list[str]) -> int:
+        """Removes categories, returning their items to the unknown one of
+        their kind; the reserved unknown categories stay. Returns how many."""
         ...
 
     # ── Render ──────────────────────────────────────────────────────────────

@@ -5,6 +5,9 @@ import {
   UNKNOWN_KIND_CATEGORY,
   generateKind,
   generateUUID,
+  nextPartition,
+  predictionCorrection,
+  representsUnknown,
 } from "core/entities";
 import { Partition } from "core/dl/enums";
 import { TaskCancelledError } from "core/dl/cancel";
@@ -26,6 +29,7 @@ import {
 } from "../query";
 
 import type {
+  AnnotationCategory,
   AnnotationObject,
   AnnotationVolume,
   Category,
@@ -49,15 +53,18 @@ import type {
   AnnotationQuery,
   AnnotationRecord,
   AnnotationSort,
+  AnnotationUpdate,
   Backend,
   BackendSession,
   CallOptions,
+  Changed,
   Counts,
   Deleted,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
   ImageSort,
+  ImageUpdate,
   Page,
   PageRequest,
   ProjectSummary,
@@ -68,6 +75,7 @@ import type {
   SegmentationModelDescriptor,
   SegmentationRunRequest,
   SegmentationRunSummary,
+  VolumeUpdate,
 } from "../types";
 
 type FakeImageSeed = {
@@ -433,6 +441,45 @@ export class FakeBackend implements Backend {
       this.#bus.emit({ type: "images/didRemove", imageIds: [...ids] });
       return { deleted: ids.size };
     },
+
+    categorize: async (
+      query: ImageQuery,
+      categoryId: string,
+    ): Promise<Changed> => {
+      const category = this.#category(categoryId);
+      if (category.type !== "image") {
+        throw new BackendError("NOT_FOUND", "Not an image category");
+      }
+      const updates: ImageUpdate[] = [];
+      for (const image of this.#imageListing(query)) {
+        if (image.categoryId === categoryId) continue;
+        const corrected = predictionCorrection(
+          image.categoryId,
+          categoryId,
+          {
+            predictedAtRunId: image.predictedAtRunId,
+            predictionConfidence: image.predictionConfidence,
+          },
+          image.predictionCorrected,
+        );
+        image.partition = nextPartition(categoryId, image.partition, false);
+        image.categoryId = categoryId;
+        delete image.predictionConfidence;
+        delete image.predictedAtRunId;
+        if (corrected) image.predictionCorrected = corrected;
+        else delete image.predictionCorrected;
+        updates.push({
+          id: image.id,
+          categoryId,
+          partition: image.partition,
+          ...(corrected && { predictionCorrected: corrected }),
+        });
+      }
+      if (updates.length > 0) {
+        this.#bus.emit({ type: "images/didUpdate", updates });
+      }
+      return { changed: updates.length };
+    },
   };
 
   readonly annotations = {
@@ -453,6 +500,163 @@ export class FakeBackend implements Backend {
         volumeIds,
       });
       return { deleted: ids.size };
+    },
+
+    categorize: async (
+      query: AnnotationQuery,
+      categoryId: string,
+    ): Promise<Changed> => {
+      const category = this.#category(categoryId);
+      if (category.type !== "annotation") {
+        throw new BackendError("NOT_FOUND", "Not an object category");
+      }
+      const rows = this.#annotationListing(query);
+      const moved = new Set<string>();
+      const volumes: VolumeUpdate[] = [];
+      for (const row of rows) {
+        const volume = this.#volumes.find((v) => v.id === row.volume.id)!;
+        if (volume.categoryId === categoryId || moved.has(volume.id)) continue;
+        moved.add(volume.id);
+        volumes.push(this.#moveVolume(volume, category));
+      }
+      if (moved.size === 0) return { changed: 0 };
+      this.#bus.emit({
+        type: "annotations/didUpdate",
+        volumes,
+        annotations: this.#repartition(moved, categoryId),
+      });
+      return {
+        changed: rows.filter((row) => moved.has(row.volume.id)).length,
+      };
+    },
+  };
+
+  #category(id: string): Category {
+    const category = this.#categories.find((c) => c.id === id);
+    if (!category)
+      throw new BackendError("NOT_FOUND", `Unknown category ${id}`);
+    return category;
+  }
+
+  #categoriesChanged(): void {
+    this.#bus.emit({
+      type: "categories/didChange",
+      categories: [...this.#categories],
+    });
+  }
+
+  /* Moves a volume by hand: category, kind, prediction record. */
+  #moveVolume(
+    volume: AnnotationVolume,
+    category: AnnotationCategory,
+  ): VolumeUpdate {
+    volume.predictionCorrected = predictionCorrection(
+      volume.categoryId,
+      category.id,
+      {
+        predictedAtRunId: volume.predictedAtRunId,
+        predictionConfidence: volume.predictionConfidence,
+      },
+      volume.predictionCorrected,
+    );
+    volume.categoryId = category.id;
+    volume.kindId = category.kindId;
+    delete volume.predictionConfidence;
+    delete volume.predictedAtRunId;
+    const { id, kindId, categoryId, predictionCorrected } = volume;
+    return {
+      id,
+      kindId,
+      categoryId,
+      ...(predictionCorrected && { predictionCorrected }),
+    };
+  }
+
+  /* Every annotation of the volumes follows the partition rule. */
+  #repartition(volumeIds: Set<string>, categoryId: string): AnnotationUpdate[] {
+    const updates: AnnotationUpdate[] = [];
+    for (const annotation of this.#annotations) {
+      if (!volumeIds.has(annotation.volumeId)) continue;
+      annotation.partition = nextPartition(
+        categoryId,
+        annotation.partition,
+        false,
+      );
+      updates.push({ id: annotation.id, partition: annotation.partition });
+    }
+    return updates;
+  }
+
+  readonly categories = {
+    create: async (categories: Category[]): Promise<Category[]> => {
+      for (const category of categories) {
+        if (this.#categories.some((c) => c.id === category.id)) {
+          throw new BackendError(
+            "NOT_SUPPORTED",
+            `A category ${category.id} already exists`,
+          );
+        }
+      }
+      if (categories.length > 0) {
+        this.#categories.push(...categories);
+        this.#categoriesChanged();
+      }
+      return categories;
+    },
+
+    update: async (
+      id: string,
+      changes: { name?: string; color?: string },
+    ): Promise<Category> => {
+      const category = this.#category(id);
+      if (changes.name !== undefined) category.name = changes.name;
+      if (changes.color !== undefined) category.color = changes.color;
+      this.#categoriesChanged();
+      return { ...category };
+    },
+
+    delete: async (ids: string[]): Promise<Deleted> => {
+      const gone = new Set(
+        ids.filter(
+          (id) =>
+            !representsUnknown(id) && this.#categories.some((c) => c.id === id),
+        ),
+      );
+      if (gone.size === 0) return { deleted: 0 };
+      const updates: ImageUpdate[] = [];
+      for (const image of this.#images) {
+        if (!gone.has(image.categoryId)) continue;
+        image.categoryId = UNKNOWN_IMAGE_CATEGORY.id;
+        updates.push({
+          id: image.id,
+          categoryId: image.categoryId,
+          partition: image.partition,
+        });
+      }
+      const volumes: VolumeUpdate[] = [];
+      for (const volume of this.#volumes) {
+        if (!gone.has(volume.categoryId)) continue;
+        const kind = this.#kinds.find((k) => k.id === volume.kindId)!;
+        volume.categoryId = kind.unknownCategoryId;
+        volumes.push({
+          id: volume.id,
+          kindId: volume.kindId,
+          categoryId: volume.categoryId,
+        });
+      }
+      this.#categories = this.#categories.filter((c) => !gone.has(c.id));
+      if (updates.length > 0) {
+        this.#bus.emit({ type: "images/didUpdate", updates });
+      }
+      if (volumes.length > 0) {
+        this.#bus.emit({
+          type: "annotations/didUpdate",
+          volumes,
+          annotations: [],
+        });
+      }
+      this.#categoriesChanged();
+      return { deleted: gone.size };
     },
   };
 
