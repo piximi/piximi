@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 
 import { useClassifierApi } from "core/dl/classification";
+import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
 
 import { WithLabel, TextFieldWithBlur, StyledSelect } from "components/inputs";
 
@@ -32,7 +33,7 @@ import { useClassificationModel } from "@ProjectViewer/hooks";
 
 import type { SelectChangeEvent } from "@mui/material";
 
-import type { ModelArch, ModelInfoDTO } from "core/dl/classification/types";
+import type { ModelInfoDTO } from "core/dl/classification/types";
 
 export const ModelPicker = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
@@ -71,7 +72,7 @@ const ModelArchiitectureOptions = ({
   newModelArch,
 }: {
   targetId: string;
-  newModelArch: ModelArch;
+  newModelArch: string;
 }) => {
   const dispatch = useDispatch();
 
@@ -79,7 +80,7 @@ const ModelArchiitectureOptions = ({
   const [draft, setDraft] = useState<string | null>(null);
 
   const handleArchitectureChange = (event: SelectChangeEvent<unknown>) => {
-    const value = event.target.value as ModelArch;
+    const value = event.target.value as string;
     dispatch(
       classifierSlice.actions.setNewModelArch({
         targetId,
@@ -125,7 +126,7 @@ const ModelArchiitectureOptions = ({
         >
           <MenuItem
             dense
-            value={0}
+            value={ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN]}
             sx={{
               borderRadius: 0,
               minHeight: "1rem",
@@ -133,7 +134,11 @@ const ModelArchiitectureOptions = ({
           >
             Simple CNN
           </MenuItem>
-          <MenuItem dense value={1} sx={{ borderRadius: 0, minHeight: "1rem" }}>
+          <MenuItem
+            dense
+            value={ARCHITECTURE_IDS[ModelArch.MOBILE_NET]}
+            sx={{ borderRadius: 0, minHeight: "1rem" }}
+          >
             MobileNet
           </MenuItem>
         </StyledSelect>

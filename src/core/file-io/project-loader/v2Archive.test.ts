@@ -149,7 +149,7 @@ describe("zarr-v2-on-disk archive at Piximi format 2.x", () => {
       channels: 2,
     });
     expect(run.hyperparameters.optimizer.learningRate).toBe(
-      info.optimizerSettings.learningRate,
+      info.hyperparameters.optimizer.learningRate,
     );
   });
 
@@ -208,10 +208,11 @@ describe("zarr-v2-on-disk edge cases", () => {
     const info =
       project.classifier.kindClassifiers.Image.modelInfoDict["acc 100%"];
     expect(info.valid).toBe(false);
-    expect(info.preprocessSettings.shuffle).toBe(false);
-    expect(info.preprocessSettings.normalizeOptions.normalize).toBe(false);
-    expect(info.preprocessSettings.normalizeOptions.center).toBe(false);
-    expect(info.preprocessSettings.cropOptions.numCrops).toBe(0);
+    const { preprocess } = info.hyperparameters;
+    expect(preprocess.shuffle).toBe(false);
+    expect(preprocess.normalizeOptions.normalize).toBe(false);
+    expect(preprocess.normalizeOptions.center).toBe(false);
+    expect(preprocess.cropOptions.numCrops).toBe(0);
     expect(project.data.channelMetas.entities["meta-1"]!.visible).toBe(false);
   });
 

@@ -8,7 +8,7 @@ import {
 } from "@mui/icons-material";
 
 import { useClassifierApi } from "core/dl/classification";
-import { ModelArch } from "core/dl/classification/types";
+import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
 
 import { useDialog, useDialogHotkey } from "hooks";
 
@@ -57,7 +57,7 @@ export const ModelSelection = ({
     open: SaveClassifierDialogOpen,
   } = useDialog();
   const handleModelChange = (event: SelectChangeEvent<unknown>) => {
-    const value: string | ModelArch = event.target.value as string;
+    const value = event.target.value as string;
     if (value === "new") {
       batch(() => {
         dispatch(
@@ -69,7 +69,7 @@ export const ModelSelection = ({
         dispatch(
           classifierSlice.actions.setNewModelArch({
             targetId: modelTarget,
-            modelArch: ModelArch.SIMPLE_CNN,
+            modelArch: ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN],
           }),
         );
       });

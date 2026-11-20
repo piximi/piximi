@@ -1,4 +1,8 @@
-import { architectureIdOf } from "core/dl/classification/types";
+import {
+  ARCHITECTURE_IDS,
+  ModelArch,
+  architectureIdOf,
+} from "core/dl/classification/types";
 
 import {
   getAttr,
@@ -42,9 +46,8 @@ import type {
 } from "core/file-io/project-saver/types";
 import type { Partition } from "core/dl/enums";
 import type {
-  ModelArch,
+  Classifier,
   ModelClassMap,
-  ModelInfo,
   ModelLifecycleStatus,
   OptimizerSettings,
   PreprocessSettings,
@@ -732,25 +735,37 @@ const readClassifier = async (
   return { kindClassifiers };
 };
 
+/* An attribute a newer writer adds; older files lack it. */
+const optionalAttr = <T>(group: Group, attr: string): T | undefined =>
+  attr in group.attrs ? (group.attrs[attr] as T) : undefined;
+
 const readKindClassifier = async (group: Group): Promise<KindClassifier> => {
-  const modelNames = (await getAttr(
+  // Model groups are named by classifier id (the name, for files written
+  // by the browser); the name is an attribute of the group.
+  const modelIds = (await getAttr(
     group,
     ZARR_V2_CLASSIFIER.Models,
   )) as string[];
+  const modelTargetId = (await getAttr(
+    group,
+    ZARR_V2_CLASSIFIER.ModelTargetId,
+  )) as string;
 
-  const modelInfoDict: Record<string, ModelInfo> = {};
-  for (const modelName of modelNames) {
-    const modelGroup = await getGroup(group, modelName);
-    modelInfoDict[modelName] = await readModelInfo(
+  const modelInfoDict: Record<string, Classifier> = {};
+  for (const modelId of modelIds) {
+    const modelGroup = await getGroup(group, modelId);
+    modelInfoDict[modelId] = await readModelInfo(
       await getGroup(modelGroup, ZARR_V2_GROUP.ModelInfo),
+      {
+        id: modelId,
+        name: (await getAttr(modelGroup, ZARR_V2_MODEL_INFO.Name)) as string,
+        targetId: modelTargetId,
+      },
     );
   }
 
   return {
-    modelTargetId: (await getAttr(
-      group,
-      ZARR_V2_CLASSIFIER.ModelTargetId,
-    )) as string,
+    modelTargetId,
     modelTargetName: (await getAttr(
       group,
       ZARR_V2_CLASSIFIER.ModelTargetName,
@@ -761,10 +776,12 @@ const readKindClassifier = async (group: Group): Promise<KindClassifier> => {
         ZARR_V2_CLASSIFIER.ActiveModel,
       )) as Nullable<string>,
     ),
-    newModelArch: (await getAttr(
-      group,
-      ZARR_V2_CLASSIFIER.NewModelArch,
-    )) as ModelArch,
+    // Files written before Phase 7 hold the architecture enum's number.
+    newModelArch: architectureIdOf(
+      (await getAttr(group, ZARR_V2_CLASSIFIER.NewModelArch)) as
+        | ModelArch
+        | string,
+    ),
     modelInfoDict,
     status: (await getAttr(
       group,
@@ -773,25 +790,46 @@ const readKindClassifier = async (group: Group): Promise<KindClassifier> => {
   };
 };
 
-const readModelInfo = async (infoGroup: Group): Promise<ModelInfo> => {
+const readModelInfo = async (
+  infoGroup: Group,
+  identity: Pick<Classifier, "id" | "name" | "targetId">,
+): Promise<Classifier> => {
   const trained = (await getAttr(
     infoGroup,
     ZARR_V2_MODEL_INFO.Trained,
   )) as Nullable<number>;
+  const runs = await readRuns(infoGroup);
+  const trainable = optionalAttr<number>(
+    infoGroup,
+    ZARR_V2_MODEL_INFO.Trainable,
+  );
 
   return {
+    ...identity,
+    // Older files name the architecture only in their runs, if at all.
+    architectureId:
+      optionalAttr<string>(infoGroup, ZARR_V2_MODEL_INFO.ArchitectureId) ??
+      runs.at(-1)?.hyperparameters.architecture ??
+      ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN],
+    framework:
+      optionalAttr<string>(infoGroup, ZARR_V2_MODEL_INFO.Framework) ??
+      "tensorflow.js",
+    hyperparameters: {
+      preprocess: await readPreprocessSettings(infoGroup),
+      optimizer: await readOptimizerSettings(infoGroup),
+    },
     classMap: readClassMap(
       (await getAttr(infoGroup, ZARR_V2_MODEL_INFO.ClassMap)) as Nullable<
         Array<[number, string]>
       >,
     ),
-    preprocessSettings: await readPreprocessSettings(infoGroup),
-    optimizerSettings: await readOptimizerSettings(infoGroup),
+    classes:
+      optionalAttr<string[]>(infoGroup, ZARR_V2_MODEL_INFO.Classes) ?? [],
     confidenceThreshold: (await getAttr(
       infoGroup,
       ZARR_V2_MODEL_INFO.ConfidenceThreshold,
     )) as number,
-    runs: await readRuns(infoGroup),
+    runs,
     valid: toBool(
       (await getAttr(infoGroup, ZARR_V2_MODEL_INFO.Valid)) as number,
     ),
@@ -801,7 +839,8 @@ const readModelInfo = async (infoGroup: Group): Promise<ModelInfo> => {
         ZARR_V2_MODEL_INFO.InitSeed,
       )) as Nullable<number>,
     ),
-    trained: trained === null ? undefined : toBool(trained),
+    trained: trained === null ? false : toBool(trained),
+    trainable: trainable === undefined ? true : toBool(trainable),
   };
 };
 

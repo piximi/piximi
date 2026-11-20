@@ -36,6 +36,11 @@ export const ARCHITECTURE_IDS: Record<ModelArch, string> = {
 export const architectureIdOf = (arch: ModelArch | string): string =>
   typeof arch === "number" ? ARCHITECTURE_IDS[arch] : arch;
 
+export const ARCHITECTURE_LABELS: Record<string, string> = {
+  [ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN]]: "Simple-CNN",
+  [ARCHITECTURE_IDS[ModelArch.MOBILE_NET]]: "Mobilenet",
+};
+
 export const modelArchOf = (architectureId: string): ModelArch | undefined => {
   const found = Object.entries(ARCHITECTURE_IDS).find(
     ([, id]) => id === architectureId,
@@ -150,16 +155,6 @@ export type Run = {
 };
 /* Output class index (a string key, as JSON carries it) → category id. */
 export type ModelClassMap = Record<string, string>;
-export type ModelInfo = {
-  classMap?: ModelClassMap;
-  preprocessSettings: PreprocessSettings;
-  optimizerSettings: OptimizerSettings;
-  confidenceThreshold: number;
-  runs: Run[];
-  valid: boolean;
-  initSeed?: number;
-  trained?: boolean;
-};
 export type ClassifierActivity = "training" | "predicting" | "evaluating";
 
 /*

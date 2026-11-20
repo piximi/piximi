@@ -13,7 +13,7 @@ import type {
   PredictionCorrection,
 } from "core/entities";
 import type { Partition } from "core/dl/enums";
-import type { ModelInfo } from "core/dl/classification/types";
+import type { Classifier } from "core/dl/classification/types";
 
 import type { ClassifierState, KindClassifier } from "store/classifier/types";
 
@@ -156,7 +156,7 @@ export type V2NormalizeOptions = {
 // export type V2ModelInfo = Omit<V11ModelInfo, "preprocessSettings"> & {
 //   preprocessSettings: V2PreprocessSettings;
 // };
-export type V2ModelInfo = ModelInfo;
+export type V2ModelInfo = Classifier;
 
 export type V2KindClassifier = KindClassifier;
 

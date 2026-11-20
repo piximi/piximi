@@ -3,8 +3,8 @@ import { shallowEqual } from "react-redux";
 import { createSelector, lruMemoize } from "@reduxjs/toolkit";
 
 import type {
+  Classifier,
   ModelLifecycleStatus,
-  ModelInfo,
   Run,
   EvaluationResult,
 } from "core/dl/classification/types";
@@ -31,7 +31,9 @@ const selectKindClassifierDict = ({
 export const selectAllCreatedModelNames = createSelector(
   selectKindClassifierDict,
   (kcd): string[] =>
-    Object.values(kcd).flatMap((kc) => Object.keys(kc.modelInfoDict)),
+    Object.values(kcd).flatMap((kc) =>
+      Object.values(kc.modelInfoDict).map((c) => c.name),
+    ),
   {
     memoize: lruMemoize,
     memoizeOptions: { resultEqualityCheck: shallowEqual },
@@ -78,18 +80,23 @@ export const selectActiveModelName = createSelector(
 export const selectKindModelNames = createSelector(selectKindClassifier, (kc) =>
   Object.keys(kc.modelInfoDict),
 );
+export const selectKindClassifiers = createSelector(
+  selectKindClassifier,
+  (kc): Classifier[] => Object.values(kc.modelInfoDict),
+);
 
 /*
- * Model Info
+ * The active classifier's record
  */
 const selectModelInfo = createSelector(
   selectKindClassifier,
-  (kc): ModelInfo | undefined => {
+  (kc): Classifier | undefined => {
     const modelName = kc.activeModel;
     if (!modelName) return;
     return kc.modelInfoDict[modelName];
   },
 );
+export const selectActiveClassifier = selectModelInfo;
 
 export const selectModelIsValid = createSelector(
   selectModelInfo,
@@ -101,11 +108,11 @@ export const selectModelIsTrained = createSelector(
 );
 export const selectModelPreprocessSettings = createSelector(
   selectModelInfo,
-  (info) => info?.preprocessSettings,
+  (info) => info?.hyperparameters.preprocess,
 );
 export const selectModelOptimizerSettings = createSelector(
   selectModelInfo,
-  (info) => info?.optimizerSettings,
+  (info) => info?.hyperparameters.optimizer,
 );
 export const selectModelTargetName = createSelector(
   selectKindClassifier,

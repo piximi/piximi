@@ -5,7 +5,7 @@ import { arrayRange } from "utils/arrayUtils";
 
 import { validateModelMetadata } from "./validateModelMetadata";
 import { SequentialClassifier } from "./AbstractClassifier";
-import { createCompileArgs, getDefaultModelInfo } from "../utils";
+import { createCompileArgs, getDefaultModelParams } from "../utils";
 import { convertArrayToShape } from "../../utils";
 import { ModelArch } from "../types";
 
@@ -118,7 +118,7 @@ export class UploadedClassifier extends SequentialClassifier {
       this._optimizerSettings = metadata.optimizerSettings;
       this._modelArch = metadata.modelArch;
     } else {
-      const defaultModelInfo = getDefaultModelInfo();
+      const defaultModelInfo = getDefaultModelParams();
       this._preprocessingSettings = {
         inputShape: {
           ...convertArrayToShape(this.defaultInputShape as ShapeArray),

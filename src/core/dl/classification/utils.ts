@@ -15,12 +15,14 @@ import {
 
 import { seededShuffle } from "utils/arrayUtils";
 
+import { ARCHITECTURE_IDS } from "./types";
+
 import type { ModelCompileArgs, LayersModel } from "@tensorflow/tfjs";
 
 import type { TrainingInput } from "core/dl/types";
 
 import type {
-  ModelInfo,
+  Classifier,
   ClassifierModelParams,
   DatasetFingerprint,
   ModelLayerData,
@@ -64,10 +66,23 @@ export const getDefaultModelParams = (
   },
 });
 
-export const getDefaultModelInfo = (): ModelInfo => ({
-  ...getDefaultModelParams(),
-  valid: true,
+/* A classifier record before any run, with the given or default settings. */
+export const defaultClassifier = (
+  identity: Pick<Classifier, "id" | "name" | "targetId" | "architectureId"> &
+    Partial<Pick<Classifier, "framework">>,
+  params: ClassifierModelParams = getDefaultModelParams(),
+): Classifier => ({
+  ...identity,
+  framework: identity.framework ?? "tensorflow.js",
+  hyperparameters: {
+    preprocess: params.preprocessSettings,
+    optimizer: params.optimizerSettings,
+  },
+  classes: [],
   confidenceThreshold: DEFAULT_CONFIDENCE_THRESHOLD,
+  trained: false,
+  trainable: true,
+  valid: true,
   runs: [],
 });
 
@@ -326,10 +341,12 @@ export async function fingerprintDataset(
 
 export { hashCategorySet };
 
-export function modelInfoDTOToModelInfo(
+/* The record for a model the worker loaded from files. */
+export function classifierFromDTO(
   dto: ModelInfoDTO,
+  targetId: string,
   runs: Run[] = [],
-): ModelInfo {
+): Classifier {
   if (!dto.optimizerSettings || !dto.preprocessingSettings) {
     throw new Error(
       `Cannot convert ModelInfoDTO "${dto.name}": missing optimizer or preprocess settings`,
@@ -354,11 +371,25 @@ export function modelInfoDTOToModelInfo(
   };
 
   return {
-    preprocessSettings,
-    optimizerSettings: dto.optimizerSettings,
+    id: dto.name,
+    name: dto.name,
+    targetId,
+    architectureId:
+      dto.modelArch === undefined
+        ? "uploaded"
+        : typeof dto.modelArch === "number"
+          ? ARCHITECTURE_IDS[dto.modelArch]
+          : dto.modelArch,
+    framework: "tensorflow.js",
+    hyperparameters: {
+      preprocess: preprocessSettings,
+      optimizer: dto.optimizerSettings,
+    },
+    classes: dto.classes,
     confidenceThreshold: DEFAULT_CONFIDENCE_THRESHOLD,
     runs,
     valid: dto.modelLoaded,
     trained: dto.pretrained,
+    trainable: dto.trainable,
   };
 }

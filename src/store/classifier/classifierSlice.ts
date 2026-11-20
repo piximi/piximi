@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { UNKNOWN_KIND, UNKNOWN_KIND_ID } from "core/entities";
-import { ModelArch } from "core/dl/classification/types";
+import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
 
 import { dataSlice } from "store/data";
 import { projectReset } from "store/actions";
@@ -13,9 +13,11 @@ import { IMAGE_CLASSIFIER_ID, IMAGE_CLASSIFIER_NAME } from "./constants";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 import type {
+  Classifier,
   ModelLifecycleStatus,
-  ModelInfo,
   ModelClassMap,
+  OptimizerSettings,
+  PreprocessSettings,
   Run,
   RunHistoryEpoch,
   RunStatus,
@@ -29,7 +31,7 @@ import type { ClassifierState, KindClassifier, SoftmaxById } from "./types";
 
 const getDefaultKindClassifier = () => ({
   activeModel: undefined,
-  newModelArch: ModelArch.SIMPLE_CNN,
+  newModelArch: ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN],
   modelInfoDict: {},
   status: "idle" as ModelLifecycleStatus,
 });
@@ -88,12 +90,60 @@ export const classifierSlice = createSlice({
       action.payload.forEach((kindId) => delete state.kindClassifiers[kindId]);
     },
 
+    /*
+     * The records a backend announces, every classifier of the project:
+     * each target's dictionary is rebuilt from them, so one that went away
+     * disappears, and a session's active choice is dropped with it.
+     */
+    setClassifiers(state, action: PayloadAction<Classifier[]>) {
+      const byTarget = new Map<string, Classifier[]>();
+      for (const classifier of action.payload) {
+        const group = byTarget.get(classifier.targetId) ?? [];
+        group.push(classifier);
+        byTarget.set(classifier.targetId, group);
+      }
+      for (const kc of Object.values(state.kindClassifiers)) {
+        kc.modelInfoDict = Object.fromEntries(
+          (byTarget.get(kc.modelTargetId) ?? []).map((c) => [c.id, c]),
+        );
+        if (kc.activeModel && !(kc.activeModel in kc.modelInfoDict)) {
+          kc.activeModel = undefined;
+        }
+      }
+    },
+    upsertClassifier(state, action: PayloadAction<Classifier>) {
+      const classifier = action.payload;
+      const kc = state.kindClassifiers[classifier.targetId];
+      if (kc) kc.modelInfoDict[classifier.id] = classifier;
+    },
+    removeClassifier(state, action: PayloadAction<string>) {
+      for (const kc of Object.values(state.kindClassifiers)) {
+        delete kc.modelInfoDict[action.payload];
+        if (kc.activeModel === action.payload) kc.activeModel = undefined;
+      }
+    },
+    /* One epoch of a run, as a backend announces it. */
+    appendEpoch(
+      state,
+      action: PayloadAction<{
+        classifierId: string;
+        runId: string;
+        epoch: RunHistoryEpoch;
+      }>,
+    ) {
+      for (const kc of Object.values(state.kindClassifiers)) {
+        const run = kc.modelInfoDict[action.payload.classifierId]?.runs.find(
+          (r) => r.id === action.payload.runId,
+        );
+        if (run) run.history.push(action.payload.epoch);
+      }
+    },
     addModelInfo(
       state,
       action: PayloadAction<{
         targetId: string;
         modelName: string;
-        modelInfo: ModelInfo;
+        modelInfo: Classifier;
       }>,
     ) {
       const { targetId, modelName, modelInfo } = action.payload;
@@ -135,7 +185,7 @@ export const classifierSlice = createSlice({
     updateModelOptimizerSettings(
       state,
       action: PayloadAction<{
-        settings: Partial<ModelInfo["optimizerSettings"]>;
+        settings: Partial<OptimizerSettings>;
         targetId: string;
       }>,
     ) {
@@ -145,14 +195,14 @@ export const classifierSlice = createSlice({
       const activeModel = kc.activeModel;
       if (activeModel)
         Object.assign(
-          kc.modelInfoDict[activeModel].optimizerSettings,
+          kc.modelInfoDict[activeModel].hyperparameters.optimizer,
           settings,
         );
     },
     updateModelPreprocessSettings(
       state,
       action: PayloadAction<{
-        settings: RecursivePartial<ModelInfo["preprocessSettings"]>;
+        settings: RecursivePartial<PreprocessSettings>;
         targetId: string;
       }>,
     ) {
@@ -162,7 +212,7 @@ export const classifierSlice = createSlice({
       const activeModel = kc.activeModel;
       if (activeModel)
         recursiveAssign(
-          kc.modelInfoDict[activeModel].preprocessSettings,
+          kc.modelInfoDict[activeModel].hyperparameters.preprocess,
           settings,
         );
     },
@@ -176,7 +226,7 @@ export const classifierSlice = createSlice({
       const activeModel = kc.activeModel;
       if (activeModel)
         Object.assign(
-          kc.modelInfoDict[activeModel].preprocessSettings.inputShape,
+          kc.modelInfoDict[activeModel].hyperparameters.preprocess.inputShape,
           inputShape,
         );
     },
@@ -195,7 +245,7 @@ export const classifierSlice = createSlice({
     },
     setNewModelArch(
       state,
-      action: PayloadAction<{ modelArch: ModelArch; targetId: string }>,
+      action: PayloadAction<{ modelArch: string; targetId: string }>,
     ) {
       const { modelArch, targetId } = action.payload;
       const classifier = state.kindClassifiers[targetId];

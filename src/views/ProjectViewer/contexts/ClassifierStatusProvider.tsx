@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useImmer } from "use-immer";
 
 import { Partition } from "core/dl/enums";
+import { ARCHITECTURE_LABELS } from "core/dl/classification/types";
 import { getDefaultModelParams } from "core/dl/classification/utils";
 import { representsUnknown, type Shape } from "core/entities";
 
@@ -156,7 +157,7 @@ const useModelParams = () => {
   const suggestedModelName = useMemo(
     () =>
       getUniqueName(
-        `${modelTargetName}_${newModelArch === 0 ? "Simple-CNN" : "Mobilenet"}`,
+        `${modelTargetName}_${ARCHITECTURE_LABELS[newModelArch] ?? newModelArch}`,
         restrictedClassifierNames,
         (base, n) => `${base}${n}`,
       ),

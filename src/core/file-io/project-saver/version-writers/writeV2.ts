@@ -31,8 +31,8 @@ import type { EntityState } from "@reduxjs/toolkit";
 // Aliased on import so the `Group` annotations throughout this file stand.
 
 import type {
+  Classifier,
   ModelClassMap,
-  ModelInfo,
   OptimizerSettings,
   PreprocessSettings,
   Run,
@@ -436,10 +436,12 @@ const writeKindClassifier = async (
   kindId: string,
   kindClassifier: KindClassifier,
 ) => {
-  const modelNames = Object.keys(kindClassifier.modelInfoDict);
+  // Groups are named by classifier id, which the local backend keeps equal
+  // to the name; the name is an attribute of its own.
+  const classifiers = Object.values(kindClassifier.modelInfoDict);
 
   const group = await createGroup(classifierGroup, kindId, {
-    [ZARR_V2_CLASSIFIER.Models]: modelNames,
+    [ZARR_V2_CLASSIFIER.Models]: classifiers.map((c) => c.id),
     [ZARR_V2_CLASSIFIER.ModelTargetId]: kindClassifier.modelTargetId,
     [ZARR_V2_CLASSIFIER.ModelTargetName]: kindClassifier.modelTargetName,
     [ZARR_V2_CLASSIFIER.ActiveModel]: kindClassifier.activeModel ?? null,
@@ -449,12 +451,12 @@ const writeKindClassifier = async (
     [ZARR_V2_CLASSIFIER.Status]: "idle",
   });
 
-  for (const modelName of modelNames) {
-    const modelGroup = await createGroup(group, modelName, {
-      [ZARR_V2_MODEL_INFO.Name]: modelName,
+  for (const classifier of classifiers) {
+    const modelGroup = await createGroup(group, classifier.id, {
+      [ZARR_V2_MODEL_INFO.Name]: classifier.name,
     });
 
-    await writeModelInfo(modelGroup, kindClassifier.modelInfoDict[modelName]);
+    await writeModelInfo(modelGroup, classifier);
   }
 };
 
@@ -463,19 +465,25 @@ const writeKindClassifier = async (
  * are written here, and v3 only accepts attributes at creation, so the caller
  * cannot create it first.
  */
-const writeModelInfo = async (modelGroup: Group, modelInfo: ModelInfo) => {
+const writeModelInfo = async (modelGroup: Group, classifier: Classifier) => {
   const infoGroup = await createGroup(modelGroup, ZARR_V2_GROUP.ModelInfo, {
-    [ZARR_V2_MODEL_INFO.ClassMap]: classMapEntries(modelInfo.classMap),
-    [ZARR_V2_MODEL_INFO.ConfidenceThreshold]: modelInfo.confidenceThreshold,
-    [ZARR_V2_MODEL_INFO.Valid]: Number(modelInfo.valid),
-    [ZARR_V2_MODEL_INFO.InitSeed]: modelInfo.initSeed ?? null,
-    [ZARR_V2_MODEL_INFO.Trained]:
-      modelInfo.trained === undefined ? null : Number(modelInfo.trained),
+    [ZARR_V2_MODEL_INFO.ClassMap]: classMapEntries(classifier.classMap),
+    [ZARR_V2_MODEL_INFO.ConfidenceThreshold]: classifier.confidenceThreshold,
+    [ZARR_V2_MODEL_INFO.Valid]: Number(classifier.valid),
+    [ZARR_V2_MODEL_INFO.InitSeed]: classifier.initSeed ?? null,
+    [ZARR_V2_MODEL_INFO.Trained]: Number(classifier.trained),
+    [ZARR_V2_MODEL_INFO.ArchitectureId]: classifier.architectureId,
+    [ZARR_V2_MODEL_INFO.Framework]: classifier.framework,
+    [ZARR_V2_MODEL_INFO.Classes]: classifier.classes,
+    [ZARR_V2_MODEL_INFO.Trainable]: Number(classifier.trainable),
   });
 
-  await writePreprocessSettings(infoGroup, modelInfo.preprocessSettings);
-  await writeOptimizerSettings(infoGroup, modelInfo.optimizerSettings);
-  await writeRuns(infoGroup, modelInfo.runs);
+  await writePreprocessSettings(
+    infoGroup,
+    classifier.hyperparameters.preprocess,
+  );
+  await writeOptimizerSettings(infoGroup, classifier.hyperparameters.optimizer);
+  await writeRuns(infoGroup, classifier.runs);
 };
 
 const writePreprocessSettings = async (

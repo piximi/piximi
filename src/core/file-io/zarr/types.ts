@@ -249,6 +249,12 @@ export const ZARR_V2_MODEL_INFO = {
   Valid: "valid_B",
   InitSeed: "init_seed",
   Trained: "trained_B",
+  // Added with the backend's classifier records; files written before carry
+  // none of these and are read with defaults.
+  ArchitectureId: "architecture_id",
+  Framework: "framework",
+  Classes: "classes",
+  Trainable: "trainable_B",
 } as const;
 
 export const ZARR_V2_PREPROCESS = {

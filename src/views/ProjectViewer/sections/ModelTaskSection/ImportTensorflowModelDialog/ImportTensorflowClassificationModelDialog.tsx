@@ -14,7 +14,7 @@ import {
 
 import { useClassifierApi } from "core/dl/classification";
 import { type ModelInfoDTO, type Run } from "core/dl/classification/types";
-import { modelInfoDTOToModelInfo } from "core/dl/classification/utils";
+import { classifierFromDTO } from "core/dl/classification/utils";
 import { zipInputToBuffer } from "core/file-io/file-loader/fileInputUtils";
 import {
   importFittedModelFromZip,
@@ -145,7 +145,7 @@ export const ImportTensorflowClassificationModelDialog = ({
         }));
       }
 
-      const modelInfo = modelInfoDTOToModelInfo(modelDetails, runs);
+      const modelInfo = classifierFromDTO(modelDetails, modelTarget, runs);
       const lastRunMap = runs.at(-1)?.classMap;
       const reusableClassMap =
         lastRunMap &&
@@ -179,7 +179,7 @@ export const ImportTensorflowClassificationModelDialog = ({
     if (result.success) {
       const modelDetails = result.data;
       setUploadResult({ success: true, modelDetails: modelDetails, runs: [] });
-      const modelInfo = modelInfoDTOToModelInfo(modelDetails, []);
+      const modelInfo = classifierFromDTO(modelDetails, modelTarget, []);
       batch(() => {
         dispatch(
           classifierSlice.actions.addModelInfo({

@@ -11,7 +11,6 @@ import {
   Partition,
 } from "core/dl/enums";
 import { CancelSource } from "core/dl/cancel";
-import { ModelArch } from "core/dl/classification/types";
 import { MODELS } from "core/dl/segmentation/types";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 
@@ -41,7 +40,7 @@ import type {
   Plane,
 } from "core/entities";
 import type { SerializedModels } from "core/dl/types";
-import type { ModelInfo, Run } from "core/dl/classification/types";
+import type { Classifier, Run } from "core/dl/classification/types";
 import type { SegmentationModelDetails } from "core/dl/segmentation/types";
 
 import type { DataStateV2 } from "store/data/types";
@@ -445,15 +444,24 @@ const buildFixture = () => {
     },
   };
 
-  const modelInfo: ModelInfo = {
+  const modelInfo: Classifier = {
+    id: "SimpleCNN-1",
+    name: "SimpleCNN-1",
+    targetId: "Image",
+    architectureId: "simple-cnn",
+    framework: "tensorflow.js",
     classMap: { 0: "cat-image-a", 1: "cat-image-b" },
-    preprocessSettings: run.hyperparameters.preprocess,
-    optimizerSettings: run.hyperparameters.optimizer,
+    hyperparameters: {
+      preprocess: run.hyperparameters.preprocess,
+      optimizer: run.hyperparameters.optimizer,
+    },
+    classes: ["a", "b"],
     confidenceThreshold: 0.5,
     runs: [run],
     valid: true,
     initSeed: 1234,
     trained: true,
+    trainable: true,
   };
 
   const classifier: ClassifierState = {
@@ -462,7 +470,7 @@ const buildFixture = () => {
         modelTargetId: "Image",
         modelTargetName: "Image",
         activeModel: "SimpleCNN-1",
-        newModelArch: ModelArch.SIMPLE_CNN,
+        newModelArch: "simple-cnn",
         modelInfoDict: { "SimpleCNN-1": modelInfo },
         status: "idle",
       },
@@ -471,7 +479,7 @@ const buildFixture = () => {
         modelTargetName: "cell",
         // No model trained for this kind yet.
         activeModel: undefined,
-        newModelArch: ModelArch.MOBILE_NET,
+        newModelArch: "mobilenet",
         modelInfoDict: {},
         status: "idle",
       },
@@ -744,7 +752,7 @@ describe("v2 project round trip", () => {
 
     const info =
       result.classifier.kindClassifiers.Image.modelInfoDict["SimpleCNN-1"];
-    expect(info.optimizerSettings.learningRate).toBe(0.0123456789);
+    expect(info.hyperparameters.optimizer.learningRate).toBe(0.0123456789);
   });
 
   /**

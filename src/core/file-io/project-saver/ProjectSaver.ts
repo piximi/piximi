@@ -115,9 +115,11 @@ export class ProjectSaver implements IProjectSaver {
   ): Promise<SerializedModels> {
     const cfApi = getClassifierApi();
     const modelNames = new Set<string>();
+    // The worker keys its models by the name the classifier was created
+    // with, which is the local backend's id.
     for (const kindClassifier of Object.values(classifier.kindClassifiers)) {
-      Object.keys(kindClassifier.modelInfoDict).forEach((name) =>
-        modelNames.add(name),
+      Object.values(kindClassifier.modelInfoDict).forEach((record) =>
+        modelNames.add(record.id),
       );
     }
 

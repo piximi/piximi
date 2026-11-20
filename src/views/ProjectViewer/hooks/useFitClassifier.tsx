@@ -6,9 +6,14 @@ import { version_core } from "@tensorflow/tfjs";
 
 import { generateUUID } from "core/entities";
 import { Partition } from "core/dl/enums";
-import { architectureIdOf } from "core/dl/classification/types";
+import {
+  ModelArch,
+  architectureIdOf,
+  modelArchOf,
+} from "core/dl/classification/types";
 import {
   applySplitAndShuffle,
+  defaultClassifier,
   fingerprintDataset,
   hashCategorySet,
   partitionTrainingData,
@@ -35,7 +40,7 @@ import { useClassifierHistory } from "../contexts/ClassifierHistoryProvider";
 import { useClassifierErrorHandler } from "./useClassifierErrorHandler";
 
 import type {
-  ModelInfo,
+  Classifier,
   ModelClassMap,
   Run,
   RunTrigger,
@@ -109,7 +114,7 @@ export const useFitClassifier = () => {
   );
   const prepareInitialRun = async (
     kindClassifier: KindClassifier,
-    modelInfo: ModelInfo,
+    modelInfo: Classifier,
   ) => {
     let model: ModelInfoDTO;
     let classMap: ModelClassMap | undefined;
@@ -118,7 +123,7 @@ export const useFitClassifier = () => {
     try {
       const result = await cfApi.createNewModel(
         newModelName,
-        kindClassifier.newModelArch,
+        modelArchOf(kindClassifier.newModelArch) ?? ModelArch.SIMPLE_CNN,
         seed,
       );
       if (result.success) {
@@ -165,8 +170,8 @@ export const useFitClassifier = () => {
 
     const { splitTrainingItems, splitValidationItems } = applySplitAndShuffle(
       labeledUnassigned,
-      modelInfo.preprocessSettings.trainingPercentage,
-      modelInfo.preprocessSettings.shuffle
+      modelInfo.hyperparameters.preprocess.trainingPercentage,
+      modelInfo.hyperparameters.preprocess.shuffle
         ? { shuffle: true, seed: seed }
         : { shuffle: false },
     );
@@ -193,8 +198,8 @@ export const useFitClassifier = () => {
         validationData,
         knownCategories.length,
         knownCategories,
-        modelInfo.preprocessSettings,
-        modelInfo.optimizerSettings,
+        modelInfo.hyperparameters.preprocess,
+        modelInfo.hyperparameters.optimizer,
         seed,
       );
       if (!result.success) {
@@ -219,7 +224,7 @@ export const useFitClassifier = () => {
 
   const prepareContinuedRun = async (
     kindClassifier: KindClassifier,
-    modelInfo: ModelInfo,
+    modelInfo: Classifier,
     modelName: string,
   ) => {
     let model: ModelInfoDTO;
@@ -290,12 +295,12 @@ export const useFitClassifier = () => {
 
     const optimizerDiff = diffCompileSettings(
       lastRun?.hyperparameters.optimizer,
-      modelInfo.optimizerSettings,
+      modelInfo.hyperparameters.optimizer,
     );
     if (optimizerDiff.changed) {
       const result = await cfApi.recompile(
         model.name,
-        modelInfo.optimizerSettings,
+        modelInfo.hyperparameters.optimizer,
       );
       if (!result.success) {
         throw new Error(
@@ -380,7 +385,7 @@ export const useFitClassifier = () => {
     classMap,
     seed,
   }: {
-    modelInfo: ModelInfo;
+    modelInfo: Classifier;
     trainingData: TrainingInput[];
     validationData: TrainingInput[];
     isInit: boolean;
@@ -429,8 +434,8 @@ export const useFitClassifier = () => {
       device,
       hyperparameters: {
         architecture: architectureIdOf(kindClassifier.newModelArch),
-        optimizer: structuredClone(modelInfo.optimizerSettings),
-        preprocess: structuredClone(modelInfo.preprocessSettings),
+        optimizer: structuredClone(modelInfo.hyperparameters.optimizer),
+        preprocess: structuredClone(modelInfo.hyperparameters.preprocess),
       },
       classMap,
       ...datasetFingerprint,
@@ -444,20 +449,25 @@ export const useFitClassifier = () => {
     if (!kindClassifier) return;
     const startedAt = new Date().toISOString();
     const modelName = kindClassifier.activeModel;
-    const modelInfo: ModelInfo = modelName
+    const modelInfo: Classifier = modelName
       ? kindClassifier?.modelInfoDict[modelName]
-      : {
-          ...structuredClone(modelParams),
-          confidenceThreshold: 0.5,
-          runs: [],
-          valid: true,
-        };
+      : defaultClassifier(
+          {
+            id: newModelName,
+            name: newModelName,
+            targetId: modelTarget,
+            architectureId: kindClassifier.newModelArch,
+          },
+          structuredClone(modelParams),
+        );
 
     const currentModelEpochs = modelInfo.runs.reduce((total: number, run) => {
       const runEpochs = run.hyperparameters.optimizer.epochs;
       return (total += runEpochs);
     }, 0);
-    setTotalEpochs(currentModelEpochs + modelInfo.optimizerSettings.epochs);
+    setTotalEpochs(
+      currentModelEpochs + modelInfo.hyperparameters.optimizer.epochs,
+    );
     // An invalid model means categories changed — a new model must be created.
     // Forcing initFit here ensures we never try to continue training an output
     // layer whose size no longer matches the current category set.
@@ -544,7 +554,7 @@ export const useFitClassifier = () => {
     try {
       const trainingResults = await cfApi.train(
         initializedModelName,
-        modelInfo.optimizerSettings,
+        modelInfo.hyperparameters.optimizer,
         { onEpochEnd },
       );
       if (trainingResults.success) {

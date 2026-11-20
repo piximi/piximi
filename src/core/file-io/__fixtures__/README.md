@@ -1,7 +1,7 @@
 # Golden project archives
 
 ⚠️ **Do not regenerate these files.** They are the only coverage of reading an
-archive produced by an *earlier* writer. Regenerating them with the current
+archive produced by an _earlier_ writer. Regenerating them with the current
 writer makes the tests that consume them tautological — they would pass while
 every archive users already have on disk fails to open.
 
@@ -24,10 +24,10 @@ requirement that the old writer could not have satisfied.
 
 ## Contents
 
-| file | Piximi format | Zarr format on disk |
-|---|---|---|
-| `golden-v2-zarrv2.zip` | 2.0.0 | **v2** (`.zgroup` / `.zarray` / `.zattrs`, chunk keys `0.0`) |
-| `golden-v2-zarrv2-edge.zip` | 2.0.0 | **v2**, adversarial values |
+| file                        | Piximi format | Zarr format on disk                                          |
+| --------------------------- | ------------- | ------------------------------------------------------------ |
+| `golden-v2-zarrv2.zip`      | 2.0.0         | **v2** (`.zgroup` / `.zarray` / `.zattrs`, chunk keys `0.0`) |
+| `golden-v2-zarrv2-edge.zip` | 2.0.0         | **v2**, adversarial values                                   |
 
 Both were captured from the `zarr` (zarr.js 0.6.3) writer, before the migration
 to `zarrita`, by driving `writeV2` over the fixture in

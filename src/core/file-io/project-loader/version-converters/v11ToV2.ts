@@ -9,8 +9,8 @@ import {
   UNKNOWN_KIND_ID,
   representsUnknown,
 } from "core/entities";
-import { getDefaultModelInfo } from "core/dl/classification/utils";
-import { ModelArch } from "core/dl/classification/types";
+import { defaultClassifier } from "core/dl/classification/utils";
+import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
 
 import {
   IMAGE_CLASSIFIER_ID,
@@ -124,26 +124,36 @@ function convertKindClassifier(
       normalize: rescaleOptions.rescale,
       center: rescaleOptions.center,
     };
-    const defaultModelInfo = getDefaultModelInfo();
-    defaultModelInfo.preprocessSettings = { normalizeOptions, ...restPreProc };
-    defaultModelInfo.classMap = restInfo.classMap;
     const { lossFunction, ...optimizer } = restInfo.optimizerSettings;
-    defaultModelInfo.optimizerSettings = {
-      ...optimizer,
-      // v1.1 allowed a list or a per-output map; only one ever applied.
-      lossFunction: Array.isArray(lossFunction)
-        ? lossFunction[0]
-        : typeof lossFunction === "object"
-          ? Object.values(lossFunction)[0]
-          : lossFunction,
-    };
-    v2ModelInfoDict[id] = defaultModelInfo;
+    const classifier = defaultClassifier(
+      {
+        id,
+        name: id,
+        targetId: kindId,
+        // v1.1 kept no architecture per model; its models were the CNN.
+        architectureId: ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN],
+      },
+      {
+        preprocessSettings: { normalizeOptions, ...restPreProc },
+        optimizerSettings: {
+          ...optimizer,
+          // v1.1 allowed a list or a per-output map; only one ever applied.
+          lossFunction: Array.isArray(lossFunction)
+            ? lossFunction[0]
+            : typeof lossFunction === "object"
+              ? Object.values(lossFunction)[0]
+              : lossFunction,
+        },
+      },
+    );
+    classifier.classMap = restInfo.classMap;
+    v2ModelInfoDict[id] = classifier;
   });
   return {
     activeModel: undefined,
     modelTargetId: kindId,
     modelTargetName,
-    newModelArch: ModelArch.SIMPLE_CNN,
+    newModelArch: ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN],
     modelInfoDict: v2ModelInfoDict,
     status: "idle",
   };
@@ -177,7 +187,7 @@ function convertClassifier(
     modelTargetId: UNKNOWN_KIND_ID,
     activeModel: undefined,
     modelTargetName: "Unknown",
-    newModelArch: ModelArch.SIMPLE_CNN,
+    newModelArch: ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN],
     modelInfoDict: {},
     status: "idle",
   };
