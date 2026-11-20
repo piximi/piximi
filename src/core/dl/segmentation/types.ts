@@ -196,6 +196,5 @@ export interface ISegmenterApi {
   // model I/O
 
   getSavedModelData(name: ModelName): Promise<ApiResult<SerializedModelData>>;
-  getZippedModelsBuffer(): Promise<ApiResult<ArrayBuffer>>;
   destroy(): Promise<ApiResult<void>>;
 }

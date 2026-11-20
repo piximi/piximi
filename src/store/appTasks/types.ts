@@ -3,6 +3,7 @@ export type AppTaskType =
   | "file-upload"
   | "project-load"
   | "project-download"
+  | "classifier-download"
   | "image-classification"
   | "image-segmentation"
   | "measurement";

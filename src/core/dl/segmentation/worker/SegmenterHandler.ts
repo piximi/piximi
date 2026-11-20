@@ -1,5 +1,3 @@
-import JSZip from "jszip";
-
 import { err, ok } from "../../utils";
 import { CellposeSAM } from "../models/CellposeSAM";
 import { CocoSSD } from "../models/CocoSSD";
@@ -160,20 +158,6 @@ export class SegmenterHandler implements ISegmenterApi {
     }
   }
 
-  public async getZippedModelsBuffer(): Promise<ApiResult<ArrayBuffer>> {
-    try {
-      const zip = new JSZip();
-      const savedModelData = await this.getAllSavedModelData();
-      Object.values(savedModelData).forEach((m) => {
-        zip.file(m.modelJson.fileName, m.modelJson.blob);
-        zip.file(m.modelWeights.fileName, m.modelWeights.blob);
-      });
-      const buffer = await zip.generateAsync({ type: "arraybuffer" });
-      return ok(buffer);
-    } catch (e) {
-      return err("UNKNOWN", "Failed to generate zipped models buffer", e);
-    }
-  }
   public async getSavedModelData(
     modelName: ModelName,
   ): Promise<ApiResult<SerializedModelData>> {

@@ -570,20 +570,7 @@ export class ClassifierHandler implements IClassifierApi {
     }
     return ok({ loadedModels, failedModels });
   }
-  public async getZippedModelsBuffer(): Promise<ApiResult<ArrayBuffer>> {
-    try {
-      const zip = new JSZip();
-      const savedModelData = await this.getAllSavedModelData();
-      Object.values(savedModelData).forEach((m) => {
-        zip.file(m.modelJson.fileName, m.modelJson.blob);
-        zip.file(m.modelWeights.fileName, m.modelWeights.blob);
-      });
-      const buffer = await zip.generateAsync({ type: "arraybuffer" });
-      return ok(buffer);
-    } catch (e) {
-      return err("UNKNOWN", "Failed to generate zipped models buffer", e);
-    }
-  }
+
   public async getSavedModelData(
     modelName: string,
   ): Promise<ApiResult<SerializedModelData>> {

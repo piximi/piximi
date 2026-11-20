@@ -41,3 +41,28 @@ export const buildClassifierZip = async (
   const zipBlob = await zip.generateAsync({ type: "blob" });
   return zipBlob;
 };
+
+/** Zip entry names can't carry path separators or a leading dot. */
+const sanitizeZipEntryName = (name: string) => name.replace(/[./\\]/g, "_");
+
+/**
+ * Bundle several fitted classifiers into one archive of per-model zips.
+ *
+ * Each inner `<modelName>.zip` is exactly what {@link buildClassifierZip}
+ * produces, so after unzipping the outer archive every model imports through
+ * the normal single-model import path, manifest and run history included.
+ */
+export const buildClassifiersBundle = async (
+  entries: {
+    modelName: string;
+    modelData: { modelJson: Blob; modelWeights: Blob };
+    runs: Run[];
+  }[],
+): Promise<Blob> => {
+  const bundle = new JSZip();
+  for (const { modelName, modelData, runs } of entries) {
+    const modelZip = await buildClassifierZip(modelData, runs, { modelName });
+    bundle.file(`${sanitizeZipEntryName(modelName)}.zip`, modelZip);
+  }
+  return bundle.generateAsync({ type: "blob" });
+};

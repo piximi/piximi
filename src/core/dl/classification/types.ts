@@ -288,6 +288,5 @@ export interface IClassifierApi {
     buffer: ArrayBuffer,
   ): Promise<ApiResult<BatchModelLoadResult>>;
   getSavedModelData(name: string): Promise<ApiResult<SerializedModelData>>;
-  getZippedModelsBuffer(): Promise<ApiResult<ArrayBuffer>>;
   destroy(): Promise<ApiResult<void>>;
 }

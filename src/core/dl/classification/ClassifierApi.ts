@@ -134,9 +134,7 @@ class ClassifierApi implements IClassifierApi {
   getSavedModelData(modelName: string) {
     return this.backend.getSavedModelData(modelName);
   }
-  getZippedModelsBuffer() {
-    return this.backend.getZippedModelsBuffer();
-  }
+
   async destroy() {
     try {
       await this.backend.destroy();

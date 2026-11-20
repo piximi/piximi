@@ -14,6 +14,7 @@ export { useWindowSize } from "./useWindowSize";
 export { useFileLoader } from "./useFileLoader";
 export { useProjectLoader } from "./useProjectLoader";
 export { useProjectSaver } from "./useProjectSaver";
+export { useClassifiersSaver } from "./useClassifiersSaver";
 export { useHistogram } from "./useHistogram";
 export { useRawImageData } from "./useRawImageData";
 export { useRenderedSrc } from "./useRenderedSrcs";

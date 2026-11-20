@@ -25,7 +25,7 @@ import {
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
 
-import { useDialogHotkey } from "hooks";
+import { useClassifiersSaver, useDialogHotkey } from "hooks";
 
 import { selectAllCreatedModelNames } from "store/classifier/selectors";
 
@@ -37,8 +37,6 @@ import { SaveProjectDialog } from "./SaveProjectDialog";
 
 import type { AlertState } from "utils/types";
 
-//import { saveAs } from "file-saver";
-
 export const FallbackDialog = (props: any) => {
   const error = props.error as Error;
 
@@ -47,6 +45,8 @@ export const FallbackDialog = (props: any) => {
   const [stackTrace, setStackTrace] = useState<string | undefined>(error.stack);
 
   const projectClassificationModels = useSelector(selectAllCreatedModelNames);
+  const { saveClassifiers, isSaving: isSavingClassifiers } =
+    useClassifiersSaver();
 
   useEffect(() => {
     if (error.stack) {
@@ -95,14 +95,6 @@ export const FallbackDialog = (props: any) => {
     "bug" +
     "&body=" +
     encodeURIComponent(issueDescription);
-
-  const handleSaveClassifiers = async () => {
-    alert("Not Yet Implemented");
-    // const modelsZip = classifierHandler.zipModels();
-    // modelsZip.generateAsync({ type: "blob" }).then((blob) => {
-    //   saveAs(blob, `${"experimentName"}-classifiers.zip`);
-    // });
-  };
 
   const handleSaveProject = () => {
     onSaveProjectDialogOpen();
@@ -216,8 +208,12 @@ export const FallbackDialog = (props: any) => {
             Save Project
           </Button>
           {projectClassificationModels.length > 0 && (
-            <Button variant="outlined" onClick={handleSaveClassifiers}>
-              Save Classifier
+            <Button
+              variant="outlined"
+              onClick={saveClassifiers}
+              disabled={isSavingClassifiers}
+            >
+              Save Classifiers
             </Button>
           )}
         </Stack>
