@@ -14,7 +14,10 @@ import type {
   Channel,
   Partition,
 } from "core/entities";
-import type { Classifier } from "core/dl/classification/types";
+import type {
+  Classifier,
+  EvaluationResult,
+} from "core/dl/classification/types";
 
 import type { Capability } from "../capabilities";
 import type { BackendEventListener } from "../events";
@@ -29,10 +32,19 @@ import type {
   AnnotationSort,
   AnnotationUpdate,
   Backend,
+  BackendClassification,
   BackendSegmentation,
   BackendSession,
   CallOptions,
   Changed,
+  ClassifierCreateRequest,
+  ClassifierExport,
+  ClassifierFitRequest,
+  ClassifierFitSummary,
+  ClassifierImportRequest,
+  ClassifierPredictRequest,
+  ClassifierPredictSummary,
+  ClassifierUpdateRequest,
   Counts,
   Deleted,
   ImageCountGroup,
@@ -121,6 +133,7 @@ export class RemoteBackend implements Backend {
   capabilities: readonly Capability[] = [];
   session: BackendSession = { id: "", protocolVersion: PROTOCOL_VERSION };
   segmentation?: BackendSegmentation;
+  classification?: BackendClassification;
 
   readonly #peer: RpcPeer;
   readonly #bus = new EventBus();
@@ -262,6 +275,9 @@ export class RemoteBackend implements Backend {
     };
     this.segmentation = hasCapability(this.capabilities, "segmentation")
       ? this.#segmentation()
+      : undefined;
+    this.classification = hasCapability(this.capabilities, "classification")
+      ? this.#classification()
       : undefined;
     this.#peer.notify("initialized");
   }
@@ -532,6 +548,82 @@ export class RemoteBackend implements Backend {
           { signal: options?.signal, onProgress: options?.onProgress },
         );
       },
+    };
+  }
+
+  // ── Classification ─────────────────────────────────────────────────────────
+
+  #classification(): BackendClassification {
+    const progress = (options?: CallOptions) => ({
+      signal: options?.signal,
+      onProgress: options?.onProgress,
+    });
+    return {
+      listArchitectures: async (): Promise<ModelDescriptor[]> =>
+        asDomain<ModelDescriptor[]>(
+          (await this.#call("classification/listArchitectures", undefined))
+            .models,
+        ),
+
+      list: async (): Promise<Classifier[]> =>
+        asDomain<Classifier[]>(
+          (await this.#call("classification/list", undefined)).classifiers,
+        ),
+
+      create: async (request: ClassifierCreateRequest): Promise<Classifier> =>
+        asDomain<Classifier>(
+          await this.#call(
+            "classification/create",
+            asWire<P.ClassifierCreateRequest>(request),
+          ),
+        ),
+
+      update: async (request: ClassifierUpdateRequest): Promise<Classifier> =>
+        asDomain<Classifier>(
+          await this.#call(
+            "classification/update",
+            asWire<P.ClassifierUpdateRequest>(request),
+          ),
+        ),
+
+      delete: async (classifierId: string): Promise<void> => {
+        await this.#call("classification/delete", { classifierId });
+      },
+
+      fit: async (
+        request: ClassifierFitRequest,
+        options?: CallOptions,
+      ): Promise<ClassifierFitSummary> => {
+        if (options?.signal?.aborted) return { status: "stopped" };
+        return asDomain<ClassifierFitSummary>(
+          await this.#call("classification/fit", request, progress(options)),
+        );
+      },
+
+      predict: async (
+        request: ClassifierPredictRequest,
+        options?: CallOptions,
+      ): Promise<ClassifierPredictSummary> => {
+        if (options?.signal?.aborted) return { predicted: 0, cancelled: true };
+        return this.#call("classification/predict", request, progress(options));
+      },
+
+      evaluate: (classifierId: string): Promise<EvaluationResult> =>
+        this.#call("classification/evaluate", { classifierId }),
+
+      acceptPredictions: (targetId: string): Promise<Changed> =>
+        this.#call("classification/acceptPredictions", { targetId }),
+
+      clearPredictions: (targetId: string): Promise<Changed> =>
+        this.#call("classification/clearPredictions", { targetId }),
+
+      export: (classifierId: string): Promise<ClassifierExport> =>
+        this.#call("classification/export", { classifierId }),
+
+      import: async (request: ClassifierImportRequest): Promise<Classifier> =>
+        asDomain<Classifier>(
+          await this.#call("classification/import", request),
+        ),
     };
   }
 }

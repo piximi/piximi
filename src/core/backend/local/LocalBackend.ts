@@ -1,5 +1,6 @@
 import { DataConnector } from "core/data-connector";
 import { generateUUID, representsUnknown } from "core/entities";
+import { getClassifierApi } from "core/dl/classification";
 import { getSegmenterApi } from "core/dl/segmentation/SegmenterApi";
 
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
@@ -26,15 +27,13 @@ import {
   sortAnnotations,
   sortImages,
 } from "../query";
+import { LocalClassification } from "./LocalClassification";
 import { LocalSegmentation } from "./LocalSegmentation";
 import { ThumbnailWorkerPool } from "./ThumbnailWorkerPool";
+import { imageUpdate, volumeUpdate } from "./updates";
 
-import type {
-  AnnotationVolume,
-  Category,
-  ImageObject,
-  StorageReference,
-} from "core/entities";
+import type { Category, ImageObject, StorageReference } from "core/entities";
+import type { IClassifierApi } from "core/dl/classification/types";
 import type { ISegmenterApi } from "core/dl/segmentation/types";
 
 import type { CompositeLayer } from "utils/image/compositeChannels";
@@ -50,6 +49,7 @@ import type {
   AnnotationSort,
   Backend,
   BackendSegmentation,
+  BackendClassification,
   BackendSession,
   CallOptions,
   Changed,
@@ -59,12 +59,10 @@ import type {
   ImageQuery,
   ImageRecord,
   ImageSort,
-  ImageUpdate,
   Page,
   PageRequest,
   ProjectSummary,
   RawChannelData,
-  VolumeUpdate,
   RenderRequest,
   RenderResult,
   RenderedImage,
@@ -79,6 +77,7 @@ type LocalBackendDeps = {
   thumbnails?: ThumbnailRenderer;
   /* Factories, so that constructing the backend spawns no workers. */
   segmenter?: () => ISegmenterApi;
+  classifier?: () => IClassifierApi;
   measurements?: () => MeasurementsProvider;
 };
 
@@ -98,37 +97,6 @@ const groupBy = <T>(
 
 type RootState = ReturnType<StoreHandle["getState"]>;
 type DataState = RootState["data"];
-
-/* The fields a category change rewrites, as the store holds them now. */
-const imageUpdate = (image: ImageObject): ImageUpdate => ({
-  id: image.id,
-  categoryId: image.categoryId,
-  partition: image.partition,
-  ...(image.predictionConfidence !== undefined && {
-    predictionConfidence: image.predictionConfidence,
-  }),
-  ...(image.predictedAtRunId !== undefined && {
-    predictedAtRunId: image.predictedAtRunId,
-  }),
-  ...(image.predictionCorrected !== undefined && {
-    predictionCorrected: image.predictionCorrected,
-  }),
-});
-
-const volumeUpdate = (volume: AnnotationVolume): VolumeUpdate => ({
-  id: volume.id,
-  kindId: volume.kindId,
-  categoryId: volume.categoryId,
-  ...(volume.predictionConfidence !== undefined && {
-    predictionConfidence: volume.predictionConfidence,
-  }),
-  ...(volume.predictedAtRunId !== undefined && {
-    predictedAtRunId: volume.predictedAtRunId,
-  }),
-  ...(volume.predictionCorrected !== undefined && {
-    predictionCorrected: volume.predictionCorrected,
-  }),
-});
 
 /* A value derived from one slice of state, rebuilt only when that slice is
  * replaced. */
@@ -180,6 +148,7 @@ export class LocalBackend implements Backend {
   readonly #bus = new EventBus();
   readonly #jobs = new JobRegistry(this.#bus);
   readonly segmentation: BackendSegmentation;
+  readonly classification: BackendClassification;
 
   readonly #imageRows = new Derived((images: DataState["images"]) =>
     images.ids.map((id) => images.entities[id]),
@@ -222,6 +191,12 @@ export class LocalBackend implements Backend {
       store: deps.store,
       segmenter: deps.segmenter ?? getSegmenterApi,
       measurements: deps.measurements ?? (() => MeasurementsApi.getInstance()),
+      jobs: this.#jobs,
+      bus: this.#bus,
+    });
+    this.classification = new LocalClassification({
+      store: deps.store,
+      classifier: deps.classifier ?? getClassifierApi,
       jobs: this.#jobs,
       bus: this.#bus,
     });

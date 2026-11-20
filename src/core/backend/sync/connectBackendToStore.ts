@@ -1,6 +1,7 @@
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { backendSyncSlice } from "store/backendSync";
+import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 
 import { isTerminal } from "../jobs";
@@ -171,9 +172,23 @@ const applyBackendEvent = (
       }
       break;
     case "classifiers/didChange":
+      // The local backend writes its own records; a remote one is mirrored.
+      if (remote) {
+        store.dispatch(
+          classifierSlice.actions.setClassifiers(event.classifiers),
+        );
+      }
+      return;
     case "classifiers/didEpoch":
-      // The classifier slice follows these once classification is behind
-      // the backend; nothing a query answers changed.
+      if (remote) {
+        store.dispatch(
+          classifierSlice.actions.appendEpoch({
+            classifierId: event.classifierId,
+            runId: event.runId,
+            epoch: event.epoch,
+          }),
+        );
+      }
       return;
   }
   if (remote) store.dispatch(backendSyncSlice.actions.backendDataChanged());

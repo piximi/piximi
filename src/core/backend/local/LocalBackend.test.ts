@@ -8,11 +8,12 @@ import {
   UNKNOWN_KIND_CATEGORY,
   generateUUID,
 } from "core/entities";
-import { Partition } from "core/dl/enums";
+import { ModelTask, Partition } from "core/dl/enums";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
+import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
@@ -25,6 +26,10 @@ import { createMainThreadThumbnailRenderer } from "./thumbnails";
 
 import type { Channel, ChannelMeta } from "core/entities";
 import type { ChannelStorageInput } from "core/data-connector/types";
+import type {
+  IClassifierApi,
+  ModelInfoDTO,
+} from "core/dl/classification/types";
 import type {
   ISegmenterApi,
   SegmentationModelDetails,
@@ -83,6 +88,157 @@ const createFakeSegmenter = (): ISegmenterApi => {
   };
 };
 
+/*
+ * Stands in for the classifier worker: a majority-class model that reports
+ * what the handler reports, without tfjs.
+ */
+const createFakeClassifier = (): IClassifierApi => {
+  type Model = {
+    loaded: boolean;
+    trainingLoaded: boolean;
+    classes: string[];
+    majority?: string;
+    pending: number;
+  };
+  const models = new Map<string, Model>();
+  const unsupported = {
+    success: false as const,
+    reason: { code: "UNKNOWN" as const, message: "not supported by the fake" },
+  };
+  const dto = (name: string): ModelInfoDTO => {
+    const model = models.get(name)!;
+    return {
+      name,
+      modelArch: 0,
+      task: ModelTask.Classification,
+      graph: false,
+      trainable: true,
+      pretrained: model.loaded,
+      classes: model.classes,
+      numClasses: model.classes.length,
+      preprocessingSettings: undefined,
+      optimizerSettings: undefined,
+      currentFitHistory: [],
+      modelSummary: undefined,
+      modelLoaded: model.loaded,
+      trainingLoaded: model.trainingLoaded,
+      validationLoaded: model.trainingLoaded,
+      inferenceLoaded: true,
+      defaultInputShape: undefined,
+      defaultOutputShape: undefined,
+    };
+  };
+  const missing = (name: string) => ({
+    success: false as const,
+    reason: { code: "MODEL_NOT_FOUND" as const, message: `No model ${name}` },
+  });
+  const evaluation = {
+    confusionMatrix: [
+      [1, 0],
+      [0, 1],
+    ],
+    accuracy: 1,
+    crossEntropy: 0.1,
+    precision: 1,
+    recall: 1,
+    f1Score: 1,
+  };
+  return {
+    getModelBackend: async () => ({ success: true, data: "fake" }),
+    getModelNames: async () => ({ success: true, data: [...models.keys()] }),
+    getModelInfo: async (name) =>
+      models.has(name) ? { success: true, data: dto(name) } : missing(name),
+    hasModel: async (name) => ({ success: true, data: models.has(name) }),
+    createNewModel: async (name) => {
+      models.set(name, {
+        loaded: false,
+        trainingLoaded: false,
+        classes: [],
+        pending: 0,
+      });
+      return { success: true, data: dto(name) };
+    },
+    removeModel: async (name) => {
+      models.delete(name);
+      return { success: true, data: name };
+    },
+    removeAllModels: async () => {
+      models.clear();
+      return { success: true };
+    },
+    loadTraining: async (name) => ({ success: true, data: name }),
+    loadValidation: async (name) => ({ success: true, data: name }),
+    loadInference: async (name, items) => {
+      const model = models.get(name);
+      if (!model) return missing(name);
+      model.pending = items.length;
+      return { success: true, data: name };
+    },
+    loadData: async (name) => ({ success: true, data: name }),
+    prepareModel: async (name, training, _validation, _n, categories) => {
+      const model = models.get(name);
+      if (!model) return missing(name);
+      model.loaded = true;
+      model.trainingLoaded = true;
+      model.classes = categories.map((c) => c.id);
+      const counts = new Map<string, number>();
+      for (const item of training) {
+        counts.set(item.categoryId, (counts.get(item.categoryId) ?? 0) + 1);
+      }
+      model.majority = [...counts.entries()].sort(
+        (x, y) => y[1] - x[1],
+      )[0]?.[0];
+      return { success: true };
+    },
+    recompile: async (name) => ({ success: true, data: name }),
+    train: async (name, options, callbacks) => {
+      if (!models.has(name)) return missing(name);
+      for (let epoch = 0; epoch < options.epochs; epoch++) {
+        await callbacks.onEpochEnd(epoch, {
+          loss: 1 / (epoch + 1),
+          val_loss: 1.1 / (epoch + 1),
+          categoricalAccuracy: 0.5,
+          val_categoricalAccuracy: 0.5,
+        });
+      }
+      return {
+        success: true,
+        data: {
+          weightsRef: name,
+          status: "completed",
+          evalResults: evaluation,
+        },
+      };
+    },
+    cancelTraining: async (name) => ({ success: true, data: name }),
+    predict: async (name, categories) => {
+      const model = models.get(name);
+      if (!model) return missing(name);
+      const index = Math.max(
+        0,
+        categories.findIndex((c) => c.id === model.majority),
+      );
+      const softmax = categories.map((_, i) => (i === index ? 0.75 : 0.25));
+      return {
+        success: true,
+        data: Array.from({ length: model.pending }, () => ({
+          categoryId: categories[index].id,
+          maxProb: 0.75,
+          softmax,
+        })),
+      };
+    },
+    evaluate: async (name) =>
+      models.has(name) ? { success: true, data: evaluation } : missing(name),
+    modelFromFiles: async () => unsupported,
+    modelFromUrl: async () => unsupported,
+    modelsFromZipBuffer: async () => unsupported,
+    getSavedModelData: async () => unsupported,
+    getZippedModelsBuffer: async () => unsupported,
+    destroy: async () => ({ success: true }),
+  };
+};
+
 type ImageSeed = {
   id: string;
   width: number;
@@ -94,6 +250,8 @@ const seed: ImageSeed[] = [
   { id: "img-a", width: 4, height: 3, channels: 2 },
   { id: "img-b", width: 2, height: 2, channels: 2 },
   { id: "img-c", width: 5, height: 1, channels: 2 },
+  { id: "img-d", width: 3, height: 3, channels: 2 },
+  { id: "img-e", width: 2, height: 3, channels: 2 },
 ];
 
 const channelId = (imageId: string, c: number) => `${imageId}-ch${c}`;
@@ -201,18 +359,24 @@ describeBackendConformance("LocalBackend", async () => {
   );
 
   const store = configureStore({
-    reducer: { data: dataSlice.reducer, appTasks: appTasksSlice.reducer },
+    reducer: {
+      data: dataSlice.reducer,
+      appTasks: appTasksSlice.reducer,
+      classifier: classifierSlice.reducer,
+    },
     middleware: (getDefault) => getDefault({ serializableCheck: false }),
   });
   store.dispatch(dataSlice.actions.setState(makeProject()));
 
   const handle = store as unknown as StoreHandle;
   const segmenter = createFakeSegmenter();
+  const classifier = createFakeClassifier();
   const backend = new LocalBackend({
     store: handle,
     dataConnector: storage,
     thumbnails: createMainThreadThumbnailRenderer(storage),
     segmenter: () => segmenter,
+    classifier: () => classifier,
     // The worker-free versions; the intensity one reads the same IndexedDB.
     measurements: () => ({
       computeFeatures: async (objects) => computeObjectFeatures(objects),

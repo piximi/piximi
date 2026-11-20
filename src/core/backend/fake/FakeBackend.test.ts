@@ -9,6 +9,8 @@ const seed = [
   { id: "img-a", width: 4, height: 3, channels: 2 },
   { id: "img-b", width: 2, height: 2, channels: 2 },
   { id: "img-c", width: 5, height: 1, channels: 2 },
+  { id: "img-d", width: 3, height: 3, channels: 2 },
+  { id: "img-e", width: 2, height: 3, channels: 2 },
 ];
 
 describeBackendConformance("FakeBackend", async () => ({

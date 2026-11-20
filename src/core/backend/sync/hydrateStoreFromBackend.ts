@@ -57,6 +57,14 @@ export const hydrateStoreFromBackend = async (
     );
   };
 
+  if (backend.classification) {
+    dispatch(
+      classifierSlice.actions.setClassifiers(
+        await backend.classification.list(),
+      ),
+    );
+  }
+
   const first = await backend.query.images(
     {},
     { offset: 0, limit: IMAGE_PAGE },

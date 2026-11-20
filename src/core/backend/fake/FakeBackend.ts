@@ -11,11 +11,19 @@ import {
 } from "core/entities";
 import { Partition } from "core/dl/enums";
 import { TaskCancelledError } from "core/dl/cancel";
+import { defaultClassifier } from "core/dl/classification/utils";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
+
 import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
 
+import {
+  fingerprintItems,
+  hashCategorySet,
+  splitForTraining,
+} from "../classification";
 import { BackendError } from "../errors";
 import { EventBus } from "../events";
 import { JobRegistry } from "../jobs";
@@ -23,6 +31,7 @@ import {
   countBy,
   filterAnnotations,
   filterImages,
+  marginOf,
   paginate,
   sortAnnotations,
   sortImages,
@@ -41,6 +50,11 @@ import type {
   Kind,
   Plane,
 } from "core/entities";
+import type {
+  Classifier,
+  EvaluationResult,
+  Run,
+} from "core/dl/classification/types";
 
 import type { StoredPixels } from "utils/image/compositeChannels";
 
@@ -55,9 +69,17 @@ import type {
   AnnotationSort,
   AnnotationUpdate,
   Backend,
+  BackendClassification,
   BackendSession,
   CallOptions,
   Changed,
+  ClassifierCreateRequest,
+  ClassifierFitRequest,
+  ClassifierFitSummary,
+  ClassifierPredictRequest,
+  ClassifierPredictSummary,
+  ClassifierUpdateRequest,
+  ModelDescriptor,
   Counts,
   Deleted,
   ImageCountGroup,
@@ -86,6 +108,10 @@ type FakeImageSeed = {
 };
 
 export const FAKE_MODEL_ID = "fake-whole-image";
+export const FAKE_ARCHITECTURE_ID = "fake-majority";
+
+/* An item as the fake's classifier sees it, whatever the target. */
+type Labeled = { id: string; categoryId: string; partition: Partition };
 
 /*
  * A complete in-memory backend with no workers, no IndexedDB and no models,
@@ -96,7 +122,12 @@ export const FAKE_MODEL_ID = "fake-whole-image";
  */
 export class FakeBackend implements Backend {
   readonly kind = "local" as const;
-  readonly capabilities: readonly Capability[] = ["raw-local", "segmentation"];
+  readonly capabilities: readonly Capability[] = [
+    "raw-local",
+    "segmentation",
+    "classification",
+    "classification.train",
+  ];
   readonly session: BackendSession = {
     id: generateUUID(),
     protocolVersion: "0.0.0-fake",
@@ -117,6 +148,11 @@ export class FakeBackend implements Backend {
   #volumes: AnnotationVolume[] = [];
   #annotations: AnnotationObject[] = [];
   #modelLoaded = false;
+  #classifiers: Classifier[] = [];
+  /* What each fitted classifier learned: the majority class and the shares. */
+  #learned = new Map<string, { categoryId: string; softmax: number[] }>();
+  /* The distributions behind pending predictions, for the softmax sort. */
+  #softmax = new Map<string, number[]>();
 
   constructor(seed: { images: FakeImageSeed[] }) {
     const channelCount = Math.max(0, ...seed.images.map((im) => im.channels));
@@ -215,6 +251,10 @@ export class FakeBackend implements Backend {
     return {
       categoryName: (id) => categories.get(id)?.name ?? "",
       isAnnotated: (id) => annotated.has(id),
+      softmaxMargin: (id) => {
+        const probabilities = this.#softmax.get(id);
+        return probabilities && marginOf(probabilities);
+      },
     };
   }
 
@@ -226,6 +266,10 @@ export class FakeBackend implements Backend {
       categoryName: (id) => categories.get(id)?.name ?? "",
       imageName: (id) => images.get(id)?.name ?? "",
       planeZIndex: (id) => planes.get(id)?.zIndex ?? -Infinity,
+      softmaxMargin: (id) => {
+        const probabilities = this.#softmax.get(id);
+        return probabilities && marginOf(probabilities);
+      },
     };
   }
 
@@ -795,6 +839,494 @@ export class FakeBackend implements Backend {
       }
       this.#jobs.finish(job.id, cancelled ? "cancelled" : "succeeded");
       return { jobId: job.id, added: annotations.length, skipped, cancelled };
+    },
+  };
+
+  // ── Classification ─────────────────────────────────────────────────────────
+  //
+  // The fake's classifier predicts the majority class of its training set,
+  // which is enough to drive the records, events, partitions and jobs the
+  // real ones go through.
+
+  #classifier(id: string): Classifier {
+    const classifier = this.#classifiers.find((c) => c.id === id);
+    if (!classifier) {
+      throw new BackendError("MODEL_NOT_FOUND", `No classifier ${id}`);
+    }
+    return classifier;
+  }
+
+  #classifiersChanged(): void {
+    this.#bus.emit({
+      type: "classifiers/didChange",
+      classifiers: this.#classifiers.map((c) => structuredClone(c)),
+    });
+  }
+
+  #knownCategories(targetId: string): Category[] {
+    return this.#categories.filter(
+      (c) =>
+        !representsUnknown(c.id) &&
+        (targetId === IMAGE_CLASSIFIER_ID
+          ? c.type === "image"
+          : c.type === "annotation" && c.kindId === targetId),
+    );
+  }
+
+  #labeled(targetId: string): Labeled[] {
+    if (targetId === IMAGE_CLASSIFIER_ID) {
+      return this.#images.map(({ id, categoryId, partition }) => ({
+        id,
+        categoryId,
+        partition,
+      }));
+    }
+    const volumes = new Map(this.#volumes.map((v) => [v.id, v]));
+    return this.#annotations
+      .filter((a) => volumes.get(a.volumeId)?.kindId === targetId)
+      .map((a) => ({
+        id: a.id,
+        categoryId: volumes.get(a.volumeId)!.categoryId,
+        partition: a.partition,
+      }));
+  }
+
+  #setPartitions(
+    targetId: string,
+    assignments: Array<{ id: string; partition: Partition }>,
+  ): void {
+    if (assignments.length === 0) return;
+    const wanted = new Map(assignments.map((a) => [a.id, a.partition]));
+    if (targetId === IMAGE_CLASSIFIER_ID) {
+      const updates: ImageUpdate[] = [];
+      for (const image of this.#images) {
+        const partition = wanted.get(image.id);
+        if (partition === undefined) continue;
+        image.partition = partition;
+        updates.push({
+          id: image.id,
+          categoryId: image.categoryId,
+          partition,
+          ...(image.predictionConfidence !== undefined && {
+            predictionConfidence: image.predictionConfidence,
+          }),
+          ...(image.predictedAtRunId !== undefined && {
+            predictedAtRunId: image.predictedAtRunId,
+          }),
+        });
+      }
+      this.#bus.emit({ type: "images/didUpdate", updates });
+    } else {
+      const updates: AnnotationUpdate[] = [];
+      for (const annotation of this.#annotations) {
+        const partition = wanted.get(annotation.id);
+        if (partition === undefined) continue;
+        annotation.partition = partition;
+        updates.push({ id: annotation.id, partition });
+      }
+      this.#bus.emit({
+        type: "annotations/didUpdate",
+        volumes: [],
+        annotations: updates,
+      });
+    }
+  }
+
+  /* Writes a category as a prediction or by hand, following the rules. */
+  #label(
+    targetId: string,
+    changes: Array<{ id: string; categoryId: string; confidence?: number }>,
+    runId?: string,
+  ): void {
+    if (changes.length === 0) return;
+    const predicted = runId !== undefined;
+    if (targetId === IMAGE_CLASSIFIER_ID) {
+      const updates: ImageUpdate[] = [];
+      for (const { id, categoryId, confidence } of changes) {
+        const image = this.#images.find((im) => im.id === id);
+        if (!image) continue;
+        const corrected = predicted
+          ? undefined
+          : predictionCorrection(
+              image.categoryId,
+              categoryId,
+              {
+                predictedAtRunId: image.predictedAtRunId,
+                predictionConfidence: image.predictionConfidence,
+              },
+              image.predictionCorrected,
+            );
+        image.categoryId = categoryId;
+        image.partition = nextPartition(categoryId, image.partition, predicted);
+        if (predicted) {
+          image.predictionConfidence = confidence;
+          image.predictedAtRunId = runId;
+        } else {
+          delete image.predictionConfidence;
+          delete image.predictedAtRunId;
+        }
+        if (corrected) image.predictionCorrected = corrected;
+        else delete image.predictionCorrected;
+        updates.push({
+          id,
+          categoryId,
+          partition: image.partition,
+          ...(image.predictionConfidence !== undefined && {
+            predictionConfidence: image.predictionConfidence,
+          }),
+          ...(image.predictedAtRunId !== undefined && {
+            predictedAtRunId: image.predictedAtRunId,
+          }),
+          ...(corrected && { predictionCorrected: corrected }),
+        });
+      }
+      this.#bus.emit({ type: "images/didUpdate", updates });
+      return;
+    }
+    const volumes: VolumeUpdate[] = [];
+    const moved = new Set<string>();
+    for (const { id, categoryId, confidence } of changes) {
+      const annotation = this.#annotations.find((a) => a.id === id);
+      const volume = annotation
+        ? this.#volumes.find((v) => v.id === annotation.volumeId)
+        : undefined;
+      if (!volume || moved.has(volume.id)) continue;
+      moved.add(volume.id);
+      const category = this.#category(categoryId);
+      if (category.type !== "annotation") continue;
+      if (predicted) {
+        volume.categoryId = categoryId;
+        volume.predictionConfidence = confidence;
+        volume.predictedAtRunId = runId;
+        delete volume.predictionCorrected;
+        volumes.push({
+          id: volume.id,
+          kindId: volume.kindId,
+          categoryId,
+          predictionConfidence: confidence,
+          predictedAtRunId: runId,
+        });
+      } else {
+        volumes.push(this.#moveVolume(volume, category));
+      }
+    }
+    const annotations: AnnotationUpdate[] = [];
+    for (const annotation of this.#annotations) {
+      if (!moved.has(annotation.volumeId)) continue;
+      const volume = this.#volumes.find((v) => v.id === annotation.volumeId)!;
+      annotation.partition = nextPartition(
+        volume.categoryId,
+        annotation.partition,
+        predicted,
+      );
+      annotations.push({ id: annotation.id, partition: annotation.partition });
+    }
+    this.#bus.emit({ type: "annotations/didUpdate", volumes, annotations });
+  }
+
+  readonly classification: BackendClassification = {
+    listArchitectures: async (): Promise<ModelDescriptor[]> => [
+      {
+        name: FAKE_ARCHITECTURE_ID,
+        displayName: "Majority class",
+        description: "Predicts the most common training category",
+        use: "Testing",
+        sources: [],
+        modelLoaded: false,
+        status: "ready",
+        framework: "fake",
+        tasks: ["classification", "classification.train"],
+        channelPolicy: { mode: CHANNEL_MODE.PASSTHROUGH, maxChannels: 16 },
+        cancellableLoad: false,
+      },
+    ],
+
+    list: async (): Promise<Classifier[]> =>
+      this.#classifiers.map((c) => structuredClone(c)),
+
+    create: async (request: ClassifierCreateRequest): Promise<Classifier> => {
+      if (request.architectureId !== FAKE_ARCHITECTURE_ID) {
+        throw new BackendError(
+          "MODEL_NOT_FOUND",
+          `No architecture ${request.architectureId}`,
+        );
+      }
+      if (this.#classifiers.some((c) => c.name === request.name)) {
+        throw new BackendError(
+          "MODEL_CREATE_FAILED",
+          `A classifier named "${request.name}" already exists`,
+        );
+      }
+      const classifier = defaultClassifier(
+        {
+          id: generateUUID(),
+          name: request.name,
+          targetId: request.targetId,
+          architectureId: request.architectureId,
+          framework: "fake",
+        },
+        {
+          preprocessSettings: structuredClone(
+            request.hyperparameters.preprocess,
+          ),
+          optimizerSettings: structuredClone(request.hyperparameters.optimizer),
+        },
+      );
+      classifier.initSeed = request.seed;
+      this.#classifiers.push(classifier);
+      this.#classifiersChanged();
+      return structuredClone(classifier);
+    },
+
+    update: async (request: ClassifierUpdateRequest): Promise<Classifier> => {
+      const classifier = this.#classifier(request.classifierId);
+      if (request.hyperparameters) {
+        classifier.hyperparameters = structuredClone(request.hyperparameters);
+      }
+      if (request.classMap) classifier.classMap = { ...request.classMap };
+      if (request.confidenceThreshold !== undefined) {
+        classifier.confidenceThreshold = request.confidenceThreshold;
+      }
+      this.#classifiersChanged();
+      return structuredClone(classifier);
+    },
+
+    delete: async (classifierId: string): Promise<void> => {
+      this.#classifier(classifierId);
+      this.#classifiers = this.#classifiers.filter(
+        (c) => c.id !== classifierId,
+      );
+      this.#learned.delete(classifierId);
+      this.#classifiersChanged();
+    },
+
+    fit: async (
+      request: ClassifierFitRequest,
+      options?: CallOptions,
+    ): Promise<ClassifierFitSummary> => {
+      const classifier = this.#classifier(request.classifierId);
+      if (options?.signal?.aborted) return { status: "stopped" };
+      const job = this.#jobs.start(
+        "classifier-fit",
+        `Training ${classifier.name}`,
+        options?.signal,
+      );
+      const signal = this.#jobs.signal(job.id);
+      const { preprocess, optimizer } = classifier.hyperparameters;
+      const seed = request.seed ?? classifier.initSeed ?? 0;
+      const fresh = classifier.runs.length === 0;
+      const categories = this.#knownCategories(classifier.targetId);
+      const classMap = fresh
+        ? Object.fromEntries(categories.map((c, i) => [String(i), c.id]))
+        : classifier.classMap;
+      if (!classMap) {
+        this.#jobs.finish(job.id, "failed", { error: "No class map" });
+        throw new BackendError("TRAINING_FAILED", "No class map");
+      }
+      const split = splitForTraining(this.#labeled(classifier.targetId), {
+        trainingPercentage: preprocess.trainingPercentage,
+        shuffle: preprocess.shuffle,
+        seed,
+        continued: !fresh,
+      });
+      if (split.training.length === 0 || split.validation.length === 0) {
+        this.#jobs.finish(job.id, "failed", { error: "Too few labeled items" });
+        throw new BackendError(
+          "PREPROCESS_FAILED",
+          "Cannot train: need at least one training and one validation item",
+        );
+      }
+      this.#setPartitions(classifier.targetId, split.assignments);
+
+      const classIds = Object.values(classMap);
+      const counts = classIds.map(
+        (id) => split.training.filter((it) => it.categoryId === id).length,
+      );
+      const majority = counts.indexOf(Math.max(...counts));
+      this.#learned.set(classifier.id, {
+        categoryId: classIds[majority],
+        softmax: counts.map((n) => n / split.training.length),
+      });
+      const run: Run = {
+        id: generateUUID(),
+        parentRunId: classifier.runs.at(-1)?.id,
+        startedAt: new Date().toISOString(),
+        status: "in-progress",
+        trigger: fresh ? "fresh" : "continue",
+        seed,
+        appVersion: "fake",
+        frameworkVersion: "0",
+        device: "none",
+        hyperparameters: {
+          architecture: classifier.architectureId,
+          optimizer: structuredClone(optimizer),
+          preprocess: structuredClone(preprocess),
+        },
+        classMap,
+        trainingFingerprint: await fingerprintItems(split.training),
+        validationFingerprint: await fingerprintItems(split.validation),
+        valIds: split.validation.map((it) => it.id),
+        categorySetHash: await hashCategorySet(categories.map((c) => c.id)),
+        history: [],
+      };
+      classifier.classMap = classMap;
+      classifier.classes = categories.map((c) => c.name);
+      classifier.busy = "training";
+      classifier.runs.push(run);
+      this.#classifiersChanged();
+
+      let status: Run["status"] = "completed";
+      for (let epoch = 0; epoch < optimizer.epochs; epoch++) {
+        await Promise.resolve();
+        if (signal.aborted) {
+          status = "stopped";
+          break;
+        }
+        const entry = {
+          epoch,
+          loss: 1 / (epoch + 1),
+          valLoss: 1.1 / (epoch + 1),
+          accuracy: 1 - 0.5 / (epoch + 1),
+          valAccuracy: 1 - 0.6 / (epoch + 1),
+        };
+        run.history.push(entry);
+        this.#bus.emit({
+          type: "classifiers/didEpoch",
+          classifierId: classifier.id,
+          runId: run.id,
+          epoch: entry,
+        });
+        const percent = Math.round(((epoch + 1) / optimizer.epochs) * 100);
+        options?.onProgress?.({ percent, message: `Epoch ${epoch + 1}` });
+        this.#jobs.update(job.id, { progress: percent });
+      }
+      const hits = split.validation.filter(
+        (it) => it.categoryId === classIds[majority],
+      ).length;
+      const evalResults: EvaluationResult = {
+        confusionMatrix: classIds.map((_, row) =>
+          classIds.map((__, col) =>
+            col === majority
+              ? split.validation.filter((it) => it.categoryId === classIds[row])
+                  .length
+              : 0,
+          ),
+        ),
+        accuracy: hits / split.validation.length,
+        crossEntropy: 0.5,
+        precision: 0.5,
+        recall: 0.5,
+        f1Score: 0.5,
+      };
+      run.status = status;
+      run.finishedAt = new Date().toISOString();
+      run.evalResults = evalResults;
+      classifier.trained = true;
+      delete classifier.busy;
+      this.#classifiersChanged();
+      this.#jobs.finish(
+        job.id,
+        status === "stopped" ? "cancelled" : "succeeded",
+      );
+      return { jobId: job.id, runId: run.id, status, evalResults };
+    },
+
+    predict: async (
+      request: ClassifierPredictRequest,
+      options?: CallOptions,
+    ): Promise<ClassifierPredictSummary> => {
+      const classifier = this.#classifier(request.classifierId);
+      if (options?.signal?.aborted) return { predicted: 0, cancelled: true };
+      const learned = this.#learned.get(classifier.id);
+      const run = classifier.runs.at(-1);
+      if (!learned || !run) {
+        throw new BackendError(
+          "PREDICTION_FAILED",
+          "The classifier has no run",
+        );
+      }
+      const job = this.#jobs.start(
+        "classifier-predict",
+        `Predicting with ${classifier.name}`,
+        options?.signal,
+        { cancellable: false },
+      );
+      const wanted = request.ids && new Set(request.ids);
+      const items = this.#labeled(classifier.targetId).filter(
+        (it) =>
+          representsUnknown(it.categoryId) && (!wanted || wanted.has(it.id)),
+      );
+      classifier.busy = "predicting";
+      this.#classifiersChanged();
+      const confidence = Math.max(...learned.softmax);
+      for (const item of items) this.#softmax.set(item.id, learned.softmax);
+      this.#label(
+        classifier.targetId,
+        items.map((it) => ({
+          id: it.id,
+          categoryId: learned.categoryId,
+          confidence,
+        })),
+        run.id,
+      );
+      delete classifier.busy;
+      this.#classifiersChanged();
+      this.#jobs.finish(job.id, "succeeded");
+      return { jobId: job.id, predicted: items.length, cancelled: false };
+    },
+
+    evaluate: async (classifierId: string): Promise<EvaluationResult> => {
+      const run = this.#classifier(classifierId).runs.at(-1);
+      if (!run?.evalResults) {
+        throw new BackendError(
+          "EVALUATION_FAILED",
+          "The classifier has no run",
+        );
+      }
+      return run.evalResults;
+    },
+
+    acceptPredictions: async (targetId: string): Promise<Changed> => {
+      const pending = this.#labeled(targetId).filter(
+        (it) =>
+          it.partition === Partition.Inference &&
+          !representsUnknown(it.categoryId),
+      );
+      this.#setPartitions(
+        targetId,
+        pending.map((it) => ({ id: it.id, partition: Partition.Unassigned })),
+      );
+      for (const it of pending) this.#softmax.delete(it.id);
+      return { changed: pending.length };
+    },
+
+    clearPredictions: async (targetId: string): Promise<Changed> => {
+      const pending = this.#labeled(targetId).filter(
+        (it) =>
+          it.partition === Partition.Inference &&
+          !representsUnknown(it.categoryId),
+      );
+      const unknown = this.#categories.find(
+        (c) =>
+          representsUnknown(c.id) &&
+          (targetId === IMAGE_CLASSIFIER_ID
+            ? c.type === "image"
+            : c.type === "annotation" && c.kindId === targetId),
+      )!;
+      this.#label(
+        targetId,
+        pending.map((it) => ({ id: it.id, categoryId: unknown.id })),
+      );
+      for (const it of pending) this.#softmax.delete(it.id);
+      return { changed: pending.length };
+    },
+
+    export: async () => {
+      throw new BackendError("NOT_SUPPORTED", "The fake keeps no weights");
+    },
+
+    import: async () => {
+      throw new BackendError("NOT_SUPPORTED", "The fake keeps no weights");
     },
   };
 }

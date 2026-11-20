@@ -4,7 +4,11 @@ import {
   Partition,
   UNKNOWN_IMAGE_CATEGORY_ID,
   generateCategory,
+  representsUnknown,
 } from "core/entities";
+import { getDefaultModelParams } from "core/dl/classification/utils";
+
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { hasCapability } from "../capabilities";
 import { randomKey } from "../query";
@@ -82,6 +86,9 @@ export const describeBackendConformance = (
         const { backend } = ctx;
         expect(backend.segmentation !== undefined).toBe(
           hasCapability(backend.capabilities, "segmentation"),
+        );
+        expect(backend.classification !== undefined).toBe(
+          hasCapability(backend.capabilities, "classification"),
         );
         expect(typeof backend.render.raw === "function").toBe(
           hasCapability(backend.capabilities, "raw-local"),
@@ -585,6 +592,186 @@ export const describeBackendConformance = (
         expect(
           (await query.masks([first.annotation.id]))[first.annotation.id],
         ).toEqual(mask);
+      });
+    });
+
+    describe("classification", () => {
+      it("lists at least one architecture that can be trained", async () => {
+        const { classification } = ctx.backend;
+        if (!classification) return;
+        const architectures = await classification.listArchitectures();
+        expect(architectures.length).toBeGreaterThan(0);
+        for (const model of architectures) {
+          expect(model.name).toBeTruthy();
+          expect(model.framework).toBeTruthy();
+          expect(model.channelPolicy).toBeDefined();
+          expect(model.tasks.some((t) => t.startsWith("classification"))).toBe(
+            true,
+          );
+        }
+        expect(
+          architectures.some((m) => m.tasks.includes("classification.train")),
+        ).toBe(hasCapability(ctx.backend.capabilities, "classification.train"));
+      });
+
+      it("trains on labeled images, predicts the rest, and keeps the record", async () => {
+        const { backend } = ctx;
+        const { classification, query } = backend;
+        if (!classification) return;
+        if (!hasCapability(backend.capabilities, "classification.train"))
+          return;
+        // Two per category so each can both train and validate at a half split.
+        expect(ctx.images.length).toBeGreaterThanOrEqual(5);
+        const [a, b, c, d, e] = ctx.images;
+        const [first, second] = await backend.categories.create([
+          generateCategory("First", "#ff0000", { type: "image" }),
+          generateCategory("Second", "#00ff00", { type: "image" }),
+        ]);
+        await backend.images.categorize({ ids: [a.id, b.id] }, first.id);
+        await backend.images.categorize({ ids: [c.id, d.id] }, second.id);
+        const [architecture] = (
+          await classification.listArchitectures()
+        ).filter((m) => m.tasks.includes("classification.train"));
+        const defaults = getDefaultModelParams();
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((event) => events.push(event));
+
+        const created = await classification.create({
+          targetId: IMAGE_CLASSIFIER_ID,
+          name: `Conformance-${Date.now()}`,
+          architectureId: architecture.name,
+          hyperparameters: {
+            preprocess: {
+              ...defaults.preprocessSettings,
+              trainingPercentage: 0.5,
+              shuffle: true,
+            },
+            optimizer: {
+              ...defaults.optimizerSettings,
+              epochs: 2,
+              batchSize: 2,
+            },
+          },
+          seed: 7,
+        });
+        expect(created).toMatchObject({
+          targetId: IMAGE_CLASSIFIER_ID,
+          architectureId: architecture.name,
+          trained: false,
+          runs: [],
+        });
+        expect(await classification.list()).toContainEqual(
+          expect.objectContaining({ id: created.id }),
+        );
+
+        const fit = await classification.fit({
+          classifierId: created.id,
+          seed: 7,
+        });
+        expect(fit.status).toBe("completed");
+        expect(fit.runId).toBeTruthy();
+        expect(fit.evalResults?.accuracy).toBeGreaterThanOrEqual(0);
+        // Each epoch is announced, and the record ends up trained.
+        const epochs = events.filter(
+          (ev) => ev.type === "classifiers/didEpoch",
+        );
+        expect(epochs).toHaveLength(2);
+        expect(epochs.every((ev) => ev.runId === fit.runId)).toBe(true);
+        const trained = (await classification.list()).find(
+          (cl) => cl.id === created.id,
+        )!;
+        expect(trained.trained).toBe(true);
+        expect(trained.busy).toBeUndefined();
+        expect(Object.values(trained.classMap ?? {}).sort()).toEqual(
+          [first.id, second.id].sort(),
+        );
+        const run = trained.runs.at(-1)!;
+        expect(run).toMatchObject({ id: fit.runId, status: "completed" });
+        expect(run.history).toHaveLength(2);
+        expect(run.evalResults).toEqual(fit.evalResults);
+        expect(
+          events
+            .filter((ev) => ev.type === "classifiers/didChange")
+            .at(-1)
+            ?.classifiers.find((cl) => cl.id === created.id)
+            ?.runs.at(-1)?.status,
+        ).toBe("completed");
+        // The split placed the labeled items; the unlabeled one waits.
+        expect(await query.imageCounts({}, "partition")).toEqual({
+          total: 5,
+          groups: {
+            [Partition.Training]: 2,
+            [Partition.Validation]: 2,
+            [Partition.Inference]: 1,
+          },
+        });
+
+        const predicted = await classification.predict({
+          classifierId: created.id,
+        });
+        expect(predicted).toMatchObject({ predicted: 1, cancelled: false });
+        const after = (await query.images({ ids: [e.id] }, { limit: 1 }))
+          .items[0].image;
+        expect(representsUnknown(after.categoryId)).toBe(false);
+        expect(after.partition).toBe(Partition.Inference);
+        expect(after.predictedAtRunId).toBe(fit.runId);
+        expect(after.predictionConfidence).toBeGreaterThan(0);
+        expect(await query.imageIds({}, { key: "softmax" })).toHaveLength(5);
+
+        // Clearing returns it to unknown; predicting again and accepting keeps it.
+        expect(
+          await classification.clearPredictions(IMAGE_CLASSIFIER_ID),
+        ).toEqual({ changed: 1 });
+        const cleared = (await query.images({ ids: [e.id] }, { limit: 1 }))
+          .items[0].image;
+        expect(representsUnknown(cleared.categoryId)).toBe(true);
+        expect(cleared.partition).toBe(Partition.Inference);
+        await classification.predict({ classifierId: created.id });
+        expect(
+          await classification.acceptPredictions(IMAGE_CLASSIFIER_ID),
+        ).toEqual({ changed: 1 });
+        const accepted = (await query.images({ ids: [e.id] }, { limit: 1 }))
+          .items[0].image;
+        expect(representsUnknown(accepted.categoryId)).toBe(false);
+        expect(accepted.partition).toBe(Partition.Unassigned);
+
+        expect((await classification.evaluate(created.id)).accuracy).toBe(
+          fit.evalResults?.accuracy,
+        );
+        unsubscribe();
+
+        await classification.delete(created.id);
+        expect(
+          (await classification.list()).some((cl) => cl.id === created.id),
+        ).toBe(false);
+        await backend.categories.delete([first.id, second.id]);
+      });
+
+      it("resolves a fit cancelled before it starts without a run", async () => {
+        const { classification } = ctx.backend;
+        if (!classification) return;
+        if (!hasCapability(ctx.backend.capabilities, "classification.train"))
+          return;
+        const [architecture] = await classification.listArchitectures();
+        const defaults = getDefaultModelParams();
+        const created = await classification.create({
+          targetId: IMAGE_CLASSIFIER_ID,
+          name: `Cancelled-${Date.now()}`,
+          architectureId: architecture.name,
+          hyperparameters: {
+            preprocess: defaults.preprocessSettings,
+            optimizer: defaults.optimizerSettings,
+          },
+        });
+        const controller = new AbortController();
+        controller.abort();
+        expect(
+          await classification.fit(
+            { classifierId: created.id },
+            { signal: controller.signal },
+          ),
+        ).toEqual({ status: "stopped" });
+        await classification.delete(created.id);
       });
     });
 
