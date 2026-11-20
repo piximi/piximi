@@ -2,12 +2,20 @@ import type {
   AnnotationCategory,
   AnnotationObject,
   AnnotationVolume,
+  Category,
   ChannelMeta,
   Kind,
 } from "core/entities";
+import type { Classifier, RunHistoryEpoch } from "core/dl/classification/types";
 
 import type { Job } from "./jobs";
-import type { ImageRecord, ModelDescriptor } from "./types";
+import type {
+  AnnotationUpdate,
+  ImageRecord,
+  ImageUpdate,
+  ModelDescriptor,
+  VolumeUpdate,
+} from "./types";
 
 /*
  * Changes a backend announces after the fact. Both backends emit these for
@@ -44,6 +52,25 @@ export type BackendEvent =
       annotationIds: string[];
       /* Volumes left without annotations, removed along with them. */
       volumeIds: string[];
+    }
+  /* Images were categorized, or had partitions or predictions written. */
+  | { type: "images/didUpdate"; updates: ImageUpdate[] }
+  | {
+      type: "annotations/didUpdate";
+      volumes: VolumeUpdate[];
+      annotations: AnnotationUpdate[];
+    }
+  /* A category was created, edited or deleted; carries the whole list. */
+  | { type: "categories/didChange"; categories: Category[] }
+  /* A classifier was created, updated, trained, deleted or imported, or a
+   * job began or finished with it; carries every classifier. */
+  | { type: "classifiers/didChange"; classifiers: Classifier[] }
+  /* One epoch of a run finished; appended to that run's history. */
+  | {
+      type: "classifiers/didEpoch";
+      classifierId: string;
+      runId: string;
+      epoch: RunHistoryEpoch;
     };
 
 export type BackendEventListener = (event: BackendEvent) => void;

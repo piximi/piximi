@@ -1,3 +1,5 @@
+import { architectureIdOf } from "core/dl/classification/types";
+
 import {
   getAttr,
   getGroup,
@@ -895,13 +897,18 @@ const readRuns = async (infoGroup: Group): Promise<Run[]> => {
         (await getAttr(runGroup, ZARR_V2_RUN.Seed)) as Nullable<number>,
       ),
       appVersion: (await getAttr(runGroup, ZARR_V2_RUN.AppVersion)) as string,
-      tfjsVersion: (await getAttr(runGroup, ZARR_V2_RUN.TfjsVersion)) as string,
-      backend: (await getAttr(runGroup, ZARR_V2_RUN.Backend)) as string,
+      // Attribute names predate the rename; the file format is unchanged.
+      frameworkVersion: (await getAttr(
+        runGroup,
+        ZARR_V2_RUN.TfjsVersion,
+      )) as string,
+      device: (await getAttr(runGroup, ZARR_V2_RUN.Backend)) as string,
       hyperparameters: {
-        architecture: (await getAttr(
-          hyperGroup,
-          ZARR_V2_RUN.Architecture,
-        )) as Run["hyperparameters"]["architecture"],
+        architecture: architectureIdOf(
+          (await getAttr(hyperGroup, ZARR_V2_RUN.Architecture)) as
+            | ModelArch
+            | string,
+        ),
         optimizer: await readOptimizerSettings(hyperGroup),
         preprocess: await readPreprocessSettings(hyperGroup),
       },

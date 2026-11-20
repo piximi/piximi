@@ -196,7 +196,7 @@ export const getLayersModelSummary = (model: LayersModel): ModelLayerData[] => {
       layerName,
       outputShape: String(outputShape).slice(1),
       parameters: parameters,
-      trainable: String(trainable),
+      trainable,
     };
 
     modelSummary.push(layerSummary);

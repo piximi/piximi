@@ -401,10 +401,10 @@ const buildFixture = () => {
     trigger: "fresh",
     seed: 1234,
     appVersion: "1.1.4",
-    tfjsVersion: "4.2.0",
-    backend: "webgl",
+    frameworkVersion: "4.2.0",
+    device: "webgl",
     hyperparameters: {
-      architecture: ModelArch.SIMPLE_CNN,
+      architecture: "simple-cnn",
       optimizer: {
         epochs: 10,
         batchSize: 32,

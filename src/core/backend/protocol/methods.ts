@@ -4,7 +4,7 @@
  */
 import type * as P from "./generated";
 
-export const PROTOCOL_VERSION = "2.0.0";
+export const PROTOCOL_VERSION = "2.1.0";
 
 /* Requests, keyed by method name. `progress` is the `$/progress` payload. */
 export type ProtocolMethods = {
@@ -80,6 +80,36 @@ export type ProtocolMethods = {
     progress: void;
     direction: "client->server";
   };
+  "images/categorize": {
+    params: P.ImagesCategorizeParams;
+    result: P.ChangedResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "annotations/categorize": {
+    params: P.AnnotationsCategorizeParams;
+    result: P.ChangedResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "categories/create": {
+    params: P.CategoriesCreateParams;
+    result: P.CategoriesResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "categories/update": {
+    params: P.CategoryUpdateParams;
+    result: P.CategoriesResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "categories/delete": {
+    params: P.CategoriesDeleteParams;
+    result: P.DeletedResult;
+    progress: void;
+    direction: "client->server";
+  };
   "render/image": {
     params: P.RenderImageParams;
     result: P.RenderedImage;
@@ -122,6 +152,78 @@ export type ProtocolMethods = {
     progress: P.ProgressValue;
     direction: "client->server";
   };
+  "classification/listArchitectures": {
+    params: void;
+    result: P.ListModelsResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/list": {
+    params: void;
+    result: P.ClassifiersResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/create": {
+    params: P.ClassifierCreateRequest;
+    result: P.Classifier;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/update": {
+    params: P.ClassifierUpdateRequest;
+    result: P.Classifier;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/delete": {
+    params: P.ClassifierRequest;
+    result: void;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/fit": {
+    params: P.ClassifierFitParams;
+    result: P.ClassifierFitSummary;
+    progress: P.ProgressValue;
+    direction: "client->server";
+  };
+  "classification/predict": {
+    params: P.ClassifierPredictParams;
+    result: P.ClassifierPredictSummary;
+    progress: P.ProgressValue;
+    direction: "client->server";
+  };
+  "classification/evaluate": {
+    params: P.ClassifierRequest;
+    result: P.EvaluationResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/acceptPredictions": {
+    params: P.ClassificationTargetRequest;
+    result: P.ChangedResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/clearPredictions": {
+    params: P.ClassificationTargetRequest;
+    result: P.ChangedResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/export": {
+    params: P.ClassifierRequest;
+    result: P.ClassifierExportResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "classification/import": {
+    params: P.ClassifierImportRequest;
+    result: P.Classifier;
+    progress: void;
+    direction: "client->server";
+  };
 };
 
 /* Notifications (no response), keyed by method name. */
@@ -147,6 +249,26 @@ export type ProtocolNotifications = {
   };
   "annotations/didRemove": {
     params: P.AnnotationsDidRemove;
+    direction: "server->client";
+  };
+  "images/didUpdate": {
+    params: P.ImagesDidUpdate;
+    direction: "server->client";
+  };
+  "annotations/didUpdate": {
+    params: P.AnnotationsDidUpdate;
+    direction: "server->client";
+  };
+  "categories/didChange": {
+    params: P.CategoriesDidChange;
+    direction: "server->client";
+  };
+  "classifiers/didChange": {
+    params: P.ClassifiersDidChange;
+    direction: "server->client";
+  };
+  "classifiers/didEpoch": {
+    params: P.ClassifiersDidEpoch;
     direction: "server->client";
   };
 };

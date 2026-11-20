@@ -84,6 +84,66 @@ export type DType = "uint8" | "uint16" | "int32" | "float32";
 export type ChannelFeature = "entropy" | "contrast" | "snr";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CropSchema".
+ */
+export type CropSchema = "None" | "Match";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "LossFunction".
+ */
+export type LossFunction =
+  | "Absolute difference"
+  | "Categorical (softmax) cross entropy"
+  | "Hinge"
+  | "Huber"
+  | "Log"
+  | "Mean squared error (MSE)"
+  | "Sigmoid cross entropy";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "Metric".
+ */
+export type Metric =
+  | "Binary accuracy"
+  | "Binary cros-sentropy"
+  | "Categorical accuracy"
+  | "Categorical cross-entropy"
+  | "Cosine proximity"
+  | "Mean absolute error (MAE)"
+  | "Mean absolute percentage error"
+  | "Mean squared error"
+  | "Precision"
+  | "Recall"
+  | "Sparse categorical accuracy";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "OptimizationAlgorithm".
+ */
+export type OptimizationAlgorithm =
+  | "Adadelta"
+  | "Adagrad"
+  | "Adam"
+  | "Adamax"
+  | "Momentum"
+  | "RMSProp"
+  | "Stochastic gradient descent (SGD)";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierActivity".
+ */
+export type ClassifierActivity = "training" | "predicting" | "evaluating";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "RunStatus".
+ */
+export type RunStatus = "in-progress" | "completed" | "stopped" | "failed";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "RunTrigger".
+ */
+export type RunTrigger = "fresh" | "continue" | "hitl-correction" | "import";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ImageCountGroup".
  */
 export type ImageCountGroup = "category" | "partition";
@@ -110,7 +170,11 @@ export type IntensityMeasurement =
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "JobKind".
  */
-export type JobKind = "segmentation" | "model-load";
+export type JobKind =
+  | "segmentation"
+  | "model-load"
+  | "classifier-fit"
+  | "classifier-predict";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "JobStatus".
@@ -334,6 +398,22 @@ export interface PredictionCorrection {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationUpdate".
+ */
+export interface AnnotationUpdate {
+  id: string;
+  partition: Partition;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationsCategorizeParams".
+ */
+export interface AnnotationsCategorizeParams {
+  query: AnnotationQuery;
+  categoryId: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "AnnotationsDeleteParams".
  */
 export interface AnnotationsDeleteParams {
@@ -356,6 +436,31 @@ export interface AnnotationsDidRemove {
   type: "annotations/didRemove";
   annotationIds: string[];
   volumeIds: string[];
+}
+/**
+ * Objects were categorized or had partitions or predictions written:
+ * the category and prediction live on the volume, the partition on each
+ * annotation.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationsDidUpdate".
+ */
+export interface AnnotationsDidUpdate {
+  type: "annotations/didUpdate";
+  volumes: VolumeUpdate[];
+  annotations: AnnotationUpdate[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "VolumeUpdate".
+ */
+export interface VolumeUpdate {
+  id: string;
+  kindId: string;
+  categoryId: string;
+  predictionConfidence?: number;
+  predictedAtRunId?: string;
+  predictionCorrected?: PredictionCorrection;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -422,6 +527,65 @@ export interface OptionCondition {
  */
 export interface CancelParams {
   id: number | string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CategoriesCreateParams".
+ */
+export interface CategoriesCreateParams {
+  categories: (ImageCategory | AnnotationCategory)[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageCategory".
+ */
+export interface ImageCategory {
+  type: "image";
+  id: string;
+  color: string;
+  name: string;
+  isUnknown: boolean;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CategoriesDeleteParams".
+ */
+export interface CategoriesDeleteParams {
+  ids: string[];
+}
+/**
+ * A category was created, renamed, recoloured or deleted. Carries the
+ * whole list, which is short, so a client replaces what it holds.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CategoriesDidChange".
+ */
+export interface CategoriesDidChange {
+  type: "categories/didChange";
+  categories: (ImageCategory | AnnotationCategory)[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CategoriesResult".
+ */
+export interface CategoriesResult {
+  categories: (ImageCategory | AnnotationCategory)[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CategoryUpdateParams".
+ */
+export interface CategoryUpdateParams {
+  id: string;
+  name?: string;
+  color?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ChangedResult".
+ */
+export interface ChangedResult {
+  changed: number;
 }
 /**
  * A channel's metadata. Where its pixels live is the backend's business,
@@ -532,6 +696,276 @@ export interface ChannelPolicyPassthrough {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassificationTargetRequest".
+ */
+export interface ClassificationTargetRequest {
+  targetId: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "Classifier".
+ */
+export interface Classifier {
+  id: string;
+  targetId: string;
+  name: string;
+  architectureId: string;
+  framework: string;
+  hyperparameters: ClassifierHyperparameters;
+  classMap?: {
+    [k: string]: string;
+  };
+  classes: string[];
+  confidenceThreshold: number;
+  trained: boolean;
+  trainable: boolean;
+  valid: boolean;
+  initSeed?: number;
+  summary?: ModelLayer[];
+  busy?: ClassifierActivity;
+  runs: Run[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierHyperparameters".
+ */
+export interface ClassifierHyperparameters {
+  preprocess: PreprocessSettings;
+  optimizer: OptimizerSettings;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "PreprocessSettings".
+ */
+export interface PreprocessSettings {
+  shuffle: boolean;
+  inputShape: Shape;
+  normalizeOptions: NormalizeOptions;
+  cropOptions: CropOptions;
+  trainingPercentage: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "NormalizeOptions".
+ */
+export interface NormalizeOptions {
+  normalize: boolean;
+  center: boolean;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CropOptions".
+ */
+export interface CropOptions {
+  numCrops: number;
+  cropSchema: CropSchema;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "OptimizerSettings".
+ */
+export interface OptimizerSettings {
+  learningRate: number;
+  lossFunction: LossFunction;
+  metrics: Metric[];
+  optimizationAlgorithm: OptimizationAlgorithm;
+  epochs: number;
+  batchSize: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ModelLayer".
+ */
+export interface ModelLayer {
+  layerName: string;
+  outputShape: string;
+  parameters: number;
+  trainable: boolean;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "Run".
+ */
+export interface Run {
+  id: string;
+  parentRunId?: string;
+  startedAt: string;
+  finishedAt?: string;
+  status: RunStatus;
+  trigger: RunTrigger;
+  seed?: number;
+  appVersion: string;
+  frameworkVersion: string;
+  device: string;
+  hyperparameters: RunHyperparameterSnapshot;
+  classMap: {
+    [k: string]: string;
+  };
+  trainingFingerprint: string;
+  validationFingerprint: string;
+  valIds: string[];
+  categorySetHash: string;
+  history: RunHistoryEpoch[];
+  evalResults?: EvaluationResult;
+  weightsRef?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "RunHyperparameterSnapshot".
+ */
+export interface RunHyperparameterSnapshot {
+  architecture: string;
+  optimizer: OptimizerSettings;
+  preprocess: PreprocessSettings;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "RunHistoryEpoch".
+ */
+export interface RunHistoryEpoch {
+  epoch: number;
+  loss: number;
+  valLoss: number;
+  accuracy: number;
+  valAccuracy: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "EvaluationResult".
+ */
+export interface EvaluationResult {
+  confusionMatrix: number[][];
+  accuracy: number;
+  crossEntropy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierCreateRequest".
+ */
+export interface ClassifierCreateRequest {
+  targetId: string;
+  name: string;
+  architectureId: string;
+  hyperparameters: ClassifierHyperparameters;
+  seed?: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierExportResult".
+ */
+export interface ClassifierExportResult {
+  fileName: string;
+  mime: string;
+  /**
+   * msgpack binary
+   */
+  data: Uint8Array;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierFitParams".
+ */
+export interface ClassifierFitParams {
+  classifierId: string;
+  seed?: number;
+  progressToken?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierFitSummary".
+ */
+export interface ClassifierFitSummary {
+  jobId?: string;
+  runId?: string;
+  status: RunStatus;
+  evalResults?: EvaluationResult;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierImportRequest".
+ */
+export interface ClassifierImportRequest {
+  targetId: string;
+  /**
+   * msgpack binary
+   */
+  data: Uint8Array;
+  name?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierPredictParams".
+ */
+export interface ClassifierPredictParams {
+  classifierId: string;
+  ids?: string[];
+  progressToken?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierPredictSummary".
+ */
+export interface ClassifierPredictSummary {
+  jobId?: string;
+  predicted: number;
+  cancelled: boolean;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierRequest".
+ */
+export interface ClassifierRequest {
+  classifierId: string;
+}
+/**
+ * Changes to a classifier's settings between runs; absent fields stay.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifierUpdateRequest".
+ */
+export interface ClassifierUpdateRequest {
+  classifierId: string;
+  hyperparameters?: ClassifierHyperparameters;
+  classMap?: {
+    [k: string]: string;
+  };
+  confidenceThreshold?: number;
+}
+/**
+ * A classifier was created, updated, trained, deleted or imported, or a
+ * job began or finished with it. Carries every classifier of the project.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifiersDidChange".
+ */
+export interface ClassifiersDidChange {
+  type: "classifiers/didChange";
+  classifiers: Classifier[];
+}
+/**
+ * One epoch of a training run finished; appended to the run's history.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifiersDidEpoch".
+ */
+export interface ClassifiersDidEpoch {
+  type: "classifiers/didEpoch";
+  classifierId: string;
+  runId: string;
+  epoch: RunHistoryEpoch;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ClassifiersResult".
+ */
+export interface ClassifiersResult {
+  classifiers: Classifier[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "CountsResult".
  */
 export interface CountsResult {
@@ -579,17 +1013,6 @@ export interface Experiment {
  */
 export interface IdsResult {
   ids: string[];
-}
-/**
- * This interface was referenced by `PiximiProtocol`'s JSON-Schema
- * via the `definition` "ImageCategory".
- */
-export interface ImageCategory {
-  type: "image";
-  id: string;
-  color: string;
-  name: string;
-  isUnknown: boolean;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -691,6 +1114,26 @@ export interface Plane {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageUpdate".
+ */
+export interface ImageUpdate {
+  id: string;
+  categoryId: string;
+  partition: Partition;
+  predictionConfidence?: number;
+  predictedAtRunId?: string;
+  predictionCorrected?: PredictionCorrection;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImagesCategorizeParams".
+ */
+export interface ImagesCategorizeParams {
+  query: ImageQuery;
+  categoryId: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ImagesDeleteParams".
  */
 export interface ImagesDeleteParams {
@@ -715,6 +1158,17 @@ export interface ImagesDidAdd {
 export interface ImagesDidRemove {
   type: "images/didRemove";
   imageIds: string[];
+}
+/**
+ * Images were categorized, or had partitions or predictions written;
+ * each update carries the fields a category change rewrites.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImagesDidUpdate".
+ */
+export interface ImagesDidUpdate {
+  type: "images/didUpdate";
+  updates: ImageUpdate[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema

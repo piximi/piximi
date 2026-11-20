@@ -54,7 +54,7 @@ export const ModelSummaryTable = ({ modelSummary }: ModelSummaryTableProps) => {
           .map((column) => {
             return column.id === "outputShape"
               ? `"'${row[column.id].replaceAll(",", " ")}"`
-              : row[column.id];
+              : String(row[column.id]);
           })
           .join(","),
       )
@@ -85,7 +85,7 @@ export const ModelSummaryTable = ({ modelSummary }: ModelSummaryTableProps) => {
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
                   {columns.map((column) => {
-                    const value = row[column.id];
+                    const value = String(row[column.id]);
                     return <TableCell key={column.id}>{value}</TableCell>;
                   })}
                 </TableRow>

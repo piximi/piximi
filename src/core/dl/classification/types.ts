@@ -24,12 +24,30 @@ export enum ModelArch {
   SIMPLE_CNN = 0,
   MOBILE_NET = 1,
 }
+
+/* The architectures the in-browser worker builds, as listed models. */
+export const ARCHITECTURE_IDS: Record<ModelArch, string> = {
+  [ModelArch.SIMPLE_CNN]: "simple-cnn",
+  [ModelArch.MOBILE_NET]: "mobilenet",
+};
+
+/* An architecture id from either form; files written before Phase 7 hold
+ * the enum's number. */
+export const architectureIdOf = (arch: ModelArch | string): string =>
+  typeof arch === "number" ? ARCHITECTURE_IDS[arch] : arch;
+
+export const modelArchOf = (architectureId: string): ModelArch | undefined => {
+  const found = Object.entries(ARCHITECTURE_IDS).find(
+    ([, id]) => id === architectureId,
+  );
+  return found ? (Number(found[0]) as ModelArch) : undefined;
+};
 export type RunStatus = "in-progress" | "completed" | "stopped" | "failed";
 export interface ModelLayerData {
   layerName: string;
   outputShape: string;
   parameters: number;
-  trainable: string;
+  trainable: boolean;
 }
 export type ModelArgs = {
   name: string;
@@ -60,10 +78,7 @@ export type ReducedPreprocessSettings = {
 };
 export type OptimizerSettings = {
   learningRate: number;
-  lossFunction:
-    | LossFunction
-    | Array<LossFunction>
-    | { [outputName: string]: LossFunction };
+  lossFunction: LossFunction;
   metrics: Array<Metric>;
   optimizationAlgorithm: OptimizationAlgorithm;
   epochs: number;
@@ -72,6 +87,11 @@ export type OptimizerSettings = {
 export type ClassifierModelParams = {
   preprocessSettings: PreprocessSettings;
   optimizerSettings: OptimizerSettings;
+};
+/* The same pair as the backend contract and a run's snapshot carry it. */
+export type ClassifierHyperparameters = {
+  preprocess: PreprocessSettings;
+  optimizer: OptimizerSettings;
 };
 export type FitOptions = Pick<OptimizerSettings, "epochs" | "batchSize">;
 
@@ -100,7 +120,8 @@ export type ModelLifecycleStatus =
   | "evaluating";
 
 export type RunHyperparameterSnapshot = {
-  architecture: 0 | 1 | string; // mirrors KindClassifier.modelNameOrArch
+  /* The architecture's model id (see `ARCHITECTURE_IDS`). */
+  architecture: string;
   optimizer: OptimizerSettings;
   preprocess: PreprocessSettings;
 };
@@ -114,8 +135,9 @@ export type Run = {
   trigger: RunTrigger;
   seed?: number; // Determine how useful this is. seeds are only used during model creation afaik
   appVersion: string;
-  tfjsVersion: string;
-  backend: string;
+  frameworkVersion: string;
+  /* Where it trained: a tfjs backend name, or a torch device. */
+  device: string;
   hyperparameters: RunHyperparameterSnapshot;
   classMap: ModelClassMap;
   trainingFingerprint: string; // equality comparison between runs
@@ -126,7 +148,8 @@ export type Run = {
   evalResults?: EvaluationResult; // moved off ModelInfo
   weightsRef?: string; // model name in classifierHandler, currently no real use but reference snapshotted weights in the future
 };
-export type ModelClassMap = Record<number, string>;
+/* Output class index (a string key, as JSON carries it) → category id. */
+export type ModelClassMap = Record<string, string>;
 export type ModelInfo = {
   classMap?: ModelClassMap;
   preprocessSettings: PreprocessSettings;
@@ -137,6 +160,37 @@ export type ModelInfo = {
   initSeed?: number;
   trained?: boolean;
 };
+export type ClassifierActivity = "training" | "predicting" | "evaluating";
+
+/*
+ * A classifier as the backend records it: built from a listed architecture
+ * for one target (the project's images, or a kind's objects), with its
+ * settings, class map and runs. The classifier slice mirrors these.
+ */
+export type Classifier = {
+  id: string;
+  targetId: string;
+  /* Unique within the project; what the user sees. */
+  name: string;
+  architectureId: string;
+  framework: string;
+  hyperparameters: ClassifierHyperparameters;
+  /* Unset until mapped (an imported model). */
+  classMap?: ModelClassMap;
+  /* Names of the output classes, in index order; empty until built. */
+  classes: string[];
+  confidenceThreshold: number;
+  trained: boolean;
+  trainable: boolean;
+  /* False once the target's categories changed after a run. */
+  valid: boolean;
+  initSeed?: number;
+  summary?: ModelLayerData[];
+  /* What a job is doing with it right now. */
+  busy?: ClassifierActivity;
+  runs: Run[];
+};
+
 /*
  * Interface
  */

@@ -2,6 +2,7 @@ import JSZip from "jszip";
 import { z } from "zod";
 
 import { getClassifierApi } from "core/dl/classification";
+import { architectureIdOf } from "core/dl/classification/types";
 import {
   CropSchema,
   LossFunction,
@@ -44,11 +45,21 @@ const LossFunctionSchema = z.nativeEnum(LossFunction);
 
 const OptimizerSettingsSchema = z.object({
   learningRate: z.number(),
-  lossFunction: z.union([
-    LossFunctionSchema,
-    z.array(LossFunctionSchema),
-    z.record(z.string(), LossFunctionSchema),
-  ]),
+  // Older archives could carry a list or a per-output map; the first entry
+  // is the one that ever applied.
+  lossFunction: z
+    .union([
+      LossFunctionSchema,
+      z.array(LossFunctionSchema),
+      z.record(z.string(), LossFunctionSchema),
+    ])
+    .transform((value) =>
+      Array.isArray(value)
+        ? value[0]
+        : typeof value === "object"
+          ? Object.values(value)[0]
+          : value,
+    ),
   metrics: z.array(z.nativeEnum(Metric)),
   optimizationAlgorithm: z.nativeEnum(OptimizationAlgorithm),
   epochs: z.number(),
@@ -64,7 +75,10 @@ const PreprocessSettingsSchema = z.object({
 });
 
 const RunHyperparameterSnapshotSchema = z.object({
-  architecture: z.union([z.literal(0), z.literal(1), z.string()]),
+  // Archives written before Phase 7 hold the architecture enum's number.
+  architecture: z
+    .union([z.literal(0), z.literal(1), z.string()])
+    .transform(architectureIdOf),
   optimizer: OptimizerSettingsSchema,
   preprocess: PreprocessSettingsSchema,
 });
@@ -78,39 +92,48 @@ const EvaluationResultSchema = z.object({
   f1Score: z.number().nullable(),
 });
 
-const RunSchema = z.object({
-  id: z.string(),
-  startedAt: z.string(),
-  status: z.union([
-    z.literal("in-progress"),
-    z.literal("completed"),
-    z.literal("stopped"),
-    z.literal("failed"),
-  ]),
-  trigger: z.union([
-    z.literal("fresh"),
-    z.literal("continue"),
-    z.literal("hitl-correction"),
-    z.literal("import"),
-  ]),
-  appVersion: z.string(),
-  tfjsVersion: z.string(),
-  backend: z.string().optional(),
-  hyperparameters: RunHyperparameterSnapshotSchema,
-  // JSON keys are always strings; Record<number,string> and Record<string,string>
-  // are equivalent at runtime for plain objects
-  classMap: z.record(z.string(), z.string()),
-  trainingFingerprint: z.string(),
-  validationFingerprint: z.string(),
-  valIds: z.array(z.string()),
-  categorySetHash: z.string(),
-  history: z.array(RunHistoryEpochSchema),
-  parentRunId: z.string().optional(),
-  finishedAt: z.string().optional(),
-  seed: z.number().optional(),
-  evalResults: EvaluationResultSchema.optional(),
-  weightsRef: z.string().optional(),
-});
+const RunSchema = z
+  .object({
+    id: z.string(),
+    startedAt: z.string(),
+    status: z.union([
+      z.literal("in-progress"),
+      z.literal("completed"),
+      z.literal("stopped"),
+      z.literal("failed"),
+    ]),
+    trigger: z.union([
+      z.literal("fresh"),
+      z.literal("continue"),
+      z.literal("hitl-correction"),
+      z.literal("import"),
+    ]),
+    appVersion: z.string(),
+    // `tfjsVersion` and `backend` are what archives held before Phase 7.
+    frameworkVersion: z.string().optional(),
+    tfjsVersion: z.string().optional(),
+    device: z.string().optional(),
+    backend: z.string().optional(),
+    hyperparameters: RunHyperparameterSnapshotSchema,
+    // JSON keys are always strings; Record<number,string> and Record<string,string>
+    // are equivalent at runtime for plain objects
+    classMap: z.record(z.string(), z.string()),
+    trainingFingerprint: z.string(),
+    validationFingerprint: z.string(),
+    valIds: z.array(z.string()),
+    categorySetHash: z.string(),
+    history: z.array(RunHistoryEpochSchema),
+    parentRunId: z.string().optional(),
+    finishedAt: z.string().optional(),
+    seed: z.number().optional(),
+    evalResults: EvaluationResultSchema.optional(),
+    weightsRef: z.string().optional(),
+  })
+  .transform(({ tfjsVersion, frameworkVersion, backend, device, ...run }) => ({
+    ...run,
+    frameworkVersion: frameworkVersion ?? tfjsVersion ?? "unknown",
+    device: device ?? backend ?? "unknown",
+  }));
 
 const ManifestFilesSchema = z.object({
   modelTopology: z.string(),

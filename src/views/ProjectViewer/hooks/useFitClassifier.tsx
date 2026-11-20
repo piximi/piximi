@@ -6,6 +6,7 @@ import { version_core } from "@tensorflow/tfjs";
 
 import { generateUUID } from "core/entities";
 import { Partition } from "core/dl/enums";
+import { architectureIdOf } from "core/dl/classification/types";
 import {
   applySplitAndShuffle,
   fingerprintDataset,
@@ -412,10 +413,10 @@ export const useFitClassifier = () => {
         ? "hitl-correction"
         : "continue";
 
-    let backend: string;
+    let device: string;
     const backendRes = await cfApi.getModelBackend();
-    if (!backendRes.success) backend = "undefined";
-    else backend = backendRes.data;
+    if (!backendRes.success) device = "undefined";
+    else device = backendRes.data;
     return {
       id: generateUUID(),
       parentRunId,
@@ -424,10 +425,10 @@ export const useFitClassifier = () => {
       seed,
       status: "in-progress",
       appVersion: import.meta.env.VITE_APP_VERSION ?? "dev",
-      tfjsVersion: version_core,
-      backend,
+      frameworkVersion: version_core,
+      device,
       hyperparameters: {
-        architecture: kindClassifier.newModelArch,
+        architecture: architectureIdOf(kindClassifier.newModelArch),
         optimizer: structuredClone(modelInfo.optimizerSettings),
         preprocess: structuredClone(modelInfo.preprocessSettings),
       },

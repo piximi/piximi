@@ -38,12 +38,7 @@ const exportColumns: readonly ExportColumn[] = [
   },
   {
     label: "Loss Function",
-    get: (run) => {
-      const lossFunction = run.hyperparameters.optimizer.lossFunction;
-      if (typeof lossFunction === "string") return lossFunction;
-      else if (Array.isArray(lossFunction)) return lossFunction[0];
-      return Object.values(lossFunction)[0];
-    },
+    get: (run) => run.hyperparameters.optimizer.lossFunction,
   },
   { label: "Metrics", get: (run) => run.hyperparameters.optimizer.metrics[0] },
   {

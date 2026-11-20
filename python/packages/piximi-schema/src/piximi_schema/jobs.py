@@ -6,6 +6,8 @@ from .base import WireModel
 class JobKind(StrEnum):
     SEGMENTATION = "segmentation"
     MODEL_LOAD = "model-load"
+    CLASSIFIER_FIT = "classifier-fit"
+    CLASSIFIER_PREDICT = "classifier-predict"
 
 
 class JobStatus(StrEnum):

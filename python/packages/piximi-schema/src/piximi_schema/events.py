@@ -6,7 +6,21 @@ from typing import Annotated, Literal
 from pydantic import Field
 
 from .base import WireModel
-from .entities import AnnotationCategory, AnnotationObject, AnnotationVolume, ChannelMeta, Kind
+from .classification import (
+    AnnotationUpdate,
+    Classifier,
+    ImageUpdate,
+    RunHistoryEpoch,
+    VolumeUpdate,
+)
+from .entities import (
+    AnnotationCategory,
+    AnnotationObject,
+    AnnotationVolume,
+    Category,
+    ChannelMeta,
+    Kind,
+)
 from .jobs import Job
 from .query import ImageRecord
 from .segmentation import ModelDescriptor
@@ -65,6 +79,49 @@ class ModelsDidChange(WireModel):
     models: list[ModelDescriptor]
 
 
+class ImagesDidUpdate(WireModel):
+    """Images were categorized, or had partitions or predictions written;
+    each update carries the fields a category change rewrites."""
+
+    type: Literal["images/didUpdate"]
+    updates: list[ImageUpdate]
+
+
+class AnnotationsDidUpdate(WireModel):
+    """Objects were categorized or had partitions or predictions written:
+    the category and prediction live on the volume, the partition on each
+    annotation."""
+
+    type: Literal["annotations/didUpdate"]
+    volumes: list[VolumeUpdate]
+    annotations: list[AnnotationUpdate]
+
+
+class CategoriesDidChange(WireModel):
+    """A category was created, renamed, recoloured or deleted. Carries the
+    whole list, which is short, so a client replaces what it holds."""
+
+    type: Literal["categories/didChange"]
+    categories: list[Category]
+
+
+class ClassifiersDidChange(WireModel):
+    """A classifier was created, updated, trained, deleted or imported, or a
+    job began or finished with it. Carries every classifier of the project."""
+
+    type: Literal["classifiers/didChange"]
+    classifiers: list[Classifier]
+
+
+class ClassifiersDidEpoch(WireModel):
+    """One epoch of a training run finished; appended to the run's history."""
+
+    type: Literal["classifiers/didEpoch"]
+    classifier_id: str
+    run_id: str
+    epoch: RunHistoryEpoch
+
+
 BackendEvent = Annotated[
     KindsDidAdd
     | AnnotationsDidAdd
@@ -72,7 +129,12 @@ BackendEvent = Annotated[
     | ImagesDidAdd
     | ModelsDidChange
     | ImagesDidRemove
-    | AnnotationsDidRemove,
+    | AnnotationsDidRemove
+    | ImagesDidUpdate
+    | AnnotationsDidUpdate
+    | CategoriesDidChange
+    | ClassifiersDidChange
+    | ClassifiersDidEpoch,
     Field(discriminator="type"),
 ]
 
@@ -84,4 +146,9 @@ EVENT_TYPES: tuple[type[WireModel], ...] = (
     ModelsDidChange,
     ImagesDidRemove,
     AnnotationsDidRemove,
+    ImagesDidUpdate,
+    AnnotationsDidUpdate,
+    CategoriesDidChange,
+    ClassifiersDidChange,
+    ClassifiersDidEpoch,
 )

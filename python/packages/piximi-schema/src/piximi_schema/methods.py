@@ -8,6 +8,23 @@ from dataclasses import dataclass
 from typing import Literal
 
 from .base import WireModel
+from .classification import (
+    ChangedResult,
+    ClassificationTargetRequest,
+    Classifier,
+    ClassifierCreateRequest,
+    ClassifierExportResult,
+    ClassifierFitRequest,
+    ClassifierFitSummary,
+    ClassifierImportRequest,
+    ClassifierPredictRequest,
+    ClassifierPredictSummary,
+    ClassifierRequest,
+    ClassifiersResult,
+    ClassifierUpdateRequest,
+    EvaluationResult,
+)
+from .entities import Category
 from .events import EVENT_TYPES
 from .jobs import Job
 from .query import (
@@ -90,6 +107,45 @@ class DeletedResult(WireModel):
     deleted: int
 
 
+class CategoriesCreateParams(WireModel):
+    categories: list[Category]
+    """Made by the client with fresh ids; the backend keeps them as given."""
+
+
+class CategoryUpdateParams(WireModel):
+    id: str
+    name: str | None = None
+    color: str | None = None
+
+
+class CategoriesDeleteParams(WireModel):
+    ids: list[str]
+    """Items of a deleted category return to the unknown one; the reserved
+    unknown categories cannot be deleted."""
+
+
+class CategoriesResult(WireModel):
+    categories: list[Category]
+
+
+class ImagesCategorizeParams(WireModel):
+    query: ImageQuery
+    category_id: str
+
+
+class AnnotationsCategorizeParams(WireModel):
+    query: AnnotationQuery
+    category_id: str
+
+
+class ClassifierFitParams(ClassifierFitRequest):
+    progress_token: str | None = None
+
+
+class ClassifierPredictParams(ClassifierPredictRequest):
+    progress_token: str | None = None
+
+
 class RenderImageParams(WireModel):
     request: RenderRequest
 
@@ -159,6 +215,11 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("query/masks", MasksParams, MasksResult),
     MethodSpec("images/delete", ImagesDeleteParams, DeletedResult),
     MethodSpec("annotations/delete", AnnotationsDeleteParams, DeletedResult),
+    MethodSpec("images/categorize", ImagesCategorizeParams, ChangedResult),
+    MethodSpec("annotations/categorize", AnnotationsCategorizeParams, ChangedResult),
+    MethodSpec("categories/create", CategoriesCreateParams, CategoriesResult),
+    MethodSpec("categories/update", CategoryUpdateParams, CategoriesResult),
+    MethodSpec("categories/delete", CategoriesDeleteParams, DeletedResult),
     MethodSpec("render/image", RenderImageParams, RenderedImage),
     MethodSpec(
         "render/thumbnails",
@@ -176,6 +237,23 @@ METHODS: tuple[MethodSpec, ...] = (
         SegmentationRunSummary,
         progress=ProgressValue,
     ),
+    MethodSpec("classification/listArchitectures", None, ListModelsResult),
+    MethodSpec("classification/list", None, ClassifiersResult),
+    MethodSpec("classification/create", ClassifierCreateRequest, Classifier),
+    MethodSpec("classification/update", ClassifierUpdateRequest, Classifier),
+    MethodSpec("classification/delete", ClassifierRequest, None),
+    MethodSpec("classification/fit", ClassifierFitParams, ClassifierFitSummary, progress=ProgressValue),
+    MethodSpec(
+        "classification/predict",
+        ClassifierPredictParams,
+        ClassifierPredictSummary,
+        progress=ProgressValue,
+    ),
+    MethodSpec("classification/evaluate", ClassifierRequest, EvaluationResult),
+    MethodSpec("classification/acceptPredictions", ClassificationTargetRequest, ChangedResult),
+    MethodSpec("classification/clearPredictions", ClassificationTargetRequest, ChangedResult),
+    MethodSpec("classification/export", ClassifierRequest, ClassifierExportResult),
+    MethodSpec("classification/import", ClassifierImportRequest, Classifier),
 )
 
 NOTIFICATIONS: tuple[NotificationSpec, ...] = (

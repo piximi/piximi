@@ -127,7 +127,16 @@ function convertKindClassifier(
     const defaultModelInfo = getDefaultModelInfo();
     defaultModelInfo.preprocessSettings = { normalizeOptions, ...restPreProc };
     defaultModelInfo.classMap = restInfo.classMap;
-    defaultModelInfo.optimizerSettings = restInfo.optimizerSettings;
+    const { lossFunction, ...optimizer } = restInfo.optimizerSettings;
+    defaultModelInfo.optimizerSettings = {
+      ...optimizer,
+      // v1.1 allowed a list or a per-output map; only one ever applied.
+      lossFunction: Array.isArray(lossFunction)
+        ? lossFunction[0]
+        : typeof lossFunction === "object"
+          ? Object.values(lossFunction)[0]
+          : lossFunction,
+    };
     v2ModelInfoDict[id] = defaultModelInfo;
   });
   return {

@@ -5,7 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {},
-  "protocolVersion": "2.0.0",
+  "protocolVersion": "2.1.0",
   "$defs": {
     "AnnotationCategory": {
       "additionalProperties": false,
@@ -358,6 +358,23 @@
       "title": "AnnotationSortKey",
       "type": "string"
     },
+    "AnnotationUpdate": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "partition": {
+          "$ref": "#/$defs/Partition"
+        }
+      },
+      "required": [
+        "id",
+        "partition"
+      ],
+      "title": "AnnotationUpdate",
+      "type": "object"
+    },
     "AnnotationVolume": {
       "additionalProperties": false,
       "properties": {
@@ -393,6 +410,23 @@
         "categoryId"
       ],
       "title": "AnnotationVolume",
+      "type": "object"
+    },
+    "AnnotationsCategorizeParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/AnnotationQuery"
+        },
+        "categoryId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "query",
+        "categoryId"
+      ],
+      "title": "AnnotationsCategorizeParams",
       "type": "object"
     },
     "AnnotationsDeleteParams": {
@@ -462,6 +496,35 @@
         "volumeIds"
       ],
       "title": "AnnotationsDidRemove",
+      "type": "object"
+    },
+    "AnnotationsDidUpdate": {
+      "additionalProperties": false,
+      "description": "Objects were categorized or had partitions or predictions written:\nthe category and prediction live on the volume, the partition on each\nannotation.",
+      "properties": {
+        "type": {
+          "const": "annotations/didUpdate",
+          "type": "string"
+        },
+        "volumes": {
+          "items": {
+            "$ref": "#/$defs/VolumeUpdate"
+          },
+          "type": "array"
+        },
+        "annotations": {
+          "items": {
+            "$ref": "#/$defs/AnnotationUpdate"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "volumes",
+        "annotations"
+      ],
+      "title": "AnnotationsDidUpdate",
       "type": "object"
     },
     "AnnotationsParams": {
@@ -599,6 +662,150 @@
       ],
       "title": "Capability",
       "type": "string"
+    },
+    "CategoriesCreateParams": {
+      "additionalProperties": false,
+      "properties": {
+        "categories": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "annotation": "#/$defs/AnnotationCategory",
+                "image": "#/$defs/ImageCategory"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ImageCategory"
+              },
+              {
+                "$ref": "#/$defs/AnnotationCategory"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "categories"
+      ],
+      "title": "CategoriesCreateParams",
+      "type": "object"
+    },
+    "CategoriesDeleteParams": {
+      "additionalProperties": false,
+      "properties": {
+        "ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "title": "CategoriesDeleteParams",
+      "type": "object"
+    },
+    "CategoriesDidChange": {
+      "additionalProperties": false,
+      "description": "A category was created, renamed, recoloured or deleted. Carries the\nwhole list, which is short, so a client replaces what it holds.",
+      "properties": {
+        "type": {
+          "const": "categories/didChange",
+          "type": "string"
+        },
+        "categories": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "annotation": "#/$defs/AnnotationCategory",
+                "image": "#/$defs/ImageCategory"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ImageCategory"
+              },
+              {
+                "$ref": "#/$defs/AnnotationCategory"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "categories"
+      ],
+      "title": "CategoriesDidChange",
+      "type": "object"
+    },
+    "CategoriesResult": {
+      "additionalProperties": false,
+      "properties": {
+        "categories": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "annotation": "#/$defs/AnnotationCategory",
+                "image": "#/$defs/ImageCategory"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ImageCategory"
+              },
+              {
+                "$ref": "#/$defs/AnnotationCategory"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "categories"
+      ],
+      "title": "CategoriesResult",
+      "type": "object"
+    },
+    "CategoryUpdateParams": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "CategoryUpdateParams",
+      "type": "object"
+    },
+    "ChangedResult": {
+      "additionalProperties": false,
+      "properties": {
+        "changed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "changed"
+      ],
+      "title": "ChangedResult",
+      "type": "object"
     },
     "Channel": {
       "additionalProperties": false,
@@ -881,6 +1088,384 @@
       "title": "ChannelPolicyPassthrough",
       "type": "object"
     },
+    "ClassificationTargetRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "targetId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "targetId"
+      ],
+      "title": "ClassificationTargetRequest",
+      "type": "object"
+    },
+    "Classifier": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "architectureId": {
+          "type": "string"
+        },
+        "framework": {
+          "type": "string"
+        },
+        "hyperparameters": {
+          "$ref": "#/$defs/ClassifierHyperparameters"
+        },
+        "classMap": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "classes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "confidenceThreshold": {
+          "type": "number"
+        },
+        "trained": {
+          "type": "boolean"
+        },
+        "trainable": {
+          "type": "boolean"
+        },
+        "valid": {
+          "type": "boolean"
+        },
+        "initSeed": {
+          "type": "integer"
+        },
+        "summary": {
+          "items": {
+            "$ref": "#/$defs/ModelLayer"
+          },
+          "type": "array"
+        },
+        "busy": {
+          "$ref": "#/$defs/ClassifierActivity"
+        },
+        "runs": {
+          "items": {
+            "$ref": "#/$defs/Run"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "targetId",
+        "name",
+        "architectureId",
+        "framework",
+        "hyperparameters",
+        "classes",
+        "confidenceThreshold",
+        "trained",
+        "trainable",
+        "valid",
+        "runs"
+      ],
+      "title": "Classifier",
+      "type": "object"
+    },
+    "ClassifierActivity": {
+      "enum": [
+        "training",
+        "predicting",
+        "evaluating"
+      ],
+      "title": "ClassifierActivity",
+      "type": "string"
+    },
+    "ClassifierCreateRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "targetId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "architectureId": {
+          "type": "string"
+        },
+        "hyperparameters": {
+          "$ref": "#/$defs/ClassifierHyperparameters"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "targetId",
+        "name",
+        "architectureId",
+        "hyperparameters"
+      ],
+      "title": "ClassifierCreateRequest",
+      "type": "object"
+    },
+    "ClassifierExportResult": {
+      "additionalProperties": false,
+      "properties": {
+        "fileName": {
+          "type": "string"
+        },
+        "mime": {
+          "type": "string"
+        },
+        "data": {
+          "tsType": "Uint8Array",
+          "description": "msgpack binary"
+        }
+      },
+      "required": [
+        "fileName",
+        "mime",
+        "data"
+      ],
+      "title": "ClassifierExportResult",
+      "type": "object"
+    },
+    "ClassifierFitParams": {
+      "additionalProperties": false,
+      "properties": {
+        "classifierId": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "progressToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "classifierId"
+      ],
+      "title": "ClassifierFitParams",
+      "type": "object"
+    },
+    "ClassifierFitSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "jobId": {
+          "type": "string"
+        },
+        "runId": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/RunStatus"
+        },
+        "evalResults": {
+          "$ref": "#/$defs/EvaluationResult"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "ClassifierFitSummary",
+      "type": "object"
+    },
+    "ClassifierHyperparameters": {
+      "additionalProperties": false,
+      "properties": {
+        "preprocess": {
+          "$ref": "#/$defs/PreprocessSettings"
+        },
+        "optimizer": {
+          "$ref": "#/$defs/OptimizerSettings"
+        }
+      },
+      "required": [
+        "preprocess",
+        "optimizer"
+      ],
+      "title": "ClassifierHyperparameters",
+      "type": "object"
+    },
+    "ClassifierImportRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "targetId": {
+          "type": "string"
+        },
+        "data": {
+          "tsType": "Uint8Array",
+          "description": "msgpack binary"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "targetId",
+        "data"
+      ],
+      "title": "ClassifierImportRequest",
+      "type": "object"
+    },
+    "ClassifierPredictParams": {
+      "additionalProperties": false,
+      "properties": {
+        "classifierId": {
+          "type": "string"
+        },
+        "ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "progressToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "classifierId"
+      ],
+      "title": "ClassifierPredictParams",
+      "type": "object"
+    },
+    "ClassifierPredictSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "jobId": {
+          "type": "string"
+        },
+        "predicted": {
+          "type": "integer"
+        },
+        "cancelled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "predicted",
+        "cancelled"
+      ],
+      "title": "ClassifierPredictSummary",
+      "type": "object"
+    },
+    "ClassifierRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "classifierId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "classifierId"
+      ],
+      "title": "ClassifierRequest",
+      "type": "object"
+    },
+    "ClassifierUpdateRequest": {
+      "additionalProperties": false,
+      "description": "Changes to a classifier's settings between runs; absent fields stay.",
+      "properties": {
+        "classifierId": {
+          "type": "string"
+        },
+        "hyperparameters": {
+          "$ref": "#/$defs/ClassifierHyperparameters"
+        },
+        "classMap": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "confidenceThreshold": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "classifierId"
+      ],
+      "title": "ClassifierUpdateRequest",
+      "type": "object"
+    },
+    "ClassifiersDidChange": {
+      "additionalProperties": false,
+      "description": "A classifier was created, updated, trained, deleted or imported, or a\njob began or finished with it. Carries every classifier of the project.",
+      "properties": {
+        "type": {
+          "const": "classifiers/didChange",
+          "type": "string"
+        },
+        "classifiers": {
+          "items": {
+            "$ref": "#/$defs/Classifier"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "classifiers"
+      ],
+      "title": "ClassifiersDidChange",
+      "type": "object"
+    },
+    "ClassifiersDidEpoch": {
+      "additionalProperties": false,
+      "description": "One epoch of a training run finished; appended to the run's history.",
+      "properties": {
+        "type": {
+          "const": "classifiers/didEpoch",
+          "type": "string"
+        },
+        "classifierId": {
+          "type": "string"
+        },
+        "runId": {
+          "type": "string"
+        },
+        "epoch": {
+          "$ref": "#/$defs/RunHistoryEpoch"
+        }
+      },
+      "required": [
+        "type",
+        "classifierId",
+        "runId",
+        "epoch"
+      ],
+      "title": "ClassifiersDidEpoch",
+      "type": "object"
+    },
+    "ClassifiersResult": {
+      "additionalProperties": false,
+      "properties": {
+        "classifiers": {
+          "items": {
+            "$ref": "#/$defs/Classifier"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "classifiers"
+      ],
+      "title": "ClassifiersResult",
+      "type": "object"
+    },
     "ConfidenceRange": {
       "additionalProperties": false,
       "description": "Keeps items whose prediction confidence lies strictly between ``min``\nand ``max``; items without one are left out.",
@@ -917,6 +1502,31 @@
       ],
       "title": "CountsResult",
       "type": "object"
+    },
+    "CropOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "numCrops": {
+          "type": "integer"
+        },
+        "cropSchema": {
+          "$ref": "#/$defs/CropSchema"
+        }
+      },
+      "required": [
+        "numCrops",
+        "cropSchema"
+      ],
+      "title": "CropOptions",
+      "type": "object"
+    },
+    "CropSchema": {
+      "enum": [
+        "None",
+        "Match"
+      ],
+      "title": "CropSchema",
+      "type": "string"
     },
     "DType": {
       "enum": [
@@ -987,6 +1597,45 @@
         "error"
       ],
       "title": "ErrorResponseMessage",
+      "type": "object"
+    },
+    "EvaluationResult": {
+      "additionalProperties": false,
+      "properties": {
+        "confusionMatrix": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "accuracy": {
+          "type": "number"
+        },
+        "crossEntropy": {
+          "type": "number"
+        },
+        "precision": {
+          "type": "number"
+        },
+        "recall": {
+          "type": "number"
+        },
+        "f1Score": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "confusionMatrix",
+        "accuracy",
+        "crossEntropy",
+        "precision",
+        "recall",
+        "f1Score"
+      ],
+      "title": "EvaluationResult",
       "type": "object"
     },
     "Experiment": {
@@ -1302,6 +1951,53 @@
       "title": "ImageSortKey",
       "type": "string"
     },
+    "ImageUpdate": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "string"
+        },
+        "partition": {
+          "$ref": "#/$defs/Partition"
+        },
+        "predictionConfidence": {
+          "type": "number"
+        },
+        "predictedAtRunId": {
+          "type": "string"
+        },
+        "predictionCorrected": {
+          "$ref": "#/$defs/PredictionCorrection"
+        }
+      },
+      "required": [
+        "id",
+        "categoryId",
+        "partition"
+      ],
+      "title": "ImageUpdate",
+      "type": "object"
+    },
+    "ImagesCategorizeParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/ImageQuery"
+        },
+        "categoryId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "query",
+        "categoryId"
+      ],
+      "title": "ImagesCategorizeParams",
+      "type": "object"
+    },
     "ImagesDeleteParams": {
       "additionalProperties": false,
       "properties": {
@@ -1363,6 +2059,28 @@
         "imageIds"
       ],
       "title": "ImagesDidRemove",
+      "type": "object"
+    },
+    "ImagesDidUpdate": {
+      "additionalProperties": false,
+      "description": "Images were categorized, or had partitions or predictions written;\neach update carries the fields a category change rewrites.",
+      "properties": {
+        "type": {
+          "const": "images/didUpdate",
+          "type": "string"
+        },
+        "updates": {
+          "items": {
+            "$ref": "#/$defs/ImageUpdate"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "updates"
+      ],
+      "title": "ImagesDidUpdate",
       "type": "object"
     },
     "ImagesParams": {
@@ -1502,7 +2220,9 @@
     "JobKind": {
       "enum": [
         "segmentation",
-        "model-load"
+        "model-load",
+        "classifier-fit",
+        "classifier-predict"
       ],
       "title": "JobKind",
       "type": "string"
@@ -1657,6 +2377,19 @@
       "title": "LoadModelParams",
       "type": "object"
     },
+    "LossFunction": {
+      "enum": [
+        "Absolute difference",
+        "Categorical (softmax) cross entropy",
+        "Hinge",
+        "Huber",
+        "Log",
+        "Mean squared error (MSE)",
+        "Sigmoid cross entropy"
+      ],
+      "title": "LossFunction",
+      "type": "string"
+    },
     "MasksParams": {
       "additionalProperties": false,
       "properties": {
@@ -1691,6 +2424,23 @@
       ],
       "title": "MasksResult",
       "type": "object"
+    },
+    "Metric": {
+      "enum": [
+        "Binary accuracy",
+        "Binary cros-sentropy",
+        "Categorical accuracy",
+        "Categorical cross-entropy",
+        "Cosine proximity",
+        "Mean absolute error (MAE)",
+        "Mean absolute percentage error",
+        "Mean squared error",
+        "Precision",
+        "Recall",
+        "Sparse categorical accuracy"
+      ],
+      "title": "Metric",
+      "type": "string"
     },
     "ModelDescriptor": {
       "additionalProperties": false,
@@ -1804,6 +2554,31 @@
       "title": "ModelDescriptor",
       "type": "object"
     },
+    "ModelLayer": {
+      "additionalProperties": false,
+      "properties": {
+        "layerName": {
+          "type": "string"
+        },
+        "outputShape": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "integer"
+        },
+        "trainable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "layerName",
+        "outputShape",
+        "parameters",
+        "trainable"
+      ],
+      "title": "ModelLayer",
+      "type": "object"
+    },
     "ModelLink": {
       "additionalProperties": false,
       "properties": {
@@ -1880,6 +2655,23 @@
         "models"
       ],
       "title": "ModelsDidChange",
+      "type": "object"
+    },
+    "NormalizeOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "normalize": {
+          "type": "boolean"
+        },
+        "center": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "normalize",
+        "center"
+      ],
+      "title": "NormalizeOptions",
       "type": "object"
     },
     "NotificationMessage": {
@@ -1974,6 +2766,55 @@
       ],
       "title": "ObjectFeature",
       "type": "string"
+    },
+    "OptimizationAlgorithm": {
+      "enum": [
+        "Adadelta",
+        "Adagrad",
+        "Adam",
+        "Adamax",
+        "Momentum",
+        "RMSProp",
+        "Stochastic gradient descent (SGD)"
+      ],
+      "title": "OptimizationAlgorithm",
+      "type": "string"
+    },
+    "OptimizerSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "learningRate": {
+          "type": "number"
+        },
+        "lossFunction": {
+          "$ref": "#/$defs/LossFunction"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "type": "array"
+        },
+        "optimizationAlgorithm": {
+          "$ref": "#/$defs/OptimizationAlgorithm"
+        },
+        "epochs": {
+          "type": "integer"
+        },
+        "batchSize": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "learningRate",
+        "lossFunction",
+        "metrics",
+        "optimizationAlgorithm",
+        "epochs",
+        "batchSize"
+      ],
+      "title": "OptimizerSettings",
+      "type": "object"
     },
     "OptionCondition": {
       "additionalProperties": false,
@@ -2199,6 +3040,35 @@
         "correctedAt"
       ],
       "title": "PredictionCorrection",
+      "type": "object"
+    },
+    "PreprocessSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "shuffle": {
+          "type": "boolean"
+        },
+        "inputShape": {
+          "$ref": "#/$defs/Shape"
+        },
+        "normalizeOptions": {
+          "$ref": "#/$defs/NormalizeOptions"
+        },
+        "cropOptions": {
+          "$ref": "#/$defs/CropOptions"
+        },
+        "trainingPercentage": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "shuffle",
+        "inputShape",
+        "normalizeOptions",
+        "cropOptions",
+        "trainingPercentage"
+      ],
+      "title": "PreprocessSettings",
       "type": "object"
     },
     "ProgressParams": {
@@ -2484,6 +3354,165 @@
       ],
       "title": "RpcError",
       "type": "object"
+    },
+    "Run": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "parentRunId": {
+          "type": "string"
+        },
+        "startedAt": {
+          "type": "string"
+        },
+        "finishedAt": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/RunStatus"
+        },
+        "trigger": {
+          "$ref": "#/$defs/RunTrigger"
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "appVersion": {
+          "type": "string"
+        },
+        "frameworkVersion": {
+          "type": "string"
+        },
+        "device": {
+          "type": "string"
+        },
+        "hyperparameters": {
+          "$ref": "#/$defs/RunHyperparameterSnapshot"
+        },
+        "classMap": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "trainingFingerprint": {
+          "type": "string"
+        },
+        "validationFingerprint": {
+          "type": "string"
+        },
+        "valIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "categorySetHash": {
+          "type": "string"
+        },
+        "history": {
+          "items": {
+            "$ref": "#/$defs/RunHistoryEpoch"
+          },
+          "type": "array"
+        },
+        "evalResults": {
+          "$ref": "#/$defs/EvaluationResult"
+        },
+        "weightsRef": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "startedAt",
+        "status",
+        "trigger",
+        "appVersion",
+        "frameworkVersion",
+        "device",
+        "hyperparameters",
+        "classMap",
+        "trainingFingerprint",
+        "validationFingerprint",
+        "valIds",
+        "categorySetHash",
+        "history"
+      ],
+      "title": "Run",
+      "type": "object"
+    },
+    "RunHistoryEpoch": {
+      "additionalProperties": false,
+      "properties": {
+        "epoch": {
+          "type": "integer"
+        },
+        "loss": {
+          "type": "number"
+        },
+        "valLoss": {
+          "type": "number"
+        },
+        "accuracy": {
+          "type": "number"
+        },
+        "valAccuracy": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "epoch",
+        "loss",
+        "valLoss",
+        "accuracy",
+        "valAccuracy"
+      ],
+      "title": "RunHistoryEpoch",
+      "type": "object"
+    },
+    "RunHyperparameterSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "architecture": {
+          "type": "string"
+        },
+        "optimizer": {
+          "$ref": "#/$defs/OptimizerSettings"
+        },
+        "preprocess": {
+          "$ref": "#/$defs/PreprocessSettings"
+        }
+      },
+      "required": [
+        "architecture",
+        "optimizer",
+        "preprocess"
+      ],
+      "title": "RunHyperparameterSnapshot",
+      "type": "object"
+    },
+    "RunStatus": {
+      "enum": [
+        "in-progress",
+        "completed",
+        "stopped",
+        "failed"
+      ],
+      "title": "RunStatus",
+      "type": "string"
+    },
+    "RunTrigger": {
+      "enum": [
+        "fresh",
+        "continue",
+        "hitl-correction",
+        "import"
+      ],
+      "title": "RunTrigger",
+      "type": "string"
     },
     "SegmentationRunParams": {
       "additionalProperties": false,
@@ -2785,6 +3814,36 @@
       ],
       "title": "ThumbnailsPartial",
       "type": "object"
+    },
+    "VolumeUpdate": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kindId": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "string"
+        },
+        "predictionConfidence": {
+          "type": "number"
+        },
+        "predictedAtRunId": {
+          "type": "string"
+        },
+        "predictionCorrected": {
+          "$ref": "#/$defs/PredictionCorrection"
+        }
+      },
+      "required": [
+        "id",
+        "kindId",
+        "categoryId"
+      ],
+      "title": "VolumeUpdate",
+      "type": "object"
     }
   },
   "methods": {
@@ -2860,6 +3919,36 @@
       "result": "#/$defs/DeletedResult",
       "progress": null
     },
+    "images/categorize": {
+      "direction": "client->server",
+      "params": "#/$defs/ImagesCategorizeParams",
+      "result": "#/$defs/ChangedResult",
+      "progress": null
+    },
+    "annotations/categorize": {
+      "direction": "client->server",
+      "params": "#/$defs/AnnotationsCategorizeParams",
+      "result": "#/$defs/ChangedResult",
+      "progress": null
+    },
+    "categories/create": {
+      "direction": "client->server",
+      "params": "#/$defs/CategoriesCreateParams",
+      "result": "#/$defs/CategoriesResult",
+      "progress": null
+    },
+    "categories/update": {
+      "direction": "client->server",
+      "params": "#/$defs/CategoryUpdateParams",
+      "result": "#/$defs/CategoriesResult",
+      "progress": null
+    },
+    "categories/delete": {
+      "direction": "client->server",
+      "params": "#/$defs/CategoriesDeleteParams",
+      "result": "#/$defs/DeletedResult",
+      "progress": null
+    },
     "render/image": {
       "direction": "client->server",
       "params": "#/$defs/RenderImageParams",
@@ -2901,6 +3990,78 @@
       "params": "#/$defs/SegmentationRunParams",
       "result": "#/$defs/SegmentationRunSummary",
       "progress": "#/$defs/ProgressValue"
+    },
+    "classification/listArchitectures": {
+      "direction": "client->server",
+      "params": null,
+      "result": "#/$defs/ListModelsResult",
+      "progress": null
+    },
+    "classification/list": {
+      "direction": "client->server",
+      "params": null,
+      "result": "#/$defs/ClassifiersResult",
+      "progress": null
+    },
+    "classification/create": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassifierCreateRequest",
+      "result": "#/$defs/Classifier",
+      "progress": null
+    },
+    "classification/update": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassifierUpdateRequest",
+      "result": "#/$defs/Classifier",
+      "progress": null
+    },
+    "classification/delete": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassifierRequest",
+      "result": null,
+      "progress": null
+    },
+    "classification/fit": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassifierFitParams",
+      "result": "#/$defs/ClassifierFitSummary",
+      "progress": "#/$defs/ProgressValue"
+    },
+    "classification/predict": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassifierPredictParams",
+      "result": "#/$defs/ClassifierPredictSummary",
+      "progress": "#/$defs/ProgressValue"
+    },
+    "classification/evaluate": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassifierRequest",
+      "result": "#/$defs/EvaluationResult",
+      "progress": null
+    },
+    "classification/acceptPredictions": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassificationTargetRequest",
+      "result": "#/$defs/ChangedResult",
+      "progress": null
+    },
+    "classification/clearPredictions": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassificationTargetRequest",
+      "result": "#/$defs/ChangedResult",
+      "progress": null
+    },
+    "classification/export": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassifierRequest",
+      "result": "#/$defs/ClassifierExportResult",
+      "progress": null
+    },
+    "classification/import": {
+      "direction": "client->server",
+      "params": "#/$defs/ClassifierImportRequest",
+      "result": "#/$defs/Classifier",
+      "progress": null
     }
   },
   "notifications": {
@@ -2947,6 +4108,26 @@
     "annotations/didRemove": {
       "direction": "server->client",
       "params": "#/$defs/AnnotationsDidRemove"
+    },
+    "images/didUpdate": {
+      "direction": "server->client",
+      "params": "#/$defs/ImagesDidUpdate"
+    },
+    "annotations/didUpdate": {
+      "direction": "server->client",
+      "params": "#/$defs/AnnotationsDidUpdate"
+    },
+    "categories/didChange": {
+      "direction": "server->client",
+      "params": "#/$defs/CategoriesDidChange"
+    },
+    "classifiers/didChange": {
+      "direction": "server->client",
+      "params": "#/$defs/ClassifiersDidChange"
+    },
+    "classifiers/didEpoch": {
+      "direction": "server->client",
+      "params": "#/$defs/ClassifiersDidEpoch"
     }
   }
 }

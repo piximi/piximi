@@ -13,7 +13,15 @@ import type {
   Kind,
   Partition,
   Plane,
+  Predictable,
 } from "core/entities";
+import type {
+  Classifier,
+  ClassifierHyperparameters,
+  EvaluationResult,
+  ModelClassMap,
+  RunStatus,
+} from "core/dl/classification/types";
 import type {
   ModelDisplayInfo,
   OutputPolicy,
@@ -51,6 +59,7 @@ export interface Backend {
   readonly images: BackendImages;
   readonly annotations: BackendAnnotations;
   readonly segmentation?: BackendSegmentation;
+  readonly classification?: BackendClassification;
 }
 
 export type BackendKind = "local" | "remote";
@@ -251,9 +260,28 @@ export interface BackendRender {
 //
 // Scoped like the listings: a query says what goes, so "the selection" and
 // "everything in this category" are the same call. The backend announces what
-// went as `images/didRemove` / `annotations/didRemove`.
+// went as `images/didRemove` / `annotations/didRemove`, and what changed as
+// `images/didUpdate` / `annotations/didUpdate`.
 
 export type Deleted = { deleted: number };
+
+export type Changed = { changed: number };
+
+/*
+ * What a categorization or a prediction changed, as partial records: the
+ * fields a category change always rewrites. An absent prediction field was
+ * cleared. For objects, the category and prediction live on the volume and
+ * the partition on each annotation.
+ */
+export type ImageUpdate = Predictable & { id: string; categoryId: string };
+
+export type VolumeUpdate = Omit<Predictable, "partition"> & {
+  id: string;
+  kindId: string;
+  categoryId: string;
+};
+
+export type AnnotationUpdate = { id: string; partition: Partition };
 
 export interface BackendImages {
   /* Each image with its planes, channels and objects. */
@@ -353,4 +381,98 @@ export interface BackendSegmentation {
     request: SegmentationRunRequest,
     options?: CallOptions,
   ): Promise<SegmentationRunSummary>;
+}
+
+// ── Classification ───────────────────────────────────────────────────────────
+//
+// A classifier belongs to a target: the project's images, or one kind's
+// objects. The backend owns its record (settings, class map, runs,
+// predictions) and announces changes as `classifiers/didChange`, with each
+// training epoch as `classifiers/didEpoch`; the classifier slice mirrors
+// both. Fitting and predicting are jobs.
+
+export type ClassifierCreateRequest = {
+  targetId: string;
+  name: string;
+  /* A listed model with the `classification.train` task. */
+  architectureId: string;
+  hyperparameters: ClassifierHyperparameters;
+  seed?: number;
+};
+
+/* Changes between runs; absent fields stay as they are. */
+export type ClassifierUpdateRequest = {
+  classifierId: string;
+  hyperparameters?: ClassifierHyperparameters;
+  classMap?: ModelClassMap;
+  confidenceThreshold?: number;
+};
+
+/*
+ * Trains on the target's labeled items. The backend splits those still
+ * unassigned into training and validation per category by the
+ * hyperparameters' percentage (shuffled by `seed`), records the partitions,
+ * and announces each epoch.
+ */
+export type ClassifierFitRequest = { classifierId: string; seed?: number };
+
+export type ClassifierFitSummary = {
+  /* Absent when cancelled before anything started. */
+  jobId?: string;
+  runId?: string;
+  status: RunStatus;
+  evalResults?: EvaluationResult;
+};
+
+/*
+ * Labels the target's unlabeled items, or just `ids`, with the classifier's
+ * predictions; they stay in the inference partition until accepted or
+ * cleared.
+ */
+export type ClassifierPredictRequest = { classifierId: string; ids?: string[] };
+
+export type ClassifierPredictSummary = {
+  jobId?: string;
+  predicted: number;
+  cancelled: boolean;
+};
+
+/* A zip: the framework's saved model, the runs and a manifest. */
+export type ClassifierExport = {
+  fileName: string;
+  mime: string;
+  data: Uint8Array;
+};
+
+export type ClassifierImportRequest = {
+  targetId: string;
+  data: Uint8Array;
+  /* Overrides the name in the archive's manifest. */
+  name?: string;
+};
+
+export interface BackendClassification {
+  /* Listed models with a classification task. */
+  listArchitectures(): Promise<ModelDescriptor[]>;
+  list(): Promise<Classifier[]>;
+  create(request: ClassifierCreateRequest): Promise<Classifier>;
+  update(request: ClassifierUpdateRequest): Promise<Classifier>;
+  delete(classifierId: string): Promise<void>;
+  fit(
+    request: ClassifierFitRequest,
+    options?: CallOptions,
+  ): Promise<ClassifierFitSummary>;
+  predict(
+    request: ClassifierPredictRequest,
+    options?: CallOptions,
+  ): Promise<ClassifierPredictSummary>;
+  /* Against the validation set; also recorded on the latest run. */
+  evaluate(classifierId: string): Promise<EvaluationResult>;
+  /* Keeps the target's predicted categories and takes the items out of
+   * the inference partition. */
+  acceptPredictions(targetId: string): Promise<Changed>;
+  /* Returns the target's predicted items to the unknown category. */
+  clearPredictions(targetId: string): Promise<Changed>;
+  export(classifierId: string): Promise<ClassifierExport>;
+  import(request: ClassifierImportRequest): Promise<Classifier>;
 }

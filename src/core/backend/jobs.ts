@@ -2,7 +2,11 @@ import { generateUUID } from "core/entities";
 
 import type { EventBus } from "./events";
 
-export type JobKind = "segmentation" | "model-load";
+export type JobKind =
+  | "segmentation"
+  | "model-load"
+  | "classifier-fit"
+  | "classifier-predict";
 
 export type JobStatus =
   | "queued"

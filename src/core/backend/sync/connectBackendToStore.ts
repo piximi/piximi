@@ -17,6 +17,8 @@ import type { Backend, ImageRecord } from "../types";
 const taskType: Record<JobKind, AppTaskType> = {
   segmentation: "image-segmentation",
   "model-load": "model-load",
+  "classifier-fit": "image-classification",
+  "classifier-predict": "image-classification",
 };
 
 /*

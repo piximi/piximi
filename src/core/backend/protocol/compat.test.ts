@@ -23,6 +23,23 @@ import type {
   SegmenterOptionGroup,
   SegmenterOptionSchema,
 } from "core/dl/segmentation/types";
+import type {
+  CropSchema,
+  LossFunction,
+  Metric,
+  OptimizationAlgorithm,
+} from "core/dl/enums";
+import type {
+  Classifier,
+  ClassifierHyperparameters,
+  EvaluationResult,
+  ModelLayerData,
+  OptimizerSettings,
+  PreprocessSettings,
+  Run,
+  RunHistoryEpoch,
+  RunHyperparameterSnapshot,
+} from "core/dl/classification/types";
 
 import type { Capability } from "../capabilities";
 import type { BackendEvent } from "../events";
@@ -31,11 +48,18 @@ import type {
   AnnotationCountGroup,
   AnnotationQuery,
   AnnotationSort,
+  AnnotationUpdate,
+  Changed,
   ChannelDisplay,
+  ClassifierCreateRequest,
+  ClassifierExport,
+  ClassifierFitSummary,
+  ClassifierPredictSummary,
   Counts,
   ImageCountGroup,
   ImageQuery,
   ImageSort,
+  ImageUpdate,
   ModelDescriptor,
   ModelStatus,
   ModelTask,
@@ -46,6 +70,7 @@ import type {
   RenderRequest,
   SegmentationRunRequest,
   SegmentationRunSummary,
+  VolumeUpdate,
 } from "../types";
 import type * as P from "./generated";
 
@@ -87,6 +112,31 @@ type WithPartitions<T extends { partitions?: Partition[] }> = Omit<
   partitions?: Values<Partition>[];
 };
 type Unmeasured<T> = Omit<T, "features" | "intensityMeasurements">;
+/* Hyperparameters hold several string enums; the wire carries their values. */
+type WireOptimizer = Omit<
+  OptimizerSettings,
+  "lossFunction" | "metrics" | "optimizationAlgorithm"
+> & {
+  lossFunction: Values<LossFunction>;
+  metrics: Values<Metric>[];
+  optimizationAlgorithm: Values<OptimizationAlgorithm>;
+};
+type WirePreprocess = Omit<PreprocessSettings, "cropOptions"> & {
+  cropOptions: { numCrops: number; cropSchema: Values<CropSchema> };
+};
+type WireHyperparameters = {
+  [K in keyof ClassifierHyperparameters]: K extends "optimizer"
+    ? WireOptimizer
+    : WirePreprocess;
+};
+type WireRun = Omit<Run, "hyperparameters"> & {
+  hyperparameters: Omit<RunHyperparameterSnapshot, "optimizer" | "preprocess"> &
+    WireHyperparameters;
+};
+type WireClassifier = Omit<Classifier, "hyperparameters" | "runs"> & {
+  hyperparameters: WireHyperparameters;
+  runs: WireRun[];
+};
 
 /* Every entry must be `true`; `Assert` makes `tsc` say which one is not. */
 type Checks = [
@@ -216,6 +266,49 @@ type Checks = [
     >
   >,
   Assert<Equivalent<P.SegmentationRunSummary, SegmentationRunSummary>>,
+
+  // ── Classification ────────────────────────────────────────────────────────
+  Assert<Equivalent<P.OptimizerSettings, WireOptimizer>>,
+  Assert<Equivalent<P.PreprocessSettings, WirePreprocess>>,
+  Assert<Equivalent<P.ClassifierHyperparameters, WireHyperparameters>>,
+  Assert<Equivalent<P.RunHistoryEpoch, RunHistoryEpoch>>,
+  Assert<Equivalent<P.EvaluationResult, EvaluationResult>>,
+  Assert<Equivalent<P.ModelLayer, ModelLayerData>>,
+  Assert<Equivalent<P.Run, WireRun>>,
+  Assert<Equivalent<P.Classifier, WireClassifier>>,
+  Assert<
+    Equivalent<
+      P.ClassifierCreateRequest,
+      Omit<ClassifierCreateRequest, "hyperparameters"> & {
+        hyperparameters: WireHyperparameters;
+      }
+    >
+  >,
+  Assert<Equivalent<P.ClassifierFitSummary, ClassifierFitSummary>>,
+  Assert<Equivalent<P.ClassifierPredictSummary, ClassifierPredictSummary>>,
+  Assert<Equivalent<P.ChangedResult, Changed>>,
+  Assert<Equivalent<P.ClassifierExportResult, ClassifierExport>>,
+  Assert<Equivalent<P.ImageUpdate, WithPartition<ImageUpdate>>>,
+  Assert<Equivalent<P.VolumeUpdate, VolumeUpdate>>,
+  Assert<Equivalent<P.AnnotationUpdate, WithPartition<AnnotationUpdate>>>,
+  Assert<
+    Equivalent<
+      P.ClassifiersDidEpoch,
+      Extract<BackendEvent, { type: "classifiers/didEpoch" }>
+    >
+  >,
+  Assert<
+    Equivalent<P.ClassifiersDidChange["classifiers"][number], WireClassifier>
+  >,
+  Assert<
+    Equivalent<
+      P.CategoriesDidChange["categories"][number],
+      Extract<
+        BackendEvent,
+        { type: "categories/didChange" }
+      >["categories"][number]
+    >
+  >,
 ];
 
 describe("protocol compat", () => {
