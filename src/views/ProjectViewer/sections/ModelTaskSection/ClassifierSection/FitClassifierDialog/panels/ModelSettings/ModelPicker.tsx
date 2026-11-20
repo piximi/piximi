@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -6,13 +6,14 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Chip,
+  CircularProgress,
   MenuItem,
   Stack,
   Typography,
 } from "@mui/material";
 
 import { useBackend } from "core/backend";
-import { ARCHITECTURE_IDS, ModelArch } from "core/dl/classification/types";
 
 import { WithLabel, TextFieldWithBlur, StyledSelect } from "components/inputs";
 
@@ -27,10 +28,14 @@ import {
   useClassifierStatus,
 } from "@ProjectViewer/contexts/ClassifierStatusProvider";
 import { TooltipWithDisable } from "@ProjectViewer/components";
-import { useClassificationModel } from "@ProjectViewer/hooks";
+import {
+  useClassificationModel,
+  useClassifierArchitectures,
+} from "@ProjectViewer/hooks";
 
-import type { SelectChangeEvent } from "@mui/material";
+import type { ChipProps, SelectChangeEvent } from "@mui/material";
 
+import type { ModelStatus } from "core/backend";
 import type { Classifier } from "core/dl/classification/types";
 
 export const ModelPicker = () => {
@@ -56,7 +61,7 @@ export const ModelPicker = () => {
       {activeModel ? (
         <PretrainedModelOptions activeModel={activeModel} />
       ) : (
-        <ModelArchiitectureOptions
+        <ModelArchitectureOptions
           targetId={kindClassifierInfo.modelTargetId}
           newModelArch={kindClassifierInfo.newModelArch}
         />
@@ -65,7 +70,23 @@ export const ModelPicker = () => {
   );
 };
 
-const ModelArchiitectureOptions = ({
+const statusChip: Record<
+  ModelStatus,
+  { label: string; color: ChipProps["color"] }
+> = {
+  unavailable: { label: "Not built", color: "default" },
+  building: { label: "Building", color: "info" },
+  ready: { label: "Ready", color: "success" },
+  loaded: { label: "Loaded", color: "success" },
+  failed: { label: "Failed", color: "error" },
+};
+
+/*
+ * The architecture a new classifier is built from, as the backend lists
+ * them. One that runs in its own environment may not be built yet; fitting
+ * builds it, with the build's phases in the task toast.
+ */
+const ModelArchitectureOptions = ({
   targetId,
   newModelArch,
 }: {
@@ -73,9 +94,23 @@ const ModelArchiitectureOptions = ({
   newModelArch: string;
 }) => {
   const dispatch = useDispatch();
-
+  const architectures = useClassifierArchitectures();
   const { newModelName, setNewModelName, activeErrors } = useClassifierStatus();
   const [draft, setDraft] = useState<string | null>(null);
+
+  const known = architectures.some((model) => model.name === newModelArch);
+  const selected = architectures.find((model) => model.name === newModelArch);
+  // The slice remembers an id from the last session; this backend may not
+  // list it, so fall back to its first architecture.
+  useEffect(() => {
+    if (known || architectures.length === 0) return;
+    dispatch(
+      classifierSlice.actions.setNewModelArch({
+        targetId,
+        modelArch: architectures[0].name,
+      }),
+    );
+  }, [known, architectures, dispatch, targetId]);
 
   const handleArchitectureChange = (event: SelectChangeEvent<unknown>) => {
     const value = event.target.value as string;
@@ -100,72 +135,102 @@ const ModelArchiitectureOptions = ({
   };
 
   return (
-    <Stack
-      data-doc="model-picker"
-      direction="row"
-      spacing={2}
-      sx={{
-        py: 1,
-        justifyContent: "space-evenly",
-      }}
-    >
-      <WithLabel
-        label="Model Architecture:"
-        labelProps={{
-          variant: "body2",
-          sx: { mr: "1rem", whiteSpace: "nowrap" },
-        }}
-        data-help={HelpItem.ModelArchitecture}
+    <Stack data-doc="model-picker" spacing={1} sx={{ py: 1 }}>
+      <Stack
+        direction="row"
+        spacing={2}
+        sx={{ justifyContent: "space-evenly" }}
       >
-        <StyledSelect
-          value={newModelArch}
-          onChange={handleArchitectureChange}
-          fullWidth
+        <WithLabel
+          label="Model Architecture:"
+          labelProps={{
+            variant: "body2",
+            sx: { mr: "1rem", whiteSpace: "nowrap" },
+          }}
+          data-help={HelpItem.ModelArchitecture}
         >
-          <MenuItem
-            dense
-            value={ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN]}
-            sx={{
-              borderRadius: 0,
-              minHeight: "1rem",
-            }}
+          <StyledSelect
+            value={known ? newModelArch : ""}
+            onChange={handleArchitectureChange}
+            fullWidth
+            disabled={architectures.length === 0}
           >
-            Simple CNN
-          </MenuItem>
-          <MenuItem
-            dense
-            value={ARCHITECTURE_IDS[ModelArch.MOBILE_NET]}
-            sx={{ borderRadius: 0, minHeight: "1rem" }}
-          >
-            MobileNet
-          </MenuItem>
-        </StyledSelect>
-      </WithLabel>
-      <WithLabel
-        label="Model Name:"
-        labelProps={{
-          variant: "body2",
-          sx: { mr: "1rem", whiteSpace: "nowrap" },
-        }}
-      >
-        <TextFieldWithBlur
-          size="small"
-          onChange={handleNameChange}
-          value={draft ?? newModelName}
-          fullWidth
-          onBlur={handleConfirmName}
-          error={activeErrors.some(
-            (err) => err.reason === ErrorReason.DuplicateModelName,
+            {architectures.map((model) => (
+              <MenuItem
+                key={model.name}
+                dense
+                value={model.name}
+                sx={{ borderRadius: 0, minHeight: "1rem" }}
+              >
+                {model.displayName}
+              </MenuItem>
+            ))}
+          </StyledSelect>
+        </WithLabel>
+        <WithLabel
+          label="Model Name:"
+          labelProps={{
+            variant: "body2",
+            sx: { mr: "1rem", whiteSpace: "nowrap" },
+          }}
+        >
+          <TextFieldWithBlur
+            size="small"
+            onChange={handleNameChange}
+            value={draft ?? newModelName}
+            fullWidth
+            onBlur={handleConfirmName}
+            error={activeErrors.some(
+              (err) => err.reason === ErrorReason.DuplicateModelName,
+            )}
+            sx={(theme) => ({
+              input: {
+                py: 0.5,
+                fontSize: theme.typography.body2.fontSize,
+                minHeight: "1rem",
+              },
+            })}
+          />
+        </WithLabel>
+      </Stack>
+      {selected && (
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ alignItems: "center", px: 1, maxWidth: "100%" }}
+        >
+          <Chip
+            size="small"
+            variant="outlined"
+            color={statusChip[selected.status].color}
+            label={statusChip[selected.status].label}
+            icon={
+              selected.status === "building" ? (
+                <CircularProgress size={12} color="inherit" />
+              ) : undefined
+            }
+          />
+          <Typography variant="caption" color="textSecondary">
+            {selected.version
+              ? `${selected.framework} ${selected.version}`
+              : selected.framework}
+          </Typography>
+          {selected.statusMessage && (
+            <Typography
+              variant="caption"
+              color={selected.status === "failed" ? "error" : "textSecondary"}
+              sx={{ overflowWrap: "anywhere" }}
+            >
+              {selected.statusMessage}
+            </Typography>
           )}
-          sx={(theme) => ({
-            input: {
-              py: 0.5,
-              fontSize: theme.typography.body2.fontSize,
-              minHeight: "1rem",
-            },
-          })}
-        />
-      </WithLabel>
+          {selected.status === "unavailable" && (
+            <Typography variant="caption" color="textSecondary">
+              Fitting builds the environment first.
+            </Typography>
+          )}
+        </Stack>
+      )}
     </Stack>
   );
 };

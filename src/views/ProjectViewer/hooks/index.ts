@@ -14,6 +14,7 @@ export {
 export { useReactWindow } from "./useReactWindow";
 export { useAcceptClearPredictions } from "./useAcceptClearPredictions";
 export { useClassifierCounts } from "./useClassifierCounts";
+export { useClassifierArchitectures } from "./useClassifierArchitectures";
 export { useClassificationModel } from "./useClassificationModel";
 export { useFitClassifier } from "./useFitClassifier";
 export { usePredictClassifier } from "./usePredictClassifier";

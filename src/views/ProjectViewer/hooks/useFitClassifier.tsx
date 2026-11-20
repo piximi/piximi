@@ -60,10 +60,21 @@ export const useFitClassifier = () => {
     setStatus("loading");
     try {
       if (!record) {
+        const architectures = (await classification.listArchitectures()).filter(
+          (model) => model.tasks.includes("classification.train"),
+        );
+        const architectureId = architectures.some(
+          (model) => model.name === kindClassifier.newModelArch,
+        )
+          ? kindClassifier.newModelArch
+          : architectures[0]?.name;
+        if (!architectureId) {
+          throw new Error("This backend offers no trainable architecture");
+        }
         record = await classification.create({
           targetId: modelTarget,
           name: newModelName,
-          architectureId: kindClassifier.newModelArch,
+          architectureId,
           hyperparameters: {
             preprocess: modelParams.preprocessSettings,
             optimizer: modelParams.optimizerSettings,
