@@ -13,3 +13,6 @@ CELLCAST = _HERE / "cellcast" / "piximi-model.toml"
 
 CELLPOSE = _HERE / "cellpose" / "piximi-model.toml"
 """Cellpose 3 on PyTorch: a second framework, to prove the isolation."""
+
+TORCH_CNN = _HERE / "torch_cnn" / "piximi-model.toml"
+"""The browser's Simple CNN classifier in PyTorch, trainable on the engine."""

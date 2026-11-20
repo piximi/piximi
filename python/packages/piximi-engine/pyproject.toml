@@ -33,6 +33,7 @@ piximi = "piximi_engine.jupyter:setup_piximi"
 [project.entry-points."piximi.models"]
 cellcast = "piximi_engine.plugins:CELLCAST"
 cellpose = "piximi_engine.plugins:CELLPOSE"
+torch-cnn = "piximi_engine.plugins:TORCH_CNN"
 
 [build-system]
 requires = ["hatchling"]

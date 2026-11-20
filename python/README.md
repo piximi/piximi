@@ -113,7 +113,9 @@ project's labeled items the way the browser does (crop, resize, scale),
 writes it as `.npy` files the worker maps without copying, and records each
 epoch the model reports; weights round-trip through the worker for the
 project's archives. The engine always lists a numpy logistic regression
-built in, so a project can be classified without any plugin.
+built in, so a project can be classified without any plugin, and ships the
+browser's Simple CNN in PyTorch as a plugin (`torch-cnn`), trained from
+scratch on the engine with the same hyperparameters the app offers.
 
 The engine ships two segmenters: StarDist2D through
 [cellcast](https://github.com/uw-loci/cellcast) (numpy-only, GPU on macOS

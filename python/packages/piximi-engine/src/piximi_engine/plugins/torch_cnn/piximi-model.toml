@@ -1,0 +1,33 @@
+# The browser's Simple CNN, in PyTorch: two convolution-and-pooling blocks
+# ahead of a dense softmax layer, trained from scratch on the project's
+# labeled items. PyTorch stopped shipping wheels for Intel Macs after 2.2,
+# which needs Python 3.11; other platforms take current releases.
+
+[plugin]
+id = "torch-cnn"
+name = "PyTorch classifiers"
+version = "1"
+framework = "pytorch"
+entry = "model.py"
+
+[plugin.env]
+python = "3.11"
+requirements = [
+  "torch==2.2.*; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+  "torch>=2.2; sys_platform != 'darwin' or platform_machine != 'x86_64'",
+  "numpy<2",
+]
+
+[plugin.resources]
+gpu = true
+memory_hint = "small: a few MB of weights; a GPU is used when PyTorch finds one"
+
+[[models]]
+id = "torch-simple-cnn"
+attribute = "SIMPLE_CNN"
+display_name = "Simple CNN (PyTorch)"
+description = "Two convolution and pooling blocks ahead of a dense softmax layer; the browser's Simple CNN, trained on the engine"
+use = "A first classifier for any images, trained from scratch"
+tasks = ["classification", "classification.train"]
+channels = { mode = "passthrough", max_channels = 16 }
+sources = [{ text = "PyTorch", url = "https://pytorch.org" }]
