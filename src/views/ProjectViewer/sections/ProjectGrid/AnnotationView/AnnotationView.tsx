@@ -6,10 +6,10 @@ import { Add as AddIcon } from "@mui/icons-material";
 import { Badge, Box, Divider, IconButton } from "@mui/material";
 
 import { UNKNOWN_KIND_ID } from "core/entities";
+import { useBackend } from "core/backend";
 
 import { useMenu, useMobileView } from "hooks";
 
-import { dataSlice } from "store/data";
 import { selectKindEntities } from "store/data/selectors";
 import { HelpItem } from "help/HelpContent";
 
@@ -28,6 +28,7 @@ const UNKNOWN_KIND_QUERY = { kindIds: [UNKNOWN_KIND_ID] };
 
 export const AnnotationView = () => {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const gridState = useSelector(selectAnnotationGridState);
   const kinds = useSelector(selectKindEntities);
   const unknownCount = useAnnotationCounts(UNKNOWN_KIND_QUERY)?.total ?? 0;
@@ -57,11 +58,17 @@ export const AnnotationView = () => {
     anchorEl: addKindMenuAnchor,
   } = useMenu();
 
+  // Kinds are the backend's: deleting and renaming go through it and the
+  // store follows its announcements.
   const handleTabDelete = useCallback(
     (id: string) => {
-      dispatch(dataSlice.actions.deleteKind(id));
+      backend.kinds
+        .delete([id])
+        .catch((error: unknown) =>
+          console.error("[AnnotationView] delete kind", error),
+        );
     },
-    [dispatch],
+    [backend],
   );
 
   const handleTabMinimize = useCallback(
@@ -89,9 +96,11 @@ export const AnnotationView = () => {
   };
 
   const handleKindEdit = (kindId: string, newDisplayName: string) => {
-    dispatch(
-      dataSlice.actions.updateKindName({ kindId, name: newDisplayName }),
-    );
+    backend.kinds
+      .update(kindId, newDisplayName)
+      .catch((error: unknown) =>
+        console.error("[AnnotationView] rename kind", error),
+      );
   };
 
   useEffect(() => {

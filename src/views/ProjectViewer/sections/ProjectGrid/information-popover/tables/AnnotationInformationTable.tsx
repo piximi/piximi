@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import {
   Box,
@@ -31,7 +31,6 @@ import {
   selectKindEntities,
 } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
-import { dataSlice } from "store/data";
 
 import {
   AnnotationKindSelect,
@@ -79,7 +78,6 @@ const AnnotationInfoTable = ({
 }: {
   annotation: ExtendedAnnotationObject;
 }) => {
-  const dispatch = useDispatch();
   const backend = useBackend();
   const kinds = useSelector(selectKindEntities);
 
@@ -109,14 +107,13 @@ const AnnotationInfoTable = ({
 
   const handlePartitionSelect = useCallback(
     (partition: Partition) => {
-      dispatch(
-        dataSlice.actions.updateAnnotationPartition({
-          id: annotation.id,
-          partition,
-        }),
-      );
+      backend.annotations
+        .update([{ id: annotation.id, partition }])
+        .catch((error) =>
+          console.error("[AnnotationInfoTable] set partition", error),
+        );
     },
-    [dispatch, annotation],
+    [backend, annotation.id],
   );
 
   const handleKindSelect = useCallback(
@@ -212,7 +209,7 @@ const KindChangeDialog = ({
   targetKind: Kind;
   targetAnn: ExtendedAnnotationObject;
 }) => {
-  const dispatch = useDispatch();
+  const backend = useBackend();
   const categoryChangeOptions = useParameterizedSelector(
     selectCategoriesByKindId,
     targetKind.id,
@@ -241,32 +238,31 @@ const KindChangeDialog = ({
     setDecision(decision as KindChangeDecision);
   };
 
+  // Moving an object to another kind is categorizing it into one of that
+  // kind's categories: the kind follows the category on the backend.
   const handleConfirm = () => {
     onClose();
-
+    const report = (error: unknown) =>
+      console.error("[KindChangeDialog] change kind", error);
     if (decision === "copy") {
       const copiedCategory = generateCategory(
         targetAnn.category.name,
         targetAnn.category.color,
         { type: "annotation", kindId: targetKind.id },
       );
-
-      dispatch(dataSlice.actions.addCategory(copiedCategory));
-      dispatch(
-        dataSlice.actions.bubbleUpdateAnnotationKind({
-          id: targetAnn.id,
-          kindId: targetKind.id,
-          categoryId: copiedCategory.id,
-        }),
-      );
+      backend.categories
+        .create([copiedCategory])
+        .then(() =>
+          backend.annotations.categorize(
+            { ids: [targetAnn.id] },
+            copiedCategory.id,
+          ),
+        )
+        .catch(report);
     } else {
-      dispatch(
-        dataSlice.actions.bubbleUpdateAnnotationKind({
-          id: targetAnn.id,
-          kindId: targetKind.id,
-          categoryId: selectedCategoryId,
-        }),
-      );
+      backend.annotations
+        .categorize({ ids: [targetAnn.id] }, selectedCategoryId)
+        .catch(report);
     }
 
     closePopover();

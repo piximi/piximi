@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useDispatch } from "react-redux";
-
 import { useBackend } from "core/backend";
 
 import { TextFieldWithBlur } from "components/inputs";
@@ -12,7 +10,6 @@ import {
   selectExtendedImageById,
   selectPlanesByImageId,
 } from "store/data/selectors";
-import { dataSlice } from "store/data";
 
 import {
   ImagePlaneSelect,
@@ -50,7 +47,6 @@ export const ImagePopoverContent = ({
 };
 
 const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
-  const dispatch = useDispatch();
   const backend = useBackend();
 
   const volumes = useParameterizedSelector(
@@ -68,14 +64,16 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
     [],
   );
 
+  // Through the backend, which owns the image; the store follows its
+  // announcement, so the grid and this table agree.
+  const report = (what: string) => (error: unknown) =>
+    console.error(`[ImageInfoTable] ${what}`, error);
   const handleDispatchNameChange = useCallback(() => {
-    dispatch(
-      dataSlice.actions.updateImageName({
-        imageId: image.id,
-        name: newImageName,
-      }),
-    );
-  }, [dispatch, newImageName, image.id]);
+    if (!newImageName.trim() || newImageName === image.name) return;
+    backend.images
+      .update([{ id: image.id, name: newImageName }])
+      .catch(report("rename"));
+  }, [backend, newImageName, image.id, image.name]);
 
   // Through the backend, which owns the category and is where the grid and
   // the sidebar's counts read from; a store-only change would show here alone.
@@ -90,25 +88,19 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
 
   const handlePartitionSelect = useCallback(
     (partition: Partition) => {
-      dispatch(
-        dataSlice.actions.updateImagePartition({
-          id: image.id,
-          partition,
-        }),
-      );
+      backend.images
+        .update([{ id: image.id, partition }])
+        .catch(report("set partition"));
     },
-    [dispatch, image],
+    [backend, image.id],
   );
   const handlePlaneSelect = useCallback(
     (idx: number) => {
-      dispatch(
-        dataSlice.actions.updateImageActivePlane({
-          imageId: image.id,
-          planeId: planes[idx].id,
-        }),
-      );
+      backend.images
+        .update([{ id: image.id, activePlaneId: planes[idx].id }])
+        .catch(report("change plane"));
     },
-    [dispatch, image, planes],
+    [backend, image.id, planes],
   );
 
   const tableData = useMemo(() => {

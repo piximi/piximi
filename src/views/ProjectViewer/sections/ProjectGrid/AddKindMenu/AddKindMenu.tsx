@@ -2,10 +2,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Menu, MenuItem, Typography } from "@mui/material";
 
+import { useBackend } from "core/backend";
+
 import { useDialogHotkey, useMobileView } from "hooks";
 
 import { selectKindNames } from "store/data/selectors";
-import { dataSlice } from "store/data";
 
 import { HotkeyContext } from "utils/enums";
 
@@ -27,6 +28,7 @@ export const AddKindMenu = ({
   filteredKinds: Kind[];
 }) => {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const activeKind = useSelector(selectActiveKindId);
   const existingKinds = useSelector(selectKindNames);
 
@@ -64,13 +66,13 @@ export const AddKindMenu = ({
     handleCloseCreateKindDialog();
     onClose();
   };
+  // The backend owns the kinds; the store follows its announcement.
   const addKind = (kind: Kind, newUnknownCategory: AnnotationCategory) => {
-    dispatch(
-      dataSlice.actions.addKind({
-        kind: kind,
-        category: newUnknownCategory,
-      }),
-    );
+    backend.kinds
+      .create([{ kind, category: newUnknownCategory }])
+      .catch((error: unknown) =>
+        console.error("[AddKindMenu] create kind", error),
+      );
   };
   return (
     <>

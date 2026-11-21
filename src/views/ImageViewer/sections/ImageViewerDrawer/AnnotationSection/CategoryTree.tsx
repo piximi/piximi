@@ -32,12 +32,12 @@ import {
   representsUnknown,
   UNKNOWN_KIND_CATEGORY,
 } from "core/entities";
+import { useBackend } from "core/backend";
 
 import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
 
-import { dataSlice } from "store/data";
 import { HelpItem } from "help/HelpContent";
 
 import { getCategoryIconStyle } from "utils/styleUtils";
@@ -93,7 +93,13 @@ export const CategoryTree = ({
   header,
 }: AnnotationTreeProps) => {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const { toggleCategories } = useCriterionToggles();
+  // Kinds and categories are the backend's and take effect at once, unlike
+  // the annotations, which the session commits when it leaves; the store
+  // follows the backend's announcements.
+  const report = (what: string) => (error: unknown) =>
+    console.error(`[CategoryTree] ${what}`, error);
   const theme = useTheme();
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [dialog, setDialog] = useState<TaxonomyDialogRequest | null>(null);
@@ -188,33 +194,29 @@ export const CategoryTree = ({
     if (d.mode === "create") {
       if (d.type === "kind") {
         const { kind, unknownCategory } = generateKind(name);
-        dispatch(
-          dataSlice.actions.addKind({
-            kind: kind,
-            category: unknownCategory,
-          }),
-        );
-        dispatch(
-          imageViewerDataSlice.actions.setSelectedCategory(unknownCategory),
-        );
-        setExpanded((e) => ({ ...e, [kind.id]: true }));
+        backend.kinds
+          .create([{ kind, category: unknownCategory }])
+          .then(() => {
+            dispatch(
+              imageViewerDataSlice.actions.setSelectedCategory(unknownCategory),
+            );
+            setExpanded((e) => ({ ...e, [kind.id]: true }));
+          })
+          .catch(report("create kind"));
       } else {
         const category = generateCategory(name, color!, {
           type: "annotation",
           kindId: d.kindId!,
         });
-        dispatch(dataSlice.actions.addCategory(category));
+        backend.categories.create([category]).catch(report("create category"));
       }
     } else {
       if (d.type === "kind") {
-        dispatch(dataSlice.actions.updateKindName({ kindId: d.kindId!, name }));
+        backend.kinds.update(d.kindId!, name).catch(report("rename kind"));
       } else {
-        dispatch(
-          dataSlice.actions.updateCategoryDisplayProps({
-            id: d.catId!,
-            changes: { name, color },
-          }),
-        );
+        backend.categories
+          .update(d.catId!, { name, color })
+          .catch(report("edit category"));
         if (selectedCategory.id === d.catId)
           dispatch(
             imageViewerDataSlice.actions.setSelectedCategory({
@@ -237,8 +239,8 @@ export const CategoryTree = ({
     if (type === "kind") {
       const catIds = k ? k.cats.map((c) => c.id) : [];
       if (representsUnknown(k.id)) return;
+      backend.kinds.delete([kindId]).catch(report("delete kind"));
       batch(() => {
-        dispatch(dataSlice.actions.deleteKind(kindId));
         dispatch(
           imageViewerDataSlice.actions.toggleCatSelection({
             ids: catIds,
@@ -254,13 +256,8 @@ export const CategoryTree = ({
       });
     } else {
       if (representsUnknown(catId!)) return;
+      backend.categories.delete([catId!]).catch(report("delete category"));
       batch(() => {
-        dispatch(
-          dataSlice.actions.deleteCategory({
-            id: catId!,
-            details: { type: "annotation", kindId },
-          }),
-        );
         dispatch(
           imageViewerDataSlice.actions.toggleCatSelection({
             ids: [catId!],
