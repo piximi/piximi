@@ -333,6 +333,12 @@ class MetaStore:
         """Runs a read-only statement a caller composed."""
         return self._db.execute(sql, tuple(params)).fetchall()
 
+    def execute(self, sql: str, params: Sequence[Any] = ()) -> int:
+        """Runs a statement that writes, in its own transaction; returns the
+        rows it changed."""
+        with self._db:
+            return self._db.execute(sql, tuple(params)).rowcount
+
     def select_ids(
         self,
         kind: str,

@@ -152,7 +152,7 @@ def populate(
                 channel_rows.append(
                     (
                         Channel(
-                            id=channel_id, plane_id=plane_id, channel_meta_id=f"channel-meta-{c}", name=f"Channel {c}",
+                            id=channel_id, plane_id=plane_id, channel_meta_id=f"channel-meta-{c}", name=f"Channel-{c}",
                             dtype="uint8", bit_depth=8, width=size, height=size,
                             **(channel_statistics(data) if data is not None else {"max_value": 255.0, "min_value": 0.0}),
                         ),

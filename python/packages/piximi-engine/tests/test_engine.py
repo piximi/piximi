@@ -327,3 +327,21 @@ async def test_categories_and_categorizing(engine: ReferenceEngine):
     assert all(c.id not in (cells.id, round_.id) for c in (await engine.project()).categories)
     kept = engine.meta.get("image", b.image.id, ImageObject)
     assert kept.category_id == UNKNOWN_IMAGE_CATEGORY_ID and kept.partition == Partition.UNASSIGNED
+
+
+async def test_old_default_channel_names_are_renamed_on_open(engine: ReferenceEngine):
+    """Stores from before the default matched the browser's carry "Channel N"."""
+    engine.meta.execute(
+        "UPDATE entities SET data = json_set(data, '$.name', 'Channel ' || substr(json_extract(data, '$.name'), 9)), "
+        "name = 'Channel ' || substr(name, 9) "
+        "WHERE kind IN ('channel', 'channel_meta') AND json_extract(data, '$.name') GLOB 'Channel-[0-9]*'"
+    )
+    assert (await engine.project()).channel_metas[0].name == "Channel 0"
+    reopened = ReferenceEngine(engine.data_dir, models={})
+    try:
+        metas = (await reopened.project()).channel_metas
+        assert [meta.name for meta in metas] == [f"Channel-{i}" for i in range(len(metas))]
+        page = await reopened.images(ImageQuery(), None, PageRequest(limit=1))
+        assert all(channel.name.startswith("Channel-") for channel in page.items[0].channels)
+    finally:
+        await reopened.close()

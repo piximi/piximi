@@ -118,7 +118,7 @@ from .decode import SUPPORTED_SUFFIXES, read_image
 from .dedup import MaskedBox, is_duplicate
 from .jobs import JobRegistry
 from .measure import channel_statistics, intensity_measurements, object_features
-from .measurements import measure_annotations, measurement_table, unmeasured_ids
+from .measurements import measure_annotations, measure_images, measurement_table, unmeasured_ids
 from .models import ModelRegistry, SegmentationModel, default_registry
 from .models.base import apply_option_defaults
 from .query import (
@@ -237,6 +237,14 @@ class ReferenceEngine:
             self.meta.put("kind", UNKNOWN_KIND)
             self.meta.put("category", UNKNOWN_IMAGE_CATEGORY)
             self.meta.put("category", UNKNOWN_KIND_CATEGORY)
+        # Stores written before the default name matched the browser's
+        # ("Channel-N") still carry "Channel N"; measurement labels and the
+        # channel tree are built from these names, so bring them in line.
+        self.meta.execute(
+            "UPDATE entities SET data = json_set(data, '$.name', 'Channel-' || substr(json_extract(data, '$.name'), 9)), "
+            "name = 'Channel-' || substr(name, 9) "
+            "WHERE kind IN ('channel', 'channel_meta') AND json_extract(data, '$.name') GLOB 'Channel [0-9]*'"
+        )
 
     @property
     def experiment(self) -> Experiment:
@@ -275,7 +283,7 @@ class ReferenceEngine:
                 new_metas.append(
                     ChannelMeta(
                         id=meta_id,
-                        name=f"Channel {index}",
+                        name=f"Channel-{index}",
                         bit_depth=bit_depth,
                         color_map=DEFAULT_COLORS[index % len(DEFAULT_COLORS)],
                         visible=True,
@@ -330,7 +338,7 @@ class ReferenceEngine:
                     id=generate_uuid(),
                     plane_id=plane.id,
                     channel_meta_id=f"channel-meta-{index}",
-                    name=f"Channel {index}",
+                    name=f"Channel-{index}",
                     dtype=dtype,
                     bit_depth=decoded.bit_depth,
                     width=width,
@@ -499,12 +507,15 @@ class ReferenceEngine:
         shared across threads; the masks are small), yielding between them
         so other requests and a cancel get through."""
         self._capture_loop()
-        ids = unmeasured_ids(self.meta, request.query, request.force)
+        ids = unmeasured_ids(self.meta, request)
         if ctx.cancelled:
             return MeasurementsComputeSummary(measured=0, cancelled=True)
-        job = self.jobs.start(JobKind.MEASUREMENTS, f"Measuring {len(ids)} objects")
+        images = request.scope.type == "images"
+        noun = "images" if images else "objects"
+        job = self.jobs.start(JobKind.MEASUREMENTS, f"Measuring {len(ids)} {noun}")
         self._run_contexts[job.id] = ctx
-        chunk_size = 200
+        # Images read whole channels, objects a box each.
+        chunk_size = 50 if images else 200
         measured = 0
         cancelled = False
         try:
@@ -512,12 +523,24 @@ class ReferenceEngine:
                 if ctx.cancelled or self.jobs.is_cancelling(job.id):
                     cancelled = True
                     break
-                updates = measure_annotations(self.meta, self.pixels, ids[start : start + chunk_size])
-                measured += len(updates)
-                if updates:
-                    self._emit(AnnotationsDidUpdate(type="annotations/didUpdate", volumes=[], annotations=updates))
+                chunk = ids[start : start + chunk_size]
+                if images:
+                    done = measure_images(self.meta, self.pixels, chunk, request.force)
+                    measured += len(done)
+                    if done:
+                        rows = self.meta.get_many("image", done, ImageObject)
+                        self._emit(
+                            ImagesDidUpdate(
+                                type="images/didUpdate", updates=[_image_update(rows[id]) for id in done if id in rows]
+                            )
+                        )
+                else:
+                    updates = measure_annotations(self.meta, self.pixels, chunk)
+                    measured += len(updates)
+                    if updates:
+                        self._emit(AnnotationsDidUpdate(type="annotations/didUpdate", volumes=[], annotations=updates))
                 percent = round(min(start + chunk_size, len(ids)) / len(ids) * 100)
-                message = f"Measured {measured}/{len(ids)} objects"
+                message = f"Measured {measured}/{len(ids)} {noun}"
                 ctx.progress(ProgressValue(percent=percent, message=message).to_wire())
                 self.jobs.update(job.id, progress=percent, message=message)
                 await asyncio.sleep(0)
@@ -529,7 +552,7 @@ class ReferenceEngine:
         self.jobs.finish(
             job.id,
             JobStatus.CANCELLED if cancelled else JobStatus.SUCCEEDED,
-            message=f"Measured {measured} objects",
+            message=f"Measured {measured} {noun}",
         )
         return MeasurementsComputeSummary(job_id=job.id, measured=measured, cancelled=cancelled)
 
