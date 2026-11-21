@@ -208,6 +208,9 @@ export class LocalBackend implements Backend {
       store: deps.store,
       images: (state, query) => this.#images(state, query),
       annotations: (state, query) => this.#annotations(state, query),
+      measurements: deps.measurements ?? (() => MeasurementsApi.getInstance()),
+      jobs: this.#jobs,
+      bus: this.#bus,
     });
   }
 

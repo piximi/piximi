@@ -705,6 +705,58 @@ export const describeBackendConformance = (
         });
       });
 
+      it("measures objects again on demand, as a job, to the same values", async () => {
+        const { backend } = ctx;
+        const { measurements, jobs, query } = backend;
+        if (!measurements || !backend.segmentation) return;
+        const kindId = await segmentedKind();
+        const [meta] = (await query.project()).channelMetas;
+        const columns = [
+          featureColumn("area"),
+          intensityColumn("mean", meta.id),
+        ];
+        const scope = { type: "objects" as const, kindId };
+        const before = await measurements.table({ scope, columns });
+        // Everything a run adds is measured already.
+        expect(
+          await measurements.compute({ query: { kindIds: [kindId] } }),
+        ).toMatchObject({ measured: 0, cancelled: false });
+        const again = await measurements.compute({
+          query: { kindIds: [kindId] },
+          force: true,
+        });
+        expect(again).toMatchObject({
+          measured: before.ids.length,
+          cancelled: false,
+        });
+        expect(again.jobId).toBeTruthy();
+        expect(
+          (await jobs.list()).find((job) => job.id === again.jobId),
+        ).toMatchObject({
+          kind: "measurements",
+          status: "succeeded",
+        });
+        const after = await measurements.table({ scope, columns });
+        expect(after.ids).toEqual(before.ids);
+        for (const column of columns) {
+          after.values[column].forEach((value, i) => {
+            const previous = before.values[column][i];
+            if (value === null || previous === null)
+              expect(value).toBe(previous);
+            else expect(value).toBeCloseTo(previous, 6);
+          });
+        }
+        // Cancelled before it starts: nothing measured, no job.
+        const controller = new AbortController();
+        controller.abort();
+        expect(
+          await measurements.compute(
+            { query: { kindIds: [kindId] }, force: true },
+            { signal: controller.signal },
+          ),
+        ).toEqual({ measured: 0, cancelled: true });
+      });
+
       it("tables the images' channel statistics and refuses what it cannot measure", async () => {
         const { backend } = ctx;
         const { measurements, query } = backend;

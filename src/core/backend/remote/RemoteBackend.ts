@@ -525,6 +525,17 @@ export class RemoteBackend implements Backend {
             { signal: options?.signal },
           ),
         ),
+      compute: async (request, options) => {
+        if (options?.signal?.aborted) return { measured: 0, cancelled: true };
+        return this.#call(
+          "measurements/compute",
+          {
+            query: asWire<P.AnnotationQuery>(request.query),
+            force: request.force ?? false,
+          },
+          { signal: options?.signal, onProgress: options?.onProgress },
+        );
+      },
     };
   }
 

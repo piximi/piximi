@@ -93,6 +93,8 @@ import type {
   ImageSort,
   MeasurementTable,
   MeasurementTableRequest,
+  MeasurementsComputeRequest,
+  MeasurementsComputeSummary,
   ImageUpdate,
   Page,
   PageRequest,
@@ -864,6 +866,57 @@ export class FakeBackend implements Backend {
         values,
         total,
       };
+    },
+
+    compute: async (
+      request: MeasurementsComputeRequest,
+      options?: CallOptions,
+    ): Promise<MeasurementsComputeSummary> => {
+      if (options?.signal?.aborted) return { measured: 0, cancelled: true };
+      const targets = this.#annotationListing(request.query)
+        .map(
+          ({ annotation }) =>
+            this.#annotations.find((a) => a.id === annotation.id)!,
+        )
+        .filter(
+          (annotation) =>
+            request.force === true ||
+            !annotation.features ||
+            !annotation.intensityMeasurements,
+        );
+      const job = this.#jobs.start(
+        "measurements",
+        `Measuring ${targets.length} objects`,
+        options?.signal,
+      );
+      // The fake's masks cover their bounding boxes, so the features follow
+      // from the box and the intensities from the plane's channels.
+      for (const annotation of targets) {
+        const [x0, y0, x1, y1] = annotation.boundingBox;
+        annotation.features = wholeImageFeatures(x1 - x0, y1 - y0);
+        annotation.intensityMeasurements = Object.fromEntries(
+          this.#channels
+            .filter((channel) => channel.planeId === annotation.planeId)
+            .flatMap((channel) => {
+              const pixels = this.#pixels.get(channel.id);
+              return pixels ? [[channel.id, intensityStatistics(pixels)]] : [];
+            }),
+        );
+      }
+      if (targets.length > 0) {
+        this.#bus.emit({
+          type: "annotations/didUpdate",
+          volumes: [],
+          annotations: targets.map((a) => ({
+            id: a.id,
+            partition: a.partition,
+          })),
+        });
+      }
+      this.#jobs.finish(job.id, "succeeded", {
+        message: `Measured ${targets.length} objects`,
+      });
+      return { jobId: job.id, measured: targets.length, cancelled: false };
     },
   };
 
