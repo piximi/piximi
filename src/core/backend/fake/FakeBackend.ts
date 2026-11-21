@@ -18,6 +18,7 @@ import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
+import { computeStatistics } from "utils/measurements/statistics";
 
 import {
   fingerprintItems,
@@ -25,6 +26,7 @@ import {
   splitForTraining,
 } from "../classification";
 import { BackendError } from "../errors";
+import { parseMeasurementColumn } from "../measurements/columns";
 import { EventBus } from "../events";
 import { JobRegistry } from "../jobs";
 import {
@@ -47,7 +49,9 @@ import type {
   Experiment,
   ImageObject,
   ImageSeries,
+  IntensityMeasurement,
   Kind,
+  ObjectFeature,
   Plane,
 } from "core/entities";
 import type {
@@ -70,6 +74,7 @@ import type {
   AnnotationUpdate,
   Backend,
   BackendClassification,
+  BackendMeasurements,
   BackendSession,
   CallOptions,
   Changed,
@@ -86,6 +91,8 @@ import type {
   ImageQuery,
   ImageRecord,
   ImageSort,
+  MeasurementTable,
+  MeasurementTableRequest,
   ImageUpdate,
   Page,
   PageRequest,
@@ -113,6 +120,55 @@ const FAKE_ARCHITECTURE_ID = "fake-majority";
 /* An item as the fake's classifier sees it, whatever the target. */
 type Labeled = { id: string; categoryId: string; partition: Partition };
 
+/* The statistics a real backend computes, over the fake's 8-bit pixels. */
+const intensityStatistics = (
+  pixels: StoredPixels,
+): Partial<Record<IntensityMeasurement, number>> => {
+  const values = Array.from(new Uint8Array(pixels.data));
+  if (values.length < 4) return {};
+  const { mean, median, std, min, max, lowerQuartile, upperQuartile } =
+    computeStatistics(values);
+  const mad = computeStatistics(
+    values.map((value) => Math.abs(value - median)),
+  ).median;
+  return {
+    maxValue: max,
+    minValue: min,
+    total: values.reduce((sum, value) => sum + value, 0),
+    mean,
+    median,
+    std,
+    mad,
+    lowerQuartile,
+    upperQuartile,
+  };
+};
+
+/* The shape features of a mask covering the whole image. */
+const wholeImageFeatures = (
+  width: number,
+  height: number,
+): Partial<Record<ObjectFeature, number>> => {
+  const area = width * height;
+  const perimeter = 2 * (width + height);
+  const eqpc = 2 * Math.sqrt(area / Math.PI);
+  const ped = perimeter / Math.PI;
+  const sphericity = eqpc / ped;
+  return {
+    area,
+    bboxArea: area,
+    extent: 1,
+    perimeter,
+    eqpc,
+    ped,
+    sphericity,
+    radius: ped / 2,
+    compactness: 1 / sphericity,
+    comX: (width - 1) / 2,
+    comY: (height - 1) / 2,
+  };
+};
+
 /*
  * A complete in-memory backend with no workers, no IndexedDB and no models,
  * for exercising everything above the Backend interface: the conformance
@@ -127,6 +183,7 @@ export class FakeBackend implements Backend {
     "segmentation",
     "classification",
     "classification.train",
+    "measurements",
   ];
   readonly session: BackendSession = {
     id: generateUUID(),
@@ -206,12 +263,13 @@ export class FakeBackend implements Backend {
       for (let i = 0; i < data.length; i++) {
         data[i] = (Math.floor(((i % width) / width) * 255) + c * 64) % 256;
       }
-      this.#pixels.set(channelId, {
+      const pixels: StoredPixels = {
         data: data.buffer,
         width,
         height,
         bitDepth: 8,
-      });
+      };
+      this.#pixels.set(channelId, pixels);
       this.#channels.push({
         id: channelId,
         planeId,
@@ -221,6 +279,7 @@ export class FakeBackend implements Backend {
         bitDepth: 8,
         width,
         height,
+        ...intensityStatistics(pixels),
         minValue: 0,
         maxValue: 255,
         storageReference: {
@@ -707,6 +766,107 @@ export class FakeBackend implements Backend {
     },
   };
 
+  // ── Measurements ───────────────────────────────────────────────────────────
+
+  readonly measurements: BackendMeasurements = {
+    table: async (
+      request: MeasurementTableRequest,
+    ): Promise<MeasurementTable> => {
+      const columns = request.columns.map((key) => ({
+        key,
+        column: parseMeasurementColumn(key),
+      }));
+      const channelOf = (planeId: string, channelMetaId: string) =>
+        this.#channels.find(
+          (channel) =>
+            channel.planeId === planeId &&
+            channel.channelMetaId === channelMetaId,
+        );
+      const values: MeasurementTable["values"] = {};
+      const window = <T>(rows: T[]) =>
+        request.page
+          ? paginate(rows, request.page)
+          : { items: rows, total: rows.length };
+
+      if (request.scope.type === "images") {
+        if (columns.some(({ column }) => column.kind === "feature")) {
+          throw new BackendError(
+            "NOT_SUPPORTED",
+            "Images have no shape features; ask for intensity columns",
+          );
+        }
+        const { items, total } = window(
+          this.#imageListing(request.imageQuery ?? {}),
+        );
+        for (const { key, column } of columns) {
+          if (column.kind !== "intensity") continue;
+          values[key] = items.map(
+            (image) =>
+              channelOf(image.activePlaneId, column.channelMetaId)?.[
+                column.measurement
+              ] ?? null,
+          );
+        }
+        return {
+          ids: items.map((image) => image.id),
+          imageNames: items.map((image) => image.name),
+          categoryIds: items.map((image) => image.categoryId),
+          partitions: items.map((image) => image.partition),
+          timepoints: items.map((image) => image.timepoint),
+          values,
+          total,
+        };
+      }
+
+      const { kindId } = request.scope;
+      if (!kindId) {
+        throw new BackendError(
+          "NOT_SUPPORTED",
+          "An objects scope names its kind",
+        );
+      }
+      const query = request.annotationQuery ?? {};
+      const kindIds = query.kindIds
+        ? query.kindIds.filter((id) => id === kindId)
+        : [kindId];
+      const { items, total } = window(
+        this.#annotationListing({ ...query, kindIds }),
+      );
+      const imageOf = (id: string) => this.#images.find((im) => im.id === id);
+      for (const { key, column } of columns) {
+        values[key] = items.map(({ annotation }) => {
+          const entity = this.#annotations.find((a) => a.id === annotation.id);
+          if (column.kind === "feature") {
+            return entity?.features?.[column.feature] ?? null;
+          }
+          const channel = channelOf(annotation.planeId, column.channelMetaId);
+          return (
+            (channel &&
+              entity?.intensityMeasurements?.[channel.id]?.[
+                column.measurement
+              ]) ??
+            null
+          );
+        });
+      }
+      return {
+        ids: items.map(({ annotation }) => annotation.id),
+        imageIds: items.map(({ annotation }) => annotation.imageId),
+        imageNames: items.map(
+          ({ annotation }) => imageOf(annotation.imageId)?.name ?? "",
+        ),
+        categoryIds: items.map(({ volume }) => volume.categoryId),
+        partitions: items.map(({ annotation }) => annotation.partition),
+        timepoints: items.map(
+          ({ annotation }) => imageOf(annotation.imageId)?.timepoint ?? 0,
+        ),
+        boundingBoxes: items.map(({ annotation }) => annotation.boundingBox),
+        values,
+        total,
+      };
+    },
+  };
+
   // ── Jobs ───────────────────────────────────────────────────────────────────
 
   readonly jobs = {
@@ -832,6 +992,17 @@ export class FakeBackend implements Backend {
           boundingBox: [0, 0, width, height],
           // Binary RLE starting with background: no background, all foreground.
           encodedMask: [0, width * height],
+          features: wholeImageFeatures(width, height),
+          intensityMeasurements: Object.fromEntries(
+            this.#channels
+              .filter((channel) => channel.planeId === image.activePlaneId)
+              .flatMap((channel) => {
+                const pixels = this.#pixels.get(channel.id);
+                return pixels
+                  ? [[channel.id, intensityStatistics(pixels)]]
+                  : [];
+              }),
+          ),
         });
       }
 

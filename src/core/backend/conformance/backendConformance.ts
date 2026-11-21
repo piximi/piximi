@@ -11,6 +11,7 @@ import { getDefaultModelParams } from "core/dl/classification/utils";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { hasCapability } from "../capabilities";
+import { featureColumn, intensityColumn } from "../measurements/columns";
 import { randomKey } from "../query";
 
 import type { BackendEvent } from "../events";
@@ -97,6 +98,9 @@ export const describeBackendConformance = (
           typeof backend.classification?.importFromUrl === "function",
         ).toBe(
           hasCapability(backend.capabilities, "classification.import-url"),
+        );
+        expect(backend.measurements !== undefined).toBe(
+          hasCapability(backend.capabilities, "measurements"),
         );
       });
     });
@@ -597,6 +601,159 @@ export const describeBackendConformance = (
         expect(
           (await query.masks([first.annotation.id]))[first.annotation.id],
         ).toEqual(mask);
+      });
+    });
+
+    describe("measurements", () => {
+      /* Objects to table: whatever a segmenter has found, or finds now. */
+      const segmentedKind = async (): Promise<string> => {
+        const { backend } = ctx;
+        const counts = await backend.query.annotationCounts({}, "kind");
+        const [existing] = Object.keys(counts.groups ?? {});
+        if (existing) return existing;
+        const [model] = await backend.segmentation!.listModels();
+        await backend.segmentation!.run({
+          modelId: model.name,
+          imageIds: ctx.images.map((im) => im.id),
+          channelMetaIds: [],
+          kindName: `Measured-${Date.now()}`,
+        });
+        const after = await backend.query.annotationCounts({}, "kind");
+        return Object.keys(after.groups ?? {})[0];
+      };
+
+      it("tables the objects of a kind by column key, paged and filtered", async () => {
+        const { backend } = ctx;
+        const { measurements, query } = backend;
+        if (!measurements || !backend.segmentation) return;
+        const kindId = await segmentedKind();
+        const [meta] = (await query.project()).channelMetas;
+        const [area, mean, none] = [
+          featureColumn("area"),
+          intensityColumn("mean", meta.id),
+          intensityColumn("mean", "no-such-meta"),
+        ];
+        const scope = { type: "objects" as const, kindId };
+        const table = await measurements.table({
+          scope,
+          columns: [area, mean, none],
+        });
+        const listed = await query.annotations(
+          { kindIds: [kindId] },
+          { limit: 1000 },
+        );
+        expect(table.total).toBe(listed.total);
+        expect(table.ids).toHaveLength(listed.total);
+        expect(table.ids.length).toBeGreaterThan(0);
+        const byId = new Map(listed.items.map((r) => [r.annotation.id, r]));
+        const images = new Map(
+          (await query.images({}, { limit: 1000 })).items.map((r) => [
+            r.image.id,
+            r.image,
+          ]),
+        );
+        table.ids.forEach((id, i) => {
+          const record = byId.get(id)!;
+          expect(record).toBeDefined();
+          expect(table.imageIds?.[i]).toBe(record.annotation.imageId);
+          expect(table.imageNames[i]).toBe(
+            images.get(record.annotation.imageId)!.name,
+          );
+          expect(table.categoryIds[i]).toBe(record.volume.categoryId);
+          expect(table.partitions[i]).toBe(record.annotation.partition);
+          expect(table.boundingBoxes?.[i]).toEqual(
+            record.annotation.boundingBox,
+          );
+          const [x0, y0, x1, y1] = record.annotation.boundingBox;
+          const value = table.values[area][i];
+          expect(value).toBeGreaterThan(0);
+          expect(value).toBeLessThanOrEqual((x1 - x0) * (y1 - y0));
+          const intensity = table.values[mean][i];
+          expect(intensity === null || Number.isFinite(intensity)).toBe(true);
+          // A meta no plane has is a column of nothing, not an error.
+          expect(table.values[none][i]).toBeNull();
+        });
+
+        // A page is a window of the same rows; a query narrows them within the kind.
+        const page = await measurements.table({
+          scope,
+          columns: [area],
+          page: { offset: 1, limit: 2 },
+        });
+        expect(page.total).toBe(table.total);
+        expect(page.ids).toEqual(table.ids.slice(1, 3));
+        expect(page.values[area]).toEqual(table.values[area].slice(1, 3));
+        const [first] = ctx.images;
+        const onFirst = await measurements.table({
+          scope,
+          columns: [area],
+          annotationQuery: { imageIds: [first.id] },
+        });
+        expect(onFirst.ids).toEqual(
+          table.ids.filter((_, i) => table.imageIds?.[i] === first.id),
+        );
+        expect(onFirst.total).toBe(onFirst.ids.length);
+        const elsewhere = await measurements.table({
+          scope,
+          columns: [area],
+          annotationQuery: { kindIds: ["some-other-kind"] },
+        });
+        expect(elsewhere).toMatchObject({
+          ids: [],
+          total: 0,
+          values: { [area]: [] },
+        });
+      });
+
+      it("tables the images' channel statistics and refuses what it cannot measure", async () => {
+        const { backend } = ctx;
+        const { measurements, query } = backend;
+        if (!measurements) return;
+        const [meta] = (await query.project()).channelMetas;
+        const column = intensityColumn("mean", meta.id);
+        const table = await measurements.table({
+          scope: { type: "images" },
+          columns: [column],
+        });
+        const listed = (await query.images({}, { limit: 1000 })).items;
+        expect(table.total).toBe(listed.length);
+        expect(table.ids).toEqual(listed.map((r) => r.image.id));
+        expect(table.imageIds).toBeUndefined();
+        expect(table.boundingBoxes).toBeUndefined();
+        listed.forEach((record, i) => {
+          expect(table.imageNames[i]).toBe(record.image.name);
+          expect(table.categoryIds[i]).toBe(record.image.categoryId);
+          expect(table.partitions[i]).toBe(record.image.partition);
+          const channel = record.channels.find(
+            (c) =>
+              c.planeId === record.image.activePlaneId &&
+              c.channelMetaId === meta.id,
+          );
+          expect(table.values[column][i]).toBe(channel?.mean ?? null);
+        });
+        const only = await measurements.table({
+          scope: { type: "images" },
+          columns: [column],
+          imageQuery: { ids: [listed[1].image.id] },
+        });
+        expect(only.ids).toEqual([listed[1].image.id]);
+        expect(only.total).toBe(1);
+
+        for (const request of [
+          { scope: { type: "images" as const }, columns: ["bogus"] },
+          {
+            scope: { type: "images" as const },
+            columns: [featureColumn("area")],
+          },
+          {
+            scope: { type: "objects" as const },
+            columns: [featureColumn("area")],
+          },
+        ]) {
+          await expect(measurements.table(request)).rejects.toMatchObject({
+            code: "NOT_SUPPORTED",
+          });
+        }
       });
     });
 

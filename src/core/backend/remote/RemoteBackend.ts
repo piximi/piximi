@@ -33,6 +33,7 @@ import type {
   AnnotationUpdate,
   Backend,
   BackendClassification,
+  BackendMeasurements,
   BackendSegmentation,
   BackendSession,
   CallOptions,
@@ -51,6 +52,7 @@ import type {
   ImageQuery,
   ImageRecord,
   ImageSort,
+  MeasurementTable,
   ImageUpdate,
   ModelDescriptor,
   Page,
@@ -134,6 +136,7 @@ export class RemoteBackend implements Backend {
   session: BackendSession = { id: "", protocolVersion: PROTOCOL_VERSION };
   segmentation?: BackendSegmentation;
   classification?: BackendClassification;
+  measurements?: BackendMeasurements;
 
   readonly #peer: RpcPeer;
   readonly #bus = new EventBus();
@@ -278,6 +281,9 @@ export class RemoteBackend implements Backend {
       : undefined;
     this.classification = hasCapability(this.capabilities, "classification")
       ? this.#classification()
+      : undefined;
+    this.measurements = hasCapability(this.capabilities, "measurements")
+      ? this.#measurements()
       : undefined;
     this.#peer.notify("initialized");
   }
@@ -500,6 +506,27 @@ export class RemoteBackend implements Backend {
   };
 
   // ── Segmentation ───────────────────────────────────────────────────────────
+
+  #measurements(): BackendMeasurements {
+    return {
+      table: async (request, options) =>
+        asDomain<MeasurementTable>(
+          await this.#call(
+            "measurements/table",
+            {
+              scope: request.scope,
+              columns: request.columns,
+              imageQuery: asWire<P.ImageQuery | undefined>(request.imageQuery),
+              annotationQuery: asWire<P.AnnotationQuery | undefined>(
+                request.annotationQuery,
+              ),
+              page: request.page,
+            },
+            { signal: options?.signal },
+          ),
+        ),
+    };
+  }
 
   #segmentation(): BackendSegmentation {
     return {

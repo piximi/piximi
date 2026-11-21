@@ -28,6 +28,7 @@ import {
   sortImages,
 } from "../query";
 import { LocalClassification } from "./LocalClassification";
+import { LocalMeasurements } from "./LocalMeasurements";
 import { LocalSegmentation } from "./LocalSegmentation";
 import { ThumbnailWorkerPool } from "./ThumbnailWorkerPool";
 import { imageUpdate, volumeUpdate } from "./updates";
@@ -50,6 +51,7 @@ import type {
   Backend,
   BackendSegmentation,
   BackendClassification,
+  BackendMeasurements,
   BackendSession,
   CallOptions,
   Changed,
@@ -150,6 +152,7 @@ export class LocalBackend implements Backend {
   readonly #jobs = new JobRegistry(this.#bus);
   readonly segmentation: BackendSegmentation;
   readonly classification: BackendClassification;
+  readonly measurements: BackendMeasurements;
 
   readonly #imageRows = new Derived((images: DataState["images"]) =>
     images.ids.map((id) => images.entities[id]),
@@ -200,6 +203,11 @@ export class LocalBackend implements Backend {
       classifier: deps.classifier ?? getClassifierApi,
       jobs: this.#jobs,
       bus: this.#bus,
+    });
+    this.measurements = new LocalMeasurements({
+      store: deps.store,
+      images: (state, query) => this.#images(state, query),
+      annotations: (state, query) => this.#annotations(state, query),
     });
   }
 

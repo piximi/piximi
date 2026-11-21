@@ -290,6 +290,15 @@ const seed: ImageSeed[] = [
 
 const channelId = (imageId: string, c: number) => `${imageId}-ch${c}`;
 
+/* The pixel pattern `makeStorageInput` writes, as the loader would describe it. */
+const pixelValue = (i: number, c: number) => (i * 37 + c * 64) % 256;
+const channelMean = (im: ImageSeed, c: number) => {
+  const count = im.width * im.height;
+  let sum = 0;
+  for (let i = 0; i < count; i++) sum += pixelValue(i, c);
+  return sum / count;
+};
+
 const makeChannel = (im: ImageSeed, c: number): Channel => ({
   id: channelId(im.id, c),
   planeId: `${im.id}-plane`,
@@ -301,6 +310,7 @@ const makeChannel = (im: ImageSeed, c: number): Channel => ({
   height: im.height,
   minValue: 0,
   maxValue: 255,
+  mean: channelMean(im, c),
   storageReference: {
     storageId: channelId(im.id, c),
     storeName: STORES.CHANNEL_DATA,
@@ -314,7 +324,7 @@ const makeChannel = (im: ImageSeed, c: number): Channel => ({
 const makeStorageInput = (im: ImageSeed, c: number): ChannelStorageInput => {
   const { storageReference: _ref, ...channel } = makeChannel(im, c);
   const data = new Uint8Array(im.width * im.height);
-  for (let i = 0; i < data.length; i++) data[i] = (i * 37 + c * 64) % 256;
+  for (let i = 0; i < data.length; i++) data[i] = pixelValue(i, c);
   return { ...channel, data: data.buffer, histogram: new Uint8Array(1).buffer };
 };
 
