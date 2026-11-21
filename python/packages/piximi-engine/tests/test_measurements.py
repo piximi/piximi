@@ -188,7 +188,7 @@ async def test_compute_measures_what_lacks_values(engine: ReferenceEngine):
     progress = []
 
     summary = await engine.measurements_compute(
-        MeasurementsComputeRequest(query=AnnotationQuery(kind_ids=[kind_id])), HandlerContext(progress.append)
+        MeasurementsComputeRequest(scope=MeasurementScope(type="objects", kind_id=kind_id)), HandlerContext(progress.append)
     )
     assert summary.measured == 1 and summary.cancelled is False and summary.job_id
     assert progress[-1]["percent"] == 100
@@ -209,9 +209,57 @@ async def test_compute_measures_what_lacks_values(engine: ReferenceEngine):
     assert (await engine.annotation_counts(AnnotationQuery(category_ids=[volume.category_id]))).total >= 1
 
     # Nothing is left to measure, unless asked to measure everything again.
-    assert (await engine.measurements_compute(MeasurementsComputeRequest(query=AnnotationQuery(kind_ids=[kind_id])), HandlerContext(None))).measured == 0
+    assert (
+        await engine.measurements_compute(
+            MeasurementsComputeRequest(scope=MeasurementScope(type="objects", kind_id=kind_id)), HandlerContext(None)
+        )
+    ).measured == 0
     forced = await engine.measurements_compute(
-        MeasurementsComputeRequest(query=AnnotationQuery(kind_ids=[kind_id]), force=True), HandlerContext(None)
+        MeasurementsComputeRequest(scope=MeasurementScope(type="objects", kind_id=kind_id), force=True),
+        HandlerContext(None),
     )
     assert forced.measured == listed.total + 1
     assert (await engine.measurement_table(objects(kind_id, columns=[AREA]))).values[AREA] == table.values[AREA]
+
+
+async def test_compute_fills_image_statistics(engine: ReferenceEngine):
+    """A store from before ingest kept every statistic has only max, min and
+    mean on its channels; the images scope fills the rest from the pixels."""
+    listed = (await engine.images(ImageQuery(), None, PageRequest(limit=100))).items
+    stale = listed[1]
+    engine.meta.execute(
+        "UPDATE entities SET data = json_remove(data, '$.total', '$.median', '$.std', '$.mad', '$.lowerQuartile', "
+        "'$.upperQuartile') WHERE kind = 'channel' AND plane_id IN "
+        f"({', '.join('?' * len(stale.planes))})",
+        [plane.id for plane in stale.planes],
+    )
+    before = await engine.measurement_table(images(columns=[MEAN_0, MEDIAN_0]))
+    at = {id: i for i, id in enumerate(before.ids)}
+    assert before.values[MEDIAN_0][at[stale.image.id]] is None
+    assert before.values[MEAN_0][at[stale.image.id]] is not None
+    events = []
+    engine.subscribe(events.append)
+
+    summary = await engine.measurements_compute(
+        MeasurementsComputeRequest(scope=MeasurementScope(type="images")), HandlerContext(None)
+    )
+    assert summary.measured == 1 and summary.cancelled is False
+    updated = [event for event in events if event.type == "images/didUpdate"]
+    assert [update.id for event in updated for update in event.updates] == [stale.image.id]
+    after = await engine.measurement_table(images(columns=[MEAN_0, MEDIAN_0]))
+    assert after.values[MEDIAN_0][at[stale.image.id]] is not None
+    assert after.values[MEAN_0] == before.values[MEAN_0]
+    # Nothing left; `force` measures every image, a query only some.
+    assert (
+        await engine.measurements_compute(MeasurementsComputeRequest(scope=MeasurementScope(type="images")), HandlerContext(None))
+    ).measured == 0
+    forced = await engine.measurements_compute(
+        MeasurementsComputeRequest(scope=MeasurementScope(type="images"), force=True), HandlerContext(None)
+    )
+    assert forced.measured == len(listed)
+    one = await engine.measurements_compute(
+        MeasurementsComputeRequest(scope=MeasurementScope(type="images"), image_query=ImageQuery(ids=[stale.image.id]), force=True),
+        HandlerContext(None),
+    )
+    assert one.measured == 1
+    assert (await engine.measurement_table(images(columns=[MEDIAN_0]))).values[MEDIAN_0] == after.values[MEDIAN_0]

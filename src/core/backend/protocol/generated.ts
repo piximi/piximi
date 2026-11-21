@@ -1483,7 +1483,9 @@ export interface TablePageRequest {
  * via the `definition` "MeasurementsComputeParams".
  */
 export interface MeasurementsComputeParams {
-  query: AnnotationQuery;
+  scope: MeasurementScope;
+  annotationQuery?: AnnotationQuery;
+  imageQuery?: ImageQuery;
   force?: boolean;
   progressToken?: string;
 }

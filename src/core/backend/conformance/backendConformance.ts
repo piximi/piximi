@@ -718,13 +718,11 @@ export const describeBackendConformance = (
         const scope = { type: "objects" as const, kindId };
         const before = await measurements.table({ scope, columns });
         // Everything a run adds is measured already.
-        expect(
-          await measurements.compute({ query: { kindIds: [kindId] } }),
-        ).toMatchObject({ measured: 0, cancelled: false });
-        const again = await measurements.compute({
-          query: { kindIds: [kindId] },
-          force: true,
+        expect(await measurements.compute({ scope })).toMatchObject({
+          measured: 0,
+          cancelled: false,
         });
+        const again = await measurements.compute({ scope, force: true });
         expect(again).toMatchObject({
           measured: before.ids.length,
           cancelled: false,
@@ -751,10 +749,44 @@ export const describeBackendConformance = (
         controller.abort();
         expect(
           await measurements.compute(
-            { query: { kindIds: [kindId] }, force: true },
+            { scope, force: true },
             { signal: controller.signal },
           ),
         ).toEqual({ measured: 0, cancelled: true });
+      });
+
+      it("measures the images' channel statistics again on demand", async () => {
+        const { backend } = ctx;
+        const { measurements, query } = backend;
+        if (!measurements) return;
+        const [meta] = (await query.project()).channelMetas;
+        const column = intensityColumn("mean", meta.id);
+        const scope = { type: "images" as const };
+        const before = await measurements.table({ scope, columns: [column] });
+        // Every image comes with its statistics; a query narrows a forced pass.
+        expect(await measurements.compute({ scope })).toMatchObject({
+          measured: 0,
+          cancelled: false,
+        });
+        const again = await measurements.compute({ scope, force: true });
+        expect(again).toMatchObject({
+          measured: before.ids.length,
+          cancelled: false,
+        });
+        const after = await measurements.table({ scope, columns: [column] });
+        after.values[column].forEach((value, i) => {
+          const previous = before.values[column][i];
+          if (value === null || previous === null) expect(value).toBe(previous);
+          else expect(value).toBeCloseTo(previous, 6);
+        });
+        const [first] = ctx.images;
+        expect(
+          await measurements.compute({
+            scope,
+            imageQuery: { ids: [first.id] },
+            force: true,
+          }),
+        ).toMatchObject({ measured: 1, cancelled: false });
       });
 
       it("tables the images' channel statistics and refuses what it cannot measure", async () => {

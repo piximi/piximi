@@ -998,6 +998,20 @@ export const dataSlice = createSlice({
       });
       annotationVolumeAdapter.updateMany(state.annotationVolumes, updates);
     },
+    /* The statistics a backend computed over a channel's pixels. */
+    updateChannelStatistics(
+      state,
+      action: PayloadAction<{
+        id: string;
+        statistics: Partial<Record<IntensityMeasurement, number>>;
+      }>,
+    ) {
+      if (!state.channels.entities[action.payload.id]) return;
+      channelAdapter.updateOne(state.channels, {
+        id: action.payload.id,
+        changes: action.payload.statistics,
+      });
+    },
     updateChannelMeta(
       state,
       action: PayloadAction<{

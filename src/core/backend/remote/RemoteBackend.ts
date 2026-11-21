@@ -530,7 +530,11 @@ export class RemoteBackend implements Backend {
         return this.#call(
           "measurements/compute",
           {
-            query: asWire<P.AnnotationQuery>(request.query),
+            scope: request.scope,
+            annotationQuery: asWire<P.AnnotationQuery | undefined>(
+              request.annotationQuery,
+            ),
+            imageQuery: asWire<P.ImageQuery | undefined>(request.imageQuery),
             force: request.force ?? false,
           },
           { signal: options?.signal, onProgress: options?.onProgress },

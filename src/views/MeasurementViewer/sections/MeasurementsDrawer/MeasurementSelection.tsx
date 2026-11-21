@@ -14,18 +14,14 @@ import type {
   ObjectMeasurementGroup,
 } from "@MeasurementViewer/types";
 
-/* Objects whose selected shape features the backend has no value for. */
+/* Entities the backend has no value for in some selected measurement. */
 const useUnmeasuredCount = (): number => {
   const { table, columns } = useMeasurementTable();
   return useMemo(() => {
-    if (!table) return 0;
-    const keys = columns
-      .filter(({ key }) => key.startsWith("feature:"))
-      .map(({ key }) => key);
-    if (keys.length === 0) return 0;
+    if (!table || columns.length === 0) return 0;
     let count = 0;
     for (let i = 0; i < table.ids.length; i++) {
-      if (keys.some((key) => table.values[key]?.[i] === null)) count++;
+      if (columns.some(({ key }) => table.values[key]?.[i] === null)) count++;
     }
     return count;
   }, [table, columns]);
@@ -43,12 +39,14 @@ export const MeasurementSelection = ({
   // The job's progress shows in the task toasts; the table follows the
   // backend's announcement once the objects are measured.
   const measure = () => {
-    if (!isObjectGroup || !backend.measurements) return;
+    if (!backend.measurements) return;
     backend.measurements
-      .compute({ query: { kindIds: [group.kind] } })
-      .catch((error) =>
-        console.error("[MeasurementSelection] measure objects", error),
-      );
+      .compute({
+        scope: isObjectGroup
+          ? { type: "objects", kindId: group.kind }
+          : { type: "images" },
+      })
+      .catch((error) => console.error("[MeasurementSelection] measure", error));
   };
 
   return (
@@ -76,7 +74,7 @@ export const MeasurementSelection = ({
       </Box>
       {isObjectGroup && <ComputedObjectMeasurementOptions group={group} />}
       <IntensityMeasurementOptions group={group} />
-      {isObjectGroup && unmeasured > 0 && backend.measurements && (
+      {unmeasured > 0 && backend.measurements && (
         <Box
           data-testid="unmeasured-objects"
           sx={{
@@ -90,8 +88,8 @@ export const MeasurementSelection = ({
           }}
         >
           <Typography variant="caption">
-            {unmeasured} {unmeasured === 1 ? "object has" : "objects have"} no
-            measurements
+            {unmeasured} {isObjectGroup ? "object" : "image"}
+            {unmeasured === 1 ? " has" : "s have"} missing measurements
           </Typography>
           <Button size="small" onClick={measure}>
             Measure

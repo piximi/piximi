@@ -218,7 +218,7 @@ export class FakeBackend implements Backend {
     for (let c = 0; c < channelCount; c++) {
       this.#channelMetas.push({
         id: `meta-${c}`,
-        name: `Channel ${c}`,
+        name: `Channel-${c}`,
         bitDepth: 8,
         colorMap: [c === 0 ? 1 : 0, c === 1 ? 1 : 0, c >= 2 ? 1 : 0],
         visible: true,
@@ -276,7 +276,7 @@ export class FakeBackend implements Backend {
         id: channelId,
         planeId,
         channelMetaId: `meta-${c}`,
-        name: `Channel ${c}`,
+        name: `Channel-${c}`,
         dtype: "uint8",
         bitDepth: 8,
         width,
@@ -873,7 +873,65 @@ export class FakeBackend implements Backend {
       options?: CallOptions,
     ): Promise<MeasurementsComputeSummary> => {
       if (options?.signal?.aborted) return { measured: 0, cancelled: true };
-      const targets = this.#annotationListing(request.query)
+      if (request.scope.type === "images") {
+        const lacking = (channel: Channel) =>
+          request.force === true || channel.median === undefined;
+        const targets = this.#imageListing(request.imageQuery ?? {}).filter(
+          (image) =>
+            this.#channels.some(
+              (channel) =>
+                this.#planes.some(
+                  (plane) =>
+                    plane.imageId === image.id && plane.id === channel.planeId,
+                ) && lacking(channel),
+            ),
+        );
+        const job = this.#jobs.start(
+          "measurements",
+          `Measuring ${targets.length} images`,
+          options?.signal,
+        );
+        for (const image of targets) {
+          for (const plane of this.#planes.filter(
+            (p) => p.imageId === image.id,
+          )) {
+            for (const channel of this.#channels.filter(
+              (c) => c.planeId === plane.id && lacking(c),
+            )) {
+              const pixels = this.#pixels.get(channel.id);
+              if (pixels) Object.assign(channel, intensityStatistics(pixels));
+            }
+          }
+        }
+        if (targets.length > 0) {
+          this.#bus.emit({
+            type: "images/didUpdate",
+            updates: targets.map((image) => ({
+              id: image.id,
+              categoryId: image.categoryId,
+              partition: image.partition,
+            })),
+          });
+        }
+        this.#jobs.finish(job.id, "succeeded", {
+          message: `Measured ${targets.length} images`,
+        });
+        return { jobId: job.id, measured: targets.length, cancelled: false };
+      }
+      const { kindId } = request.scope;
+      if (!kindId) {
+        throw new BackendError(
+          "NOT_SUPPORTED",
+          "An objects scope names its kind",
+        );
+      }
+      const query = request.annotationQuery ?? {};
+      const targets = this.#annotationListing({
+        ...query,
+        kindIds: query.kindIds
+          ? query.kindIds.filter((id) => id === kindId)
+          : [kindId],
+      })
         .map(
           ({ annotation }) =>
             this.#annotations.find((a) => a.id === annotation.id)!,

@@ -2573,8 +2573,14 @@
     "MeasurementsComputeParams": {
       "additionalProperties": false,
       "properties": {
-        "query": {
+        "scope": {
+          "$ref": "#/$defs/MeasurementScope"
+        },
+        "annotationQuery": {
           "$ref": "#/$defs/AnnotationQuery"
+        },
+        "imageQuery": {
+          "$ref": "#/$defs/ImageQuery"
         },
         "force": {
           "default": false,
@@ -2585,7 +2591,7 @@
         }
       },
       "required": [
-        "query"
+        "scope"
       ],
       "title": "MeasurementsComputeParams",
       "type": "object"

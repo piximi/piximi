@@ -14,10 +14,11 @@ from collections.abc import Iterator, Sequence
 from typing import Any
 
 from piximi_link.errors import BackendError
-from piximi_schema.entities import AnnotationObject, AnnotationVolume, Channel, Partition
 from piximi_schema.classification import AnnotationUpdate
+from piximi_schema.entities import AnnotationObject, AnnotationVolume, Channel, Partition, Plane
 from piximi_schema.measurements import (
     MeasurementColumn,
+    MeasurementsComputeRequest,
     MeasurementTable,
     MeasurementTableRequest,
     TablePageRequest,
@@ -25,7 +26,7 @@ from piximi_schema.measurements import (
 )
 from piximi_schema.query import AnnotationQuery, ImageQuery
 
-from .measure import intensity_measurements, object_features
+from .measure import channel_statistics, intensity_measurements, object_features
 from .query import annotation_clauses, image_clauses
 from .rle import decode_mask
 from .store import Clause, MetaStore, PixelStore, annotation_index
@@ -174,13 +175,54 @@ _UNMEASURED = Clause(
 )
 
 
-def unmeasured_ids(meta: MetaStore, query: AnnotationQuery, force: bool) -> list[str]:
-    """The matching objects that lack features or intensities, or all of
-    them with ``force``, in insertion order."""
-    where = annotation_clauses(query)
-    if not force:
+_UNMEASURED_IMAGE = Clause(
+    "EXISTS (SELECT 1 FROM entities p JOIN entities c ON c.kind = 'channel' AND c.plane_id = p.id "
+    "WHERE p.kind = 'plane' AND p.image_id = e.id AND json_extract(c.data, '$.median') IS NULL)"
+)
+
+
+def unmeasured_ids(meta: MetaStore, request: MeasurementsComputeRequest) -> list[str]:
+    """The scope's entities that lack values (an object its features or
+    intensities, an image any channel's statistics), or all of them with
+    ``force``, in insertion order."""
+    if request.scope.type == "images":
+        where = image_clauses(request.image_query or ImageQuery())
+        if not request.force:
+            where = [*where, _UNMEASURED_IMAGE]
+        return meta.select_ids("image", where=where)
+    if request.scope.kind_id is None:
+        raise BackendError("NOT_SUPPORTED", "An objects scope names its kind")
+    query = request.annotation_query or AnnotationQuery()
+    kind_ids = (
+        [request.scope.kind_id]
+        if query.kind_ids is None
+        else [id for id in query.kind_ids if id == request.scope.kind_id]
+    )
+    where = annotation_clauses(query.model_copy(update={"kind_ids": kind_ids}))
+    if not request.force:
         where = [*where, _UNMEASURED]
     return meta.select_ids("annotation", where=where)
+
+
+def measure_images(meta: MetaStore, pixels: PixelStore, ids: Sequence[str], force: bool) -> list[str]:
+    """Computes the statistics of the channels of ``ids``' planes that lack
+    them (every channel with ``force``) from their pixels and rewrites the
+    channel rows; returns the images touched."""
+    planes = meta.list("plane", Plane, parents=list(ids))
+    channels = meta.list("channel", Channel, parents=[plane.id for plane in planes])
+    image_of = {plane.id: plane.image_id for plane in planes}
+    measured: list[Channel] = []
+    touched: set[str] = set()
+    for channel in channels:
+        if not force and channel.median is not None:
+            continue
+        measured.append(
+            Channel.model_validate({**channel.model_dump(by_alias=False), **channel_statistics(pixels.get(channel.id))})
+        )
+        touched.add(image_of[channel.plane_id])
+    if measured:
+        meta.update_many("channel", measured)
+    return [id for id in ids if id in touched]
 
 
 def measure_annotations(meta: MetaStore, pixels: PixelStore, ids: Sequence[str]) -> list[AnnotationUpdate]:

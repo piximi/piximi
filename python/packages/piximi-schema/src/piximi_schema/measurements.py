@@ -96,11 +96,16 @@ class MeasurementTable(WireModel):
 
 
 class MeasurementsComputeRequest(WireModel):
-    """Measures objects that lack values (every feature and intensity is
-    computed from the stored mask and pixels), or all of them with
-    ``force``; runs as a ``measurements`` job."""
+    """Measures what lacks values, or everything with ``force``, as a
+    ``measurements`` job. An objects scope computes each object's features
+    and intensities from its stored mask and pixels; an images scope
+    computes the statistics of every channel of each image's planes."""
 
-    query: AnnotationQuery
+    scope: MeasurementScope
+    annotation_query: AnnotationQuery | None = None
+    """Restricts an ``objects`` scope, within its kind."""
+    image_query: ImageQuery | None = None
+    """Restricts an ``images`` scope."""
     force: bool = False
 
 
@@ -108,4 +113,5 @@ class MeasurementsComputeSummary(WireModel):
     job_id: str | None = None
     """Absent when cancelled before it started, so no job exists."""
     measured: int
+    """Objects or images measured."""
     cancelled: bool

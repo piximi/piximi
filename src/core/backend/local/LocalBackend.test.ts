@@ -20,6 +20,7 @@ import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { dataSlice } from "store/data";
 
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
+import { computeStatistics } from "utils/measurements/statistics";
 import { computeObjectIntensityMeasurements } from "utils/measurements/computeObjectIntensityMeasurements";
 
 import { describeBackendConformance } from "../conformance/backendConformance";
@@ -292,25 +293,36 @@ const channelId = (imageId: string, c: number) => `${imageId}-ch${c}`;
 
 /* The pixel pattern `makeStorageInput` writes, as the loader would describe it. */
 const pixelValue = (i: number, c: number) => (i * 37 + c * 64) % 256;
-const channelMean = (im: ImageSeed, c: number) => {
-  const count = im.width * im.height;
-  let sum = 0;
-  for (let i = 0; i < count; i++) sum += pixelValue(i, c);
-  return sum / count;
+const channelStatistics = (im: ImageSeed, c: number) => {
+  const values = Array.from({ length: im.width * im.height }, (_, i) =>
+    pixelValue(i, c),
+  );
+  const { mean, median, std, min, max, lowerQuartile, upperQuartile } =
+    computeStatistics(values);
+  return {
+    maxValue: max,
+    minValue: min,
+    total: values.reduce((sum, value) => sum + value, 0),
+    mean,
+    median,
+    std,
+    mad: computeStatistics(values.map((value) => Math.abs(value - median)))
+      .median,
+    lowerQuartile,
+    upperQuartile,
+  };
 };
 
 const makeChannel = (im: ImageSeed, c: number): Channel => ({
   id: channelId(im.id, c),
   planeId: `${im.id}-plane`,
   channelMetaId: `meta-${c}`,
-  name: `Channel ${c}`,
+  name: `Channel-${c}`,
   dtype: "uint8",
   bitDepth: 8,
   width: im.width,
   height: im.height,
-  minValue: 0,
-  maxValue: 255,
-  mean: channelMean(im, c),
+  ...channelStatistics(im, c),
   storageReference: {
     storageId: channelId(im.id, c),
     storeName: STORES.CHANNEL_DATA,
@@ -371,7 +383,7 @@ const makeProject = () => ({
   channelMetas: [0, 1].map(
     (c): ChannelMeta => ({
       id: `meta-${c}`,
-      name: `Channel ${c}`,
+      name: `Channel-${c}`,
       bitDepth: 8,
       colorMap: [c === 0 ? 1 : 0, c === 1 ? 1 : 0, 0],
       visible: true,

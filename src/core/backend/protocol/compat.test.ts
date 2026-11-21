@@ -61,6 +61,7 @@ import type {
   MeasurementScope,
   MeasurementTable,
   MeasurementTableRequest,
+  MeasurementsComputeRequest,
   MeasurementsComputeSummary,
   ImageSort,
   ImageUpdate,
@@ -244,6 +245,19 @@ type Checks = [
     >
   >,
   Assert<Equivalent<P.MeasurementsComputeSummary, MeasurementsComputeSummary>>,
+  Assert<
+    Equivalent<
+      Omit<P.MeasurementsComputeParams, "progressToken">,
+      Omit<
+        MeasurementsComputeRequest,
+        "annotationQuery" | "imageQuery" | "force"
+      > & {
+        annotationQuery?: WithPartitions<AnnotationQuery>;
+        imageQuery?: WithPartitions<ImageQuery>;
+        force?: boolean;
+      }
+    >
+  >,
   Assert<
     Equivalent<
       P.MeasurementTable,

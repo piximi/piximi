@@ -517,9 +517,16 @@ export type MeasurementTable = {
   total: number;
 };
 
+/*
+ * What to measure: the objects of a kind that lack features or intensities,
+ * or the images whose channels lack statistics; `force` measures all of them.
+ */
 export type MeasurementsComputeRequest = {
-  query: AnnotationQuery;
-  /* Measure again what already has values. */
+  scope: MeasurementScope;
+  /* Restricts an `objects` scope, within its kind. */
+  annotationQuery?: AnnotationQuery;
+  /* Restricts an `images` scope. */
+  imageQuery?: ImageQuery;
   force?: boolean;
 };
 
@@ -535,9 +542,9 @@ export interface BackendMeasurements {
     request: MeasurementTableRequest,
     options?: CallOptions,
   ): Promise<MeasurementTable>;
-  /* Measures the matching objects that lack values (every feature and
-   * intensity, from the stored mask and pixels) as a `measurements` job,
-   * announcing them as updated. */
+  /* Measures what the scope lacks (an object's features and intensities
+   * from its mask and pixels, an image's channel statistics) as a
+   * `measurements` job, announcing the entities as updated. */
   compute(
     request: MeasurementsComputeRequest,
     options?: CallOptions,
