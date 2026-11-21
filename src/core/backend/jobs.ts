@@ -7,7 +7,8 @@ export type JobKind =
   | "model-load"
   | "classifier-fit"
   | "classifier-predict"
-  | "measurements";
+  | "measurements"
+  | "ingest";
 
 export type JobStatus =
   | "queued"

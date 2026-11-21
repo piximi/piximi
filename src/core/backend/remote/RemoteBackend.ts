@@ -71,6 +71,7 @@ import type {
   SegmentationModelDescriptor,
   SegmentationRunRequest,
   SegmentationRunSummary,
+  BackendIngest,
 } from "../types";
 
 type Methods = ProtocolMethods;
@@ -144,6 +145,7 @@ export class RemoteBackend implements Backend {
   segmentation?: BackendSegmentation;
   classification?: BackendClassification;
   measurements?: BackendMeasurements;
+  ingest?: BackendIngest;
 
   readonly #peer: RpcPeer;
   readonly #bus = new EventBus();
@@ -186,6 +188,7 @@ export class RemoteBackend implements Backend {
         type: "images/didAdd",
         records: event.records.map(toImageRecord),
         channelMetas: event.channelMetas,
+        updatedChannelMetas: event.updatedChannelMetas ?? [],
       });
     });
     peer.onNotification("images/didRemove", (params) =>
@@ -318,6 +321,9 @@ export class RemoteBackend implements Backend {
       : undefined;
     this.measurements = hasCapability(this.capabilities, "measurements")
       ? this.#measurements()
+      : undefined;
+    this.ingest = hasCapability(this.capabilities, "ingest.upload")
+      ? this.#ingest()
       : undefined;
     this.#peer.notify("initialized");
   }
@@ -587,6 +593,73 @@ export class RemoteBackend implements Backend {
   };
 
   // ── Segmentation ───────────────────────────────────────────────────────────
+
+  /*
+   * One `ingest` job per batch, streamed a file at a time so neither side
+   * holds the whole batch: `open` starts the job, `put` sends a file and
+   * answers with what it became, `close` ends it. A file that fails to
+   * decode comes back in the result, not as an error, so the rest go on;
+   * a cancelled job refuses the next `put`, and the caller's signal stops
+   * sending between files.
+   */
+  #ingest(): BackendIngest {
+    return {
+      upload: async (files, options) => {
+        if (files.length === 0) {
+          return { imageIds: [], failed: [], cancelled: false };
+        }
+        const signal = options?.signal;
+        if (signal?.aborted)
+          return { imageIds: [], failed: [], cancelled: true };
+        const { uploadId } = await this.#call("ingest/open", {
+          expected: files.length,
+        });
+        let cancelled = false;
+        try {
+          for (let i = 0; i < files.length; i++) {
+            if (signal?.aborted) {
+              cancelled = true;
+              break;
+            }
+            const file = files[i];
+            options?.onProgress?.({
+              percent: (i / files.length) * 100,
+              message: `Uploading ${file.name} (${i + 1}/${files.length})`,
+            });
+            const data = new Uint8Array(
+              file.data instanceof ArrayBuffer
+                ? file.data
+                : await file.data.arrayBuffer(),
+            );
+            try {
+              await this.#call(
+                "ingest/put",
+                {
+                  uploadId,
+                  file: {
+                    name: file.name,
+                    mimeType: file.mimeType,
+                    data,
+                    dimensionConfig: file.dimensionConfig,
+                  },
+                },
+                { signal },
+              );
+            } catch (error) {
+              if (isTaskCancelledError(error) || signal?.aborted) {
+                cancelled = true;
+                break;
+              }
+              throw error;
+            }
+          }
+        } finally {
+          cancelled ||= signal?.aborted ?? false;
+        }
+        return this.#call("ingest/close", { uploadId, cancelled });
+      },
+    };
+  }
 
   #measurements(): BackendMeasurements {
     return {

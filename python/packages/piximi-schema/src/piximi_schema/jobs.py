@@ -9,6 +9,7 @@ class JobKind(StrEnum):
     CLASSIFIER_FIT = "classifier-fit"
     CLASSIFIER_PREDICT = "classifier-predict"
     MEASUREMENTS = "measurements"
+    INGEST = "ingest"
 
 
 class JobStatus(StrEnum):

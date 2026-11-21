@@ -144,6 +144,20 @@ export type RunStatus = "in-progress" | "completed" | "stopped" | "failed";
  */
 export type RunTrigger = "fresh" | "continue" | "hitl-correction" | "import";
 /**
+ * Which index varies fastest in a flat stack of 2D frames, after x and
+ * y. ``xyczt``: channel fastest, then z, then t.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "DimensionOrder".
+ */
+export type DimensionOrder =
+  | "xyczt"
+  | "xyctz"
+  | "xyzct"
+  | "xyztc"
+  | "xytcz"
+  | "xytzc";
+/**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ImageCountGroup".
  */
@@ -176,7 +190,8 @@ export type JobKind =
   | "model-load"
   | "classifier-fit"
   | "classifier-predict"
-  | "measurements";
+  | "measurements"
+  | "ingest";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "JobStatus".
@@ -1087,6 +1102,16 @@ export interface DeletedResult {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "DimensionConfig".
+ */
+export interface DimensionConfig {
+  dimensionOrder: DimensionOrder;
+  channels: number;
+  slices: number;
+  frames: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ErrorResponseMessage".
  */
 export interface ErrorResponseMessage {
@@ -1270,6 +1295,7 @@ export interface ImagesDidAdd {
   type: "images/didAdd";
   records: ImageRecord[];
   channelMetas: ChannelMeta[];
+  updatedChannelMetas?: ChannelMeta[];
 }
 /**
  * Images were renamed, re-partitioned by hand or had their active
@@ -1326,6 +1352,76 @@ export interface ImagesResult {
  */
 export interface ImagesUpdateParams {
   updates: ImageChange[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "IngestCloseParams".
+ */
+export interface IngestCloseParams {
+  uploadId: string;
+  cancelled?: boolean;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "IngestFailure".
+ */
+export interface IngestFailure {
+  name: string;
+  error: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "IngestOpenParams".
+ */
+export interface IngestOpenParams {
+  expected: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "IngestOpenResult".
+ */
+export interface IngestOpenResult {
+  uploadId: string;
+  jobId: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "IngestPutParams".
+ */
+export interface IngestPutParams {
+  uploadId: string;
+  file: UploadFile;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "UploadFile".
+ */
+export interface UploadFile {
+  name: string;
+  mimeType?: string;
+  /**
+   * msgpack binary
+   */
+  data: Uint8Array;
+  dimensionConfig?: DimensionConfig;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "IngestPutResult".
+ */
+export interface IngestPutResult {
+  imageIds: string[];
+  error?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "IngestSummary".
+ */
+export interface IngestSummary {
+  jobId?: string;
+  imageIds: string[];
+  failed: IngestFailure[];
+  cancelled: boolean;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema

@@ -56,6 +56,8 @@ class ImagesDidAdd(WireModel):
     records: list[ImageRecord]
     channel_metas: list[ChannelMeta]
     """Channel metas created for these images; existing ones are not repeated."""
+    updated_channel_metas: list[ChannelMeta] = []
+    """Existing metas whose value limits widened to take these images in."""
 
 
 class ImagesDidRemove(WireModel):

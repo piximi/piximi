@@ -4,7 +4,7 @@
  */
 import type * as P from "./generated";
 
-export const PROTOCOL_VERSION = "2.2.0";
+export const PROTOCOL_VERSION = "2.3.0";
 
 /* Requests, keyed by method name. `progress` is the `$/progress` payload. */
 export type ProtocolMethods = {
@@ -161,6 +161,24 @@ export type ProtocolMethods = {
   "project/update": {
     params: P.ProjectUpdateParams;
     result: P.ExperimentResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "ingest/open": {
+    params: P.IngestOpenParams;
+    result: P.IngestOpenResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "ingest/put": {
+    params: P.IngestPutParams;
+    result: P.IngestPutResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "ingest/close": {
+    params: P.IngestCloseParams;
+    result: P.IngestSummary;
     progress: void;
     direction: "client->server";
   };

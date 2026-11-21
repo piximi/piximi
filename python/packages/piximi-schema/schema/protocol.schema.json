@@ -5,7 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {},
-  "protocolVersion": "2.2.0",
+  "protocolVersion": "2.3.0",
   "$defs": {
     "AnnotationCategory": {
       "additionalProperties": false,
@@ -1742,6 +1742,47 @@
       "title": "DeletedResult",
       "type": "object"
     },
+    "DimensionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "dimensionOrder": {
+          "$ref": "#/$defs/DimensionOrder"
+        },
+        "channels": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "slices": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "frames": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dimensionOrder",
+        "channels",
+        "slices",
+        "frames"
+      ],
+      "title": "DimensionConfig",
+      "type": "object"
+    },
+    "DimensionOrder": {
+      "description": "Which index varies fastest in a flat stack of 2D frames, after x and\ny. ``xyczt``: channel fastest, then z, then t.",
+      "enum": [
+        "xyczt",
+        "xyctz",
+        "xyzct",
+        "xyztc",
+        "xytcz",
+        "xytzc"
+      ],
+      "title": "DimensionOrder",
+      "type": "string"
+    },
     "EntityRef": {
       "additionalProperties": false,
       "description": "An existing row and the revision it was read at; a missing\n``baseRev`` skips the check (a backend without revisions).",
@@ -2273,6 +2314,13 @@
             "$ref": "#/$defs/ChannelMeta"
           },
           "type": "array"
+        },
+        "updatedChannelMetas": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ChannelMeta"
+          },
+          "type": "array"
         }
       },
       "required": [
@@ -2401,6 +2449,137 @@
       "title": "ImagesUpdateParams",
       "type": "object"
     },
+    "IngestCloseParams": {
+      "additionalProperties": false,
+      "properties": {
+        "uploadId": {
+          "type": "string"
+        },
+        "cancelled": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "uploadId"
+      ],
+      "title": "IngestCloseParams",
+      "type": "object"
+    },
+    "IngestFailure": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "error"
+      ],
+      "title": "IngestFailure",
+      "type": "object"
+    },
+    "IngestOpenParams": {
+      "additionalProperties": false,
+      "properties": {
+        "expected": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "expected"
+      ],
+      "title": "IngestOpenParams",
+      "type": "object"
+    },
+    "IngestOpenResult": {
+      "additionalProperties": false,
+      "properties": {
+        "uploadId": {
+          "type": "string"
+        },
+        "jobId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "uploadId",
+        "jobId"
+      ],
+      "title": "IngestOpenResult",
+      "type": "object"
+    },
+    "IngestPutParams": {
+      "additionalProperties": false,
+      "properties": {
+        "uploadId": {
+          "type": "string"
+        },
+        "file": {
+          "$ref": "#/$defs/UploadFile"
+        }
+      },
+      "required": [
+        "uploadId",
+        "file"
+      ],
+      "title": "IngestPutParams",
+      "type": "object"
+    },
+    "IngestPutResult": {
+      "additionalProperties": false,
+      "properties": {
+        "imageIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "imageIds"
+      ],
+      "title": "IngestPutResult",
+      "type": "object"
+    },
+    "IngestSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "jobId": {
+          "type": "string"
+        },
+        "imageIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "failed": {
+          "items": {
+            "$ref": "#/$defs/IngestFailure"
+          },
+          "type": "array"
+        },
+        "cancelled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "imageIds",
+        "failed",
+        "cancelled"
+      ],
+      "title": "IngestSummary",
+      "type": "object"
+    },
     "InitializeParams": {
       "additionalProperties": false,
       "properties": {
@@ -2521,7 +2700,8 @@
         "model-load",
         "classifier-fit",
         "classifier-predict",
-        "measurements"
+        "measurements",
+        "ingest"
       ],
       "title": "JobKind",
       "type": "string"
@@ -4463,6 +4643,30 @@
       "title": "ThumbnailsPartial",
       "type": "object"
     },
+    "UploadFile": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "data": {
+          "tsType": "Uint8Array",
+          "description": "msgpack binary"
+        },
+        "dimensionConfig": {
+          "$ref": "#/$defs/DimensionConfig"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "title": "UploadFile",
+      "type": "object"
+    },
     "VolumeCategoryChange": {
       "additionalProperties": false,
       "description": "A recategorized object; the kind follows the category and every\nannotation of the volume follows the partition rule, as\n``annotations/categorize`` does.",
@@ -4701,6 +4905,24 @@
       "direction": "client->server",
       "params": "#/$defs/ProjectUpdateParams",
       "result": "#/$defs/ExperimentResult",
+      "progress": null
+    },
+    "ingest/open": {
+      "direction": "client->server",
+      "params": "#/$defs/IngestOpenParams",
+      "result": "#/$defs/IngestOpenResult",
+      "progress": null
+    },
+    "ingest/put": {
+      "direction": "client->server",
+      "params": "#/$defs/IngestPutParams",
+      "result": "#/$defs/IngestPutResult",
+      "progress": null
+    },
+    "ingest/close": {
+      "direction": "client->server",
+      "params": "#/$defs/IngestCloseParams",
+      "result": "#/$defs/IngestSummary",
       "progress": null
     },
     "render/image": {

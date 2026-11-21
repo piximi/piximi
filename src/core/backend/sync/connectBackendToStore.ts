@@ -21,6 +21,7 @@ const taskType: Record<JobKind, AppTaskType> = {
   "classifier-fit": "image-classification",
   "classifier-predict": "image-classification",
   measurements: "measurement",
+  ingest: "file-upload",
 };
 
 /*
@@ -98,6 +99,7 @@ const applyJobUpdate = (job: Job, backend: Backend, store: StoreHandle) => {
 const applyImagesAdded = (
   records: ImageRecord[],
   channelMetas: ChannelMeta[],
+  updatedChannelMetas: ChannelMeta[],
   store: StoreHandle,
 ) => {
   const series = new Map<string, ImageSeries>();
@@ -111,6 +113,22 @@ const applyImagesAdded = (
       channelMetas,
     }),
   );
+  // Only the value limits follow: how a meta is displayed is this client's.
+  if (updatedChannelMetas.length > 0) {
+    store.dispatch(
+      dataSlice.actions.batchUpdateChannelMeta(
+        updatedChannelMetas.map((meta) => ({
+          id: meta.id,
+          changes: {
+            minValue: meta.minValue,
+            maxValue: meta.maxValue,
+            rampMinLimit: meta.rampMinLimit,
+            rampMaxLimit: meta.rampMaxLimit,
+          },
+        })),
+      ),
+    );
+  }
 };
 
 /*
@@ -170,7 +188,12 @@ const applyBackendEvent = (
       applyJobUpdate(event.job, backend, store);
       return;
     case "images/didAdd":
-      applyImagesAdded(event.records, event.channelMetas, store);
+      applyImagesAdded(
+        event.records,
+        event.channelMetas,
+        event.updatedChannelMetas ?? [],
+        store,
+      );
       break;
     case "models/didChange":
       // Nothing in the store holds models; the model dialog subscribes.

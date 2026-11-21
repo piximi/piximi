@@ -63,6 +63,11 @@ import type {
   ClassifierFitSummary,
   ClassifierPredictSummary,
   Counts,
+  DimensionConfig,
+  DimensionOrder,
+  IngestFailure,
+  IngestSummary,
+  UploadFile,
   ImageCountGroup,
   ImageQuery,
   MeasurementScope,
@@ -293,6 +298,21 @@ type Checks = [
   >,
   Assert<Equivalent<P.KindsResult, { kinds: Kind[] }>>,
   Assert<Equivalent<P.ExperimentResult, { experiment: Experiment }>>,
+
+  // ── Ingest ────────────────────────────────────────────────────────────────
+  Assert<Equivalent<P.DimensionOrder, DimensionOrder>>,
+  Assert<Equivalent<P.DimensionConfig, DimensionConfig>>,
+  Assert<Equivalent<P.IngestFailure, IngestFailure>>,
+  Assert<Equivalent<P.IngestSummary, IngestSummary>>,
+  // The file's bytes are a `Blob | ArrayBuffer` in the app and bytes on the
+  // wire; the remote backend reads them before sending.
+  Assert<Equivalent<Omit<P.UploadFile, "data">, Omit<UploadFile, "data">>>,
+  Assert<
+    Equivalent<
+      Omit<P.ImagesDidAdd, "records">,
+      Omit<Extract<BackendEvent, { type: "images/didAdd" }>, "records">
+    >
+  >,
 
   // ── Query and render ──────────────────────────────────────────────────────
   Assert<Equivalent<P.PageRequest, PageRequest>>,

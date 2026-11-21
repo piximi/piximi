@@ -39,6 +39,14 @@ from .editing import (
 )
 from .entities import Category
 from .events import EVENT_TYPES
+from .ingest import (
+    IngestCloseParams,
+    IngestOpenParams,
+    IngestOpenResult,
+    IngestPutParams,
+    IngestPutResult,
+    IngestSummary,
+)
 from .jobs import Job
 from .measurements import (
     MeasurementsComputeRequest,
@@ -257,6 +265,9 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("kinds/update", KindUpdateParams, KindsResult),
     MethodSpec("kinds/delete", KindsDeleteParams, DeletedResult),
     MethodSpec("project/update", ProjectUpdateParams, ExperimentResult),
+    MethodSpec("ingest/open", IngestOpenParams, IngestOpenResult),
+    MethodSpec("ingest/put", IngestPutParams, IngestPutResult),
+    MethodSpec("ingest/close", IngestCloseParams, IngestSummary),
     MethodSpec("render/image", RenderImageParams, RenderedImage),
     MethodSpec(
         "render/thumbnails",

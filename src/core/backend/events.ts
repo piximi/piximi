@@ -47,6 +47,8 @@ export type BackendEvent =
       records: ImageRecord[];
       /* Only metas created for these images; existing ones are not repeated. */
       channelMetas: ChannelMeta[];
+      /* Existing metas whose value limits widened to take these images in. */
+      updatedChannelMetas?: ChannelMeta[];
     }
   /*
    * The model list changed: one was registered, or its status moved (an

@@ -65,6 +65,8 @@ export interface Backend {
   readonly segmentation?: BackendSegmentation;
   readonly classification?: BackendClassification;
   readonly measurements?: BackendMeasurements;
+  /* Present with `ingest.upload`. */
+  readonly ingest?: BackendIngest;
 }
 
 export type BackendKind = "local" | "remote";
@@ -653,6 +655,58 @@ export interface BackendMeasurements {
     request: MeasurementsComputeRequest,
     options?: CallOptions,
   ): Promise<MeasurementsComputeSummary>;
+}
+
+// ── Ingest ───────────────────────────────────────────────────────────────────
+//
+// Images come in as files the backend decodes. A batch is one `ingest`
+// job; each file is announced as `images/didAdd` when it lands, and one
+// that cannot be decoded fails alone. The TIFF dimension config is worked
+// out by the caller (from the file's metadata, or a dialog) and travels
+// with the file.
+
+export type DimensionOrder =
+  | "xyczt"
+  | "xyctz"
+  | "xyzct"
+  | "xyztc"
+  | "xytcz"
+  | "xytzc";
+
+/* How a flat stack of frames maps to channels, z slices and time frames:
+ * the first dimension listed after x and y varies fastest (OME). */
+export type DimensionConfig = {
+  dimensionOrder: DimensionOrder;
+  channels: number;
+  slices: number;
+  frames: number;
+};
+
+export type UploadFile = {
+  name: string;
+  /* The file, or its bytes when the caller has read them already. */
+  data: Blob | ArrayBuffer;
+  /* Inferred from the name when absent. */
+  mimeType?: string;
+  /* Required for a multi-frame TIFF; ignored for other formats. */
+  dimensionConfig?: DimensionConfig;
+};
+
+export type IngestFailure = { name: string; error: string };
+
+export type IngestSummary = {
+  /* Absent when cancelled before anything started, so no job exists. */
+  jobId?: string;
+  imageIds: string[];
+  failed: IngestFailure[];
+  cancelled: boolean;
+};
+
+export interface BackendIngest {
+  /* Decodes and adds the files, one `ingest` job for the batch. Resolves
+   * once every file is in (or has failed) and its images announced; the
+   * caller's signal, or the job's cancel, stops it between files. */
+  upload(files: UploadFile[], options?: CallOptions): Promise<IngestSummary>;
 }
 
 export interface BackendClassification {
