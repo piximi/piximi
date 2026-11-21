@@ -2,7 +2,14 @@ import { useMemo, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
-import { Box, Button, Divider, MenuItem, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  MenuItem,
+  MenuList,
+  Typography,
+} from "@mui/material";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 
@@ -73,34 +80,37 @@ export const RecategorizePanel = ({
       >
         Categorize scope
       </Typography>
-      {scopes.map((s) => (
-        <MenuItem
-          key={s.id}
-          onClick={() => setScope(s.id)}
-          dense
-          sx={{ py: 0, minHeight: 24, minWidth: 150, borderRadius: 0 }}
-          disabled={s.count === 0}
-        >
-          {scope === s.id ? (
-            <RadioButtonCheckedIcon
-              color="primary"
-              sx={{ fontSize: 16, mr: 1 }}
-            />
-          ) : (
-            <RadioButtonUncheckedIcon
-              sx={{ fontSize: 16, mr: 1, color: "action.active" }}
-            />
-          )}
-          {s.label}
-          <Typography
-            component="span"
-            variant="caption"
-            sx={{ ml: "auto", color: "text.disabled" }}
+      {/* MenuItems need a MenuList parent (MUI 9), not just the popover. */}
+      <MenuList dense disablePadding>
+        {scopes.map((s) => (
+          <MenuItem
+            key={s.id}
+            onClick={() => setScope(s.id)}
+            dense
+            sx={{ py: 0, minHeight: 24, minWidth: 150, borderRadius: 0 }}
+            disabled={s.count === 0}
           >
-            ({s.count})
-          </Typography>
-        </MenuItem>
-      ))}
+            {scope === s.id ? (
+              <RadioButtonCheckedIcon
+                color="primary"
+                sx={{ fontSize: 16, mr: 1 }}
+              />
+            ) : (
+              <RadioButtonUncheckedIcon
+                sx={{ fontSize: 16, mr: 1, color: "action.active" }}
+              />
+            )}
+            {s.label}
+            <Typography
+              component="span"
+              variant="caption"
+              sx={{ ml: "auto", color: "text.disabled" }}
+            >
+              ({s.count})
+            </Typography>
+          </MenuItem>
+        ))}
+      </MenuList>
       <Divider sx={{ my: 0.75 }} />
       <Typography
         sx={{
