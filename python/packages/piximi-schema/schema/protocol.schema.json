@@ -124,6 +124,19 @@
       "title": "AnnotationCountsParams",
       "type": "object"
     },
+    "AnnotationExportType": {
+      "enum": [
+        "piximi",
+        "coco",
+        "labeledInstances",
+        "labeledSemanticMasks",
+        "binaryInstances",
+        "binarySemanticMasks",
+        "matrix"
+      ],
+      "title": "AnnotationExportType",
+      "type": "string"
+    },
     "AnnotationGeometryChange": {
       "additionalProperties": false,
       "description": "A redrawn object: the bounding box and the mask cropped to it. The\nbackend derives the shape and measures the object again.",
@@ -674,6 +687,28 @@
       "title": "AnnotationsDidUpdate",
       "type": "object"
     },
+    "AnnotationsExportRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/AnnotationExportType"
+        },
+        "query": {
+          "$ref": "#/$defs/AnnotationQuery"
+        },
+        "name": {
+          "type": "string"
+        },
+        "progressToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "AnnotationsExportRequest",
+      "type": "object"
+    },
     "AnnotationsParams": {
       "additionalProperties": false,
       "properties": {
@@ -830,6 +865,7 @@
         "measurements",
         "ingest.upload",
         "ingest.paths",
+        "export.annotations",
         "project.io",
         "annotations.commit",
         "events.push"
@@ -2044,6 +2080,28 @@
         "experiment"
       ],
       "title": "ExperimentResult",
+      "type": "object"
+    },
+    "FileExport": {
+      "additionalProperties": false,
+      "properties": {
+        "fileName": {
+          "type": "string"
+        },
+        "mime": {
+          "type": "string"
+        },
+        "data": {
+          "tsType": "Uint8Array",
+          "description": "msgpack binary"
+        }
+      },
+      "required": [
+        "fileName",
+        "mime",
+        "data"
+      ],
+      "title": "FileExport",
       "type": "object"
     },
     "IdsResult": {
@@ -5137,6 +5195,12 @@
       "direction": "client->server",
       "params": "#/$defs/AddPathsParams",
       "result": "#/$defs/IngestSummary",
+      "progress": "#/$defs/ProgressValue"
+    },
+    "export/annotations": {
+      "direction": "client->server",
+      "params": "#/$defs/AnnotationsExportRequest",
+      "result": "#/$defs/FileExport",
       "progress": "#/$defs/ProgressValue"
     },
     "render/image": {

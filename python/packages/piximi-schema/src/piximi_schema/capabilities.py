@@ -14,6 +14,7 @@ class Capability(StrEnum):
     MEASUREMENTS = "measurements"
     INGEST_UPLOAD = "ingest.upload"
     INGEST_PATHS = "ingest.paths"
+    EXPORT_ANNOTATIONS = "export.annotations"
     PROJECT_IO = "project.io"
     ANNOTATIONS_COMMIT = "annotations.commit"
     EVENTS_PUSH = "events.push"

@@ -29,6 +29,18 @@ export type Partition = "Training" | "Validation" | "Inference" | "Unassigned";
 export type AnnotationCountGroup = "category" | "partition" | "kind";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationExportType".
+ */
+export type AnnotationExportType =
+  | "piximi"
+  | "coco"
+  | "labeledInstances"
+  | "labeledSemanticMasks"
+  | "binaryInstances"
+  | "binarySemanticMasks"
+  | "matrix";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "AnnotationSortKey".
  */
 export type AnnotationSortKey =
@@ -84,6 +96,7 @@ export type Capability =
   | "measurements"
   | "ingest.upload"
   | "ingest.paths"
+  | "export.annotations"
   | "project.io"
   | "annotations.commit"
   | "events.push";
@@ -581,6 +594,16 @@ export interface VolumeUpdate {
   predictedAtRunId?: string;
   predictionCorrected?: PredictionCorrection;
   rev?: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationsExportRequest".
+ */
+export interface AnnotationsExportRequest {
+  type: AnnotationExportType;
+  query?: AnnotationQuery;
+  name?: string;
+  progressToken?: string;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -1200,6 +1223,18 @@ export interface Experiment {
  */
 export interface ExperimentResult {
   experiment: Experiment;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "FileExport".
+ */
+export interface FileExport {
+  fileName: string;
+  mime: string;
+  /**
+   * msgpack binary
+   */
+  data: Uint8Array;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema

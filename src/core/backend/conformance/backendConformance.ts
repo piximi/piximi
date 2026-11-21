@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { decodeTiff } from "image-js-latest";
+import JSZip from "jszip";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -12,8 +14,10 @@ import {
   generateKind,
   generateUUID,
   representsUnknown,
+  UNKNOWN_KIND_CATEGORY_ID,
 } from "core/entities";
 import { getDefaultModelParams } from "core/dl/classification/utils";
+import { AnnotationExportType } from "core/file-io/export/enums";
 
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
@@ -21,12 +25,15 @@ import { hasCapability } from "../capabilities";
 import { featureColumn, intensityColumn } from "../measurements/columns";
 import { randomKey } from "../query";
 
+import type { ExportedAnnotation } from "core/file-io/export/types";
+
 import type { BackendEvent } from "../events";
 import type {
   AnnotationChangeSet,
   Backend,
   ChannelDisplay,
   DimensionConfig,
+  ExportedFile,
   ImageRecord,
   RenderRequest,
   UploadFile,
@@ -146,6 +153,9 @@ export const describeBackendConformance = (
         );
         expect(typeof backend.ingest?.addPaths === "function").toBe(
           hasCapability(backend.capabilities, "ingest.paths"),
+        );
+        expect(backend.export !== undefined).toBe(
+          hasCapability(backend.capabilities, "export.annotations"),
         );
       });
     });
@@ -1925,6 +1935,215 @@ export const describeBackendConformance = (
           if (first.imageIds.length > 0) {
             await ctx.backend.images.delete({ ids: first.imageIds });
           }
+        }
+      });
+    });
+
+    describe("export", () => {
+      /* A 3x2 object in the top-left of the first image, as a session
+       * would commit it: rows [1 1 0] [0 1 1]. */
+      const makeObject = async () => {
+        const { backend } = ctx;
+        const image = ctx.images[0];
+        const record = (
+          await backend.query.images({ ids: [image.id] }, { limit: 1 })
+        ).items[0];
+        const volumeId = generateUUID();
+        const annotationId = generateUUID();
+        const changeSet: AnnotationChangeSet = {
+          imageIds: [image.id],
+          volumes: {
+            created: [
+              {
+                id: volumeId,
+                imageId: image.id,
+                kindId: UNKNOWN_KIND_ID,
+                categoryId: UNKNOWN_KIND_CATEGORY_ID,
+                timepoint: 0,
+              },
+            ],
+            updated: [],
+            deleted: [],
+          },
+          annotations: {
+            created: [
+              {
+                id: annotationId,
+                imageId: image.id,
+                planeId: record.planes[0].id,
+                volumeId,
+                partition: Partition.Unassigned,
+                boundingBox: [0, 0, 3, 2],
+                shape: {
+                  planes: 1,
+                  height: 2,
+                  width: 3,
+                  channels: image.channelIds.length,
+                },
+                // Row-major runs starting with background: 0 bg, 2 fg, 2 bg, 2 fg.
+                encodedMask: [0, 2, 2, 2],
+              },
+            ],
+            updated: [],
+            deleted: [],
+          },
+        };
+        const result = await backend.annotations.commit(changeSet);
+        expect(result.conflicts).toEqual([]);
+        return { image, volumeId, annotationId, planeId: record.planes[0].id };
+      };
+      const remove = (annotationId: string) =>
+        ctx.backend.annotations.delete({ ids: [annotationId] });
+      const text = (file: ExportedFile) => new TextDecoder().decode(file.data);
+
+      it("writes the Piximi JSON with the records themselves", async () => {
+        const { backend } = ctx;
+        if (!backend.export) return;
+        const made = await makeObject();
+        try {
+          const file = await backend.export.annotations({
+            type: AnnotationExportType.PIXIMI,
+            query: { ids: [made.annotationId] },
+            name: "conformance",
+          });
+          expect(file.fileName).toBe("conformance.json");
+          expect(file.mime).toBe("application/json");
+          const parsed = JSON.parse(text(file)) as {
+            format: string;
+            version: number;
+            project: string;
+            annotations: ExportedAnnotation[];
+          };
+          expect(parsed.format).toBe("piximi-annotations");
+          expect(parsed.project).toBe("conformance");
+          expect(parsed.annotations).toHaveLength(1);
+          const [ann] = parsed.annotations;
+          expect(ann.id).toBe(made.annotationId);
+          expect(ann.imageId).toBe(made.image.id);
+          expect(ann.imageName).toBe(made.image.name);
+          expect(ann.planeId).toBe(made.planeId);
+          expect(ann.planeIndex).toBe(0);
+          expect(ann.volumeId).toBe(made.volumeId);
+          expect(ann.kindId).toBe(UNKNOWN_KIND_ID);
+          expect(typeof ann.kindName).toBe("string");
+          expect(ann.categoryId).toBe(UNKNOWN_KIND_CATEGORY_ID);
+          expect(ann.boundingBox).toEqual([0, 0, 3, 2]);
+          expect(ann.encodedMask).toEqual([0, 2, 2, 2]);
+          expect(ann.imageShape.width).toBe(made.image.width);
+        } finally {
+          await remove(made.annotationId);
+        }
+      });
+
+      it("writes COCO with one image, one category and a polygon", async () => {
+        const { backend } = ctx;
+        if (!backend.export) return;
+        const made = await makeObject();
+        try {
+          const file = await backend.export.annotations({
+            type: AnnotationExportType.COCO,
+            query: { ids: [made.annotationId] },
+          });
+          expect(file.fileName.endsWith(".json")).toBe(true);
+          const coco = JSON.parse(text(file)) as {
+            images: Array<{ id: number; file_name: string; width: number }>;
+            categories: Array<{
+              id: number;
+              name: string;
+              supercategory: string;
+            }>;
+            annotations: Array<{
+              image_id: number;
+              category_id: number;
+              bbox: number[];
+              area: number;
+              segmentation: number[][];
+              iscrowd: number;
+            }>;
+          };
+          expect(coco.images).toHaveLength(1);
+          expect(coco.images[0].file_name).toBe(made.image.name);
+          expect(coco.categories).toHaveLength(1);
+          expect(coco.annotations).toHaveLength(1);
+          const [ann] = coco.annotations;
+          expect(ann.image_id).toBe(coco.images[0].id);
+          expect(ann.category_id).toBe(coco.categories[0].id);
+          expect(ann.bbox).toEqual([0, 0, 3, 2]);
+          expect(ann.area).toBe(4);
+          expect(ann.iscrowd).toBe(0);
+          expect(ann.segmentation[0].length).toBeGreaterThanOrEqual(6);
+          // Every vertex lies in or on the box.
+          for (let i = 0; i < ann.segmentation[0].length; i += 2) {
+            expect(ann.segmentation[0][i]).toBeGreaterThanOrEqual(-0.5);
+            expect(ann.segmentation[0][i]).toBeLessThanOrEqual(3.5);
+            expect(ann.segmentation[0][i + 1]).toBeGreaterThanOrEqual(-0.5);
+            expect(ann.segmentation[0][i + 1]).toBeLessThanOrEqual(2.5);
+          }
+        } finally {
+          await remove(made.annotationId);
+        }
+      });
+
+      it("zips label images laid out per format", async () => {
+        const { backend } = ctx;
+        if (!backend.export) return;
+        const made = await makeObject();
+        const kindName = (await backend.query.project()).kinds.find(
+          (kind) => kind.id === UNKNOWN_KIND_ID,
+        )!.name;
+        const categoryName = (await backend.query.project()).categories.find(
+          (category) => category.id === UNKNOWN_KIND_CATEGORY_ID,
+        )!.name;
+        const image = made.image.name;
+        try {
+          const expectedPaths: Record<string, string[]> = {
+            [AnnotationExportType.LabeledInstances]: [
+              `conformance/${image}/${kindName}.tiff`,
+              `conformance/${image}/${kindName}_${categoryName}.tiff`,
+            ],
+            [AnnotationExportType.LabeledSemanticMasks]: [
+              `conformance/${image}/${kindName}.tiff`,
+            ],
+            [AnnotationExportType.BinaryInstances]: [
+              `conformance/${image}/${kindName}/${categoryName}_0.tiff`,
+            ],
+            [AnnotationExportType.BinarySemanticMasks]: [
+              `conformance/${image}/${kindName}_${categoryName}.tiff`,
+            ],
+            [AnnotationExportType.Matrix]: [
+              `conformance/${image}/${kindName}.tiff`,
+            ],
+          };
+          for (const [type, paths] of Object.entries(expectedPaths)) {
+            const file = await backend.export.annotations({
+              type: type as AnnotationExportType,
+              query: { ids: [made.annotationId] },
+              name: "conformance",
+            });
+            expect(file.fileName).toBe("conformance.zip");
+            expect(file.mime).toBe("application/zip");
+            const zip = await JSZip.loadAsync(file.data);
+            const entries = Object.keys(zip.files)
+              .filter((entry) => !zip.files[entry].dir)
+              .sort();
+            expect(entries).toEqual([...paths].sort());
+            // The matrix labels the object 1 inside its mask and 0 outside.
+            if (type === AnnotationExportType.Matrix) {
+              const bytes = await zip.file(paths[0])!.async("uint8array");
+              // The first page is the only plane here.
+              const first = decodeTiff(bytes);
+              expect(first.width).toBe(made.image.width);
+              expect(first.height).toBe(made.image.height);
+              const pixel = (x: number, y: number) => first.getValue(x, y, 0);
+              expect(pixel(0, 0)).toBe(1);
+              expect(pixel(1, 0)).toBe(1);
+              expect(pixel(2, 0)).toBe(0);
+              expect(pixel(0, 1)).toBe(0);
+              expect(pixel(2, 1)).toBe(1);
+            }
+          }
+        } finally {
+          await remove(made.annotationId);
         }
       });
     });

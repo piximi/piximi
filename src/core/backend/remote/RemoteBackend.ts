@@ -76,6 +76,7 @@ import type {
   DirectoryListing,
   IngestSummary,
   PathInspection,
+  BackendExport,
 } from "../types";
 
 type Methods = ProtocolMethods;
@@ -156,6 +157,7 @@ export class RemoteBackend implements Backend {
   classification?: BackendClassification;
   measurements?: BackendMeasurements;
   ingest?: BackendIngest;
+  export?: BackendExport;
 
   readonly #peer: RpcPeer;
   readonly #bus = new EventBus();
@@ -334,6 +336,19 @@ export class RemoteBackend implements Backend {
       : undefined;
     this.ingest = hasCapability(this.capabilities, "ingest.upload")
       ? this.#ingest()
+      : undefined;
+    this.export = hasCapability(this.capabilities, "export.annotations")
+      ? {
+          annotations: (request, options) =>
+            this.#call(
+              "export/annotations",
+              {
+                ...request,
+                query: asWire<P.AnnotationQuery | undefined>(request.query),
+              },
+              progress(options),
+            ),
+        }
       : undefined;
     this.#peer.notify("initialized");
   }

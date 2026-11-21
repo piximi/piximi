@@ -1,5 +1,3 @@
-import { merge } from "lodash";
-
 import { TiffIO } from "core/file-io/tiff-io";
 import { AnnotationExportType } from "core/file-io/export/enums";
 
@@ -11,258 +9,185 @@ import type { BaseIFD } from "core/file-io/tiff-io";
 
 import type { ExportedAnnotation } from "./types";
 
-type MaskOptions =
-  | {
-      binary?: false;
-      random?: boolean;
-      color?: boolean;
-    }
-  | { binary?: true; random?: false; color?: false };
+/*
+ * The mask formats, laid out as `piximi_schema/exports.py` documents and as
+ * the engine writes them: one TIFF per image and kind (and category, or
+ * object, where the format says so), pages per plane, under
+ * `<name>/<image>/`. Pixels are uint16 label values, except the labeled
+ * instance images, which are RGB uint8 (three pages per plane) encoding
+ * object `k` as `(k & 255, k >> 8 & 255, k >> 16 & 255)`.
+ */
 
-type ImageField = string;
-type KindField = string;
-type CategoryField = string;
-type LMasksTiff = Record<
-  ImageField,
-  Record<
-    KindField,
-    Record<
-      CategoryField,
-      { mask: Uint8Array; width: number; height: number; planes: number }
-    >
-  >
->;
+export type LabelImage = {
+  data: Uint8Array | Uint16Array;
+  width: number;
+  height: number;
+  /* Pages in the file: planes, times three for RGB. */
+  pages: number;
+};
 
-const updateColors = (
-  colors: { r: number; g: number; b: number },
-  maskOptions: MaskOptions,
-  colorValues: string[],
+const FULL = 65535;
+
+const sanitize = (name: string): string => name.replace(/[/\\]/g, "_");
+
+const newLabelImage = (
+  shape: ExportedAnnotation["imageShape"],
+  rgb: boolean,
+): LabelImage => {
+  const pages = rgb ? shape.planes * 3 : shape.planes;
+  const size = shape.width * shape.height * pages;
+  return {
+    data: rgb ? new Uint8Array(size) : new Uint16Array(size),
+    width: shape.width,
+    height: shape.height,
+    pages,
+  };
+};
+
+/* Paints `value` (or the RGB bytes of it) over the object's mask. */
+const paint = (
+  image: LabelImage,
+  ann: ExportedAnnotation,
+  value: number,
+  rgb: boolean,
 ) => {
-  if (maskOptions.random) {
-    do {
-      colors.r = Math.round(Math.random() * 255);
-      colors.g = Math.round(Math.random() * 255);
-      colors.b = Math.round(Math.random() * 255);
-    } while (colorValues.includes(`${colors.r} ${colors.g} ${colors.b}`));
-
-    colorValues.push(`${colors.r} ${colors.g} ${colors.b}`);
-  } else if (!maskOptions.binary) {
-    colors.r++;
-    colors.g++;
-    colors.b++;
+  const [x0, y0, x1] = ann.boundingBox;
+  const boxWidth = x1 - x0;
+  const mask = decodeRleArray(ann.encodedMask);
+  const page = image.width * image.height;
+  const channels = rgb
+    ? [value & 255, (value >> 8) & 255, (value >> 16) & 255]
+    : [value];
+  for (let i = 0; i < mask.length; i++) {
+    if (mask[i] === 0) continue;
+    const x = x0 + (i % boxWidth);
+    const y = y0 + Math.floor(i / boxWidth);
+    if (x >= image.width || y >= image.height) continue;
+    for (let c = 0; c < channels.length; c++) {
+      const pageIndex = rgb ? ann.planeIndex * 3 + c : ann.planeIndex;
+      image.data[pageIndex * page + y * image.width + x] = channels[c];
+    }
   }
 };
 
-// image id -> image
+/* Which files an export writes and what each object paints into them;
+ * paths are relative to the export's top folder. */
+export const layoutMaskExport = (
+  annotations: ExportedAnnotation[],
+  exportType: AnnotationExportType,
+): Map<string, LabelImage> => {
+  const files = new Map<string, LabelImage>();
+  const rgb = exportType === AnnotationExportType.LabeledInstances;
+  const fileFor = (ann: ExportedAnnotation, path: string): LabelImage => {
+    let image = files.get(path);
+    if (!image) {
+      image = newLabelImage(ann.imageShape, rgb);
+      files.set(path, image);
+    }
+    return image;
+  };
+  /* Per file, how many objects it holds so far (labeled instances, matrix). */
+  const perFile = new Map<string, number>();
+  const next = (path: string): number => {
+    const n = (perFile.get(path) ?? 0) + 1;
+    perFile.set(path, n);
+    return n;
+  };
+  /* Per kind and category across the export (binary instances). */
+  const perCategory = new Map<string, number>();
+  /* Category index per kind, in order of first appearance (semantic). */
+  const categoryIndex = new Map<string, Map<string, number>>();
+
+  for (const ann of annotations) {
+    const image = sanitize(ann.imageName);
+    const kind = sanitize(ann.kindName);
+    const category = sanitize(ann.categoryName);
+    switch (exportType) {
+      case AnnotationExportType.LabeledInstances: {
+        const kindPath = `${image}/${kind}.tiff`;
+        paint(fileFor(ann, kindPath), ann, next(kindPath), true);
+        const categoryPath = `${image}/${kind}_${category}.tiff`;
+        paint(fileFor(ann, categoryPath), ann, next(categoryPath), true);
+        break;
+      }
+      case AnnotationExportType.LabeledSemanticMasks: {
+        let indices = categoryIndex.get(ann.kindId);
+        if (!indices) {
+          indices = new Map();
+          categoryIndex.set(ann.kindId, indices);
+        }
+        let index = indices.get(ann.categoryId);
+        if (index === undefined) {
+          index = indices.size + 1;
+          indices.set(ann.categoryId, index);
+        }
+        paint(fileFor(ann, `${image}/${kind}.tiff`), ann, index, false);
+        break;
+      }
+      case AnnotationExportType.BinaryInstances: {
+        const key = `${ann.kindId}/${ann.categoryId}`;
+        const n = perCategory.get(key) ?? 0;
+        perCategory.set(key, n + 1);
+        paint(
+          fileFor(ann, `${image}/${kind}/${category}_${n}.tiff`),
+          ann,
+          FULL,
+          false,
+        );
+        break;
+      }
+      case AnnotationExportType.BinarySemanticMasks:
+        paint(
+          fileFor(ann, `${image}/${kind}_${category}.tiff`),
+          ann,
+          FULL,
+          false,
+        );
+        break;
+      case AnnotationExportType.Matrix: {
+        const path = `${image}/${kind}.tiff`;
+        paint(fileFor(ann, path), ann, next(path), false);
+        break;
+      }
+      default:
+        throw new Error(`${exportType} is not a mask export`);
+    }
+  }
+  return files;
+};
+
+/* An uncompressed multi-page TIFF, one strip per page. */
+export const encodeLabelTiff = (image: LabelImage): Uint8Array => {
+  const utif = new TiffIO();
+  const bytesPerSample = image.data.BYTES_PER_ELEMENT;
+  const template: BaseIFD = {
+    "254": [2],
+    "256": [image.width],
+    "257": [image.height],
+    "258": [bytesPerSample * 8],
+    "259": [1],
+    "262": [1],
+    "273": [],
+    "277": [1],
+    "278": [image.height],
+    "279": [image.width * image.height * bytesPerSample],
+    "282": [[72, 1]],
+    "283": [[72, 1]],
+    "284": [1],
+    "296": [1],
+  };
+  const { ifds, ifdBlockSize } = utif.generateIFDObject(template, image.pages);
+  return new Uint8Array(utif.encodeImage(image.data, ifds, ifdBlockSize));
+};
+
 export const exportAnnotationMasks = (
   annotations: ExportedAnnotation[],
   projectName: string,
   zip: JSZip,
-  exportType: AnnotationExportType = AnnotationExportType.LabeledInstances,
+  exportType: AnnotationExportType,
 ) => {
-  const utif = new TiffIO();
-  let masks: LMasksTiff = {};
-  const maskOptions: MaskOptions = {
-    random: false,
-    binary: false,
-    color: false,
-  };
-  const colors = {
-    r: maskOptions.binary ? 255 : 0,
-    g: maskOptions.binary ? 255 : 0,
-    b: maskOptions.binary ? 255 : 0,
-  };
-
-  const colorValues: string[] = [];
-  const annotationCounts: Record<string, number> = {};
-  const categoryColorMap: Record<string, Record<string, number>> = {};
-  for (const ann of annotations) {
-    // for image names like blah.png
-    const bbox = ann.boundingBox;
-
-    const imageName = ann.imageName;
-    const bboxShape = {
-      x: bbox[0],
-      y: bbox[1],
-      width: bbox[2] - bbox[0],
-      height: bbox[3] - bbox[1],
-    };
-    const plane = ann.planeIdx;
-    const decodedMask = ann.decodedMask ?? decodeRleArray(ann.encodedMask);
-    let categoryName = ann.category.name;
-    const kind = ann.kindName;
-    const imageShape = ann.imageShape;
-
-    switch (exportType) {
-      case AnnotationExportType.BinaryInstances:
-        // output {imageName}/{kind}/{category_n}.tiff where n is the annotation index
-        const combinedName = `${kind}-${categoryName}`;
-        if (combinedName in annotationCounts) {
-          const count = annotationCounts[combinedName];
-          categoryName += `_${count}`;
-          annotationCounts[combinedName]++;
-        } else {
-          categoryName += `_0`;
-          annotationCounts[combinedName] = 1;
-        }
-        break;
-      case AnnotationExportType.Matrix:
-        //output {imageName}/{kind}.tiff
-        categoryName = kind;
-        break;
-      case AnnotationExportType.LabeledInstances:
-        // output color images (1 channel per plane) as {imageName}/{kind_category}.tiff, {kind}.tiff
-        maskOptions.color = true;
-        maskOptions.random = true;
-        if (!masks?.[imageName]?.[kind]?.[kind]) {
-          const arraySize = maskOptions.color
-            ? imageShape.width * imageShape.height * imageShape.planes * 3
-            : imageShape.width * imageShape.height * imageShape.planes;
-          const imageArray = new Uint8Array(arraySize);
-          imageArray.fill(0);
-
-          masks = merge(masks, {
-            [imageName]: {
-              [kind]: {
-                [kind]: {
-                  mask: imageArray,
-                  width: imageShape.width,
-                  height: imageShape.height,
-                  planes: imageShape.planes,
-                },
-              },
-            },
-          });
-        }
-        break;
-      case AnnotationExportType.LabeledSemanticMasks:
-        // outputs {imageName}/{kind}.tiff but with annotations colored by category
-        if (!(kind in categoryColorMap)) {
-          categoryColorMap[kind] = { [categoryName]: 1 };
-        } else {
-          if (!(categoryName in categoryColorMap[kind])) {
-            categoryColorMap[kind][categoryName] = Object.keys(
-              categoryColorMap[kind],
-            ).length;
-          }
-        }
-        break;
-      case AnnotationExportType.BinarySemanticMasks:
-        // outputs {imageName}/{kind}/{category}.tiff
-        break;
-    }
-
-    if (!masks?.[imageName]?.[kind]?.[categoryName]) {
-      const arraySize = maskOptions.color
-        ? imageShape.width * imageShape.height * imageShape.planes * 3
-        : imageShape.width * imageShape.height * imageShape.planes;
-      const imageArray =
-        exportType === AnnotationExportType.LabeledInstances
-          ? new Uint8Array(arraySize)
-          : new Uint16Array(arraySize);
-      imageArray.fill(0);
-
-      masks = merge(masks, {
-        [imageName]: {
-          [kind]: {
-            [categoryName]: {
-              mask: imageArray,
-              width: imageShape.width,
-              height: imageShape.height,
-              planes: imageShape.planes,
-            },
-          },
-        },
-      });
-    }
-
-    updateColors(colors, maskOptions, colorValues);
-    const c = Object.values(colors);
-
-    for (let i = 0; i < decodedMask.byteLength; i++) {
-      if (decodedMask[i] === 0) continue;
-      const pixel =
-        2 ** (masks[imageName][kind][categoryName].mask.BYTES_PER_ELEMENT * 8) -
-        1;
-      const bboxOffsetY = bboxShape.y + Math.floor(i / bboxShape.width);
-      const offsetX = bboxShape.x + (i % bboxShape.width);
-      if (maskOptions.color) {
-        for (let i = 0; i < c.length; i++) {
-          const planeOffset = (plane + i) * imageShape.height;
-          const offsetY = (bboxOffsetY + planeOffset) * imageShape.width;
-          const imPixelPosition = offsetY + offsetX;
-          masks[imageName][kind][categoryName].mask[imPixelPosition] = c[i];
-          if (exportType === AnnotationExportType.LabeledInstances) {
-            masks[imageName][kind][kind].mask[imPixelPosition] = c[i];
-          }
-        }
-      } else {
-        const planeOffset = plane * imageShape.height;
-        const offsetY = (bboxOffsetY + planeOffset) * imageShape.width;
-
-        const imPixelPosition = offsetY + offsetX;
-
-        masks[imageName][kind][categoryName].mask[imPixelPosition] =
-          exportType === AnnotationExportType.LabeledSemanticMasks
-            ? categoryColorMap[kind][categoryName]
-            : pixel;
-      }
-    }
-  }
-
-  zip.folder(`${projectName}`);
-  for (const [imName, kinds] of Object.entries(masks)) {
-    zip.folder(`${projectName}/${imName}`);
-    for (const [kindName, cats] of Object.entries(kinds)) {
-      const dirName =
-        exportType === AnnotationExportType.BinaryInstances
-          ? `${projectName}/${imName}/${kindName}`
-          : `${projectName}/${imName}`;
-      zip.folder(dirName);
-      for (const [catName, labelImage] of Object.entries(cats)) {
-        const ifdTemplate: BaseIFD = {
-          "254": [2],
-          "256": [labelImage.width], // width -- max 4 bytes
-          "257": [labelImage.height], // height -- max 4 bytes
-          "258": [labelImage.mask.BYTES_PER_ELEMENT * 8], // bits per sample -- max 2 bytes
-          "259": [1], // compression -- max 2 bytes
-          "262": [1], // photometric interpretation -- max 2 bytes
-          "273": [], // strips offset -- max 4 bytes
-          "277": [1], // samples per pixel -- max 2 bytes
-          "278": [labelImage.height], // rows per strip -- max 4 bytes
-          "279": [
-            labelImage.width *
-              labelImage.height *
-              labelImage.mask.BYTES_PER_ELEMENT,
-          ], // strip byte counts -- max 4 bytes
-          "282": [[72, 1]], // x resolution -- 8 bytes
-          "283": [[72, 1]], // y resolution -- 8 bytes
-          "284": [1], // planar configuration max 2 bytes
-          "296": [1], // resolution unit max 2 bytes
-        };
-
-        const numIfds = maskOptions.color
-          ? labelImage.planes * 3
-          : labelImage.planes;
-        const { ifds, ifdBlockSize } = utif.generateIFDObject(
-          ifdTemplate,
-          numIfds,
-        );
-
-        const encoded = utif.encodeImage(labelImage.mask, ifds, ifdBlockSize);
-
-        const blob = new Blob([encoded], { type: "image/tiff" });
-
-        const fileName =
-          exportType !== AnnotationExportType.BinaryInstances
-            ? kindName === catName
-              ? `${kindName}.tiff`
-              : `${kindName}_${catName}.tiff`
-            : `${catName}.tiff`;
-        zip.file(`${dirName}/${fileName}`, blob, {
-          base64: true,
-        });
-      }
-    }
+  const root = sanitize(projectName);
+  for (const [path, image] of layoutMaskExport(annotations, exportType)) {
+    zip.file(`${root}/${path}`, encodeLabelTiff(image), { binary: true });
   }
 };

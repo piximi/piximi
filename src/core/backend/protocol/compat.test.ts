@@ -40,6 +40,7 @@ import type {
   RunHistoryEpoch,
   RunHyperparameterSnapshot,
 } from "core/dl/classification/types";
+import type { AnnotationExportType } from "core/file-io/export/enums";
 
 import type { Capability } from "../capabilities";
 import type { BackendEvent } from "../events";
@@ -64,6 +65,8 @@ import type {
   ClassifierPredictSummary,
   Counts,
   AddPathsRequest,
+  AnnotationsExportRequest,
+  ExportedFile,
   DimensionConfig,
   DimensionHint,
   DimensionOrder,
@@ -321,6 +324,22 @@ type Checks = [
     Equivalent<
       Omit<P.ImagesDidAdd, "records">,
       Omit<Extract<BackendEvent, { type: "images/didAdd" }>, "records">
+    >
+  >,
+
+  // ── Export ────────────────────────────────────────────────────────────────
+  Assert<Equivalent<P.AnnotationExportType, Values<AnnotationExportType>>>,
+  Assert<Equivalent<P.FileExport, ExportedFile>>,
+  Assert<
+    Equivalent<
+      Omit<P.AnnotationsExportRequest, "progressToken" | "type" | "query">,
+      Omit<AnnotationsExportRequest, "type" | "query">
+    >
+  >,
+  Assert<
+    Equivalent<
+      P.AnnotationsExportRequest["query"],
+      WithPartitions<AnnotationQuery> | undefined
     >
   >,
 

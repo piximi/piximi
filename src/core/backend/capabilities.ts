@@ -17,6 +17,7 @@ export const CAPABILITIES = [
   "measurements",
   "ingest.upload",
   "ingest.paths",
+  "export.annotations",
   "project.io",
   "annotations.commit",
   // The backend can originate changes (notebook, other clients) and pushes

@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+
+import { saveAs } from "file-saver";
 
 import {
   Box,
@@ -13,23 +15,20 @@ import {
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 
-import {
-  exportOptions,
-  runAnnotationExport,
-} from "core/file-io/export/runAnnotationExport";
+import { useBackend } from "core/backend";
+import { exportOptions } from "core/file-io/export/runAnnotationExport";
 
 import { StyledSelect } from "components/inputs";
 
-import {
-  selectAllExtendedAnnotations,
-  selectImageEntities,
-  selectKindEntities,
-} from "store/data/selectors";
+import { applicationSettingsSlice } from "store/applicationSettings";
+
+import { AlertType } from "utils/enums";
 
 import type { SelectChangeEvent } from "@mui/material";
 
 import type { AnnotationExportType } from "core/file-io/export/enums";
-import type { ExportedAnnotation } from "core/file-io/export/types";
+
+import type { AlertState } from "utils/types";
 
 import type { OpScope, ScopeId } from "./types";
 
@@ -51,27 +50,37 @@ export const ExportOptionsPanel = ({
   experimentName,
   onExported,
 }: ExportOptionsPanelProps) => {
-  const annotations = useSelector(selectAllExtendedAnnotations);
-  const images = useSelector(selectImageEntities);
-  const kinds = useSelector(selectKindEntities);
+  const backend = useBackend();
+  const dispatch = useDispatch();
   const [format, setFormat] = useState<AnnotationExportType>(
     exportOptions[0].type,
   );
   const [scope, setScope] = useState<ScopeId>("selected");
 
+  // The backend renders the file from what it holds, so this session's
+  // unsaved edits are not in it until they are saved.
   const handleExport = async () => {
-    const idsInScope = [...scopeToAnnotations(scope)];
-    const annotationsById = new Map(annotations.map((a) => [a.id, a]));
-    const exportedAnnotations: ExportedAnnotation[] = idsInScope.map((id) => {
-      const ann = annotationsById.get(id)!;
-      return {
-        ...ann,
-        kindName: kinds[ann.kindId].name,
-        imageShape: images[ann.imageId].shape,
+    if (!backend.export) return;
+    try {
+      const file = await backend.export.annotations({
+        type: format,
+        query: { ids: [...scopeToAnnotations(scope)] },
+        name: experimentName,
+      });
+      // A copy: the bytes may sit in a shared or offset buffer.
+      saveAs(new Blob([file.data.slice()], { type: file.mime }), file.fileName);
+    } catch (err) {
+      const warning: AlertState = {
+        alertType: AlertType.Warning,
+        name: "Could not export annotations",
+        description: err instanceof Error ? err.message : String(err),
       };
-    });
-
-    await runAnnotationExport(format, exportedAnnotations, experimentName);
+      dispatch(
+        applicationSettingsSlice.actions.updateAlertState({
+          alertState: warning,
+        }),
+      );
+    }
   };
   const handleFormatChange = (event: SelectChangeEvent<unknown>) => {
     setFormat(event.target.value as AnnotationExportType);

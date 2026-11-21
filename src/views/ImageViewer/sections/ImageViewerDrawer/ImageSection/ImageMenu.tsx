@@ -1,9 +1,7 @@
-import { useState } from "react";
-
 import { useDispatch } from "react-redux";
 
 // import JSZip from "jszip";
-import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
+import { Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
@@ -11,8 +9,6 @@ import { selectAnnotationsByImageId } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
 import { imageViewerDataSlice } from "@ImageViewer/state/imageViewerData";
-
-import { ExportAnnotationsMenu } from "./ExportAnnotationsMenu";
 
 import type { ExtendedImageObject } from "core/entities";
 
@@ -51,16 +47,6 @@ export const ImageMenu = ({
 
   const t = useTranslation();
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLLIElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   return (
     <Menu
       anchorEl={anchorElImageMenu}
@@ -72,15 +58,6 @@ export const ImageMenu = ({
     >
       <MenuList dense variant="menu">
         <div>
-          <MenuItem onClick={handleClick}>Export annotations as</MenuItem>
-          <ExportAnnotationsMenu
-            anchorEl={anchorEl}
-            onClose={handleClose}
-            open={Boolean(anchorEl)}
-            selectedImage={selectedImage}
-          />
-
-          <Divider />
           <MenuItem onClick={handleClearAnnotations}>
             <Typography variant="inherit">{t("Clear Annotations")}</Typography>
           </MenuItem>

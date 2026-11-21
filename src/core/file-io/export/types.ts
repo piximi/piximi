@@ -1,11 +1,46 @@
 import { z } from "zod";
 
-import type { ExtendedAnnotationObject, Shape } from "core/entities";
+import type {
+  BBox,
+  IntensityMeasurement,
+  ObjectFeature,
+  Partition,
+  Shape,
+} from "core/entities";
 
-export type ExportedAnnotation = ExtendedAnnotationObject & {
-  kindName: string;
+/*
+ * One object as the exporters see it: its geometry plus the names its ids
+ * stand for, so a file needs nothing else from the project. The wire's
+ * `ExportedAnnotation`; every backend builds the same records.
+ */
+export type ExportedAnnotation = {
+  id: string;
+  imageId: string;
+  imageName: string;
   imageShape: Shape;
+  planeId: string;
+  planeIndex: number;
+  volumeId: string;
+  kindId: string;
+  kindName: string;
+  categoryId: string;
+  categoryName: string;
+  partition: Partition;
+  timepoint: number;
+  boundingBox: BBox;
+  encodedMask: number[];
+  features?: Partial<Record<ObjectFeature, number>>;
+  intensityMeasurements?: Record<
+    string,
+    Partial<Record<IntensityMeasurement, number>>
+  >;
 };
+
+export const PIXIMI_ANNOTATIONS_FORMAT = "piximi-annotations";
+export const PIXIMI_ANNOTATIONS_VERSION = 1;
+
+/* What an export call hands back: a file to save. */
+export type ExportedFile = { fileName: string; mime: string; data: Uint8Array };
 const SerializedCOCOInfoRtype = z.object({
   year: z.int(),
   version: z.string(),

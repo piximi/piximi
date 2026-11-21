@@ -39,6 +39,7 @@ from .editing import (
 )
 from .entities import Category
 from .events import EVENT_TYPES
+from .exports import AnnotationsExportRequest, FileExport
 from .ingest import (
     AddPathsParams,
     BrowseParams,
@@ -276,6 +277,7 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("ingest/browse", BrowseParams, DirectoryListing),
     MethodSpec("ingest/inspect", InspectParams, InspectResult),
     MethodSpec("ingest/addPaths", AddPathsParams, IngestSummary, progress=ProgressValue),
+    MethodSpec("export/annotations", AnnotationsExportRequest, FileExport, progress=ProgressValue),
     MethodSpec("render/image", RenderImageParams, RenderedImage),
     MethodSpec(
         "render/thumbnails",

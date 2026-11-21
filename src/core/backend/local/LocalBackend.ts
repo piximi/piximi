@@ -1,5 +1,6 @@
 import { DataConnector } from "core/data-connector";
 import { workerImageDecoder } from "core/file-io/file-loader/decoders";
+import { buildAnnotationExport } from "core/file-io/export/runAnnotationExport";
 import { generateUUID, representsUnknown } from "core/entities";
 import { getClassifierApi } from "core/dl/classification";
 import { getSegmenterApi } from "core/dl/segmentation/SegmenterApi";
@@ -45,6 +46,7 @@ import type {
   StorageReference,
 } from "core/entities";
 import type { ImageDecoder } from "core/file-io/file-loader/decoders";
+import type { ExportedAnnotation } from "core/file-io/export/types";
 import type { IClassifierApi } from "core/dl/classification/types";
 import type { ISegmenterApi } from "core/dl/segmentation/types";
 
@@ -84,6 +86,7 @@ import type {
   RenderResult,
   RenderedImage,
   BackendIngest,
+  BackendExport,
 } from "../types";
 import type { MeasurementsProvider } from "./LocalSegmentation";
 import type { StoreHandle } from "./store";
@@ -155,6 +158,7 @@ export class LocalBackend implements Backend {
     "classification.import-url",
     "measurements",
     "ingest.upload",
+    "export.annotations",
     "project.io",
     "annotations.commit",
   ];
@@ -764,6 +768,54 @@ export class LocalBackend implements Backend {
   };
 
   // ── Jobs ───────────────────────────────────────────────────────────────────
+
+  readonly export: BackendExport = {
+    annotations: async (request) => {
+      const state = this.#store.getState();
+      const records = this.#exportedAnnotations(state, request.query ?? {});
+      const name = request.name ?? state.data.experiment.name;
+      return buildAnnotationExport(request.type, records, name);
+    },
+  };
+
+  /* The objects the exporters render, resolved from the store's tables. */
+  #exportedAnnotations(
+    state: RootState,
+    query: AnnotationQuery,
+  ): ExportedAnnotation[] {
+    const { data } = state;
+    const records: ExportedAnnotation[] = [];
+    for (const row of this.#annotations(state, query)) {
+      const annotation = data.annotations.entities[row.annotation.id];
+      const image = data.images.entities[row.annotation.imageId];
+      if (!annotation || !image) continue;
+      const volume = row.volume;
+      records.push({
+        id: annotation.id,
+        imageId: image.id,
+        imageName: image.name,
+        imageShape: image.shape,
+        planeId: annotation.planeId,
+        planeIndex: data.planes.entities[annotation.planeId]?.zIndex ?? 0,
+        volumeId: volume.id,
+        kindId: volume.kindId,
+        kindName: data.kinds.entities[volume.kindId]?.name ?? volume.kindId,
+        categoryId: volume.categoryId,
+        categoryName:
+          data.categories.entities[volume.categoryId]?.name ??
+          volume.categoryId,
+        partition: annotation.partition,
+        timepoint: volume.timepoint ?? 0,
+        boundingBox: annotation.boundingBox,
+        encodedMask: annotation.encodedMask,
+        ...(annotation.features && { features: annotation.features }),
+        ...(annotation.intensityMeasurements && {
+          intensityMeasurements: annotation.intensityMeasurements,
+        }),
+      });
+    }
+    return records;
+  }
 
   readonly jobs = {
     list: async (): Promise<Job[]> => this.#jobs.list(),

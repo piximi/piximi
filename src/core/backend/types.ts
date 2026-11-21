@@ -29,6 +29,7 @@ import type {
   SegmentationModelDetails,
   SegmenterOptionValues,
 } from "core/dl/segmentation/types";
+import type { AnnotationExportType } from "core/file-io/export/enums";
 
 import type { Capability } from "./capabilities";
 import type { BackendEventListener } from "./events";
@@ -67,6 +68,8 @@ export interface Backend {
   readonly measurements?: BackendMeasurements;
   /* Present with `ingest.upload`. */
   readonly ingest?: BackendIngest;
+  /* Present with `export.annotations`. */
+  readonly export?: BackendExport;
 }
 
 export type BackendKind = "local" | "remote";
@@ -765,6 +768,31 @@ export interface BackendIngest {
     request: AddPathsRequest,
     options?: CallOptions,
   ): Promise<IngestSummary>;
+}
+
+// ── Export ───────────────────────────────────────────────────────────────────
+//
+// Annotations leave as files: the Piximi JSON (the records themselves),
+// COCO, or zips of label images. Every backend renders the same records the
+// same way (`core/file-io/export` and the engine's `exports.py` agree), so a
+// file looks alike whichever side wrote it.
+
+export type AnnotationsExportRequest = {
+  type: AnnotationExportType;
+  /* Which objects; absent fields do not restrict. */
+  query?: AnnotationQuery;
+  /* The file's base name and the zip's top folder; the project's name
+   * when absent. */
+  name?: string;
+};
+
+export type ExportedFile = { fileName: string; mime: string; data: Uint8Array };
+
+export interface BackendExport {
+  annotations(
+    request: AnnotationsExportRequest,
+    options?: CallOptions,
+  ): Promise<ExportedFile>;
 }
 
 export interface BackendClassification {

@@ -1,9 +1,10 @@
+/* Values are the wire's (`piximi_schema.export.AnnotationExportType`). */
 export enum AnnotationExportType {
-  LabeledSemanticMasks,
-  Matrix,
-  BinarySemanticMasks,
-  BinaryInstances,
-  LabeledInstances,
-  COCO,
-  PIXIMI,
+  PIXIMI = "piximi",
+  COCO = "coco",
+  LabeledInstances = "labeledInstances",
+  LabeledSemanticMasks = "labeledSemanticMasks",
+  BinaryInstances = "binaryInstances",
+  BinarySemanticMasks = "binarySemanticMasks",
+  Matrix = "matrix",
 }

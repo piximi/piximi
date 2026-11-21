@@ -1,12 +1,12 @@
 import JSZip from "jszip";
-import { saveAs } from "file-saver";
 
 import { AnnotationExportType } from "core/file-io/export/enums";
 
 import { exportAnnotationMasks } from "./annotationExporters";
 import { serializeCOCOFile } from "./serializeCOCO";
+import { PIXIMI_ANNOTATIONS_FORMAT, PIXIMI_ANNOTATIONS_VERSION } from "./types";
 
-import type { ExportedAnnotation } from "./types";
+import type { ExportedAnnotation, ExportedFile } from "./types";
 
 export const exportOptions = [
   { title: "Piximi-formatted JSON", type: AnnotationExportType.PIXIMI },
@@ -30,36 +30,43 @@ export const exportOptions = [
   { title: "COCO-formatted JSON", type: AnnotationExportType.COCO },
 ];
 
-// Shared by every "export annotations" entry point (the drawer's selection
-// footer, the per-image export menu, ...) so a format added in one place
-// can't drift out of sync with the others.
-export const runAnnotationExport = async (
+const json = (value: unknown, name: string): ExportedFile => ({
+  fileName: `${name}.json`,
+  mime: "application/json",
+  data: new TextEncoder().encode(JSON.stringify(value)),
+});
+
+/*
+ * Renders the records as one of the formats. Shared by the in-browser
+ * backends, so a format added here is what the local and the fake backend
+ * both hand back; the engine's `piximi_engine/exports.py` writes the same.
+ */
+export const buildAnnotationExport = async (
   exportType: AnnotationExportType,
-  exportedAnnotations: ExportedAnnotation[],
+  annotations: ExportedAnnotation[],
   name: string,
-): Promise<void> => {
+): Promise<ExportedFile> => {
   switch (exportType) {
-    case AnnotationExportType.PIXIMI: {
-      const data = new Blob([JSON.stringify(exportedAnnotations)], {
-        type: "application/json;charset=utf-8",
-      });
-      saveAs(data, `${name}.json`);
-      return;
-    }
-    case AnnotationExportType.COCO: {
-      const cocoSerializedProject = serializeCOCOFile(exportedAnnotations);
-      const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
-        type: "application/json;charset=utf-8",
-      });
-      saveAs(blob, `${name}.json`);
-      return;
-    }
+    case AnnotationExportType.PIXIMI:
+      return json(
+        {
+          format: PIXIMI_ANNOTATIONS_FORMAT,
+          version: PIXIMI_ANNOTATIONS_VERSION,
+          project: name,
+          annotations,
+        },
+        name,
+      );
+    case AnnotationExportType.COCO:
+      return json(serializeCOCOFile(annotations), name);
     default: {
       const zip = new JSZip();
-      exportAnnotationMasks(exportedAnnotations, name, zip, exportType);
-      const blob = await zip.generateAsync({ type: "blob" });
-      saveAs(blob, `${name}.zip`);
-      return;
+      exportAnnotationMasks(annotations, name, zip, exportType);
+      return {
+        fileName: `${name}.zip`,
+        mime: "application/zip",
+        data: await zip.generateAsync({ type: "uint8array" }),
+      };
     }
   }
 };

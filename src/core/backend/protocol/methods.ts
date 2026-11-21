@@ -200,6 +200,12 @@ export type ProtocolMethods = {
     progress: P.ProgressValue;
     direction: "client->server";
   };
+  "export/annotations": {
+    params: P.AnnotationsExportRequest;
+    result: P.FileExport;
+    progress: P.ProgressValue;
+    direction: "client->server";
+  };
   "render/image": {
     params: P.RenderImageParams;
     result: P.RenderedImage;

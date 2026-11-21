@@ -1,9 +1,4 @@
-import {
-  padMask,
-  findContours,
-  simplifyPolygon,
-  decodeRleArray,
-} from "utils/image";
+import { padMask, findContours, decodeRleArray } from "utils/image";
 import { logger } from "utils/logUtils";
 
 import type {
@@ -43,18 +38,15 @@ export const serializeCOCOFile = (
     if (!(ann.categoryId in catIdMap)) {
       catIdMap[ann.categoryId] = {
         id: catCount++,
-        name: ann.category.name,
+        name: ann.categoryName,
         supercategory: ann.kindName,
       };
     }
     const boxWidth = ann.boundingBox[2] - ann.boundingBox[0];
     const boxHeight = ann.boundingBox[3] - ann.boundingBox[1];
 
-    const paddedMask = padMask(
-      decodeRleArray(ann.encodedMask!),
-      boxWidth,
-      boxHeight,
-    );
+    const mask = decodeRleArray(ann.encodedMask);
+    const paddedMask = padMask(mask, boxWidth, boxHeight);
     // +2 to W, H to account for padding on mask
     const contours = findContours(paddedMask, boxWidth + 2, boxHeight + 2);
     const outerBorder = contours.find((b) => b.seqNum === 2);
@@ -69,23 +61,22 @@ export const serializeCOCOFile = (
       );
     }
 
-    const SIMPLIFY = false;
-
-    // coco polygon points are arranged as: [x_1, y_1, x_2, y_2, ...]
-    const outerBorderPoints = (
-      SIMPLIFY ? simplifyPolygon(outerBorder.points) : outerBorder.points
-    )
-      // add x_1, y_1 coordinates of box to translate polygon
-      // points to wrt to image, rather than wrt mask
+    // coco polygon points are arranged as: [x_1, y_1, x_2, y_2, ...]. The
+    // tracer answers in the unpadded mask's coordinates, so only the box's
+    // corner goes on to put the points in image coordinates.
+    const outerBorderPoints = outerBorder.points
       .map((p) => [p.x + ann.boundingBox[0], p.y + ann.boundingBox[1]])
       .flat();
+
+    let area = 0;
+    for (let i = 0; i < mask.length; i++) if (mask[i]) area++;
 
     serializedAnnotations.push({
       id: annCount++,
       image_id: imIdMap[ann.imageId].id,
       category_id: catIdMap[ann.categoryId].id,
       segmentation: [outerBorderPoints],
-      area: 0,
+      area,
       // x1, y1, width, height
       bbox: [ann.boundingBox[0], ann.boundingBox[1], boxWidth, boxHeight],
       iscrowd: 0,
@@ -95,7 +86,7 @@ export const serializeCOCOFile = (
   const info = {
     year: new Date().getFullYear(),
     // provided in package.json scripts
-    version: import.meta.env.VITE_APP_VERSION as string,
+    version: (import.meta.env.VITE_APP_VERSION as string | undefined) ?? "dev",
     description: "",
     contributor: "",
     url: "",

@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Box, Menu, MenuItem, Popover, Typography, Link } from "@mui/material";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 
+import { useCapability } from "core/backend";
+
 import { useDialogHotkey } from "hooks";
 
 import { ConfirmationDialog } from "components/dialogs";
@@ -52,6 +54,7 @@ export const SelectionFooter = ({
   const dispatch = useDispatch();
   const [delAnchor, setDelAnchor] = useState<HTMLElement | null>(null);
   const [expAnchor, setExpAnchor] = useState<HTMLElement | null>(null);
+  const canExport = useCapability("export.annotations");
   const [catAnchor, setCatAnchor] = useState<HTMLElement | null>(null);
   const [pendingScope, setPendingScope] = useState<ScopeId | null>(null);
   const {
@@ -138,15 +141,17 @@ export const SelectionFooter = ({
           tooltipText="Categorize annotations"
           sx={{ fontSize: 12 }}
         />
-        <TooltipTextButton
-          variant="outlined"
-          endIcon={<ArrowDropUpIcon />}
-          onClick={(e) => setExpAnchor(e.currentTarget)}
-          label="Export"
-          tooltipText="Export annotations"
-          data-help={HelpItem.ExportAnnotation}
-          sx={{ fontSize: 12 }}
-        />
+        {canExport && (
+          <TooltipTextButton
+            variant="outlined"
+            endIcon={<ArrowDropUpIcon />}
+            onClick={(e) => setExpAnchor(e.currentTarget)}
+            label="Export"
+            tooltipText="Export annotations"
+            data-help={HelpItem.ExportAnnotation}
+            sx={{ fontSize: 12 }}
+          />
+        )}
       </Box>
       {catAnchor && (
         <CategorizePopover

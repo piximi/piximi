@@ -16,6 +16,7 @@ import {
   inferMimeType,
   isTiffFile,
 } from "core/file-io/file-loader/fileInputUtils";
+import { buildAnnotationExport } from "core/file-io/export/runAnnotationExport";
 import { analyzeTiff } from "core/file-io/file-loader/readers/TiffReader";
 import { MIME } from "core/file-io/file-loader/types";
 import { defaultClassifier } from "core/dl/classification/utils";
@@ -70,6 +71,7 @@ import type {
   Run,
 } from "core/dl/classification/types";
 import type { LoadAndPrepareOutput } from "core/file-io/file-loader/types";
+import type { ExportedAnnotation } from "core/file-io/export/types";
 
 import type { StoredPixels } from "utils/image/compositeChannels";
 
@@ -132,6 +134,7 @@ import type {
   IngestSummary,
   PathInspection,
   UploadFile,
+  BackendExport,
 } from "../types";
 
 type FakeImageSeed = {
@@ -276,6 +279,7 @@ export class FakeBackend implements Backend {
       "classification.train",
       "measurements",
       "ingest.upload",
+      "export.annotations",
       ...(seed.files ? (["ingest.paths"] as const) : []),
     ];
     this.ingest = {
@@ -1630,6 +1634,55 @@ export class FakeBackend implements Backend {
     });
     return output.images.map((image) => image.id);
   }
+
+  // ── Export ──────────────────────────────────────────────────────────────
+
+  readonly export: BackendExport = {
+    annotations: async (request) => {
+      const query = request.query ?? {};
+      const byId = new Map(this.#annotations.map((a) => [a.id, a]));
+      const records: ExportedAnnotation[] = [];
+      for (const row of this.#annotationListing(query)) {
+        const annotation = byId.get(row.annotation.id);
+        const image = this.#images.find(
+          (im) => im.id === row.annotation.imageId,
+        );
+        if (!annotation || !image) continue;
+        const volume = row.volume;
+        records.push({
+          id: annotation.id,
+          imageId: image.id,
+          imageName: image.name,
+          imageShape: image.shape,
+          planeId: annotation.planeId,
+          planeIndex:
+            this.#planes.find((p) => p.id === annotation.planeId)?.zIndex ?? 0,
+          volumeId: volume.id,
+          kindId: volume.kindId,
+          kindName:
+            this.#kinds.find((k) => k.id === volume.kindId)?.name ??
+            volume.kindId,
+          categoryId: volume.categoryId,
+          categoryName:
+            this.#categories.find((c) => c.id === volume.categoryId)?.name ??
+            volume.categoryId,
+          partition: annotation.partition,
+          timepoint: volume.timepoint ?? 0,
+          boundingBox: annotation.boundingBox,
+          encodedMask: annotation.encodedMask,
+          ...(annotation.features && { features: annotation.features }),
+          ...(annotation.intensityMeasurements && {
+            intensityMeasurements: annotation.intensityMeasurements,
+          }),
+        });
+      }
+      return buildAnnotationExport(
+        request.type,
+        records,
+        request.name ?? this.#experiment.name,
+      );
+    },
+  };
 
   readonly measurements: BackendMeasurements = {
     table: async (
