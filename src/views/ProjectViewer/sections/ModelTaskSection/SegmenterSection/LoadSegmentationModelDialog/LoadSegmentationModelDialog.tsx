@@ -57,6 +57,9 @@ export const LoadSegmentationModelDialog = ({
   const [selectedModel, setSelectedModel] = useState<
     SegmentationModelDetails | undefined
   >(loadedModel);
+  // A load in flight: the button and the Enter key wait for it, so a
+  // second click does not start a second job.
+  const [loading, setLoading] = useState(false);
   const { models: pretrainedModels, refresh } = useSegmentationModels(open);
   // The live descriptor for the selection: its status moves while the
   // dialog is open (an environment builds, a load fails).
@@ -71,6 +74,7 @@ export const LoadSegmentationModelDialog = ({
   // The backend's model-load job drives the task toast and its cancel
   // control; only the outcome is handled here.
   const handleLoadModel = async () => {
+    if (loading) return;
     if (!selectedModel) {
       import.meta.env.NODE_ENV !== "production" &&
         console.warn("Attempting to dispatch undefined model");
@@ -79,9 +83,11 @@ export const LoadSegmentationModelDialog = ({
     const { segmentation } = backend;
     if (!segmentation) return;
 
+    setLoading(true);
     try {
       await segmentation.loadModel(selectedModel.name);
     } catch (error) {
+      setLoading(false);
       // The list shows why; a backend without push events needs asking.
       void refresh();
       if (isTaskCancelledError(error)) return;
@@ -101,6 +107,7 @@ export const LoadSegmentationModelDialog = ({
       return;
     }
 
+    setLoading(false);
     setLoadedModel(selectedModel);
     onClose();
   };
@@ -113,7 +120,7 @@ export const LoadSegmentationModelDialog = ({
   useHotkeys(
     "enter",
     () => {
-      selectedModel && handleLoadModel();
+      selectedModel && !loading && handleLoadModel();
     },
     HotkeyContext.ConfirmationDialog,
   );
@@ -150,9 +157,15 @@ export const LoadSegmentationModelDialog = ({
         <Button
           onClick={handleLoadModel}
           color="primary"
-          disabled={!selectedModel || selected?.status === "building"}
+          disabled={
+            !selectedModel || loading || selected?.status === "building"
+          }
         >
-          {selected ? loadLabel[selected.status] : "Load Model"}
+          {loading
+            ? "Loading…"
+            : selected
+              ? loadLabel[selected.status]
+              : "Load Model"}
         </Button>
       </DialogActions>
     </Dialog>
