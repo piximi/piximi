@@ -53,6 +53,7 @@ from piximi_schema.events import (
     ModelsDidChange,
     ProjectDidChange,
 )
+from piximi_schema.exports import AnnotationsExportRequest, FileExport
 from piximi_schema.ingest import (
     AddPathsParams,
     DirectoryListing,
@@ -194,6 +195,13 @@ class Engine(Protocol):
     async def ingest_add_paths(self, params: AddPathsParams, ctx: HandlerContext) -> IngestSummary:
         """Adds the files (and folders' supported files) as an ``ingest``
         job, skipping sources imported before; announces ``images/didAdd``."""
+        ...
+
+    # ── Export ──────────────────────────────────────────────────────────────
+
+    async def export_annotations(self, request: AnnotationsExportRequest, ctx: HandlerContext) -> FileExport:
+        """The matching objects as a file in one of the export formats
+        (``export.annotations``); see ``piximi_schema.exports``."""
         ...
 
     # ── Mutations ───────────────────────────────────────────────────────────

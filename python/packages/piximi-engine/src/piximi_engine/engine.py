@@ -121,6 +121,7 @@ from piximi_schema.render import (
     ThumbnailsPartial,
 )
 from piximi_schema.errors import BackendErrorData
+from piximi_schema.exports import AnnotationsExportRequest, ExportedAnnotation, FileExport
 from piximi_schema.rpc import ProgressValue
 from piximi_schema.segmentation import (
     ModelDescriptor,
@@ -147,6 +148,7 @@ from .dedup import MaskedBox, is_duplicate
 from .jobs import JobRegistry
 from .measure import channel_statistics, intensity_measurements, object_features
 from .measurements import measure_annotations, measure_images, measurement_table, unmeasured_ids
+from .exports import build_export
 from .paths import PathPolicy
 from .models import ModelRegistry, SegmentationModel, default_registry
 from .models.base import apply_option_defaults
@@ -232,6 +234,7 @@ class ReferenceEngine:
             Capability.SEGMENTATION,
             Capability.MEASUREMENTS,
             Capability.INGEST_UPLOAD,
+            Capability.EXPORT_ANNOTATIONS,
             Capability.ANNOTATIONS_COMMIT,
             Capability.EVENTS_PUSH,
         ]
@@ -582,6 +585,64 @@ class ReferenceEngine:
         if upload is None:
             raise BackendError("NOT_FOUND", f"No upload {upload_id}")
         return upload
+
+    # ── Engine protocol: export ─────────────────────────────────────────────
+
+    async def export_annotations(self, request: AnnotationsExportRequest, ctx: HandlerContext) -> FileExport:
+        """Renders the matching objects as one of the export formats; see
+        ``piximi_engine.exports``. The records are gathered on the loop,
+        the file is built off it."""
+        name = request.name or self.experiment.name or "annotations"
+        ctx.progress(ProgressValue(percent=-1, message="Gathering objects").to_wire())
+        records = self.exported_annotations(await self.annotation_ids(request.query))
+        ctx.check_cancelled()
+        ctx.progress(ProgressValue(percent=-1, message=f"Writing {len(records)} objects").to_wire())
+        return await asyncio.to_thread(build_export, request.type, records, name, self.version)
+
+    def exported_annotations(self, ids: list[str]) -> list[ExportedAnnotation]:
+        """The objects as the exporters see them, in the order given."""
+        annotations = self.meta.get_many("annotation", ids, AnnotationObject)
+        volumes = self.meta.get_many(
+            "volume", sorted({a.volume_id for a in annotations.values()}), AnnotationVolume
+        )
+        images = {
+            record.image.id: record
+            for record in self._image_records(sorted({a.image_id for a in annotations.values()}))
+        }
+        kinds = {kind.id: kind for kind in self.meta.list("kind", Kind)}
+        categories = {category.id: category for category in self._categories()}
+        records: list[ExportedAnnotation] = []
+        for id in ids:
+            annotation = annotations.get(id)
+            volume = volumes.get(annotation.volume_id) if annotation else None
+            image = images.get(annotation.image_id) if annotation else None
+            if annotation is None or volume is None or image is None:
+                continue
+            plane_index = next((plane.z_index for plane in image.planes if plane.id == annotation.plane_id), 0)
+            kind = kinds.get(volume.kind_id)
+            category = categories.get(volume.category_id)
+            records.append(
+                ExportedAnnotation(
+                    id=annotation.id,
+                    image_id=annotation.image_id,
+                    image_name=image.image.name,
+                    image_shape=image.image.shape,
+                    plane_id=annotation.plane_id,
+                    plane_index=plane_index,
+                    volume_id=volume.id,
+                    kind_id=volume.kind_id,
+                    kind_name=kind.name if kind else volume.kind_id,
+                    category_id=volume.category_id,
+                    category_name=category.name if category else volume.category_id,
+                    partition=annotation.partition,
+                    timepoint=volume.timepoint if volume.timepoint is not None else 0,
+                    bounding_box=annotation.bounding_box,
+                    encoded_mask=annotation.encoded_mask,
+                    features=annotation.features,
+                    intensity_measurements=annotation.intensity_measurements,
+                )
+            )
+        return records
 
     # ── Engine protocol: query ──────────────────────────────────────────────
 

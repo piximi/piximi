@@ -41,6 +41,7 @@ from piximi_schema.editing import (
     KindUpdateParams,
     ProjectUpdateParams,
 )
+from piximi_schema.exports import AnnotationsExportRequest
 from piximi_schema.ingest import (
     AddPathsParams,
     BrowseParams,
@@ -346,6 +347,9 @@ class SessionHub:
         async def ingest_add_paths(params: AddPathsParams, ctx: HandlerContext):
             return await engine.ingest_add_paths(params, ctx)
 
+        async def export_annotations(params: AnnotationsExportRequest, ctx: HandlerContext):
+            return await engine.export_annotations(params, ctx)
+
         peer.on_request("initialize", typed(InitializeParams, initialize))
         peer.on_request("shutdown", typed(None, shutdown))
         peer.on_request("query/project", typed(None, lambda _ctx: engine.project()))
@@ -380,6 +384,7 @@ class SessionHub:
         peer.on_request("ingest/browse", typed(BrowseParams, ingest_browse))
         peer.on_request("ingest/inspect", typed(InspectParams, ingest_inspect))
         peer.on_request("ingest/addPaths", typed(AddPathsParams, ingest_add_paths))
+        peer.on_request("export/annotations", typed(AnnotationsExportRequest, export_annotations))
         peer.on_request("render/image", typed(RenderImageParams, render_image))
         peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
         peer.on_request("jobs/list", typed(None, jobs_list))
