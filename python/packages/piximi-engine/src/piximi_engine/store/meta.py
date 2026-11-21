@@ -324,6 +324,15 @@ class MetaStore:
             params.extend(clause.params)
         return sql, params
 
+    def where_sql(self, kind: str, clauses: Sequence[Clause] = ()) -> tuple[str, list[Any]]:
+        """The ``WHERE`` body and its parameters for rows of ``kind`` under
+        the ``e`` alias, for a caller composing its own statement."""
+        return self._where(kind, clauses)
+
+    def rows(self, sql: str, params: Sequence[Any] = ()) -> list[tuple[Any, ...]]:
+        """Runs a read-only statement a caller composed."""
+        return self._db.execute(sql, tuple(params)).fetchall()
+
     def select_ids(
         self,
         kind: str,

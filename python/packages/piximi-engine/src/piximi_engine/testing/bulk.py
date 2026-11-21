@@ -17,6 +17,7 @@ import argparse
 import sys
 import time
 from collections.abc import Iterable
+from functools import lru_cache
 from pathlib import Path
 from typing import TypeVar
 
@@ -36,6 +37,7 @@ from piximi_schema.entities import (
 from piximi_schema.unknown import UNKNOWN_IMAGE_CATEGORY_ID, generate_kind, generate_uuid
 
 from ..engine import ReferenceEngine
+from ..measure import channel_statistics, intensity_measurements, object_features
 from ..store import annotation_index
 
 T = TypeVar("T")
@@ -48,6 +50,11 @@ PARTITIONS = (Partition.UNASSIGNED, Partition.TRAINING, Partition.VALIDATION, Pa
 def _batches(items: list[T], size: int) -> Iterable[list[T]]:
     for start in range(0, len(items), size):
         yield items[start : start + size]
+
+
+@lru_cache(maxsize=None)
+def _square_features(side: int) -> dict[str, float]:
+    return object_features(np.ones((side, side), dtype=bool))
 
 
 def _pixels(rng: np.random.Generator, size: int) -> np.ndarray:
@@ -135,18 +142,19 @@ def populate(
                 )
             )
             planes.append((Plane(id=plane_id, image_id=image_id, z_index=0), image_id))
+            channel_pixels: list[tuple[str, np.ndarray]] = []
             for c in range(channels):
                 channel_id = generate_uuid()
                 data = _pixels(rng, size) if pixels else None
                 if data is not None:
                     engine.pixels.put(channel_id, data)
+                    channel_pixels.append((channel_id, data))
                 channel_rows.append(
                     (
                         Channel(
                             id=channel_id, plane_id=plane_id, channel_meta_id=f"channel-meta-{c}", name=f"Channel {c}",
                             dtype="uint8", bit_depth=8, width=size, height=size,
-                            max_value=float(data.max()) if data is not None else 255.0,
-                            min_value=float(data.min()) if data is not None else 0.0,
+                            **(channel_statistics(data) if data is not None else {"max_value": 255.0, "min_value": 0.0}),
                         ),
                         plane_id,
                     )
@@ -167,6 +175,14 @@ def populate(
                     bounding_box=(x0, y0, x0 + side, y0 + side),
                     # A full square: no background run, then every pixel.
                     encoded_mask=[0, side * side],
+                    features=_square_features(side),
+                    intensity_measurements={
+                        channel_id: stats
+                        for channel_id, data in channel_pixels
+                        if (stats := intensity_measurements(np.ones((side, side), dtype=bool), data[y0 : y0 + side, x0 : x0 + side]))
+                        is not None
+                    }
+                    or None,
                 )
                 volumes.append((volume, image_id))
                 annotations.append((annotation, image_id))

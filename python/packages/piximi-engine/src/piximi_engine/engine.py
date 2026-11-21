@@ -63,6 +63,7 @@ from piximi_schema.events import (
     ModelsDidChange,
 )
 from piximi_schema.jobs import Job, JobKind, JobStatus
+from piximi_schema.measurements import MeasurementTable, MeasurementTableRequest
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
     AnnotationCountGroup,
@@ -111,7 +112,8 @@ from .classification.service import ClassificationService
 from .decode import SUPPORTED_SUFFIXES, read_image
 from .dedup import MaskedBox, is_duplicate
 from .jobs import JobRegistry
-from .measure import intensity_measurements, object_features
+from .measure import channel_statistics, intensity_measurements, object_features
+from .measurements import measurement_table
 from .models import ModelRegistry, SegmentationModel, default_registry
 from .models.base import apply_option_defaults
 from .query import (
@@ -180,7 +182,7 @@ class ReferenceEngine:
     # ── Engine protocol: session ────────────────────────────────────────────
 
     def capabilities(self) -> list[Capability]:
-        capabilities = [Capability.SEGMENTATION, Capability.EVENTS_PUSH]
+        capabilities = [Capability.SEGMENTATION, Capability.MEASUREMENTS, Capability.EVENTS_PUSH]
         if self.models.classifiers:
             capabilities += [Capability.CLASSIFICATION, Capability.CLASSIFICATION_TRAIN]
         return capabilities
@@ -328,9 +330,7 @@ class ReferenceEngine:
                     bit_depth=decoded.bit_depth,
                     width=width,
                     height=height,
-                    max_value=float(data.max()),
-                    min_value=float(data.min()),
-                    mean=float(data.mean()),
+                    **channel_statistics(data),
                 )
                 self.pixels.put(channel.id, data)
                 channels.append((channel, plane.id))
@@ -481,6 +481,11 @@ class ReferenceEngine:
         return {id: annotation.encoded_mask for id, annotation in found.items()}
 
     # ── Engine protocol: mutations ──────────────────────────────────────────
+
+    # ── Engine protocol: measurements ───────────────────────────────────────
+
+    async def measurement_table(self, request: MeasurementTableRequest) -> MeasurementTable:
+        return measurement_table(self.meta, request)
 
     async def images_delete(self, query: ImageQuery) -> int:
         ids = self.meta.select_ids("image", where=image_clauses(query))

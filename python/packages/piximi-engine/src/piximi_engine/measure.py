@@ -45,6 +45,23 @@ def object_features(mask: np.ndarray) -> dict[str, float]:
     }
 
 
+def channel_statistics(pixels: np.ndarray) -> dict[str, float]:
+    """A whole channel's statistics, keyed as ``Channel`` carries them."""
+    values = np.asarray(pixels).ravel().astype(np.float64)
+    median = float(np.median(values))
+    return {
+        "max_value": float(values.max()),
+        "min_value": float(values.min()),
+        "total": float(values.sum()),
+        "mean": float(values.mean()),
+        "median": median,
+        "std": float(values.std()),
+        "mad": float(np.median(np.abs(values - median))),
+        "lower_quartile": float(np.percentile(values, 25)),
+        "upper_quartile": float(np.percentile(values, 75)),
+    }
+
+
 def intensity_measurements(mask: np.ndarray, pixels: np.ndarray) -> dict[str, float] | None:
     """Statistics of ``pixels`` under ``mask`` (same shape); ``None`` when the
     object is too small for them to mean anything."""
