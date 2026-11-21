@@ -68,6 +68,12 @@ export type ProtocolMethods = {
     progress: void;
     direction: "client->server";
   };
+  "measurements/table": {
+    params: P.MeasurementTableRequest;
+    result: P.MeasurementTable;
+    progress: void;
+    direction: "client->server";
+  };
   "images/delete": {
     params: P.ImagesDeleteParams;
     result: P.DeletedResult;

@@ -43,6 +43,7 @@ from piximi_schema.events import (
     ModelsDidChange,
 )
 from piximi_schema.jobs import Job
+from piximi_schema.measurements import MeasurementTable, MeasurementTableRequest
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
     AnnotationCountGroup,
@@ -121,6 +122,10 @@ class Engine(Protocol):
     ) -> CountsResult: ...
 
     async def masks(self, annotation_ids: list[str]) -> dict[str, list[int]]: ...
+
+    async def measurement_table(self, request: MeasurementTableRequest) -> MeasurementTable:
+        """A scope's measurements as columns; see ``piximi_schema.measurements``."""
+        ...
 
     # ── Mutations ───────────────────────────────────────────────────────────
 

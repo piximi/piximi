@@ -27,6 +27,7 @@ from piximi_schema.classification import (
     ClassifiersResult,
     ClassifierUpdateRequest,
 )
+from piximi_schema.measurements import MeasurementTableRequest
 from piximi_schema.methods import (
     AnnotationCountsParams,
     AnnotationIdsParams,
@@ -265,6 +266,9 @@ class SessionHub:
         peer.on_request("query/annotationIds", typed(AnnotationIdsParams, annotation_ids))
         peer.on_request("query/annotationCounts", typed(AnnotationCountsParams, annotation_counts))
         peer.on_request("query/masks", typed(MasksParams, masks))
+        peer.on_request(
+            "measurements/table", typed(MeasurementTableRequest, lambda p, _ctx: engine.measurement_table(p))
+        )
         peer.on_request("images/delete", typed(ImagesDeleteParams, images_delete))
         peer.on_request("annotations/delete", typed(AnnotationsDeleteParams, annotations_delete))
         peer.on_request("images/categorize", typed(ImagesCategorizeParams, images_categorize))

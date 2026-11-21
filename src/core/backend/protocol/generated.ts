@@ -1434,6 +1434,50 @@ export interface MasksResult {
   };
 }
 /**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "MeasurementScope".
+ */
+export interface MeasurementScope {
+  type: "images" | "objects";
+  kindId?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "MeasurementTable".
+ */
+export interface MeasurementTable {
+  ids: string[];
+  imageIds?: string[];
+  imageNames: string[];
+  categoryIds: string[];
+  partitions: Partition[];
+  timepoints: number[];
+  boundingBoxes?: [number, number, number, number][];
+  values: {
+    [k: string]: (number | null)[];
+  };
+  total: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "MeasurementTableRequest".
+ */
+export interface MeasurementTableRequest {
+  scope: MeasurementScope;
+  columns: string[];
+  imageQuery?: ImageQuery;
+  annotationQuery?: AnnotationQuery;
+  page?: TablePageRequest;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "TablePageRequest".
+ */
+export interface TablePageRequest {
+  offset?: number;
+  limit: number;
+}
+/**
  * The model list changed: one was registered, or its status moved (an
  * environment built, weights loaded, a failure). Carries the whole list,
  * which is short, so a client replaces what it shows.

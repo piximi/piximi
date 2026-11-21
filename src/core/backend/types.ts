@@ -61,6 +61,7 @@ export interface Backend {
   readonly categories: BackendCategories;
   readonly segmentation?: BackendSegmentation;
   readonly classification?: BackendClassification;
+  readonly measurements?: BackendMeasurements;
 }
 
 export type BackendKind = "local" | "remote";
@@ -476,6 +477,52 @@ export type ClassifierUrlImportRequest = {
   url: string;
   format: "layers" | "graph";
 };
+
+// ── Measurements ─────────────────────────────────────────────────────────────
+
+export type MeasurementScope = {
+  type: "images" | "objects";
+  /* The kind whose objects are tabled; required for `objects`. */
+  kindId?: string;
+};
+
+export type MeasurementTableRequest = {
+  scope: MeasurementScope;
+  /* Keys from `measurements/columns`; an unknown one is refused. */
+  columns: string[];
+  /* Restricts an `images` scope. */
+  imageQuery?: ImageQuery;
+  /* Restricts an `objects` scope, within its kind. */
+  annotationQuery?: AnnotationQuery;
+  /* A window of the rows; absent is all of them. */
+  page?: PageRequest;
+};
+
+/*
+ * A scope's entities with the requested measurements as columns, aligned
+ * with `ids`; a value no backend has computed is `null`.
+ */
+export type MeasurementTable = {
+  ids: string[];
+  /* For objects, the image each belongs to. */
+  imageIds?: string[];
+  imageNames: string[];
+  categoryIds: string[];
+  partitions: Partition[];
+  timepoints: number[];
+  /* For objects. */
+  boundingBoxes?: BBox[];
+  values: Record<string, (number | null)[]>;
+  /* Rows the scope and query match, not of the page. */
+  total: number;
+};
+
+export interface BackendMeasurements {
+  table(
+    request: MeasurementTableRequest,
+    options?: CallOptions,
+  ): Promise<MeasurementTable>;
+}
 
 export interface BackendClassification {
   /* Listed models with a classification task. */

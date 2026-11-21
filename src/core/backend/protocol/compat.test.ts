@@ -58,6 +58,9 @@ import type {
   Counts,
   ImageCountGroup,
   ImageQuery,
+  MeasurementScope,
+  MeasurementTable,
+  MeasurementTableRequest,
   ImageSort,
   ImageUpdate,
   ModelDescriptor,
@@ -229,6 +232,22 @@ type Checks = [
   Assert<Equivalent<P.AnnotationSort, AnnotationSort>>,
   Assert<Equivalent<P.ImageQuery, WithPartitions<ImageQuery>>>,
   Assert<Equivalent<P.AnnotationQuery, WithPartitions<AnnotationQuery>>>,
+  Assert<Equivalent<P.MeasurementScope, MeasurementScope>>,
+  Assert<
+    Equivalent<
+      P.MeasurementTableRequest,
+      Omit<MeasurementTableRequest, "imageQuery" | "annotationQuery"> & {
+        imageQuery?: WithPartitions<ImageQuery>;
+        annotationQuery?: WithPartitions<AnnotationQuery>;
+      }
+    >
+  >,
+  Assert<
+    Equivalent<
+      P.MeasurementTable,
+      Omit<MeasurementTable, "partitions"> & { partitions: Values<Partition>[] }
+    >
+  >,
   Assert<Equivalent<P.ImageCountGroup, ImageCountGroup>>,
   Assert<Equivalent<P.AnnotationCountGroup, AnnotationCountGroup>>,
   Assert<Equivalent<P.CountsResult, Counts>>,

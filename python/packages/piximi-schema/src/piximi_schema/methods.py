@@ -27,6 +27,7 @@ from .classification import (
 from .entities import Category
 from .events import EVENT_TYPES
 from .jobs import Job
+from .measurements import MeasurementTable, MeasurementTableRequest
 from .query import (
     AnnotationCountGroup,
     AnnotationPage,
@@ -213,6 +214,7 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("query/annotationIds", AnnotationIdsParams, IdsResult),
     MethodSpec("query/annotationCounts", AnnotationCountsParams, CountsResult),
     MethodSpec("query/masks", MasksParams, MasksResult),
+    MethodSpec("measurements/table", MeasurementTableRequest, MeasurementTable),
     MethodSpec("images/delete", ImagesDeleteParams, DeletedResult),
     MethodSpec("annotations/delete", AnnotationsDeleteParams, DeletedResult),
     MethodSpec("images/categorize", ImagesCategorizeParams, ChangedResult),

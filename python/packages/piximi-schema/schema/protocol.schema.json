@@ -2426,6 +2426,149 @@
       "title": "MasksResult",
       "type": "object"
     },
+    "MeasurementScope": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "images",
+            "objects"
+          ],
+          "type": "string"
+        },
+        "kindId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "MeasurementScope",
+      "type": "object"
+    },
+    "MeasurementTable": {
+      "additionalProperties": false,
+      "properties": {
+        "ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "imageIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "imageNames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "categoryIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "partitions": {
+          "items": {
+            "$ref": "#/$defs/Partition"
+          },
+          "type": "array"
+        },
+        "timepoints": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "boundingBoxes": {
+          "items": {
+            "maxItems": 4,
+            "minItems": 4,
+            "type": "array",
+            "items": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "additionalItems": false
+          },
+          "type": "array"
+        },
+        "values": {
+          "additionalProperties": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "type": "object"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ids",
+        "imageNames",
+        "categoryIds",
+        "partitions",
+        "timepoints",
+        "values",
+        "total"
+      ],
+      "title": "MeasurementTable",
+      "type": "object"
+    },
+    "MeasurementTableRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/MeasurementScope"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "imageQuery": {
+          "$ref": "#/$defs/ImageQuery"
+        },
+        "annotationQuery": {
+          "$ref": "#/$defs/AnnotationQuery"
+        },
+        "page": {
+          "$ref": "#/$defs/TablePageRequest"
+        }
+      },
+      "required": [
+        "scope",
+        "columns"
+      ],
+      "title": "MeasurementTableRequest",
+      "type": "object"
+    },
     "Metric": {
       "enum": [
         "Binary accuracy",
@@ -3741,6 +3884,26 @@
       "title": "SortDirection",
       "type": "string"
     },
+    "TablePageRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "offset": {
+          "default": 0,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "limit": {
+          "maximum": 50000,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "limit"
+      ],
+      "title": "TablePageRequest",
+      "type": "object"
+    },
     "ThumbnailFailed": {
       "additionalProperties": false,
       "properties": {
@@ -3906,6 +4069,12 @@
       "direction": "client->server",
       "params": "#/$defs/MasksParams",
       "result": "#/$defs/MasksResult",
+      "progress": null
+    },
+    "measurements/table": {
+      "direction": "client->server",
+      "params": "#/$defs/MeasurementTableRequest",
+      "result": "#/$defs/MeasurementTable",
       "progress": null
     },
     "images/delete": {
