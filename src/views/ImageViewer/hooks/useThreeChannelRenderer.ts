@@ -5,6 +5,8 @@ import { useSelector } from "react-redux";
 import * as THREE from "three";
 import { Image as IJSImage } from "image-js-latest";
 
+import { useBackend } from "core/backend";
+
 import { selectActiveExtendedChannels } from "store/data/selectors";
 import { useParameterizedSelector } from "store/hooks";
 
@@ -97,11 +99,18 @@ const buildUniforms = (
   };
 };
 
+/*
+ * Draws the active plane: raw channels go through the compositing shader
+ * (and are read back as the tools' image); a composite the backend rendered
+ * is shown as it is and handed to the tools directly.
+ */
 export const useThreeChannelRenderer = (
   imageWidth: number,
   imageHeight: number,
 ) => {
-  const { channelData, setIjsImage } = useActiveImage();
+  const { channelData, composite, setIjsImage } = useActiveImage();
+  const backend = useBackend();
+  const composited = !backend.render.raw;
   const activeImageId = useSelector(selectActiveImageId);
   const activeChannels = useParameterizedSelector(
     selectActiveExtendedChannels,
@@ -111,8 +120,12 @@ export const useThreeChannelRenderer = (
   const { cameraRef, rendererRef, sceneRef } = useThreeViewport();
 
   const meshRef = useRef<THREE.Mesh | null>(null);
-  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
-  const texRef = useRef<THREE.DataArrayTexture | null>(null);
+  const materialRef = useRef<
+    THREE.ShaderMaterial | THREE.MeshBasicMaterial | null
+  >(null);
+  const texRef = useRef<THREE.DataArrayTexture | THREE.DataTexture | null>(
+    null,
+  );
   const imageCamRef = useRef<THREE.OrthographicCamera | null>(null); // fixed camera for readback
 
   const imageTargetRef = useRef<THREE.WebGLRenderTarget | null>(null);
@@ -148,19 +161,22 @@ export const useThreeChannelRenderer = (
     const scene = sceneRef.current;
     if (!scene) return;
 
-    const material = new THREE.ShaderMaterial({
-      glslVersion: THREE.GLSL3,
-      vertexShader: compositeThreeVert,
-      fragmentShader: compositeFrag,
-      uniforms: {
-        uChannels: { value: null },
-        uChannelCount: { value: 0 },
-        uColorMaps: { value: new Array(MAX_CHANNELS * 3).fill(0) },
-        uRampMins: { value: new Array(MAX_CHANNELS).fill(0) },
-        uRampMaxes: { value: new Array(MAX_CHANNELS).fill(1) },
-        uVisible: { value: new Array(MAX_CHANNELS).fill(0) },
-      },
-    });
+    const material = composited
+      ? // The picture arrives finished; shown with its bytes unchanged.
+        new THREE.MeshBasicMaterial({ toneMapped: false })
+      : new THREE.ShaderMaterial({
+          glslVersion: THREE.GLSL3,
+          vertexShader: compositeThreeVert,
+          fragmentShader: compositeFrag,
+          uniforms: {
+            uChannels: { value: null },
+            uChannelCount: { value: 0 },
+            uColorMaps: { value: new Array(MAX_CHANNELS * 3).fill(0) },
+            uRampMins: { value: new Array(MAX_CHANNELS).fill(0) },
+            uRampMaxes: { value: new Array(MAX_CHANNELS).fill(1) },
+            uVisible: { value: new Array(MAX_CHANNELS).fill(0) },
+          },
+        });
     const geometry = new THREE.PlaneGeometry(imageWidth, imageHeight);
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
@@ -173,16 +189,73 @@ export const useThreeChannelRenderer = (
       geometry.dispose();
       material.dispose();
     };
-  }, [sceneRef, imageWidth, imageHeight]);
+  }, [sceneRef, imageWidth, imageHeight, composited]);
+
+  // --- A composite from the backend: texture it and hand it to the tools ---
+  useEffect(() => {
+    if (!composited) return;
+    const mat = materialRef.current;
+    const renderer = rendererRef.current;
+    const camera = cameraRef.current;
+    const scene = sceneRef.current;
+    if (!(mat instanceof THREE.MeshBasicMaterial) || !renderer || !camera)
+      return;
+    if (!scene) return;
+    if (
+      !composite ||
+      composite.width !== imageWidth ||
+      composite.height !== imageHeight
+    ) {
+      if (meshRef.current) meshRef.current.visible = false;
+      renderer.render(scene, camera);
+      return;
+    }
+    texRef.current?.dispose();
+    const tex = new THREE.DataTexture(
+      composite.data,
+      composite.width,
+      composite.height,
+      THREE.RGBAFormat,
+      THREE.UnsignedByteType,
+    );
+    // Rows arrive top first; three's plane reads them bottom first.
+    tex.flipY = true;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.minFilter = THREE.NearestFilter;
+    tex.magFilter = THREE.NearestFilter;
+    tex.needsUpdate = true;
+    texRef.current = tex;
+    mat.map = tex;
+    mat.needsUpdate = true;
+    if (meshRef.current) meshRef.current.visible = true;
+    renderer.render(scene, camera);
+    setIjsImage(
+      new IJSImage(composite.width, composite.height, {
+        data: composite.data,
+        colorModel: "RGBA",
+      }),
+    );
+  }, [
+    composited,
+    composite,
+    imageWidth,
+    imageHeight,
+    rendererRef,
+    sceneRef,
+    cameraRef,
+    setIjsImage,
+  ]);
 
   useEffect(() => {
+    if (composited) return;
     const mat = materialRef.current;
     const renderer = rendererRef.current;
     const camera = cameraRef.current;
     const imageCam = imageCamRef.current;
     const target = imageTargetRef.current;
     const scene = sceneRef.current;
-    if (!mat || !renderer || !camera || !imageCam || !target || !scene) return;
+    if (!(mat instanceof THREE.ShaderMaterial)) return;
+    if (!renderer || !camera || !imageCam || !target || !scene) return;
     if (channelData.length === 0) {
       if (meshRef.current) meshRef.current.visible = false;
       renderer.setRenderTarget(null);
@@ -226,6 +299,7 @@ export const useThreeChannelRenderer = (
       }).flip({ axis: "vertical" }),
     );
   }, [
+    composited,
     channelData,
     activeChannels,
     imageWidth,

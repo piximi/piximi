@@ -16,5 +16,7 @@ export { useProjectLoader } from "./useProjectLoader";
 export { useProjectSaver } from "./useProjectSaver";
 export { useHistogram } from "./useHistogram";
 export { useRawImageData } from "./useRawImageData";
+export { useCompositeImage } from "./useCompositeImage";
+export type { CompositeImage } from "./useCompositeImage";
 export { useRenderedSrc } from "./useRenderedSrcs";
 export { usePreloadSrcs } from "./usePreloadSrcs";

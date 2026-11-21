@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, useState } from "react";
 
 import { useSelector } from "react-redux";
 
-import { useRawImageData } from "hooks";
+import { useCompositeImage, useRawImageData } from "hooks";
 
 import { useParameterizedSelector } from "store/hooks";
 import { selectActiveExtendedChannels } from "store/data/selectors";
@@ -15,16 +15,25 @@ import type { Image as IJSImage } from "image-js-latest";
 
 import type { BitDepth } from "core/entities";
 
+import type { CompositeImage } from "hooks";
+
+/*
+ * The active plane's pixels, in whichever form the backend gives them: raw
+ * channels (composited on the GPU here) or a composite it rendered. Either
+ * way the tools end up with the composited `ijsImage`.
+ */
 const ActiveImageContext = createContext<{
   channelData: Array<{
     bitDepth: BitDepth;
     data: Uint8Array<ArrayBuffer> | Uint16Array<ArrayBuffer>;
   }>;
+  composite: CompositeImage | undefined;
   channelsLoading: boolean;
   ijsImage: IJSImage | null;
   setIjsImage: (v: IJSImage | null) => void;
 }>({
   channelData: [],
+  composite: undefined,
   channelsLoading: false,
   ijsImage: null,
   setIjsImage: () => {},
@@ -38,17 +47,19 @@ export const ActiveImageProvider = ({ children }: { children: ReactNode }) => {
   );
   const [ijsImage, setIjsImage] = useState<IJSImage | null>(null);
 
-  const { channelData, loading: channelsLoading } =
-    useRawImageData(activeChannels);
+  const { channelData, loading: rawLoading } = useRawImageData(activeChannels);
+  const { composite, loading: compositeLoading } =
+    useCompositeImage(activeChannels);
 
   const value = useMemo(
     () => ({
       channelData,
-      channelsLoading,
+      composite,
+      channelsLoading: rawLoading || compositeLoading,
       ijsImage,
       setIjsImage,
     }),
-    [channelData, channelsLoading, ijsImage],
+    [channelData, composite, rawLoading, compositeLoading, ijsImage],
   );
 
   return (
