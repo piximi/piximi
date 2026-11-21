@@ -4532,6 +4532,9 @@
         },
         "predictionCorrected": {
           "$ref": "#/$defs/PredictionCorrection"
+        },
+        "rev": {
+          "type": "integer"
         }
       },
       "required": [

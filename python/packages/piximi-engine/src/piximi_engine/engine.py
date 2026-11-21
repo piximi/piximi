@@ -1542,6 +1542,7 @@ def _volume_update(volume: AnnotationVolume) -> VolumeUpdate:
         prediction_confidence=volume.prediction_confidence,
         predicted_at_run_id=volume.predicted_at_run_id,
         prediction_corrected=volume.prediction_corrected,
+        rev=volume.rev,
     )
 
 

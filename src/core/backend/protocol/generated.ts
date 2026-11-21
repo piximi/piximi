@@ -538,6 +538,7 @@ export interface VolumeUpdate {
   predictionConfidence?: number;
   predictedAtRunId?: string;
   predictionCorrected?: PredictionCorrection;
+  rev?: number;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema

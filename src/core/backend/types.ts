@@ -284,6 +284,9 @@ export type VolumeUpdate = Omit<Predictable, "partition"> & {
   id: string;
   kindId: string;
   categoryId: string;
+  /* The volume's revision after the change, so a copy held by a viewing
+   * session can commit against it later without a spurious conflict. */
+  rev?: number;
 };
 
 export type AnnotationUpdate = { id: string; partition: Partition };

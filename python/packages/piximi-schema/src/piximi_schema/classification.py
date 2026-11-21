@@ -312,6 +312,9 @@ class VolumeUpdate(WireModel):
     prediction_confidence: float | None = None
     predicted_at_run_id: str | None = None
     prediction_corrected: PredictionCorrection | None = None
+    rev: int | None = None
+    """The volume's revision after the change, so a client holding a copy
+    can commit against it later without a spurious conflict."""
 
 
 class AnnotationUpdate(WireModel):

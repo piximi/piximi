@@ -37,4 +37,5 @@ export const volumeUpdate = (volume: AnnotationVolume): VolumeUpdate => ({
   kindId: volume.kindId,
   categoryId: volume.categoryId,
   ...predicted(volume),
+  ...(volume.rev !== undefined && { rev: volume.rev }),
 });

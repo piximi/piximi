@@ -813,12 +813,13 @@ export class FakeBackend implements Backend {
         volume.kindId = UNKNOWN_KIND.id;
         volume.categoryId = UNKNOWN_KIND_CATEGORY.id;
         volume.rev = ++this.#rev;
-        const { id, kindId, categoryId, predictionCorrected } = volume;
+        const { id, kindId, categoryId, predictionCorrected, rev } = volume;
         volumes.push({
           id,
           kindId,
           categoryId,
           ...(predictionCorrected && { predictionCorrected }),
+          rev,
         });
       }
       this.#categories = this.#categories.filter(
@@ -1129,12 +1130,13 @@ export class FakeBackend implements Backend {
     volume.rev = ++this.#rev;
     delete volume.predictionConfidence;
     delete volume.predictedAtRunId;
-    const { id, kindId, categoryId, predictionCorrected } = volume;
+    const { id, kindId, categoryId, predictionCorrected, rev } = volume;
     return {
       id,
       kindId,
       categoryId,
       ...(predictionCorrected && { predictionCorrected }),
+      rev,
     };
   }
 

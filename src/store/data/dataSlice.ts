@@ -519,6 +519,7 @@ export const dataSlice = createSlice({
             id: string;
             kindId: string;
             categoryId: string;
+            rev?: number;
           }
         >
       >,
@@ -535,6 +536,7 @@ export const dataSlice = createSlice({
               predictionConfidence: changes.predictionConfidence,
               predictedAtRunId: changes.predictedAtRunId,
               predictionCorrected: changes.predictionCorrected,
+              ...(changes.rev !== undefined && { rev: changes.rev }),
             },
           })),
       );
