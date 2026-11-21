@@ -7,6 +7,7 @@ import asyncio
 import logging
 import threading
 from collections import defaultdict
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from collections.abc import Callable, Iterable
 from pathlib import Path
@@ -76,6 +77,14 @@ from piximi_schema.events import (
     ModelsDidChange,
     ProjectDidChange,
 )
+from piximi_schema.ingest import (
+    DimensionConfig,
+    IngestFailure,
+    IngestOpenResult,
+    IngestPutResult,
+    IngestSummary,
+    UploadFile,
+)
 from piximi_schema.jobs import Job, JobKind, JobStatus
 from piximi_schema.measurements import (
     MeasurementsComputeRequest,
@@ -130,7 +139,7 @@ from piximi_schema.unknown import (
 from .classification import next_partition, prediction_correction
 from .classification.service import ClassificationService
 
-from .decode import SUPPORTED_SUFFIXES, read_image
+from .decode import SUPPORTED_SUFFIXES, DecodedImage, decode_bytes, decode_path
 from .dedup import MaskedBox, is_duplicate
 from .jobs import JobRegistry
 from .measure import channel_statistics, intensity_measurements, object_features
@@ -203,6 +212,8 @@ class ReferenceEngine:
         self._run_contexts: dict[str, HandlerContext] = {}
         self._loads: dict[str, asyncio.Future[None]] = {}
         """Model loads in flight, by model id; a second request joins the first."""
+        self._uploads: dict[str, _Upload] = {}
+        """Browser uploads in progress, by upload id."""
         self.jobs = JobRegistry(self._emit)
         self.classification = ClassificationService(self)
         self._ensure_project()
@@ -213,6 +224,7 @@ class ReferenceEngine:
         capabilities = [
             Capability.SEGMENTATION,
             Capability.MEASUREMENTS,
+            Capability.INGEST_UPLOAD,
             Capability.ANNOTATIONS_COMMIT,
             Capability.EVENTS_PUSH,
         ]
@@ -300,95 +312,217 @@ class ReferenceEngine:
             self.meta.put("experiment", _ExperimentRow(id="experiment", experiment=experiment))
         return experiment
 
-    def ensure_channel_metas(self, count: int, bit_depth: int, max_intensity: float) -> list[ChannelMeta]:
+    def ensure_channel_metas(
+        self, count: int, bit_depth: int, limits: list[tuple[float, float]] | float
+    ) -> tuple[list[ChannelMeta], list[ChannelMeta]]:
         """Creates the display settings for channel indices that have none
-        yet (``channel-meta-<index>``); returns only the new ones."""
-        metas = {meta.id for meta in self.meta.list("channel_meta", ChannelMeta)}
-        new_metas: list[ChannelMeta] = []
+        yet (``channel-meta-<index>``), with the value range seen in the
+        first image to carry them, and widens the limits of existing ones
+        to the ranges given; returns ``(created, widened)``. A single number
+        stands for ``(0, number)`` on every index."""
+        if not isinstance(limits, list):
+            limits = [(0.0, float(limits))] * count
+        existing = {meta.id: meta for meta in self.meta.list("channel_meta", ChannelMeta)}
+        created: list[ChannelMeta] = []
+        widened: list[ChannelMeta] = []
         for index in range(count):
             meta_id = f"channel-meta-{index}"
-            if meta_id not in metas:
-                new_metas.append(
+            low, high = limits[index]
+            meta = existing.get(meta_id)
+            if meta is None:
+                created.append(
                     ChannelMeta(
                         id=meta_id,
                         name=f"Channel-{index}",
                         bit_depth=bit_depth,
                         color_map=DEFAULT_COLORS[index % len(DEFAULT_COLORS)],
                         visible=True,
-                        min_value=0,
-                        max_value=max_intensity,
-                        ramp_min=0,
-                        ramp_max=max_intensity,
-                        ramp_min_limit=0,
-                        ramp_max_limit=max_intensity,
+                        min_value=low,
+                        max_value=high,
+                        ramp_min=low,
+                        ramp_max=high,
+                        ramp_min_limit=low,
+                        ramp_max_limit=high,
                     )
                 )
-        self.meta.put_many("channel_meta", [(meta, None) for meta in new_metas])
-        return new_metas
+            elif low < meta.min_value or high > meta.max_value:
+                widened.append(
+                    meta.model_copy(
+                        update={
+                            "min_value": min(meta.min_value, low),
+                            "max_value": max(meta.max_value, high),
+                            "ramp_min_limit": min(meta.ramp_min_limit, low),
+                            "ramp_max_limit": max(meta.ramp_max_limit, high),
+                        }
+                    )
+                )
+        self.meta.put_many("channel_meta", [(meta, None) for meta in created + widened])
+        return created, widened
 
-    def ingest_file(self, path: Path) -> list[str]:
-        decoded = read_image(path)
-        height, width = decoded.shape
-        max_intensity = 2**decoded.bit_depth - 1
-        dtype = "uint8" if decoded.bit_depth == 8 else "uint16"
+    def ingest_file(self, path: Path, config: DimensionConfig | None = None) -> list[str]:
+        """Adds a file from disk; a TIFF stack takes a dimension config."""
+        prepared = self._prepare_images(path.stem, decode_path(path, config), self.experiment.id)
+        return self._commit_images(prepared, source=str(path.resolve()))
 
-        experiment = self.ensure_channels(decoded.channels)
-        new_metas = self.ensure_channel_metas(decoded.channels, decoded.bit_depth, max_intensity)
-
-        series_id, image_id = generate_uuid(), generate_uuid()
-        shape = Shape(planes=len(decoded.planes), height=height, width=width, channels=decoded.channels)
-        planes = [Plane(id=generate_uuid(), image_id=image_id, z_index=z) for z in range(len(decoded.planes))]
-        image = ImageObject(
-            id=image_id,
-            name=path.stem,
-            series_id=series_id,
-            shape=shape,
-            category_id=UNKNOWN_IMAGE_CATEGORY_ID,
-            active_plane_id=planes[0].id,
-            timepoint=0,
-            bit_depth=decoded.bit_depth,
-            partition=Partition.UNASSIGNED,
-        )
+    def _prepare_images(self, name: str, decoded: list[DecodedImage], experiment_id: str) -> _PreparedImages:
+        """Turns decoded images into one series' entities and stores their
+        pixels. Runs anywhere: nothing here touches the metadata store
+        (whose connection belongs to the loop's thread), so an upload
+        decodes and writes pixels off the loop and only the bookkeeping
+        (``_commit_images``) waits for it."""
+        first = decoded[0]
+        height, width = first.shape
+        bit_depth = first.bit_depth
+        channel_count = first.channels
+        for image in decoded[1:]:
+            if image.shape != first.shape or image.channels != channel_count or image.bit_depth != bit_depth:
+                raise ValueError("Every frame of a file must have the same size, channels and bit depth")
+        dtype = "uint8" if bit_depth == 8 else "uint16"
+        series_id = generate_uuid()
+        images: list[ImageObject] = []
+        planes: list[tuple[Plane, str]] = []
+        channels: list[tuple[Channel, str]] = []
+        limits = [(float("inf"), float("-inf"))] * channel_count
+        for t, image in enumerate(decoded):
+            image_id = generate_uuid()
+            shape = Shape(planes=len(image.planes), height=height, width=width, channels=channel_count)
+            image_planes = [Plane(id=generate_uuid(), image_id=image_id, z_index=z) for z in range(len(image.planes))]
+            images.append(
+                ImageObject(
+                    id=image_id,
+                    name=name if len(decoded) == 1 else f"{name}-t{t}",
+                    series_id=series_id,
+                    shape=shape,
+                    category_id=UNKNOWN_IMAGE_CATEGORY_ID,
+                    active_plane_id=image_planes[len(image_planes) // 2].id,
+                    timepoint=t,
+                    bit_depth=bit_depth,
+                    partition=Partition.UNASSIGNED,
+                )
+            )
+            planes.extend((plane, image_id) for plane in image_planes)
+            for plane, pixels in zip(image_planes, image.planes):
+                for index in range(channel_count):
+                    data = pixels[index]
+                    channel = Channel(
+                        id=generate_uuid(),
+                        plane_id=plane.id,
+                        channel_meta_id=f"channel-meta-{index}",
+                        name=f"Channel-{index}",
+                        dtype=dtype,
+                        bit_depth=bit_depth,
+                        width=width,
+                        height=height,
+                        **channel_statistics(data),
+                    )
+                    low, high = limits[index]
+                    limits[index] = (min(low, channel.min_value), max(high, channel.max_value))
+                    self.pixels.put(channel.id, data)
+                    channels.append((channel, plane.id))
         series = ImageSeries(
             id=series_id,
-            experiment_id=experiment.id,
-            name=path.stem,
-            bit_depth=decoded.bit_depth,
-            shape=shape,
-            time_series=False,
-            active_image_id=image_id,
+            experiment_id=experiment_id,
+            name=name,
+            bit_depth=bit_depth,
+            shape=images[0].shape,
+            time_series=len(decoded) > 1,
+            active_image_id=images[0].id,
         )
-        channels: list[tuple[Channel, str]] = []
-        for plane, pixels in zip(planes, decoded.planes):
-            for index in range(decoded.channels):
-                data = pixels[index]
-                channel = Channel(
-                    id=generate_uuid(),
-                    plane_id=plane.id,
-                    channel_meta_id=f"channel-meta-{index}",
-                    name=f"Channel-{index}",
-                    dtype=dtype,
-                    bit_depth=decoded.bit_depth,
-                    width=width,
-                    height=height,
-                    **channel_statistics(data),
-                )
-                self.pixels.put(channel.id, data)
-                channels.append((channel, plane.id))
+        return _PreparedImages(series=series, images=images, planes=planes, channels=channels, limits=limits)
 
-        self.meta.put("series", series)
-        self.meta.put("image", image, parent=series_id)
-        self.meta.put_many("plane", [(plane, image_id) for plane in planes])
-        self.meta.put_many("channel", channels)
-        self.meta.record_source(str(path.resolve()), [image_id])
+    def _commit_images(self, prepared: _PreparedImages, *, source: str | None) -> list[str]:
+        """Writes a prepared series' rows and announces its images."""
+        series, images = prepared.series, prepared.images
+        channel_count = series.shape.channels
+        self.ensure_channels(channel_count)
+        created, widened = self.ensure_channel_metas(channel_count, series.bit_depth, prepared.limits)
+        with self.meta.transaction():
+            self.meta.put("series", series)
+            self.meta.put_many("image", [(image, series.id) for image in images])
+            self.meta.put_many("plane", prepared.planes)
+            self.meta.put_many("channel", prepared.channels)
+            if source is not None:
+                self.meta.record_source(source, [image.id for image in images])
+        image_ids = [image.id for image in images]
         self._emit(
             ImagesDidAdd(
                 type="images/didAdd",
-                records=[self._image_record(image_id)],
-                channel_metas=new_metas,
+                records=self._image_records(image_ids),
+                channel_metas=created,
+                updated_channel_metas=widened,
             )
         )
-        return [image_id]
+        return image_ids
+
+    # ── Engine protocol: ingest ─────────────────────────────────────────────
+    #
+    # A browser upload is one job per batch, streamed a file at a time. The
+    # job is cancellable from any client: the next ``put`` after a cancel is
+    # refused, and ``close`` records the outcome.
+
+    async def ingest_open(self, expected: int) -> IngestOpenResult:
+        self._capture_loop()
+        job = self.jobs.start(JobKind.INGEST, f"Adding {expected} image file{'s' if expected != 1 else ''}")
+        upload = _Upload(id=generate_uuid(), job_id=job.id, expected=expected)
+        self._uploads[upload.id] = upload
+        return IngestOpenResult(upload_id=upload.id, job_id=job.id)
+
+    async def ingest_put(self, upload_id: str, file: UploadFile) -> IngestPutResult:
+        upload = self._upload(upload_id)
+        if upload.cancelled or self.jobs.is_cancelling(upload.job_id):
+            upload.cancelled = True
+            raise RequestCancelled()
+        upload.received += 1
+        self.jobs.update(
+            upload.job_id,
+            progress=(upload.received - 1) / upload.expected * 100 if upload.expected else -1,
+            message=f"Adding {file.name} ({upload.received}/{max(upload.expected, upload.received)})",
+        )
+        experiment_id = self.experiment.id
+        try:
+            prepared = await asyncio.to_thread(
+                lambda: self._prepare_images(
+                    Path(file.name).stem,
+                    decode_bytes(file.name, file.data, file.mime_type, file.dimension_config),
+                    experiment_id,
+                )
+            )
+            image_ids = self._commit_images(prepared, source=None)
+        except Exception as error:
+            log.warning("upload %s: %s failed: %s", upload_id, file.name, error)
+            upload.failed.append(IngestFailure(name=file.name, error=str(error)))
+            return IngestPutResult(image_ids=[], error=str(error))
+        upload.image_ids.extend(image_ids)
+        return IngestPutResult(image_ids=image_ids)
+
+    async def ingest_close(self, upload_id: str, cancelled: bool = False) -> IngestSummary:
+        upload = self._uploads.pop(upload_id, None)
+        if upload is None:
+            raise BackendError("NOT_FOUND", f"No upload {upload_id}")
+        cancelled = cancelled or upload.cancelled or self.jobs.is_cancelling(upload.job_id)
+        added = len(upload.image_ids)
+        failed = len(upload.failed)
+        if cancelled:
+            self.jobs.finish(upload.job_id, JobStatus.CANCELLED, message=f"Stopped after {added} image{'s' if added != 1 else ''}")
+        elif failed and not added:
+            self.jobs.finish(
+                upload.job_id,
+                JobStatus.FAILED,
+                message="No images added",
+                error=upload.failed[0].error if failed == 1 else f"{failed} files could not be added: {upload.failed[0].error}",
+            )
+        else:
+            message = f"Added {added} image{'s' if added != 1 else ''}"
+            if failed:
+                message += f"; {failed} file{'s' if failed != 1 else ''} failed"
+            self.jobs.finish(upload.job_id, JobStatus.SUCCEEDED, message=message)
+        return IngestSummary(job_id=upload.job_id, image_ids=upload.image_ids, failed=upload.failed, cancelled=cancelled)
+
+    def _upload(self, upload_id: str) -> _Upload:
+        upload = self._uploads.get(upload_id)
+        if upload is None:
+            raise BackendError("NOT_FOUND", f"No upload {upload_id}")
+        return upload
 
     # ── Engine protocol: query ──────────────────────────────────────────────
 
@@ -1568,6 +1702,33 @@ def _volume_update(volume: AnnotationVolume) -> VolumeUpdate:
         prediction_corrected=volume.prediction_corrected,
         rev=volume.rev,
     )
+
+
+# ── Ingest bookkeeping ───────────────────────────────────────────────────────
+
+
+@dataclass
+class _PreparedImages:
+    """One file's entities with their pixels already stored; the rows are
+    written by ``_commit_images``."""
+
+    series: ImageSeries
+    images: list[ImageObject]
+    planes: list[tuple[Plane, str]]
+    channels: list[tuple[Channel, str]]
+    limits: list[tuple[float, float]]
+    """Per channel index, the value range across the file's channels."""
+
+
+@dataclass
+class _Upload:
+    id: str
+    job_id: str
+    expected: int
+    received: int = 0
+    image_ids: list[str] = field(default_factory=list)
+    failed: list[IngestFailure] = field(default_factory=list)
+    cancelled: bool = False
 
 
 # ── Storage rows that are not wire models themselves ─────────────────────────

@@ -53,6 +53,7 @@ from piximi_schema.events import (
     ModelsDidChange,
     ProjectDidChange,
 )
+from piximi_schema.ingest import IngestOpenResult, IngestPutResult, IngestSummary, UploadFile
 from piximi_schema.jobs import Job
 from piximi_schema.measurements import (
     MeasurementsComputeRequest,
@@ -152,6 +153,24 @@ class Engine(Protocol):
     ) -> MeasurementsComputeSummary:
         """Measures the matching objects as a job, announcing them as
         updated; see ``piximi_schema.measurements``."""
+        ...
+
+    # ── Ingest ──────────────────────────────────────────────────────────────
+
+    async def ingest_open(self, expected: int) -> IngestOpenResult:
+        """Starts an ``ingest`` job for a batch of ``expected`` uploaded
+        files; see ``piximi_schema.ingest``."""
+        ...
+
+    async def ingest_put(self, upload_id: str, file: UploadFile) -> IngestPutResult:
+        """Decodes and adds one file of the batch, announcing its images as
+        ``images/didAdd``; a file that fails is reported in the result, not
+        raised. Raises ``RequestCancelled`` once the job was cancelled."""
+        ...
+
+    async def ingest_close(self, upload_id: str, cancelled: bool = False) -> IngestSummary:
+        """Ends the batch and its job (cancelled when the client says so or
+        the job was cancelled meanwhile); returns what the batch added."""
         ...
 
     # ── Mutations ───────────────────────────────────────────────────────────

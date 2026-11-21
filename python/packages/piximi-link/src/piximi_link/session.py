@@ -8,6 +8,7 @@ notebook reaches every connected client.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import uuid
 from collections.abc import Awaitable, Callable
@@ -40,6 +41,7 @@ from piximi_schema.editing import (
     KindUpdateParams,
     ProjectUpdateParams,
 )
+from piximi_schema.ingest import IngestCloseParams, IngestOpenParams, IngestPutParams
 from piximi_schema.measurements import MeasurementsComputeRequest, MeasurementTableRequest
 from piximi_schema.methods import (
     AnnotationCountsParams,
@@ -94,6 +96,8 @@ class SessionHub:
         self.auth = auth or Auth(None)
         self.session_id = str(uuid.uuid4())
         self._peers: set[Peer] = set()
+        self._uploads: dict[Peer, set[str]] = {}
+        """Uploads each peer has open, closed as cancelled if it goes away."""
         self._unsubscribe = engine.subscribe(self._broadcast)
 
     @property
@@ -109,6 +113,23 @@ class SessionHub:
 
     def detach(self, peer: Peer) -> None:
         self._peers.discard(peer)
+        for upload_id in self._uploads.pop(peer, ()):
+            self._abandon(upload_id)
+
+    def _abandon(self, upload_id: str) -> None:
+        """A peer left mid-upload: end its job as cancelled, on the loop if
+        one is running (``detach`` is called from a transport's teardown)."""
+
+        async def close() -> None:
+            try:
+                await self.engine.ingest_close(upload_id, cancelled=True)
+            except Exception:
+                log.exception("closing abandoned upload %s", upload_id)
+
+        try:
+            asyncio.get_running_loop().create_task(close())
+        except RuntimeError:
+            log.warning("upload %s abandoned with no loop to close it on", upload_id)
 
     async def close(self) -> None:
         self._unsubscribe()
@@ -296,6 +317,18 @@ class SessionHub:
         async def classifier_export(params: ClassifierRequest, _ctx: HandlerContext):
             return await engine.classification_export(params.classifier_id)
 
+        async def ingest_open(params: IngestOpenParams, _ctx: HandlerContext):
+            result = await engine.ingest_open(params.expected)
+            self._uploads.setdefault(peer, set()).add(result.upload_id)
+            return result
+
+        async def ingest_put(params: IngestPutParams, _ctx: HandlerContext):
+            return await engine.ingest_put(params.upload_id, params.file)
+
+        async def ingest_close(params: IngestCloseParams, _ctx: HandlerContext):
+            self._uploads.get(peer, set()).discard(params.upload_id)
+            return await engine.ingest_close(params.upload_id, params.cancelled)
+
         peer.on_request("initialize", typed(InitializeParams, initialize))
         peer.on_request("shutdown", typed(None, shutdown))
         peer.on_request("query/project", typed(None, lambda _ctx: engine.project()))
@@ -324,6 +357,9 @@ class SessionHub:
         peer.on_request("kinds/update", typed(KindUpdateParams, kinds_update))
         peer.on_request("kinds/delete", typed(KindsDeleteParams, kinds_delete))
         peer.on_request("project/update", typed(ProjectUpdateParams, project_update))
+        peer.on_request("ingest/open", typed(IngestOpenParams, ingest_open))
+        peer.on_request("ingest/put", typed(IngestPutParams, ingest_put))
+        peer.on_request("ingest/close", typed(IngestCloseParams, ingest_close))
         peer.on_request("render/image", typed(RenderImageParams, render_image))
         peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
         peer.on_request("jobs/list", typed(None, jobs_list))

@@ -1,0 +1,742 @@
+{
+ "cases": [
+  {
+   "order": "xyczt",
+   "channels": 1,
+   "slices": 1,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyczt",
+   "channels": 2,
+   "slices": 3,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      2
+     ],
+     [
+      4
+     ]
+    ],
+    [
+     [
+      1
+     ],
+     [
+      3
+     ],
+     [
+      5
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyczt",
+   "channels": 2,
+   "slices": 1,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      2
+     ]
+    ],
+    [
+     [
+      1,
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyczt",
+   "channels": 3,
+   "slices": 2,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      6
+     ],
+     [
+      3,
+      9
+     ]
+    ],
+    [
+     [
+      1,
+      7
+     ],
+     [
+      4,
+      10
+     ]
+    ],
+    [
+     [
+      2,
+      8
+     ],
+     [
+      5,
+      11
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyczt",
+   "channels": 1,
+   "slices": 4,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ],
+     [
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyctz",
+   "channels": 1,
+   "slices": 1,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyctz",
+   "channels": 2,
+   "slices": 3,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      2
+     ],
+     [
+      4
+     ]
+    ],
+    [
+     [
+      1
+     ],
+     [
+      3
+     ],
+     [
+      5
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyctz",
+   "channels": 2,
+   "slices": 1,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      2
+     ]
+    ],
+    [
+     [
+      1,
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyctz",
+   "channels": 3,
+   "slices": 2,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      3
+     ],
+     [
+      6,
+      9
+     ]
+    ],
+    [
+     [
+      1,
+      4
+     ],
+     [
+      7,
+      10
+     ]
+    ],
+    [
+     [
+      2,
+      5
+     ],
+     [
+      8,
+      11
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyctz",
+   "channels": 1,
+   "slices": 4,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ],
+     [
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyzct",
+   "channels": 1,
+   "slices": 1,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyzct",
+   "channels": 2,
+   "slices": 3,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ]
+    ],
+    [
+     [
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyzct",
+   "channels": 2,
+   "slices": 1,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      2
+     ]
+    ],
+    [
+     [
+      1,
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyzct",
+   "channels": 3,
+   "slices": 2,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      6
+     ],
+     [
+      1,
+      7
+     ]
+    ],
+    [
+     [
+      2,
+      8
+     ],
+     [
+      3,
+      9
+     ]
+    ],
+    [
+     [
+      4,
+      10
+     ],
+     [
+      5,
+      11
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyzct",
+   "channels": 1,
+   "slices": 4,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ],
+     [
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyztc",
+   "channels": 1,
+   "slices": 1,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyztc",
+   "channels": 2,
+   "slices": 3,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ]
+    ],
+    [
+     [
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyztc",
+   "channels": 2,
+   "slices": 1,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      1
+     ]
+    ],
+    [
+     [
+      2,
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyztc",
+   "channels": 3,
+   "slices": 2,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      2
+     ],
+     [
+      1,
+      3
+     ]
+    ],
+    [
+     [
+      4,
+      6
+     ],
+     [
+      5,
+      7
+     ]
+    ],
+    [
+     [
+      8,
+      10
+     ],
+     [
+      9,
+      11
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xyztc",
+   "channels": 1,
+   "slices": 4,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ],
+     [
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytcz",
+   "channels": 1,
+   "slices": 1,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytcz",
+   "channels": 2,
+   "slices": 3,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      2
+     ],
+     [
+      4
+     ]
+    ],
+    [
+     [
+      1
+     ],
+     [
+      3
+     ],
+     [
+      5
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytcz",
+   "channels": 2,
+   "slices": 1,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      1
+     ]
+    ],
+    [
+     [
+      2,
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytcz",
+   "channels": 3,
+   "slices": 2,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      1
+     ],
+     [
+      6,
+      7
+     ]
+    ],
+    [
+     [
+      2,
+      3
+     ],
+     [
+      8,
+      9
+     ]
+    ],
+    [
+     [
+      4,
+      5
+     ],
+     [
+      10,
+      11
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytcz",
+   "channels": 1,
+   "slices": 4,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ],
+     [
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytzc",
+   "channels": 1,
+   "slices": 1,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytzc",
+   "channels": 2,
+   "slices": 3,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ]
+    ],
+    [
+     [
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytzc",
+   "channels": 2,
+   "slices": 1,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      1
+     ]
+    ],
+    [
+     [
+      2,
+      3
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytzc",
+   "channels": 3,
+   "slices": 2,
+   "frames": 2,
+   "index": [
+    [
+     [
+      0,
+      1
+     ],
+     [
+      2,
+      3
+     ]
+    ],
+    [
+     [
+      4,
+      5
+     ],
+     [
+      6,
+      7
+     ]
+    ],
+    [
+     [
+      8,
+      9
+     ],
+     [
+      10,
+      11
+     ]
+    ]
+   ]
+  },
+  {
+   "order": "xytzc",
+   "channels": 1,
+   "slices": 4,
+   "frames": 1,
+   "index": [
+    [
+     [
+      0
+     ],
+     [
+      1
+     ],
+     [
+      2
+     ],
+     [
+      3
+     ]
+    ]
+   ]
+  }
+ ]
+}

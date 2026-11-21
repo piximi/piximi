@@ -61,6 +61,8 @@ from piximi_schema.segmentation import (
     SegmentationRunSummary,
 )
 
+from piximi_schema.ingest import DimensionConfig
+
 from .decode import SUPPORTED_SUFFIXES
 from .engine import ReferenceEngine
 from .rle import decode_mask, encode_mask
@@ -100,16 +102,20 @@ class Project:
 
     # ── Images ───────────────────────────────────────────────────────────────
 
-    def add_images(self, *paths: str | Path) -> list[str]:
+    def add_images(self, *paths: str | Path, dimensions: DimensionConfig | dict | None = None) -> list[str]:
         """Imports files, or every supported file in folders; returns the new
-        image ids. Connected tabs see the images at once."""
+        image ids. Connected tabs see the images at once. ``dimensions``
+        says how a multi-page TIFF's frames map to channels, z slices and
+        time frames (``{"dimensionOrder": "xyczt", "channels": 2, "slices":
+        5, "frames": 1}``); without it the axes are guessed from the shape."""
+        config = DimensionConfig.model_validate(dimensions) if isinstance(dimensions, dict) else dimensions
         added: list[str] = []
         for path in paths:
             path = Path(path)
             if path.is_dir():
                 added.extend(self.engine.ingest_folder(path))
             elif path.suffix.lower() in SUPPORTED_SUFFIXES:
-                added.extend(self.engine.ingest_file(path))
+                added.extend(self.engine.ingest_file(path, config))
             else:
                 raise ValueError(f"Not a supported image or folder: {path}")
         return added
