@@ -4,6 +4,7 @@ import { useCapability } from "core/backend";
 
 import { OpenProjectMenuItem } from "./OpenProjectMenuItem";
 import { OpenImageMenuItem } from "./OpenImageMenuItem";
+import { OpenServerFilesMenuItem } from "./OpenServerFilesMenuItem";
 
 import type React from "react";
 
@@ -22,6 +23,7 @@ export const OpenMenu = ({
 }: OpenMenuProps) => {
   const projectIO = useCapability("project.io");
   const upload = useCapability("ingest.upload");
+  const serverFiles = useCapability("ingest.paths");
   return (
     <Menu
       anchorEl={anchorEl}
@@ -39,6 +41,7 @@ export const OpenMenu = ({
       {projectIO && <OpenProjectMenuItem onClose={onClose} />}
 
       {upload && <OpenImageMenuItem onCloseMenu={onClose} />}
+      {serverFiles && <OpenServerFilesMenuItem onCloseMenu={onClose} />}
       {/* TODO: Fix and implement Annotation Uploads*/}
     </Menu>
   );
