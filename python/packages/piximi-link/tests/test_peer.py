@@ -150,3 +150,12 @@ async def test_closing_rejects_pending_requests(peers):
         await task
     await asyncio.sleep(0.01)
     assert client.closed
+
+
+async def test_writer_stops_when_the_other_side_closes(peers):
+    a, b = peers
+    await a.close()
+    await b.wait_closed()
+    for _ in range(5):
+        await asyncio.sleep(0)
+    assert b.closed and b._writer is not None and b._writer.done()

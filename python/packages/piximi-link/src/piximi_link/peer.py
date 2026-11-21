@@ -225,6 +225,11 @@ class Peer:
             reason = error
         finally:
             self._settle_closed(reason)
+            # The other side went away: let the writer drain and stop on its
+            # own, whether or not `close()` is ever awaited (a server's
+            # connection task may be cancelled before it gets there), rather
+            # than leaving it pending on the queue until garbage collection.
+            self._outgoing.put_nowait(None)
             self._done.set()
 
     def _receive(self, frame: bytes) -> None:
