@@ -11,7 +11,6 @@ import { dataSlice } from "store/data";
 import { selectSoundEnabled } from "store/applicationSettings/selectors";
 
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
-import { computeObjectIntensityMeasurements } from "utils/measurements/computeObjectIntensityMeasurements";
 import { rleEncodeArray } from "utils/image";
 
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
@@ -58,8 +57,10 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
    * Rewrite each changed annotation's geometry in place and delete the operands
    * folded into it. Identity is deliberately untouched: keeping `volumeId`
    * preserves category, kind and prediction metadata, which live on the volume.
-   * Features are recomputed because they are mask-derived and would otherwise
-   * go stale and corrupt feature-range filtering.
+   * Shape features are recomputed here because they are mask-derived and the
+   * feature filters read them before anything is saved; intensities need the
+   * pixels, which the backend has, so it measures both when the session
+   * commits.
    */
   const applyOperation = useCallback(async () => {
     if (!pendingOperation || pendingOperation.empty || !activeImage) return;
@@ -75,10 +76,6 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
     const features = computeObjectFeatures(
       objs.map((o) => ({ ...o, features: undefined })),
     );
-    const intensities = await computeObjectIntensityMeasurements([
-      { channelRefs: activeImage.channelsRef, objs },
-    ]);
-
     for (const [id, region] of entries) {
       dispatch(
         dataSlice.actions.updateAnnotationMask({
@@ -86,7 +83,7 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
           boundingBox: region.bbox,
           encodedMask: rleEncodeArray(region.mask),
           features: features[id],
-          intensityMeasurements: intensities[id],
+          intensityMeasurements: {},
         }),
       );
     }
@@ -135,19 +132,7 @@ export const useAnnotationConfirmation = (annotationTool: AnnotationTool) => {
     const features = computeObjectFeatures([
       { ...annotation, decodedMask: wAnn.decodedMask },
     ]);
-    const channelMeasurements = await computeObjectIntensityMeasurements([
-      {
-        channelRefs: activeImage!.channelsRef,
-        objs: [
-          {
-            ...annotation,
-            decodedMask: wAnn.decodedMask,
-          },
-        ],
-      },
-    ]);
     annotation.features = features[annotation.id];
-    annotation.intensityMeasurements = channelMeasurements[annotation.id];
 
     dispatch(dataSlice.actions.addAnnotationVolume(volume));
     dispatch(dataSlice.actions.addAnnotation(annotation));
