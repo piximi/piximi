@@ -4,77 +4,48 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { saveAs } from "file-saver";
 
-import { INTENSITY_MEASUREMENTS } from "core/entities";
-
 import { useDialogHotkey } from "hooks";
 
 import { HotkeyContext } from "utils/enums";
 import { isObjectEmpty } from "utils/objectUtils";
-import { formatString } from "utils/stringUtils";
 
 import { selectActiveMeasurementGroup } from "./state/selectors";
 import { measurementsSlice } from "./state/measurementsSlice";
-import { selectActiveMeasuredEntities } from "./state/reselectors";
+import { useMeasurementTable } from "./contexts/MeasurementTableProvider";
 
-import type {
-  ExtendedAnnotationObject,
-  ExtendedImageObject,
-} from "core/entities";
-
-const buildAnnotationMeasurementData = (
-  entity: ExtendedAnnotationObject,
-  idx: number,
-): Record<string, number | string> => {
-  const data: Record<string, number | string> = {
-    id: entity.id,
-    name: entity.imageName + "_" + idx,
-    kind: entity.kindId,
-    category: entity.category.name,
-    partition: entity.partition,
-    imageName: entity.imageName,
-    "bbox [x1:y1:x2:y2]": `[${entity.boundingBox.join(":")}]`,
-    timepoint: entity.timepoint === undefined ? "N/A" : entity.timepoint,
-  };
-  if (entity.features) Object.assign(data, entity.features);
-  return data;
-};
-const buildImageMeasurementData = (
-  entity: ExtendedImageObject,
-): Record<string, number | string> => {
-  const data: Record<string, number | string> = {
-    id: entity.id,
-    name: entity.name,
-    category: entity.category.name,
-    partition: entity.partition,
-    timepoint: entity.timepoint === undefined ? "N/A" : entity.timepoint,
-  };
-  entity.channelsRef.forEach((c) => {
-    const labelSuffix = `-Intensity-Channel_${c.name}`;
-    INTENSITY_MEASUREMENTS.forEach((m) => {
-      const val = c[m];
-      if (!val) return;
-      data[formatString(m, undefined, "every-word") + labelSuffix] = val;
-    });
-  });
-  return data;
-};
+/* One entity per line: what identifies it, then the group's selected measurements. */
 export const useTableExport = () => {
   const activeGroup = useSelector(selectActiveMeasurementGroup);
-  const activeMeasuredEntities = useSelector(selectActiveMeasuredEntities);
+  const { scope, rows, columns, table } = useMeasurementTable();
 
   const handleExportTable = useCallback(() => {
-    if (!activeGroup) return;
-    const exportData: Record<string, number | string>[] = [];
-    Object.values(activeMeasuredEntities).forEach(
-      (entity: ExtendedImageObject | ExtendedAnnotationObject, idx) => {
-        const data =
-          "kindId" in entity
-            ? buildAnnotationMeasurementData(entity, idx)
-            : buildImageMeasurementData(entity);
-
-        exportData.push(data);
-      },
-    );
+    if (!activeGroup || !scope || !table) return;
+    const exportData = rows.map((row) => {
+      const data: Record<string, number | string> =
+        scope.type === "objects"
+          ? {
+              id: row.id,
+              name: row.name,
+              kind: scope.kindId!,
+              category: row.categoryName,
+              partition: row.partition,
+              imageName: row.imageName,
+              "bbox [x1:y1:x2:y2]": `[${row.boundingBox?.join(":") ?? ""}]`,
+              timepoint: row.timepoint,
+            }
+          : {
+              id: row.id,
+              name: row.name,
+              category: row.categoryName,
+              partition: row.partition,
+              timepoint: row.timepoint,
+            };
+      for (const { label, key } of columns) {
+        const value = table.values[key]?.[row.index];
+        data[label] = value === null || value === undefined ? "" : value;
+      }
+      return data;
+    });
     if (isObjectEmpty(exportData)) return;
     const refined: string[] = [];
     refined.push(Object.keys(exportData[0]).join(","));
@@ -86,7 +57,7 @@ export const useTableExport = () => {
     const objUrl = URL.createObjectURL(blob);
     saveAs(objUrl, `${activeGroup.name.replaceAll(" ", "-")}.csv`);
     URL.revokeObjectURL(objUrl);
-  }, [activeGroup, activeMeasuredEntities]);
+  }, [activeGroup, scope, rows, columns, table]);
 
   return handleExportTable;
 };

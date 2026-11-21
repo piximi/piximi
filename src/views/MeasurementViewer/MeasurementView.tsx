@@ -17,6 +17,7 @@ import { HotkeyContext } from "utils/enums";
 import { MeasurementDashboardSwitcher, MeasurementsDrawer } from "./sections";
 import { MeasurementsTopBar } from "./components/MeasurementsTopBar";
 import { MeasurementsSideBar } from "./components/MeasurementsSideBar";
+import { MeasurementTableProvider } from "./contexts/MeasurementTableProvider";
 
 export const MeasurementView = () => {
   const dispatch = useDispatch();
@@ -41,22 +42,24 @@ export const MeasurementView = () => {
 
   return (
     <ErrorBoundary FallbackComponent={FallbackDialog}>
-      <Box
-        sx={{
-          height: "100vh",
-          width: "100vw",
-          display: "grid",
-          gridTemplateColumns: `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
-          gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
-          gridTemplateAreas:
-            '"top-bar top-bar top-bar"  "action-drawer dashboard side-bar"',
-        }}
-      >
-        <MeasurementsTopBar />
-        <MeasurementsDrawer />
-        <MeasurementDashboardSwitcher />
-        <MeasurementsSideBar />
-      </Box>
+      <MeasurementTableProvider>
+        <Box
+          sx={{
+            height: "100vh",
+            width: "100vw",
+            display: "grid",
+            gridTemplateColumns: `${DIMENSIONS.leftDrawerWidth}px 1fr ${DIMENSIONS.toolDrawerWidth}px`,
+            gridTemplateRows: `${DIMENSIONS.toolDrawerWidth}px 1fr`,
+            gridTemplateAreas:
+              '"top-bar top-bar top-bar"  "action-drawer dashboard side-bar"',
+          }}
+        >
+          <MeasurementsTopBar />
+          <MeasurementsDrawer />
+          <MeasurementDashboardSwitcher />
+          <MeasurementsSideBar />
+        </Box>
+      </MeasurementTableProvider>
     </ErrorBoundary>
   );
 };

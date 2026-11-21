@@ -1,12 +1,7 @@
 import type { ComputedDatum } from "@nivo/swarmplot";
 import type { ColorSchemeId } from "@nivo/colors";
 
-import type {
-  ChannelFeature,
-  ExtendedAnnotationObject,
-  ExtendedImageObject,
-  ObjectFeature,
-} from "core/entities";
+import type { BBox, ChannelFeature, ObjectFeature } from "core/entities";
 import type { Partition } from "core/dl/enums";
 
 // ============================================================================
@@ -112,10 +107,6 @@ export type ImageMeasurementGroup = BaseMeasurementGroup & {
   featureMeasurements: ChannelFeature[];
 };
 
-export type ImageEntityMeasurementGroup = ImageMeasurementGroup & {
-  entities: ExtendedImageObject[];
-};
-
 // --- Object (Annotation) Measurement Groups ---
 
 export type ObjectMeasurementGroup = BaseMeasurementGroup & {
@@ -123,9 +114,30 @@ export type ObjectMeasurementGroup = BaseMeasurementGroup & {
   featureMeasurements: ObjectFeature[];
 };
 
-export type ObjectEntityMeasurementGroup = ObjectMeasurementGroup & {
-  entities: ExtendedAnnotationObject[];
+// ============================================================================
+// TABLE ROWS
+// ============================================================================
+
+/*
+ * One entity of the active group's measurement table, as the backend
+ * answered it; the value columns are indexed by `index`.
+ */
+export type MeasurementRow = {
+  id: string;
+  index: number;
+  name: string;
+  categoryId: string;
+  categoryName: string;
+  partition: Partition;
+  imageId: string;
+  imageName: string;
+  timepoint: number;
+  /* Objects only. */
+  boundingBox?: BBox;
 };
+
+/* A selected measurement: the label the group stores and the backend's column key. */
+export type MeasurementColumnRef = { label: string; key: string };
 
 // ============================================================================
 // PARSED & PREPARED DATA

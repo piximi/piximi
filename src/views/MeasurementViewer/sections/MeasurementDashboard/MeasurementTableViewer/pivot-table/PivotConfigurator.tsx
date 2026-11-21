@@ -18,7 +18,7 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 import { selectActivePivotItems } from "@MeasurementViewer/state/selectors";
 import { measurementsSlice } from "@MeasurementViewer/state/measurementsSlice";
-import { selectActiveInitialPivotDimensions } from "@MeasurementViewer/state/reselectors";
+import { useMeasurementTable } from "@MeasurementViewer/contexts/MeasurementTableProvider";
 
 import { DroppableZone } from "./DroppableZone";
 import { ExpandableDimensionChip } from "./ExpandableDimensionChip";
@@ -40,9 +40,7 @@ export const PivotConfigurator = () => {
   // Main dimensions always stay in available (they don't move)
   const dispatch = useDispatch();
   //const [dimensions, setDimensions] = useState<Dimension[]>(INITIAL_DIMENSIONS);
-  const initialPivotDimensions = useSelector(
-    selectActiveInitialPivotDimensions,
-  );
+  const { dimensions: initialPivotDimensions } = useMeasurementTable();
   const initialPivotItems = useSelector(selectActivePivotItems);
   // Items currently in the pivot zone
   const [pivotItems, setPivotItems] = useState<PivotItem[]>(initialPivotItems);

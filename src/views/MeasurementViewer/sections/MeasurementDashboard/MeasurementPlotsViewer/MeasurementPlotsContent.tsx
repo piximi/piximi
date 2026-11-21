@@ -8,10 +8,7 @@ import { Box } from "@mui/system";
 
 import { ChartType, type PlotDetail } from "@MeasurementViewer/types";
 import { CustomTabs } from "@MeasurementViewer/components/custom-tab-switcher";
-import {
-  selectActiveMeasuredEntities,
-  selectPlotData,
-} from "@MeasurementViewer/state/reselectors";
+import { useMeasurementTable } from "@MeasurementViewer/contexts/MeasurementTableProvider";
 import {
   selectActivePlotIds,
   selectRenderPlotName,
@@ -33,15 +30,10 @@ import {
 
 export const MeasurementPlotsContent = ({ plot }: { plot: PlotDetail }) => {
   const dispatch = useDispatch();
-  const measurementData = useSelector(selectPlotData);
-  const activeEntities = useSelector(selectActiveMeasuredEntities);
+  const { plotData: measurementData, ids: activeEntityIds } =
+    useMeasurementTable();
   const activePlotIds = useSelector(selectActivePlotIds);
   const renderPlotName = useSelector(selectRenderPlotName);
-
-  const activeEntityIds = useMemo(() => {
-    if (!activeEntities) return [];
-    return Object.keys(activeEntities);
-  }, [activeEntities]);
 
   const addPlot = () => {
     dispatch(measurementsSlice.actions.addActiveGroupPlot());

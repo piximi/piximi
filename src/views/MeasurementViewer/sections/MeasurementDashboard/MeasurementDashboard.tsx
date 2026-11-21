@@ -1,10 +1,11 @@
 import { useState } from "react";
 
-import { Box } from "@mui/material";
+import { Box, LinearProgress } from "@mui/material";
 import { useGridApiRef } from "@mui/x-data-grid";
 
 import { HelpItem } from "help/HelpContent";
 
+import { useMeasurementTable } from "@MeasurementViewer/contexts/MeasurementTableProvider";
 import {
   TextToggleButton,
   TextToggleButtonGroup,
@@ -19,6 +20,7 @@ import type React from "react";
 export const MeasurementDashboard = () => {
   const [view, setView] = useState<"table" | "plots">("table");
   const gridApiRef = useGridApiRef();
+  const { loading } = useMeasurementTable();
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
     newView: string,
@@ -37,6 +39,12 @@ export const MeasurementDashboard = () => {
         height: "100%",
       }}
     >
+      {loading && (
+        <LinearProgress
+          data-testid="measurements-loading"
+          sx={{ position: "absolute", top: 0, left: 0, right: 0 }}
+        />
+      )}
       <Box
         sx={{
           width: "100%",

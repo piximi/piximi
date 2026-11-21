@@ -2,17 +2,7 @@ import { computeStatistics } from "utils/measurements/statistics";
 
 import type { GridColDef, GridColumnGroup } from "@mui/x-data-grid";
 
-import type {
-  ExtendedAnnotationObject,
-  ExtendedImageObject,
-  Category,
-} from "core/entities";
-
-import type {
-  ImageEntityMeasurementGroup,
-  ObjectEntityMeasurementGroup,
-  PivotItem,
-} from "@MeasurementViewer/types";
+import type { MeasurementRow, PivotItem } from "@MeasurementViewer/types";
 
 // ============================================================================
 // TYPES
@@ -31,48 +21,32 @@ type PivotAggregation = {
   std: number;
 };
 
-export type EntityWithMeasurements =
-  | ExtendedAnnotationObject
-  | ExtendedImageObject;
-
 // ============================================================================
 // COMPOSITE KEY GENERATION
 // ============================================================================
 
 /**
- * Generates a composite key from an entity based on the pivot configuration.
+ * Generates a composite key from a row based on the pivot configuration.
  * For example, if pivotItems = [category: "Cell", partition: "Training"],
- * this returns "Cell|Training" for entities matching those values.
+ * this returns "Cell|Training" for rows matching those values.
  */
 const generateCompositeKey = (
-  entity: EntityWithMeasurements,
+  row: MeasurementRow,
   pivotItems: PivotItem[],
-  categories: Record<string, Category>,
-  images: Record<string, ExtendedImageObject>,
 ): string | null => {
   const keyParts: string[] = [];
 
   for (const pivotItem of pivotItems) {
     if (pivotItem.isMainDimension) {
-      // Main dimension - use all values (this entity's value for that dimension)
-      const value = getEntityDimensionValue(
-        entity,
-        pivotItem.id,
-        categories,
-        images,
-      );
+      // Main dimension - use all values (this row's value for that dimension)
+      const value = getRowDimensionValue(row, pivotItem.id);
       if (value === null) return null;
       keyParts.push(value);
     } else {
-      // Specific value - check if entity matches this specific value
-      const entityValue = getEntityDimensionValue(
-        entity,
-        pivotItem.parentId!,
-        categories,
-        images,
-      );
+      // Specific value - check if the row matches this specific value
+      const rowValue = getRowDimensionValue(row, pivotItem.parentId!);
       const expectedValue = pivotItem.label;
-      if (entityValue !== expectedValue) return null;
+      if (rowValue !== expectedValue) return null;
       keyParts.push(expectedValue);
     }
   }
@@ -81,33 +55,21 @@ const generateCompositeKey = (
 };
 
 /**
- * Gets the value of a dimension for an entity.
+ * Gets the value of a dimension for a row.
  */
-const getEntityDimensionValue = (
-  entity: EntityWithMeasurements,
+const getRowDimensionValue = (
+  row: MeasurementRow,
   dimensionId: string,
-  categories: Record<string, Category>,
-  images: Record<string, ExtendedImageObject>,
 ): string | null => {
   switch (dimensionId) {
     case "category":
-      return categories[entity.categoryId]?.name ?? null;
+      return row.categoryName || null;
     case "partition":
-      return entity.partition;
+      return row.partition;
     case "image":
-      // ImageObject uses its own id, AnnotationObject has imageId field
-      const id = "imageId" in entity ? entity.imageId : entity.id;
-      return images[id]?.name ?? null;
+      return row.imageName || null;
     case "timepoint":
-      // For time-series support
-      return "timepoint" in entity && entity.timepoint !== undefined
-        ? String(entity.timepoint)
-        : null;
-    case "tracklet":
-      // For tracking support
-      return "trackId" in entity && entity.trackId
-        ? String(entity.trackId)
-        : null;
+      return String(row.timepoint);
     default:
       return null;
   }
@@ -118,13 +80,11 @@ const getEntityDimensionValue = (
 // ============================================================================
 
 /**
- * Generates unique composite keys based on pivot configuration and entities.
+ * Generates unique composite keys based on pivot configuration and rows.
  */
 export const generateUniqueCompositeKeys = (
-  entities: EntityWithMeasurements[],
+  rows: MeasurementRow[],
   pivotItems: PivotItem[],
-  categories: Record<string, Category>,
-  images: Record<string, ExtendedImageObject>,
 ): string[] => {
   if (pivotItems.length === 0) {
     return ["all"];
@@ -132,8 +92,8 @@ export const generateUniqueCompositeKeys = (
 
   const uniqueKeys = new Set<string>();
 
-  entities.forEach((entity) => {
-    const key = generateCompositeKey(entity, pivotItems, categories, images);
+  rows.forEach((row) => {
+    const key = generateCompositeKey(row, pivotItems);
     if (key) {
       uniqueKeys.add(key);
     }
@@ -329,12 +289,9 @@ const formatStatValue = (value: number | undefined): string => {
  * Aggregates measurement values by composite key.
  */
 const aggregateByPivot = (
-  entities: EntityWithMeasurements[],
-  measurementKey: string,
-  getMeasurementValue: (entity: EntityWithMeasurements) => number | undefined,
+  rows: MeasurementRow[],
+  getValue: MeasurementGetter["getValue"],
   pivotItems: PivotItem[],
-  categories: Record<string, Category>,
-  images: Record<string, ExtendedImageObject>,
   compositeKeys: string[],
 ): Record<string, PivotAggregation> => {
   // Initialize buckets for each composite key
@@ -344,14 +301,14 @@ const aggregateByPivot = (
   });
 
   // Populate buckets
-  entities.forEach((entity) => {
-    const value = getMeasurementValue(entity);
-    if (value === undefined || typeof value !== "number") return;
+  rows.forEach((row) => {
+    const value = getValue(row.index);
+    if (typeof value !== "number" || Number.isNaN(value)) return;
 
     if (pivotItems.length === 0) {
       buckets["all"].push(value);
     } else {
-      const key = generateCompositeKey(entity, pivotItems, categories, images);
+      const key = generateCompositeKey(row, pivotItems);
       if (key && buckets[key]) {
         buckets[key].push(value);
       }
@@ -380,37 +337,27 @@ const aggregateByPivot = (
 export type MeasurementGetter = {
   key: string;
   label: string;
-  getValue: (entity: EntityWithMeasurements) => number | undefined;
+  /* A row's value by its position in the table. */
+  getValue: (index: number) => number | null | undefined;
 };
 
 /**
- * Generates pivot table rows from entity group and pivot configuration.
+ * Generates pivot table rows from the table's rows and pivot configuration.
  */
 export const generatePivotRows = (
-  activeEntityGroup: ImageEntityMeasurementGroup | ObjectEntityMeasurementGroup,
-  categories: Record<string, Category>,
-  images: Record<string, ExtendedImageObject>,
+  tableRows: MeasurementRow[],
   pivotItems: PivotItem[],
   measurementGetters: MeasurementGetter[],
 ): PivotRowData[] => {
-  const entities = activeEntityGroup.entities;
-  const compositeKeys = generateUniqueCompositeKeys(
-    entities,
-    pivotItems,
-    categories,
-    images,
-  );
+  const compositeKeys = generateUniqueCompositeKeys(tableRows, pivotItems);
 
   const rows: PivotRowData[] = [];
 
   measurementGetters.forEach((getter, idx) => {
     const aggregations = aggregateByPivot(
-      entities,
-      getter.key,
+      tableRows,
       getter.getValue,
       pivotItems,
-      categories,
-      images,
       compositeKeys,
     );
 
