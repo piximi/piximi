@@ -156,6 +156,8 @@ export const ExitAnnotatorDialog = ({
 
   const busy = saving !== null || conflict !== null;
 
+  // The confirmation closes itself (and the caller's `open`) before it runs
+  // Save, so what follows is shown on its own state, not on `open`.
   return (
     <>
       <ConfirmationDialog
@@ -169,7 +171,7 @@ export const ExitAnnotatorDialog = ({
         isOpen={open && !busy && error === null}
         confirmDisabled={session.loading}
       />
-      <Dialog open={open && saving !== null} fullWidth>
+      <Dialog open={saving !== null} fullWidth>
         <DialogTitle>Saving annotations</DialogTitle>
         <DialogContent>
           <Typography variant="body2" sx={{ mb: 1 }}>
@@ -184,7 +186,7 @@ export const ExitAnnotatorDialog = ({
           />
         </DialogContent>
       </Dialog>
-      <Dialog open={open && conflict !== null} fullWidth>
+      <Dialog open={conflict !== null} fullWidth>
         <DialogTitle>Changed elsewhere</DialogTitle>
         <DialogContent>
           <Typography variant="body2" data-testid="commit-conflicts">
@@ -205,7 +207,7 @@ export const ExitAnnotatorDialog = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={open && error !== null} fullWidth onClose={onClose}>
+      <Dialog open={error !== null} fullWidth onClose={onClose}>
         <DialogTitle>Saving failed</DialogTitle>
         <DialogContent>
           <Alert severity="error" data-testid="commit-error">
@@ -230,19 +232,33 @@ export const ExitAnnotatorDialog = ({
   );
 };
 
+/* A refused object is listed once even when both its annotation and its
+ * volume were refused, so count annotations, or volumes where no
+ * annotation of theirs is listed. */
+const countObjects = (conflicts: CommitResult["conflicts"]): number => {
+  const annotations = conflicts.filter((c) => c.type === "annotation").length;
+  return annotations > 0
+    ? annotations
+    : conflicts.filter((c) => c.type === "volume").length;
+};
+
 const describeConflicts = (result: CommitResult | undefined): string => {
   if (!result) return "";
-  const modified = result.conflicts.filter((c) => c.reason === "modified");
-  const missing = result.conflicts.filter((c) => c.reason === "missing");
+  const modified = countObjects(
+    result.conflicts.filter((c) => c.reason === "modified"),
+  );
+  const missing = countObjects(
+    result.conflicts.filter((c) => c.reason === "missing"),
+  );
   const parts: string[] = [];
-  if (modified.length > 0) {
+  if (modified > 0) {
     parts.push(
-      `${modified.length} ${modified.length === 1 ? "object was" : "objects were"} changed`,
+      `${modified} ${modified === 1 ? "object was" : "objects were"} changed`,
     );
   }
-  if (missing.length > 0) {
+  if (missing > 0) {
     parts.push(
-      `${missing.length} ${missing.length === 1 ? "object was" : "objects were"} deleted`,
+      `${missing} ${missing === 1 ? "object was" : "objects were"} deleted`,
     );
   }
   return parts.join(" and ");
