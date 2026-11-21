@@ -345,3 +345,51 @@ async def test_old_default_channel_names_are_renamed_on_open(engine: ReferenceEn
         assert all(channel.name.startswith("Channel-") for channel in page.items[0].channels)
     finally:
         await reopened.close()
+
+
+async def test_concurrent_loads_of_a_model_share_one_job(engine: ReferenceEngine):
+    """Clicking Load twice, or two clients loading at once, must not start two
+    jobs; the second request joins the first and shares its outcome."""
+    from piximi_engine.models.threshold import ThresholdSegmenter
+
+    class Slow(ThresholdSegmenter):
+        id = "slow"
+        is_loaded = False
+        loads = 0
+        failing = False
+
+        @property
+        def loaded(self) -> bool:
+            return self.is_loaded
+
+        async def load(self, ctx: HandlerContext) -> None:
+            self.loads += 1
+            await asyncio.sleep(0.05)
+            if self.failing:
+                raise RuntimeError("no weights")
+            self.is_loaded = True
+
+    model = Slow()
+    engine.models.add(model)
+    jobs = []
+    engine.subscribe(lambda e: jobs.append(e.job.id) if e.type == "jobs/didUpdate" else None)
+
+    await asyncio.gather(
+        engine.segmentation_load_model("slow", ctx()),
+        engine.segmentation_load_model("slow", ctx()),
+        engine.segmentation_load_model("slow", ctx()),
+    )
+    assert model.loads == 1 and model.loaded
+    assert len(set(jobs)) == 1
+    assert engine._loads == {}
+
+    # A failed load fails every joiner too, and the next attempt is a new job.
+    model.is_loaded = False
+    model.failing = True
+    results = await asyncio.gather(
+        engine.segmentation_load_model("slow", ctx()),
+        engine.segmentation_load_model("slow", ctx()),
+        return_exceptions=True,
+    )
+    assert all(isinstance(result, RuntimeError) for result in results)
+    assert model.loads == 2 and len(set(jobs)) == 2 and engine._loads == {}

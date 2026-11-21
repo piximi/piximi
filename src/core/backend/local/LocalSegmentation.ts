@@ -125,7 +125,22 @@ export class LocalSegmentation implements BackendSegmentation {
     return Object.values(result.data).map(describe);
   }
 
-  async loadModel(modelId: string, options?: CallOptions): Promise<void> {
+  /* Loads in flight, by model: a second request for the same model joins
+   * the first job rather than starting another. The joiner's own signal
+   * and progress are not wired; the job's cancel control covers both. */
+  readonly #loads = new Map<string, Promise<void>>();
+
+  loadModel(modelId: string, options?: CallOptions): Promise<void> {
+    const pending = this.#loads.get(modelId);
+    if (pending) return pending;
+    const load = this.#loadModel(modelId, options).finally(() => {
+      this.#loads.delete(modelId);
+    });
+    this.#loads.set(modelId, load);
+    return load;
+  }
+
+  async #loadModel(modelId: string, options?: CallOptions): Promise<void> {
     const segmenter = this.#deps.segmenter();
     const info = await segmenter.getModelInfo(modelId);
     if (!info.success) throw toBackendError(info.reason);

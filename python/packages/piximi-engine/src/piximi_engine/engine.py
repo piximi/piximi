@@ -201,6 +201,8 @@ class ReferenceEngine:
         self._loop: asyncio.AbstractEventLoop | None = None
         self._loop_thread: int | None = None
         self._run_contexts: dict[str, HandlerContext] = {}
+        self._loads: dict[str, asyncio.Future[None]] = {}
+        """Model loads in flight, by model id; a second request joins the first."""
         self.jobs = JobRegistry(self._emit)
         self.classification = ClassificationService(self)
         self._ensure_project()
@@ -1323,6 +1325,28 @@ class ReferenceEngine:
         model = self._model(model_id)
         if model.loaded:
             return
+        # A load already under way (another click, tab or kernel) is joined
+        # rather than doubled: one job, one toast, and the joiner shares its
+        # outcome. Shielded so a joiner's own cancel does not stop the load.
+        pending = self._loads.get(model_id)
+        if pending is not None:
+            await asyncio.shield(pending)
+            return
+        future: asyncio.Future[None] = asyncio.get_running_loop().create_future()
+        self._loads[model_id] = future
+        try:
+            await self._load_model(model, ctx)
+        except BaseException as error:
+            future.set_exception(error)
+            # Retrieved here so an unjoined failure is not reported as lost.
+            future.exception()
+            raise
+        else:
+            future.set_result(None)
+        finally:
+            self._loads.pop(model_id, None)
+
+    async def _load_model(self, model: SegmentationModel, ctx: HandlerContext) -> None:
         job = self.jobs.start(
             JobKind.MODEL_LOAD, f"Loading {model.display_name}", cancellable=model.cancellable_load
         )

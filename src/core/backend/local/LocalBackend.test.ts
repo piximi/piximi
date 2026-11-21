@@ -509,3 +509,29 @@ describe("LocalBackend: tfjs models by URL", () => {
       expect(await backend.classification.list()).toEqual([]);
     }));
 });
+
+describe("LocalBackend: model loads", () => {
+  it("joins a load already in flight instead of starting a second job", async () => {
+    const { backend, teardown } = await createLocalBackend();
+    await backend.connect();
+    try {
+      const jobs = new Set<string>();
+      backend.subscribe((event) => {
+        if (event.type === "jobs/didUpdate" && event.job.kind === "model-load")
+          jobs.add(event.job.id);
+      });
+      const [model] = await backend.segmentation.listModels();
+      // Both calls are issued before either has asked the worker anything,
+      // which is what a second click on "Load Model" amounts to.
+      await Promise.all([
+        backend.segmentation.loadModel(model.name),
+        backend.segmentation.loadModel(model.name),
+      ]);
+      expect(jobs.size).toBe(1);
+      const [after] = await backend.segmentation.listModels();
+      expect(after.modelLoaded).toBe(true);
+    } finally {
+      await teardown();
+    }
+  });
+});
