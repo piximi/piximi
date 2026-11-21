@@ -700,6 +700,55 @@ export type IngestSummary = {
   imageIds: string[];
   failed: IngestFailure[];
   cancelled: boolean;
+  /* Server paths left alone because they were imported before. */
+  skipped?: string[];
+};
+
+// Files on the backend's own machine (`ingest.paths`): a client browses
+// under the roots the backend was started with, looks at TIFFs before
+// adding them (so the dimension dialog serves server files too), and adds
+// files or whole folders.
+
+export type DirectoryEntry = {
+  name: string;
+  path: string;
+  type: "directory" | "file";
+  size?: number;
+  /* A file the backend can decode. */
+  supported?: boolean;
+};
+
+export type DirectoryListing = {
+  /* The directory listed; empty for the roots listing. */
+  path: string;
+  /* Absent at the only root and at the top; an empty string means the
+   * roots listing. */
+  parent?: string;
+  roots: string[];
+  entries: DirectoryEntry[];
+};
+
+/* What a TIFF's metadata says about its layout; unknown fields are asked
+ * for. */
+export type DimensionHint = Partial<DimensionConfig>;
+
+export type PathInspection = {
+  path: string;
+  name: string;
+  /* 2D frames the decoder will see; 1 for anything but a TIFF stack. */
+  frameCount: number;
+  isMultiFrame: boolean;
+  dimensions?: DimensionHint;
+  /* Why the file could not be looked at; the counts are 0 then. */
+  error?: string;
+};
+
+export type AddPathsRequest = {
+  /* Files, or folders whose supported files are added. */
+  paths: string[];
+  recursive?: boolean;
+  /* By file path, for multi-frame TIFFs. */
+  dimensionConfigs?: Record<string, DimensionConfig>;
 };
 
 export interface BackendIngest {
@@ -707,6 +756,15 @@ export interface BackendIngest {
    * once every file is in (or has failed) and its images announced; the
    * caller's signal, or the job's cancel, stops it between files. */
   upload(files: UploadFile[], options?: CallOptions): Promise<IngestSummary>;
+  /* The three below only with `ingest.paths`. No path lists the roots. */
+  browse?(path?: string): Promise<DirectoryListing>;
+  inspect?(paths: string[]): Promise<PathInspection[]>;
+  /* As `upload`, for files the backend reads itself; sources imported
+   * before are skipped and listed. */
+  addPaths?(
+    request: AddPathsRequest,
+    options?: CallOptions,
+  ): Promise<IngestSummary>;
 }
 
 export interface BackendClassification {

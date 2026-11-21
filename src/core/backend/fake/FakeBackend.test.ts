@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, it } from "vitest";
 
 import { describeBackendConformance } from "../conformance/backendConformance";
@@ -13,13 +17,36 @@ const seed = [
   { id: "img-e", width: 2, height: 3, channels: 2 },
 ];
 
+/* The engine's TIFF fixtures, as files under a pretend root. */
+const TIFF_FIXTURES = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../../../python/packages/piximi-engine/tests/vectors/tiff",
+);
+const fixtureBytes = (name: string): ArrayBuffer => {
+  const bytes = readFileSync(path.join(TIFF_FIXTURES, name));
+  return bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  );
+};
+const serverFiles = {
+  root: "/data",
+  files: Object.fromEntries(
+    ["pages6.tif", "pages12.tif", "garbage.bin"].map((name) => [
+      `stacks/${name}`,
+      fixtureBytes(name),
+    ]),
+  ),
+};
+
 describeBackendConformance("FakeBackend", async () => ({
-  backend: new FakeBackend({ images: seed }),
+  backend: new FakeBackend({ images: seed, files: serverFiles }),
   images: seed.map((im) => ({
     ...im,
     name: im.id,
     channelIds: [`${im.id}-ch0`, `${im.id}-ch1`],
   })),
+  serverFiles: { root: serverFiles.root },
 }));
 
 describe("FakeBackend", () => {

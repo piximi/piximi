@@ -12,7 +12,12 @@ import {
 import { Partition } from "core/dl/enums";
 import { TaskCancelledError, isTaskCancelledError } from "core/dl/cancel";
 import { inlineImageDecoder } from "core/file-io/file-loader/decoders";
-import { inferMimeType } from "core/file-io/file-loader/fileInputUtils";
+import {
+  inferMimeType,
+  isTiffFile,
+} from "core/file-io/file-loader/fileInputUtils";
+import { analyzeTiff } from "core/file-io/file-loader/readers/TiffReader";
+import { MIME } from "core/file-io/file-loader/types";
 import { defaultClassifier } from "core/dl/classification/utils";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
@@ -121,6 +126,12 @@ import type {
   VolumeUpdate,
   BackendIngest,
   IngestFailure,
+  AddPathsRequest,
+  DirectoryEntry,
+  DirectoryListing,
+  IngestSummary,
+  PathInspection,
+  UploadFile,
 } from "../types";
 
 type FakeImageSeed = {
@@ -210,14 +221,7 @@ const wholeImageFeatures = (
  */
 export class FakeBackend implements Backend {
   readonly kind = "local" as const;
-  readonly capabilities: readonly Capability[] = [
-    "raw-local",
-    "segmentation",
-    "classification",
-    "classification.train",
-    "measurements",
-    "ingest.upload",
-  ];
+  readonly capabilities: readonly Capability[];
   readonly session: BackendSession = {
     id: generateUUID(),
     protocolVersion: "0.0.0-fake",
@@ -246,9 +250,42 @@ export class FakeBackend implements Backend {
   /* The distributions behind pending predictions, for the softmax sort. */
   #softmax = new Map<string, number[]>();
 
-  constructor(seed: { images: FakeImageSeed[] }) {
+  /* A pretend filesystem for `ingest.paths`: files by absolute path. */
+  readonly #files = new Map<string, ArrayBuffer>();
+  readonly #roots: string[] = [];
+  /* Server paths already added, as the engine's `sources` table. */
+  readonly #sources = new Map<string, string[]>();
+
+  constructor(seed: {
+    images: FakeImageSeed[];
+    /* Files to browse and add from, under one root; declares `ingest.paths`. */
+    files?: { root: string; files: Record<string, ArrayBuffer> };
+  }) {
     const channelCount = Math.max(0, ...seed.images.map((im) => im.channels));
     if (channelCount > 0) this.#experiment.channels = channelCount;
+    if (seed.files) {
+      this.#roots.push(seed.files.root);
+      for (const [relative, data] of Object.entries(seed.files.files)) {
+        this.#files.set(`${seed.files.root}/${relative}`, data);
+      }
+    }
+    this.capabilities = [
+      "raw-local",
+      "segmentation",
+      "classification",
+      "classification.train",
+      "measurements",
+      "ingest.upload",
+      ...(seed.files ? (["ingest.paths"] as const) : []),
+    ];
+    this.ingest = {
+      upload: (files, options) => this.#runIngest(files, options),
+      ...(seed.files && {
+        browse: async (path?: string) => this.#browse(path),
+        inspect: async (paths: string[]) => this.#inspect(paths),
+        addPaths: (request, options) => this.#addPaths(request, options),
+      }),
+    };
     for (let c = 0; c < channelCount; c++) {
       this.#channelMetas.push({
         id: `meta-${c}`,
@@ -1243,8 +1280,16 @@ export class FakeBackend implements Backend {
 
   // ── Ingest ──────────────────────────────────────────────────────────────
 
-  readonly ingest: BackendIngest = {
-    upload: async (files, options) => {
+  readonly ingest: BackendIngest;
+
+  /* The batch loop behind `upload` and `addPaths`: one `ingest` job, each
+   * file decoded on this thread; `onAdded` records a server source. */
+  async #runIngest(
+    files: UploadFile[],
+    options?: CallOptions,
+    onAdded?: (file: UploadFile, imageIds: string[]) => void,
+  ): Promise<IngestSummary> {
+    {
       if (files.length === 0) {
         return { imageIds: [], failed: [], cancelled: false };
       }
@@ -1287,7 +1332,9 @@ export class FakeBackend implements Backend {
             () => {},
             this.#experiment.channels,
           );
-          imageIds.push(...this.#addDecoded(output));
+          const added = this.#addDecoded(output);
+          imageIds.push(...added);
+          onAdded?.(file, added);
         } catch (error) {
           if (signal.aborted || isTaskCancelledError(error)) {
             cancelled = true;
@@ -1315,8 +1362,188 @@ export class FakeBackend implements Backend {
         });
       }
       return { jobId: job.id, imageIds, failed, cancelled };
-    },
-  };
+    }
+  }
+
+  #resolvePath(path: string): string {
+    const normalized = path.replace(/\/+$/, "");
+    if (
+      !this.#roots.some(
+        (root) => normalized === root || normalized.startsWith(`${root}/`),
+      )
+    ) {
+      throw new BackendError(
+        "UNAUTHORIZED",
+        `${path} is outside the folders this backend may read`,
+      );
+    }
+    return normalized;
+  }
+
+  #isDirectory(path: string): boolean {
+    return (
+      this.#roots.includes(path) ||
+      [...this.#files.keys()].some((file) => file.startsWith(`${path}/`))
+    );
+  }
+
+  #browse(path?: string): DirectoryListing {
+    if (path === undefined || path === "") {
+      if (this.#roots.length === 1) return this.#listing(this.#roots[0]);
+      return {
+        path: "",
+        roots: [...this.#roots],
+        entries: this.#roots.map((root) => ({
+          name: root.split("/").pop() || root,
+          path: root,
+          type: "directory",
+        })),
+      };
+    }
+    return this.#listing(this.#resolvePath(path));
+  }
+
+  #listing(directory: string): DirectoryListing {
+    if (!this.#isDirectory(directory)) {
+      throw new BackendError("NOT_FOUND", `${directory} is not a folder`);
+    }
+    const children = new Map<string, DirectoryEntry>();
+    for (const [file, data] of this.#files) {
+      if (!file.startsWith(`${directory}/`)) continue;
+      const rest = file.slice(directory.length + 1);
+      const [name, ...deeper] = rest.split("/");
+      if (name.startsWith(".")) continue;
+      if (deeper.length > 0) {
+        children.set(name, {
+          name,
+          path: `${directory}/${name}`,
+          type: "directory",
+        });
+      } else {
+        children.set(name, {
+          name,
+          path: file,
+          type: "file",
+          size: data.byteLength,
+          supported: inferMimeType(name) !== MIME.UNKNOWN,
+        });
+      }
+    }
+    const entries = [...children.values()].sort(
+      (a, b) =>
+        Number(a.type !== "directory") - Number(b.type !== "directory") ||
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+    );
+    const atRoot = this.#roots.includes(directory);
+    return {
+      path: directory,
+      ...(atRoot
+        ? this.#roots.length > 1 && { parent: "" }
+        : { parent: directory.slice(0, directory.lastIndexOf("/")) }),
+      roots: [...this.#roots],
+      entries,
+    };
+  }
+
+  async #inspect(paths: string[]): Promise<PathInspection[]> {
+    const results: PathInspection[] = [];
+    for (const path of paths) {
+      const name = path.split("/").pop() ?? path;
+      const resolved = this.#resolvePath(path);
+      const data = this.#files.get(resolved);
+      if (!data) {
+        results.push({
+          path,
+          name,
+          frameCount: 0,
+          isMultiFrame: false,
+          error: `${path} is not a file`,
+        });
+        continue;
+      }
+      if (!isTiffFile(name)) {
+        results.push({
+          path: resolved,
+          name,
+          frameCount: 1,
+          isMultiFrame: false,
+        });
+        continue;
+      }
+      try {
+        const analysis = await analyzeTiff(data);
+        const dims = analysis.OMEDims;
+        const known =
+          dims?.sizec !== undefined ||
+          dims?.sizez !== undefined ||
+          dims?.sizet !== undefined;
+        results.push({
+          path: resolved,
+          name,
+          frameCount: analysis.frameCount,
+          isMultiFrame: analysis.isMultiFrame,
+          ...(known && {
+            dimensions: {
+              dimensionOrder: dims?.dimensionorder,
+              channels: dims?.sizec,
+              slices: dims?.sizez,
+              frames: dims?.sizet,
+            },
+          }),
+        });
+      } catch (error) {
+        results.push({
+          path,
+          name,
+          frameCount: 0,
+          isMultiFrame: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+    return results;
+  }
+
+  async #addPaths(
+    request: AddPathsRequest,
+    options?: CallOptions,
+  ): Promise<IngestSummary> {
+    const files: string[] = [];
+    const add = (file: string) => {
+      if (!files.includes(file)) files.push(file);
+    };
+    const walk = (directory: string) => {
+      const listing = this.#listing(directory);
+      for (const entry of listing.entries) {
+        if (entry.type === "directory") {
+          if (request.recursive) walk(entry.path);
+        } else if (entry.supported) add(entry.path);
+      }
+    };
+    for (const path of request.paths) {
+      const resolved = this.#resolvePath(path);
+      if (this.#isDirectory(resolved)) walk(resolved);
+      else if (this.#files.has(resolved)) add(resolved);
+      else throw new BackendError("NOT_FOUND", `${path} does not exist`);
+    }
+    const skipped = files.filter((file) => this.#sources.has(file));
+    const pathOf = new Map<UploadFile, string>();
+    const uploads: UploadFile[] = files
+      .filter((file) => !this.#sources.has(file))
+      .map((file) => {
+        const upload: UploadFile = {
+          name: file.split("/").pop() ?? file,
+          data: this.#files.get(file)!,
+          dimensionConfig: request.dimensionConfigs?.[file],
+        };
+        pathOf.set(upload, file);
+        return upload;
+      });
+    const summary = await this.#runIngest(uploads, options, (file, ids) =>
+      this.#sources.set(pathOf.get(file)!, ids),
+    );
+    return { ...summary, skipped };
+  }
 
   /* Takes a decoded file in: one series, its images, planes, channels and
    * pixels, with the metas matched by channel index and widened. */

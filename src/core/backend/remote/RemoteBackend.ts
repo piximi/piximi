@@ -72,6 +72,10 @@ import type {
   SegmentationRunRequest,
   SegmentationRunSummary,
   BackendIngest,
+  AddPathsRequest,
+  DirectoryListing,
+  IngestSummary,
+  PathInspection,
 } from "../types";
 
 type Methods = ProtocolMethods;
@@ -138,6 +142,12 @@ const toRenderResult = (
  * protocol request on an `RpcPeer`, and whose events are the notifications
  * the server pushes.
  */
+/* Maps a call's options onto the peer's request options. */
+const progress = (options?: CallOptions) => ({
+  signal: options?.signal,
+  onProgress: options?.onProgress,
+});
+
 export class RemoteBackend implements Backend {
   readonly kind = "remote" as const;
   capabilities: readonly Capability[] = [];
@@ -658,6 +668,17 @@ export class RemoteBackend implements Backend {
         }
         return this.#call("ingest/close", { uploadId, cancelled });
       },
+      ...(hasCapability(this.capabilities, "ingest.paths") && {
+        browse: async (path?: string): Promise<DirectoryListing> =>
+          this.#call("ingest/browse", { path }),
+        inspect: async (paths: string[]): Promise<PathInspection[]> =>
+          (await this.#call("ingest/inspect", { paths })).files,
+        addPaths: async (
+          request: AddPathsRequest,
+          options?: CallOptions,
+        ): Promise<IngestSummary> =>
+          this.#call("ingest/addPaths", request, progress(options)),
+      }),
     };
   }
 
@@ -750,10 +771,6 @@ export class RemoteBackend implements Backend {
   // ── Classification ─────────────────────────────────────────────────────────
 
   #classification(): BackendClassification {
-    const progress = (options?: CallOptions) => ({
-      signal: options?.signal,
-      onProgress: options?.onProgress,
-    });
     return {
       listArchitectures: async (): Promise<ModelDescriptor[]> =>
         asDomain<ModelDescriptor[]>(

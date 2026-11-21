@@ -63,6 +63,9 @@ type ConformanceContext = {
   /* Every image the backend holds, in insertion order and with distinct
    * names, so listings can be checked for completeness and order. */
   images: ConformanceImage[];
+  /* For `ingest.paths`: the backend's only root, holding a `stacks` folder
+   * with `pages6.tif`, `pages12.tif` and `garbage.bin` (not imported). */
+  serverFiles?: { root: string };
   teardown?: () => Promise<void> | void;
 };
 
@@ -137,6 +140,12 @@ export const describeBackendConformance = (
         );
         expect(backend.ingest !== undefined).toBe(
           hasCapability(backend.capabilities, "ingest.upload"),
+        );
+        expect(typeof backend.ingest?.browse === "function").toBe(
+          hasCapability(backend.capabilities, "ingest.paths"),
+        );
+        expect(typeof backend.ingest?.addPaths === "function").toBe(
+          hasCapability(backend.capabilities, "ingest.paths"),
         );
       });
     });
@@ -1789,6 +1798,134 @@ export const describeBackendConformance = (
           { signal: controller.signal },
         );
         expect(summary).toEqual({ imageIds: [], failed: [], cancelled: true });
+      });
+    });
+
+    describe("ingest.paths", () => {
+      const ready = () =>
+        ctx.serverFiles && ctx.backend.ingest?.browse
+          ? { root: ctx.serverFiles.root, ingest: ctx.backend.ingest }
+          : undefined;
+      const channelCount = async (): Promise<number> =>
+        (await ctx.backend.query.project()).experiment.channels ??
+        ctx.images[0].channelIds.length;
+
+      it("browses the root and its folders, hiding nothing it can read", async () => {
+        const setup = ready();
+        if (!setup) return;
+        const { root, ingest } = setup;
+        const top = await ingest.browse!();
+        expect(top.path).toBe(root);
+        expect(top.parent).toBeUndefined();
+        expect(top.roots).toEqual([root]);
+        const stacks = top.entries.find((e) => e.name === "stacks");
+        expect(stacks?.type).toBe("directory");
+        const inner = await ingest.browse!(stacks!.path);
+        expect(inner.parent).toBe(root);
+        expect(inner.entries.map((e) => e.name)).toEqual([
+          "garbage.bin",
+          "pages12.tif",
+          "pages6.tif",
+        ]);
+        expect(inner.entries.map((e) => e.supported)).toEqual([
+          false,
+          true,
+          true,
+        ]);
+        expect(inner.entries[1].size).toBeGreaterThan(0);
+      });
+
+      it("refuses paths outside the roots and folders that do not exist", async () => {
+        const setup = ready();
+        if (!setup) return;
+        const { root, ingest } = setup;
+        await expect(ingest.browse!("/")).rejects.toMatchObject({
+          code: "UNAUTHORIZED",
+        });
+        await expect(
+          ingest.browse!(`${root}/stacks/nothing-here`),
+        ).rejects.toMatchObject({ code: "NOT_FOUND" });
+        await expect(
+          ingest.addPaths!({ paths: [`${root}/stacks/missing.tif`] }),
+        ).rejects.toMatchObject({ code: "NOT_FOUND" });
+      });
+
+      it("inspects files before they are added", async () => {
+        const setup = ready();
+        if (!setup) return;
+        const { root, ingest } = setup;
+        const [stack, other] = await ingest.inspect!([
+          `${root}/stacks/pages6.tif`,
+          `${root}/stacks/garbage.bin`,
+        ]);
+        expect(stack.name).toBe("pages6.tif");
+        expect(stack.frameCount).toBe(6);
+        expect(stack.isMultiFrame).toBe(true);
+        // A plain stack carries no layout; the dialog asks.
+        expect(stack.dimensions).toBeUndefined();
+        expect(stack.error).toBeUndefined();
+        expect(other.frameCount).toBe(1);
+        expect(other.isMultiFrame).toBe(false);
+      });
+
+      it("adds a folder's files with their configs and skips them the second time", async () => {
+        const setup = ready();
+        if (!setup) return;
+        const { root, ingest } = setup;
+        const channels = await channelCount();
+        const configs = {
+          [`${root}/stacks/pages6.tif`]: {
+            dimensionOrder: "xyczt" as const,
+            channels,
+            slices: 6 / channels,
+            frames: 1,
+          },
+          [`${root}/stacks/pages12.tif`]: {
+            dimensionOrder: "xyczt" as const,
+            channels,
+            slices: 12 / channels,
+            frames: 1,
+          },
+        };
+        const events: Extract<BackendEvent, { type: "images/didAdd" }>[] = [];
+        const unsubscribe = ctx.backend.subscribe((event) => {
+          if (event.type === "images/didAdd") events.push(event);
+        });
+        const first = await ingest.addPaths!({
+          paths: [`${root}/stacks`],
+          dimensionConfigs: configs,
+        });
+        unsubscribe();
+        try {
+          expect(first.failed).toEqual([]);
+          expect(first.skipped ?? []).toEqual([]);
+          expect(first.cancelled).toBe(false);
+          expect(first.imageIds).toHaveLength(2);
+          expect(events).toHaveLength(2);
+          const names = events.map((e) => e.records[0].image.name).sort();
+          expect(names).toEqual(["pages12", "pages6"]);
+          const planes = events
+            .map((e) => e.records[0].image.shape.planes)
+            .sort((a, b) => a - b);
+          expect(planes).toEqual([6 / channels, 12 / channels]);
+          const job = (await ctx.backend.jobs.list()).find(
+            (j) => j.id === first.jobId,
+          );
+          expect(job?.status).toBe("succeeded");
+
+          const again = await ingest.addPaths!({
+            paths: [`${root}/stacks`],
+            dimensionConfigs: configs,
+          });
+          expect(again.imageIds).toEqual([]);
+          expect(
+            (again.skipped ?? []).map((p) => p.split("/").pop()).sort(),
+          ).toEqual(["pages12.tif", "pages6.tif"]);
+        } finally {
+          if (first.imageIds.length > 0) {
+            await ctx.backend.images.delete({ ids: first.imageIds });
+          }
+        }
       });
     });
 

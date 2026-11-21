@@ -85,3 +85,80 @@ class IngestSummary(WireModel):
     image_ids: list[str]
     failed: list[IngestFailure]
     cancelled: bool
+    skipped: list[str] = []
+    """Server paths left alone because they were imported before."""
+
+
+# ── Files on the backend's own machine ──────────────────────────────────────
+#
+# A backend that can read its filesystem (``ingest.paths``) lets a client
+# browse under a few roots it was started with, look at TIFFs before adding
+# them (so the same dimension dialog serves server files), and add files or
+# whole folders as an ``ingest`` job.
+
+
+class EntryType(StrEnum):
+    DIRECTORY = "directory"
+    FILE = "file"
+
+
+class DirectoryEntry(WireModel):
+    name: str
+    path: str
+    type: EntryType
+    size: int | None = None
+    supported: bool = False
+    """A file the backend can decode."""
+
+
+class BrowseParams(WireModel):
+    path: str | None = None
+    """Absent lists the roots themselves."""
+
+
+class DirectoryListing(WireModel):
+    path: str
+    """The directory listed; empty for the roots listing."""
+    parent: str | None = None
+    """Absent at a root (its parent is the roots listing) and at the top."""
+    roots: list[str]
+    entries: list[DirectoryEntry]
+
+
+class InspectParams(WireModel):
+    paths: list[str]
+
+
+class DimensionHint(WireModel):
+    """What a TIFF's metadata says about its layout; any field may be
+    unknown, and then the dialog asks."""
+
+    dimension_order: DimensionOrder | None = None
+    channels: int | None = None
+    slices: int | None = None
+    frames: int | None = None
+
+
+class PathInspection(WireModel):
+    path: str
+    name: str
+    frame_count: int
+    """2D frames the decoder will see; 1 for anything but a TIFF stack."""
+    is_multi_frame: bool
+    dimensions: DimensionHint | None = None
+    error: str | None = None
+    """Why the file could not be looked at; the counts are 0 then."""
+
+
+class InspectResult(WireModel):
+    files: list[PathInspection]
+
+
+class AddPathsParams(WireModel):
+    paths: list[str]
+    """Files, or folders whose supported files are added."""
+    recursive: bool = False
+    """Also the files of a folder's subfolders."""
+    dimension_configs: dict[str, DimensionConfig] = {}
+    """By file path, for multi-frame TIFFs."""
+    progress_token: str | None = None

@@ -40,12 +40,17 @@ from .editing import (
 from .entities import Category
 from .events import EVENT_TYPES
 from .ingest import (
+    AddPathsParams,
+    BrowseParams,
+    DirectoryListing,
     IngestCloseParams,
     IngestOpenParams,
     IngestOpenResult,
     IngestPutParams,
     IngestPutResult,
     IngestSummary,
+    InspectParams,
+    InspectResult,
 )
 from .jobs import Job
 from .measurements import (
@@ -268,6 +273,9 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("ingest/open", IngestOpenParams, IngestOpenResult),
     MethodSpec("ingest/put", IngestPutParams, IngestPutResult),
     MethodSpec("ingest/close", IngestCloseParams, IngestSummary),
+    MethodSpec("ingest/browse", BrowseParams, DirectoryListing),
+    MethodSpec("ingest/inspect", InspectParams, InspectResult),
+    MethodSpec("ingest/addPaths", AddPathsParams, IngestSummary, progress=ProgressValue),
     MethodSpec("render/image", RenderImageParams, RenderedImage),
     MethodSpec(
         "render/thumbnails",

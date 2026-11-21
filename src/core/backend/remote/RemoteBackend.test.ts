@@ -1,6 +1,12 @@
 // @vitest-environment node
 import { execFileSync, spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import {
+  copyFileSync,
+  mkdirSync,
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -68,6 +74,19 @@ if (enabled) {
       imagesDir,
     ]);
     execFileSync(command, args, { cwd: root, stdio: "inherit" });
+    // A subfolder the startup scan leaves alone, for `ingest.paths`.
+    const stacks = path.join(imagesDir, "stacks");
+    mkdirSync(stacks);
+    for (const name of ["pages6.tif", "pages12.tif", "garbage.bin"]) {
+      copyFileSync(
+        path.join(
+          root,
+          "python/packages/piximi-engine/tests/vectors/tiff",
+          name,
+        ),
+        path.join(stacks, name),
+      );
+    }
 
     const server = await startServer(imagesDir);
     processes.push(server.process);
@@ -76,6 +95,7 @@ if (enabled) {
     const page = await backend.query.images({}, { limit: 100 });
     return {
       backend,
+      serverFiles: { root: realpathSync(imagesDir) },
       images: page.items.map((record) => ({
         id: record.image.id,
         name: record.image.name,

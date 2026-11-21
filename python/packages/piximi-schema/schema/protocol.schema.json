@@ -7,6 +7,36 @@
   "properties": {},
   "protocolVersion": "2.3.0",
   "$defs": {
+    "AddPathsParams": {
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "recursive": {
+          "default": false,
+          "type": "boolean"
+        },
+        "dimensionConfigs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/DimensionConfig"
+          },
+          "default": {},
+          "type": "object"
+        },
+        "progressToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "paths"
+      ],
+      "title": "AddPathsParams",
+      "type": "object"
+    },
     "AnnotationCategory": {
       "additionalProperties": false,
       "properties": {
@@ -756,6 +786,16 @@
         "default"
       ],
       "title": "BooleanOptionField",
+      "type": "object"
+    },
+    "BrowseParams": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        }
+      },
+      "title": "BrowseParams",
       "type": "object"
     },
     "CancelParams": {
@@ -1770,6 +1810,26 @@
       "title": "DimensionConfig",
       "type": "object"
     },
+    "DimensionHint": {
+      "additionalProperties": false,
+      "description": "What a TIFF's metadata says about its layout; any field may be\nunknown, and then the dialog asks.",
+      "properties": {
+        "dimensionOrder": {
+          "$ref": "#/$defs/DimensionOrder"
+        },
+        "channels": {
+          "type": "integer"
+        },
+        "slices": {
+          "type": "integer"
+        },
+        "frames": {
+          "type": "integer"
+        }
+      },
+      "title": "DimensionHint",
+      "type": "object"
+    },
     "DimensionOrder": {
       "description": "Which index varies fastest in a flat stack of 2D frames, after x and\ny. ``xyczt``: channel fastest, then z, then t.",
       "enum": [
@@ -1782,6 +1842,64 @@
       ],
       "title": "DimensionOrder",
       "type": "string"
+    },
+    "DirectoryEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/EntryType"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "supported": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "path",
+        "type"
+      ],
+      "title": "DirectoryEntry",
+      "type": "object"
+    },
+    "DirectoryListing": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "roots": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/DirectoryEntry"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "roots",
+        "entries"
+      ],
+      "title": "DirectoryListing",
+      "type": "object"
     },
     "EntityRef": {
       "additionalProperties": false,
@@ -1799,6 +1917,14 @@
       ],
       "title": "EntityRef",
       "type": "object"
+    },
+    "EntryType": {
+      "enum": [
+        "directory",
+        "file"
+      ],
+      "title": "EntryType",
+      "type": "string"
     },
     "ErrorCode": {
       "enum": [
@@ -2570,6 +2696,13 @@
         },
         "cancelled": {
           "type": "boolean"
+        },
+        "skipped": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "required": [
@@ -2633,6 +2766,38 @@
         "serverInfo"
       ],
       "title": "InitializeResult",
+      "type": "object"
+    },
+    "InspectParams": {
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "paths"
+      ],
+      "title": "InspectParams",
+      "type": "object"
+    },
+    "InspectResult": {
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "items": {
+            "$ref": "#/$defs/PathInspection"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "files"
+      ],
+      "title": "InspectResult",
       "type": "object"
     },
     "IntensityMeasurement": {
@@ -3755,6 +3920,37 @@
       ],
       "title": "Partition",
       "type": "string"
+    },
+    "PathInspection": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "frameCount": {
+          "type": "integer"
+        },
+        "isMultiFrame": {
+          "type": "boolean"
+        },
+        "dimensions": {
+          "$ref": "#/$defs/DimensionHint"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "name",
+        "frameCount",
+        "isMultiFrame"
+      ],
+      "title": "PathInspection",
+      "type": "object"
     },
     "PeerInfo": {
       "additionalProperties": false,
@@ -4924,6 +5120,24 @@
       "params": "#/$defs/IngestCloseParams",
       "result": "#/$defs/IngestSummary",
       "progress": null
+    },
+    "ingest/browse": {
+      "direction": "client->server",
+      "params": "#/$defs/BrowseParams",
+      "result": "#/$defs/DirectoryListing",
+      "progress": null
+    },
+    "ingest/inspect": {
+      "direction": "client->server",
+      "params": "#/$defs/InspectParams",
+      "result": "#/$defs/InspectResult",
+      "progress": null
+    },
+    "ingest/addPaths": {
+      "direction": "client->server",
+      "params": "#/$defs/AddPathsParams",
+      "result": "#/$defs/IngestSummary",
+      "progress": "#/$defs/ProgressValue"
     },
     "render/image": {
       "direction": "client->server",

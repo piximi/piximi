@@ -182,6 +182,24 @@ export type ProtocolMethods = {
     progress: void;
     direction: "client->server";
   };
+  "ingest/browse": {
+    params: P.BrowseParams;
+    result: P.DirectoryListing;
+    progress: void;
+    direction: "client->server";
+  };
+  "ingest/inspect": {
+    params: P.InspectParams;
+    result: P.InspectResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "ingest/addPaths": {
+    params: P.AddPathsParams;
+    result: P.IngestSummary;
+    progress: P.ProgressValue;
+    direction: "client->server";
+  };
   "render/image": {
     params: P.RenderImageParams;
     result: P.RenderedImage;
