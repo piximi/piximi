@@ -14,7 +14,9 @@ import {
 import {
   concatTables,
   dimensionsOf,
+  mergeColumns,
   plotDataOf,
+  requestedKeys,
   scopeOf,
   selectedColumns,
   tableRows,
@@ -103,18 +105,19 @@ export const MeasurementTableProvider = ({
     () => (group ? selectedColumns(group, channelMetas) : []),
     [group, channelMetas],
   );
-  const keys = useMemo(
-    () => columns.map((column) => column.key).sort(),
-    [columns],
-  );
+  const keys = useMemo(() => requestedKeys(columns), [columns]);
   const queryKey =
     scope && backend.measurements
       ? `measurements:${scope.type}:${scope.kindId ?? ""}:${keys.join(",")}`
       : null;
-  const { value: table, loading } = useBackendQuery(
+  const { value: fetched, loading } = useBackendQuery(
     queryKey,
     () => fetchTable(backend, scope!, keys),
     revision,
+  );
+  const table = useMemo(
+    () => fetched && mergeColumns(fetched, columns),
+    [fetched, columns],
   );
 
   const rows = useMemo(

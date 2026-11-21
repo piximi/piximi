@@ -5,7 +5,9 @@ import { Partition } from "core/dl/enums";
 import {
   concatTables,
   dimensionsOf,
+  mergeColumns,
   plotDataOf,
+  requestedKeys,
   scopeOf,
   selectedColumns,
   tableRows,
@@ -57,17 +59,57 @@ const metas = [meta("m0", "DAPI"), meta("m1", "GFP")];
 describe("selectedColumns", () => {
   it("maps features and channel labels to backend column keys", () => {
     expect(selectedColumns(objectGroup, metas)).toEqual([
-      { label: "area", key: "feature:area" },
-      { label: "perimeter", key: "feature:perimeter" },
-      { label: "mean-DAPI", key: "intensity:mean:m0" },
+      { label: "area", key: "feature:area", keys: ["feature:area"] },
+      {
+        label: "perimeter",
+        key: "feature:perimeter",
+        keys: ["feature:perimeter"],
+      },
+      {
+        label: "mean-DAPI",
+        key: "intensity:mean:m0",
+        keys: ["intensity:mean:m0"],
+      },
     ]);
   });
 
   it("leaves out channel features and labels naming no meta", () => {
     expect(selectedColumns(imageGroup, metas)).toEqual([
-      { label: "median-DAPI", key: "intensity:median:m0" },
+      {
+        label: "median-DAPI",
+        key: "intensity:median:m0",
+        keys: ["intensity:median:m0"],
+      },
     ]);
     expect(selectedColumns(imageGroup, [])).toEqual([]);
+  });
+
+  it("asks for every meta of a name and merges their columns", () => {
+    const twice = [...metas, meta("m2", "DAPI")];
+    const columns = selectedColumns(imageGroup, twice);
+    expect(columns).toEqual([
+      {
+        label: "median-DAPI",
+        key: "intensity:median:m0",
+        keys: ["intensity:median:m0", "intensity:median:m2"],
+      },
+    ]);
+    expect(requestedKeys(columns)).toEqual([
+      "intensity:median:m0",
+      "intensity:median:m2",
+    ]);
+    const merged = mergeColumns(
+      page(
+        ["a", "b", "c"],
+        {
+          "intensity:median:m0": [1, null, null],
+          "intensity:median:m2": [null, 2, null],
+        },
+        3,
+      ),
+      columns,
+    );
+    expect(merged.values).toEqual({ "intensity:median:m0": [1, 2, null] });
   });
 
   it("names the scope by the group's kind", () => {
@@ -134,7 +176,7 @@ describe("tables", () => {
   it("keeps only answered values in the plot data", () => {
     const data = plotDataOf(
       rows,
-      [{ label: "area", key: "feature:area" }],
+      [{ label: "area", key: "feature:area", keys: ["feature:area"] }],
       whole,
       scope,
     );

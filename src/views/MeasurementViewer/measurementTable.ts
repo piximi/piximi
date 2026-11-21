@@ -26,7 +26,8 @@ export const scopeOf = (
 /*
  * The group's selected measurements as backend columns. Intensity labels
  * name a channel by its meta's name, so a renamed or missing meta leaves
- * its label without a column, as before it left it without a value.
+ * its label without a column, as before it left it without a value; every
+ * meta of that name is asked for, since an entity's plane carries one of them.
  */
 export const selectedColumns = (
   group: ObjectMeasurementGroup | ImageMeasurementGroup,
@@ -35,7 +36,8 @@ export const selectedColumns = (
   const refs: MeasurementColumnRef[] = [];
   if ("kind" in group) {
     for (const feature of group.featureMeasurements) {
-      refs.push({ label: feature, key: featureColumn(feature) });
+      const key = featureColumn(feature);
+      refs.push({ label: feature, key, keys: [key] });
     }
   }
   for (const label of group.intensityMeasurements) {
@@ -51,11 +53,42 @@ export const selectedColumns = (
     } catch {
       continue;
     }
-    const meta = channelMetas.find((m) => m.name === parsed.channelId);
-    if (!meta) continue;
-    refs.push({ label, key: intensityColumn(parsed.measurement, meta.id) });
+    const keys = channelMetas
+      .filter((m) => m.name === parsed.channelId)
+      .map((m) => intensityColumn(parsed.measurement, m.id));
+    if (keys.length === 0) continue;
+    refs.push({ label, key: keys[0], keys });
   }
   return refs;
+};
+
+/* Every column to ask the backend for, once each. */
+export const requestedKeys = (columns: MeasurementColumnRef[]): string[] =>
+  [...new Set(columns.flatMap((column) => column.keys))].sort();
+
+/*
+ * Folds the columns of same-named metas into each label's one column: a
+ * row's plane carries one of the metas, so at most one of them has a value.
+ */
+export const mergeColumns = (
+  table: MeasurementTable,
+  columns: MeasurementColumnRef[],
+): MeasurementTable => {
+  if (columns.every((column) => column.keys.length === 1)) return table;
+  const values: MeasurementTable["values"] = { ...table.values };
+  for (const { key, keys } of columns) {
+    if (keys.length === 1) continue;
+    const merged = table.ids.map((_, index) => {
+      for (const candidate of keys) {
+        const value = table.values[candidate]?.[index];
+        if (value !== null && value !== undefined) return value;
+      }
+      return null;
+    });
+    for (const candidate of keys) delete values[candidate];
+    values[key] = merged;
+  }
+  return { ...table, values };
 };
 
 /* One table from the pages of another, in order. */

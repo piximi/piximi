@@ -136,8 +136,18 @@ export type MeasurementRow = {
   boundingBox?: BBox;
 };
 
-/* A selected measurement: the label the group stores and the backend's column key. */
-export type MeasurementColumnRef = { label: string; key: string };
+/*
+ * A selected measurement: the label the group stores and the backend
+ * column it reads as. An intensity label names a channel by its meta's
+ * name, and a project can hold several metas of one name (one per import),
+ * so `keys` lists every column asked for and `key` the one they are merged
+ * into for the viewer.
+ */
+export type MeasurementColumnRef = {
+  label: string;
+  key: string;
+  keys: string[];
+};
 
 // ============================================================================
 // PARSED & PREPARED DATA
