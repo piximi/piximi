@@ -14,10 +14,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useBackend } from "core/backend";
-import { useClassifierApi } from "core/dl/classification";
+import { useBackend, useCapability } from "core/backend";
 import { ARCHITECTURE_LABELS } from "core/dl/classification/types";
-import { classifierFromDTO } from "core/dl/classification/utils";
 import { zipInputToBuffer } from "core/file-io/file-loader/fileInputUtils";
 
 import { DialogTitleBar } from "components/ui/DialogTitleBar";
@@ -84,7 +82,7 @@ export const ImportTensorflowClassificationModelDialog = ({
   const [isGraph, setIsGraph] = useState(false);
   const [tabVal, setTabVal] = useState("1");
 
-  const cfApi = useClassifierApi();
+  const canFetchByUrl = useCapability("classification.import-url");
 
   const onTabSelect = (event: React.SyntheticEvent, newValue: string) => {
     setTabVal(newValue);
@@ -128,23 +126,20 @@ export const ImportTensorflowClassificationModelDialog = ({
     }
   };
 
-  // A tfjs model fetched by URL lives in the browser's own worker, so this
-  // tab is only offered by the local backend.
+  // A tfjs model fetched by URL lives in the browser's own worker, so only
+  // a backend declaring `classification.import-url` offers this tab.
   const handleRemoteUpload = async (modelUrl: string) => {
-    const result = await cfApi.modelFromUrl(modelUrl, isGraph);
-    if (result.success) {
-      const classifier = classifierFromDTO(result.data, modelTarget, []);
-      dispatch(classifierSlice.actions.upsertClassifier(classifier));
-      activate(classifier);
-    } else {
-      setUploadResult({
-        success: false,
-        reason: `[loadModel] ${result.reason.code}: ${result.reason.message}`,
-      });
-      console.error(
-        `[loadModel] ${result.reason.code}: ${result.reason.message}`,
-        result.reason.cause,
+    if (!backend.classification?.importFromUrl) return;
+    try {
+      activate(
+        await backend.classification.importFromUrl({
+          targetId: modelTarget,
+          url: modelUrl,
+          format: isGraph ? "graph" : "layers",
+        }),
       );
+    } catch (e) {
+      setUploadResult({ success: false, reason: parseError(e).message });
     }
   };
 
@@ -278,8 +273,8 @@ export const ImportTensorflowClassificationModelDialog = ({
           label="Fetch Remote"
           value="2"
           placement="top"
-          disabled={backend.kind !== "local"}
-          disabledMessage="Only the in-browser backend can fetch a tfjs model by URL"
+          disabled={!canFetchByUrl}
+          disabledMessage="This backend cannot fetch a tfjs model by URL"
         />
       </Tabs>
       <DialogContent sx={{ pb: 0 }}>

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { configureStore } from "@reduxjs/toolkit";
 
 import { DataConnector } from "core/data-connector";
@@ -11,15 +12,18 @@ import {
 import { ModelTask, Partition } from "core/dl/enums";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
+import { getDefaultModelParams } from "core/dl/classification/utils";
 
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { classifierSlice } from "store/classifier";
+import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { dataSlice } from "store/data";
 
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
 import { computeObjectIntensityMeasurements } from "utils/measurements/computeObjectIntensityMeasurements";
 
 import { describeBackendConformance } from "../conformance/backendConformance";
+import { BackendError } from "../errors";
 import { connectBackendToStore } from "../sync/connectBackendToStore";
 import { LocalBackend } from "./LocalBackend";
 import { createMainThreadThumbnailRenderer } from "./thumbnails";
@@ -231,7 +235,37 @@ const createFakeClassifier = (): IClassifierApi => {
     evaluate: async (name) =>
       models.has(name) ? { success: true, data: evaluation } : missing(name),
     modelFromFiles: async () => unsupported,
-    modelFromUrl: async () => unsupported,
+    // Stands in for tfjs fetching `model.json`: anything on https resolves
+    // to a pretrained two-class model named after its folder.
+    modelFromUrl: async (url, isGraph) => {
+      if (!url.startsWith("https://")) return unsupported;
+      const name = url.split("/").at(-2) ?? "remote";
+      models.set(name, {
+        loaded: true,
+        trainingLoaded: false,
+        classes: ["cat", "dog"],
+        pending: 0,
+      });
+      const { preprocessSettings, optimizerSettings } = getDefaultModelParams();
+      return {
+        success: true,
+        data: {
+          ...dto(name),
+          modelArch: undefined,
+          graph: isGraph,
+          trainable: isGraph,
+          preprocessingSettings: {
+            cropSchema: preprocessSettings.cropOptions.cropSchema,
+            numCrops: preprocessSettings.cropOptions.numCrops,
+            inputShape: preprocessSettings.inputShape,
+            shuffle: preprocessSettings.shuffle,
+            normalize: preprocessSettings.normalizeOptions.normalize,
+            batchSize: optimizerSettings.batchSize,
+          },
+          optimizerSettings,
+        },
+      };
+    },
     modelsFromZipBuffer: async () => unsupported,
     getSavedModelData: async () => unsupported,
     getZippedModelsBuffer: async () => unsupported,
@@ -345,7 +379,7 @@ const makeProject = () => ({
   annotationVolumes: [],
 });
 
-describeBackendConformance("LocalBackend", async () => {
+const createLocalBackend = async () => {
   DataConnector.resetInstance();
   const storage = DataConnector.getInstance();
   await storage.storeBatch(
@@ -401,4 +435,55 @@ describeBackendConformance("LocalBackend", async () => {
       storage.close();
     },
   };
+};
+
+describeBackendConformance("LocalBackend", createLocalBackend);
+
+describe("LocalBackend: tfjs models by URL", () => {
+  const withBackend = async (run: (backend: LocalBackend) => Promise<void>) => {
+    const { backend, teardown } = await createLocalBackend();
+    await backend.connect();
+    try {
+      await run(backend);
+    } finally {
+      await backend.dispose();
+      await teardown();
+    }
+  };
+
+  it("writes the fetched model as a pretrained record of the target", () =>
+    withBackend(async (backend) => {
+      expect(backend.capabilities).toContain("classification.import-url");
+      const record = await backend.classification.importFromUrl!({
+        targetId: IMAGE_CLASSIFIER_ID,
+        url: "https://models.example/pets/model.json",
+        format: "graph",
+      });
+      expect(record).toMatchObject({
+        name: "pets",
+        targetId: IMAGE_CLASSIFIER_ID,
+        architectureId: "uploaded",
+        framework: "tensorflow.js",
+        classes: ["cat", "dog"],
+        trained: true,
+        trainable: true,
+        runs: [],
+      });
+      expect(record.classMap).toBeUndefined();
+      expect(await backend.classification.list()).toContainEqual(
+        expect.objectContaining({ id: record.id }),
+      );
+    }));
+
+  it("surfaces the worker's failure as a backend error", () =>
+    withBackend(async (backend) => {
+      await expect(
+        backend.classification.importFromUrl!({
+          targetId: IMAGE_CLASSIFIER_ID,
+          url: "ftp://nowhere/model.json",
+          format: "layers",
+        }),
+      ).rejects.toBeInstanceOf(BackendError);
+      expect(await backend.classification.list()).toEqual([]);
+    }));
 });

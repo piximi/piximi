@@ -66,6 +66,7 @@ export type Capability =
   | "segmentation"
   | "classification"
   | "classification.train"
+  | "classification.import-url"
   | "measurements"
   | "ingest.upload"
   | "ingest.paths"

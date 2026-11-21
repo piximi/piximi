@@ -8,6 +8,9 @@ class Capability(StrEnum):
     SEGMENTATION = "segmentation"
     CLASSIFICATION = "classification"
     CLASSIFICATION_TRAIN = "classification.train"
+    # A tfjs model fetched by URL lives in the browser's own worker, so only
+    # the in-browser backend declares this.
+    CLASSIFICATION_IMPORT_URL = "classification.import-url"
     MEASUREMENTS = "measurements"
     INGEST_UPLOAD = "ingest.upload"
     INGEST_PATHS = "ingest.paths"

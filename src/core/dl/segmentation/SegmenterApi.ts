@@ -136,7 +136,7 @@ const construct = (backend: SegmenterBackend): ISegmenterApi => {
 /**
  * Get the currently-active backend, lazily constructing the default ("local")
  * on first call. Use from non-React code (services, listeners, loaders).
- * React components should prefer `useClassifierApi()`.
+ * React code reaches the worker through the backend (`useBackend()`).
  */
 export function getSegmenterApi(): ISegmenterApi {
   if (!current) {

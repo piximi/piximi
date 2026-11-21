@@ -63,6 +63,7 @@ import type {
   ClassifierFitSummary,
   ClassifierImportRequest,
   ClassifierPredictRequest,
+  ClassifierUrlImportRequest,
   ClassifierPredictSummary,
   ClassifierUpdateRequest,
   ModelDescriptor,
@@ -848,5 +849,18 @@ export class LocalClassification implements BackendClassification {
       record.classMap = lastMap;
     }
     return this.#write(record);
+  }
+
+  /* The worker fetches the model; its record then has no runs and no class
+   * map, so the classes get mapped to categories before it predicts, as
+   * with any pretrained model. */
+  async importFromUrl(
+    request: ClassifierUrlImportRequest,
+  ): Promise<Classifier> {
+    const cfApi = this.#deps.classifier();
+    const dto = unwrap(
+      await cfApi.modelFromUrl(request.url, request.format === "graph"),
+    );
+    return this.#write(classifierFromDTO(dto, request.targetId, []));
   }
 }

@@ -93,6 +93,11 @@ export const describeBackendConformance = (
         expect(typeof backend.render.raw === "function").toBe(
           hasCapability(backend.capabilities, "raw-local"),
         );
+        expect(
+          typeof backend.classification?.importFromUrl === "function",
+        ).toBe(
+          hasCapability(backend.capabilities, "classification.import-url"),
+        );
       });
     });
 

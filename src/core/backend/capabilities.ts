@@ -10,6 +10,10 @@ export const CAPABILITIES = [
   "segmentation",
   "classification",
   "classification.train",
+  // `classification.importFromUrl` is available: a tfjs model fetched by
+  // URL lives in the browser's own worker, so only the in-browser backend
+  // declares this.
+  "classification.import-url",
   "measurements",
   "ingest.upload",
   "ingest.paths",

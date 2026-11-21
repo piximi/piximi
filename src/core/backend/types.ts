@@ -470,6 +470,13 @@ export type ClassifierImportRequest = {
   name?: string;
 };
 
+export type ClassifierUrlImportRequest = {
+  targetId: string;
+  /* Where tfjs finds the model's `model.json`. */
+  url: string;
+  format: "layers" | "graph";
+};
+
 export interface BackendClassification {
   /* Listed models with a classification task. */
   listArchitectures(): Promise<ModelDescriptor[]>;
@@ -494,4 +501,6 @@ export interface BackendClassification {
   clearPredictions(targetId: string): Promise<Changed>;
   export(classifierId: string): Promise<ClassifierExport>;
   import(request: ClassifierImportRequest): Promise<Classifier>;
+  /* Only with the `classification.import-url` capability. */
+  importFromUrl?(request: ClassifierUrlImportRequest): Promise<Classifier>;
 }

@@ -132,6 +132,7 @@ export class LocalBackend implements Backend {
     "segmentation",
     "classification",
     "classification.train",
+    "classification.import-url",
     "measurements",
     "ingest.upload",
     "project.io",
