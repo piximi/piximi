@@ -78,11 +78,14 @@ from piximi_schema.events import (
     ProjectDidChange,
 )
 from piximi_schema.ingest import (
+    AddPathsParams,
     DimensionConfig,
+    DirectoryListing,
     IngestFailure,
     IngestOpenResult,
     IngestPutResult,
     IngestSummary,
+    PathInspection,
     UploadFile,
 )
 from piximi_schema.jobs import Job, JobKind, JobStatus
@@ -144,6 +147,7 @@ from .dedup import MaskedBox, is_duplicate
 from .jobs import JobRegistry
 from .measure import channel_statistics, intensity_measurements, object_features
 from .measurements import measure_annotations, measure_images, measurement_table, unmeasured_ids
+from .paths import PathPolicy
 from .models import ModelRegistry, SegmentationModel, default_registry
 from .models.base import apply_option_defaults
 from .query import (
@@ -191,8 +195,11 @@ class ReferenceEngine:
         models: dict[str, SegmentationModel] | ModelRegistry | None = None,
         models_dirs: Iterable[Path | str] = (),
         gpu: bool = True,
+        roots: Iterable[Path | str] = (),
     ) -> None:
         self.data_dir = Path(data_dir)
+        self.paths = PathPolicy(roots)
+        """Folders a client may browse and add images from (``ingest.paths``)."""
         self.meta = MetaStore(self.data_dir / "meta.sqlite")
         self.pixels = PixelStore(self.data_dir / "pixels.zarr")
         if isinstance(models, ModelRegistry):
@@ -230,6 +237,8 @@ class ReferenceEngine:
         ]
         if self.models.classifiers:
             capabilities += [Capability.CLASSIFICATION, Capability.CLASSIFICATION_TRAIN]
+        if self.paths.enabled:
+            capabilities.append(Capability.INGEST_PATHS)
         return capabilities
 
     def subscribe(self, listener: EventListener) -> Callable[[], None]:
@@ -500,23 +509,73 @@ class ReferenceEngine:
         if upload is None:
             raise BackendError("NOT_FOUND", f"No upload {upload_id}")
         cancelled = cancelled or upload.cancelled or self.jobs.is_cancelling(upload.job_id)
-        added = len(upload.image_ids)
-        failed = len(upload.failed)
+        self._finish_ingest(upload.job_id, upload.image_ids, upload.failed, cancelled)
+        return IngestSummary(job_id=upload.job_id, image_ids=upload.image_ids, failed=upload.failed, cancelled=cancelled)
+
+    def _finish_ingest(self, job_id: str, image_ids: list[str], failures: list[IngestFailure], cancelled: bool) -> None:
+        added, failed = len(image_ids), len(failures)
         if cancelled:
-            self.jobs.finish(upload.job_id, JobStatus.CANCELLED, message=f"Stopped after {added} image{'s' if added != 1 else ''}")
+            self.jobs.finish(job_id, JobStatus.CANCELLED, message=f"Stopped after {added} image{'s' if added != 1 else ''}")
         elif failed and not added:
             self.jobs.finish(
-                upload.job_id,
+                job_id,
                 JobStatus.FAILED,
                 message="No images added",
-                error=upload.failed[0].error if failed == 1 else f"{failed} files could not be added: {upload.failed[0].error}",
+                error=failures[0].error if failed == 1 else f"{failed} files could not be added: {failures[0].error}",
             )
         else:
             message = f"Added {added} image{'s' if added != 1 else ''}"
             if failed:
                 message += f"; {failed} file{'s' if failed != 1 else ''} failed"
-            self.jobs.finish(upload.job_id, JobStatus.SUCCEEDED, message=message)
-        return IngestSummary(job_id=upload.job_id, image_ids=upload.image_ids, failed=upload.failed, cancelled=cancelled)
+            self.jobs.finish(job_id, JobStatus.SUCCEEDED, message=message)
+
+    # Files on this machine (``ingest.paths``): browsing and looking at
+    # files is immediate; adding them is an ``ingest`` job like an upload.
+
+    async def ingest_browse(self, path: str | None) -> DirectoryListing:
+        self._require_paths()
+        return self.paths.browse(path)
+
+    async def ingest_inspect(self, paths: list[str]) -> list[PathInspection]:
+        self._require_paths()
+        return await asyncio.to_thread(self.paths.inspect, paths)
+
+    async def ingest_add_paths(self, params: AddPathsParams, ctx: HandlerContext) -> IngestSummary:
+        self._require_paths()
+        self._capture_loop()
+        files = self.paths.expand(params.paths, params.recursive)
+        job = self.jobs.start(JobKind.INGEST, f"Adding {len(files)} image file{'s' if len(files) != 1 else ''}")
+        image_ids: list[str] = []
+        failures: list[IngestFailure] = []
+        skipped: list[str] = []
+        cancelled = False
+        experiment_id = self.experiment.id
+        for index, path in enumerate(files):
+            if ctx.cancelled or self.jobs.is_cancelling(job.id):
+                cancelled = True
+                break
+            if self.meta.source_image_ids(str(path)) is not None:
+                skipped.append(str(path))
+                continue
+            percent = index / len(files) * 100
+            message = f"Adding {path.name} ({index + 1}/{len(files)})"
+            self.jobs.update(job.id, progress=percent, message=message)
+            ctx.progress(ProgressValue(percent=percent, message=message).to_wire())
+            config = params.dimension_configs.get(str(path))
+            try:
+                prepared = await asyncio.to_thread(
+                    lambda p=path: self._prepare_images(p.stem, decode_path(p, config), experiment_id)
+                )
+                image_ids.extend(self._commit_images(prepared, source=str(path)))
+            except Exception as error:
+                log.warning("adding %s failed: %s", path, error)
+                failures.append(IngestFailure(name=path.name, error=str(error)))
+        self._finish_ingest(job.id, image_ids, failures, cancelled)
+        return IngestSummary(job_id=job.id, image_ids=image_ids, failed=failures, cancelled=cancelled, skipped=skipped)
+
+    def _require_paths(self) -> None:
+        if not self.paths.enabled:
+            raise BackendError("NOT_SUPPORTED", "This engine was started without any folder to read from")
 
     def _upload(self, upload_id: str) -> _Upload:
         upload = self._uploads.get(upload_id)

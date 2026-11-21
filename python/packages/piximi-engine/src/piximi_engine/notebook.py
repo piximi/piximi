@@ -13,6 +13,7 @@ renders a link for a frontend served elsewhere.
 from __future__ import annotations
 
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
 
 from piximi_link.notebook import NotebookSession, serve as serve_engine
@@ -41,15 +42,19 @@ async def serve(
     auth: bool = True,
     gpu: bool = True,
     models_dir: str | Path | None = None,
+    roots: Iterable[str | Path] | None = None,
 ) -> ProjectSession:
     """Serves a folder of images (or an existing engine) from the kernel's
-    loop; returns a session whose `.project` is the Python API."""
+    loop; returns a session whose `.project` is the Python API. ``roots``
+    are the folders the app may browse and add images from (default: the
+    images folder, else the working directory)."""
     if engine is None:
         folder = Path(images).resolve() if images else None
         engine = ReferenceEngine(
             Path(data_dir) if data_dir else (folder or Path.cwd()) / ".piximi",
             gpu=gpu,
             models_dirs=[models_dir] if models_dir else [],
+            roots=list(roots) if roots is not None else [folder or Path.cwd()],
         )
         if folder is not None:
             engine.ingest_folder(folder)

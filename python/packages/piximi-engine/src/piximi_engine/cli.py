@@ -17,6 +17,7 @@ from piximi_link.server import serve
 from piximi_link.session import SessionHub
 
 from .engine import ReferenceEngine
+from .paths import ROOTS_ENV, roots_from_env
 
 PACKAGED_FRONTEND = Path(__file__).resolve().parent / "frontend"
 
@@ -58,7 +59,13 @@ async def _serve(args: argparse.Namespace) -> None:
     if args.envs_dir:
         # Read by Appose when it is imported, which the model registry defers until here.
         os.environ["APPOSE_ENVS_DIR"] = str(Path(args.envs_dir).resolve())
-    engine = ReferenceEngine(data_dir, gpu=not args.no_gpu, models_dirs=args.models_dir or [])
+    # What a client may browse and add from: the served folder, any --root,
+    # PIXIMI_ROOTS, else the working directory.
+    roots = [images] if images is not None else []
+    roots += [Path(root) for root in args.root or []] + roots_from_env()
+    engine = ReferenceEngine(
+        data_dir, gpu=not args.no_gpu, models_dirs=args.models_dir or [], roots=roots or [Path.cwd()]
+    )
     if images is not None:
         added = engine.ingest_folder(images)
         print(f"Imported {len(added)} new image(s) from {images}", flush=True)
@@ -121,6 +128,13 @@ def main(argv: list[str] | None = None) -> int:
         metavar="PATH",
         help="Public path prefix when a proxy strips one (otherwise read from "
         "the X-Forwarded-Prefix header it sends)",
+    )
+    run.add_argument(
+        "--root",
+        action="append",
+        metavar="DIR",
+        help="A folder clients may browse and add images from, besides the served one; "
+        f"repeatable (also {ROOTS_ENV}, separated like PATH; default: the working directory)",
     )
     run.add_argument("--no-gpu", action="store_true", help="Run models on the CPU")
     run.add_argument(

@@ -41,7 +41,15 @@ from piximi_schema.editing import (
     KindUpdateParams,
     ProjectUpdateParams,
 )
-from piximi_schema.ingest import IngestCloseParams, IngestOpenParams, IngestPutParams
+from piximi_schema.ingest import (
+    AddPathsParams,
+    BrowseParams,
+    IngestCloseParams,
+    IngestOpenParams,
+    IngestPutParams,
+    InspectParams,
+    InspectResult,
+)
 from piximi_schema.measurements import MeasurementsComputeRequest, MeasurementTableRequest
 from piximi_schema.methods import (
     AnnotationCountsParams,
@@ -329,6 +337,15 @@ class SessionHub:
             self._uploads.get(peer, set()).discard(params.upload_id)
             return await engine.ingest_close(params.upload_id, params.cancelled)
 
+        async def ingest_browse(params: BrowseParams, _ctx: HandlerContext):
+            return await engine.ingest_browse(params.path)
+
+        async def ingest_inspect(params: InspectParams, _ctx: HandlerContext):
+            return InspectResult(files=await engine.ingest_inspect(params.paths))
+
+        async def ingest_add_paths(params: AddPathsParams, ctx: HandlerContext):
+            return await engine.ingest_add_paths(params, ctx)
+
         peer.on_request("initialize", typed(InitializeParams, initialize))
         peer.on_request("shutdown", typed(None, shutdown))
         peer.on_request("query/project", typed(None, lambda _ctx: engine.project()))
@@ -360,6 +377,9 @@ class SessionHub:
         peer.on_request("ingest/open", typed(IngestOpenParams, ingest_open))
         peer.on_request("ingest/put", typed(IngestPutParams, ingest_put))
         peer.on_request("ingest/close", typed(IngestCloseParams, ingest_close))
+        peer.on_request("ingest/browse", typed(BrowseParams, ingest_browse))
+        peer.on_request("ingest/inspect", typed(InspectParams, ingest_inspect))
+        peer.on_request("ingest/addPaths", typed(AddPathsParams, ingest_add_paths))
         peer.on_request("render/image", typed(RenderImageParams, render_image))
         peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
         peer.on_request("jobs/list", typed(None, jobs_list))

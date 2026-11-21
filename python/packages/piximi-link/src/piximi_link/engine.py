@@ -53,7 +53,15 @@ from piximi_schema.events import (
     ModelsDidChange,
     ProjectDidChange,
 )
-from piximi_schema.ingest import IngestOpenResult, IngestPutResult, IngestSummary, UploadFile
+from piximi_schema.ingest import (
+    AddPathsParams,
+    DirectoryListing,
+    IngestOpenResult,
+    IngestPutResult,
+    IngestSummary,
+    PathInspection,
+    UploadFile,
+)
 from piximi_schema.jobs import Job
 from piximi_schema.measurements import (
     MeasurementsComputeRequest,
@@ -171,6 +179,21 @@ class Engine(Protocol):
     async def ingest_close(self, upload_id: str, cancelled: bool = False) -> IngestSummary:
         """Ends the batch and its job (cancelled when the client says so or
         the job was cancelled meanwhile); returns what the batch added."""
+        ...
+
+    async def ingest_browse(self, path: str | None) -> DirectoryListing:
+        """Lists a folder under the engine's roots (``ingest.paths``); no
+        path lists the roots. Outside the roots: ``UNAUTHORIZED``."""
+        ...
+
+    async def ingest_inspect(self, paths: list[str]) -> list[PathInspection]:
+        """What the decoder will make of each file: its frame count and the
+        layout its metadata declares, so a client can ask about the rest."""
+        ...
+
+    async def ingest_add_paths(self, params: AddPathsParams, ctx: HandlerContext) -> IngestSummary:
+        """Adds the files (and folders' supported files) as an ``ingest``
+        job, skipping sources imported before; announces ``images/didAdd``."""
         ...
 
     # ── Mutations ───────────────────────────────────────────────────────────
