@@ -14,7 +14,8 @@ from collections.abc import Iterator, Sequence
 from typing import Any
 
 from piximi_link.errors import BackendError
-from piximi_schema.entities import Partition
+from piximi_schema.entities import AnnotationObject, AnnotationVolume, Channel, Partition
+from piximi_schema.classification import AnnotationUpdate
 from piximi_schema.measurements import (
     MeasurementColumn,
     MeasurementTable,
@@ -24,8 +25,10 @@ from piximi_schema.measurements import (
 )
 from piximi_schema.query import AnnotationQuery, ImageQuery
 
+from .measure import intensity_measurements, object_features
 from .query import annotation_clauses, image_clauses
-from .store import MetaStore
+from .rle import decode_mask
+from .store import Clause, MetaStore, PixelStore, annotation_index
 
 _CHUNK = 900
 """Ids per ``IN (...)``, under SQLite's default variable limit."""
@@ -158,3 +161,54 @@ def _values(meta: MetaStore, kind: str, ids: list[str], columns: Columns) -> dic
                     wanted,
                 )
     return values
+
+
+# ── Measuring on demand ─────────────────────────────────────────────────────
+
+_UNMEASURED = Clause(
+    "(json_extract(e.data, '$.features') IS NULL OR json_extract(e.data, '$.intensityMeasurements') IS NULL)"
+)
+
+
+def unmeasured_ids(meta: MetaStore, query: AnnotationQuery, force: bool) -> list[str]:
+    """The matching objects that lack features or intensities, or all of
+    them with ``force``, in insertion order."""
+    where = annotation_clauses(query)
+    if not force:
+        where = [*where, _UNMEASURED]
+    return meta.select_ids("annotation", where=where)
+
+
+def measure_annotations(meta: MetaStore, pixels: PixelStore, ids: Sequence[str]) -> list[AnnotationUpdate]:
+    """Computes every feature and intensity of ``ids`` from their stored
+    masks and pixels and rewrites their headers, keeping the mask column and
+    the volume-derived index; returns what was rewritten."""
+    objects = meta.get_many("annotation", list(ids), AnnotationObject)
+    volumes = meta.get_many("volume", sorted({o.volume_id for o in objects.values()}), AnnotationVolume)
+    channels_by_plane: dict[str, list[Channel]] = defaultdict(list)
+    for channel in meta.list("channel", Channel, parents=sorted({o.plane_id for o in objects.values()})):
+        channels_by_plane[channel.plane_id].append(channel)
+    measured: list[AnnotationObject] = []
+    index: dict[str, dict[str, Any]] = {}
+    for id in ids:
+        obj = objects.get(id)
+        volume = volumes.get(obj.volume_id) if obj is not None else None
+        if obj is None or volume is None:
+            continue
+        x0, y0, x1, y1 = obj.bounding_box
+        mask = decode_mask(obj.encoded_mask, (y1 - y0, x1 - x0))
+        intensities = {}
+        for channel in channels_by_plane.get(obj.plane_id, []):
+            stats = intensity_measurements(mask, pixels.get(channel.id, obj.bounding_box))
+            if stats is not None:
+                intensities[channel.id] = stats
+        # Validated rather than copied, so the measurement keys are the enums
+        # the model declares and serialise as such.
+        measured.append(
+            AnnotationObject.model_validate(
+                {**obj.model_dump(), "features": object_features(mask) or None, "intensityMeasurements": intensities or None}
+            )
+        )
+        index[obj.id] = annotation_index(volume)
+    meta.update_many("annotation", measured, index=index)
+    return [AnnotationUpdate(id=obj.id, partition=obj.partition) for obj in measured]

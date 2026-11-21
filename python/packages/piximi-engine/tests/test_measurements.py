@@ -16,6 +16,7 @@ from piximi_schema.entities import (
 )
 from piximi_schema.measurements import (
     MeasurementScope,
+    MeasurementsComputeRequest,
     MeasurementTableRequest,
     TablePageRequest,
     feature_column,
@@ -160,3 +161,57 @@ async def test_table_refuses_what_it_cannot_measure(engine: ReferenceEngine):
         with pytest.raises(BackendError) as info:
             await engine.measurement_table(request)
         assert info.value.code == "NOT_SUPPORTED"
+
+
+async def test_compute_measures_what_lacks_values(engine: ReferenceEngine):
+    kind_id = await segmented(engine)
+    listed = await engine.annotations(AnnotationQuery(kind_ids=[kind_id]), None, PageRequest(limit=10))
+    source = listed.items[0]
+    # A copy of a measured object's mask, written without any measurement.
+    volume = AnnotationVolume(
+        id=generate_uuid(), image_id=source.annotation.image_id, kind_id=kind_id, category_id=source.volume.category_id
+    )
+    bare = AnnotationObject(
+        id=generate_uuid(),
+        plane_id=source.annotation.plane_id,
+        image_id=source.annotation.image_id,
+        volume_id=volume.id,
+        partition=Partition.TRAINING,
+        shape=source.annotation.shape,
+        bounding_box=source.annotation.bounding_box,
+        encoded_mask=(await engine.masks([source.annotation.id]))[source.annotation.id],
+    )
+    engine.meta.put("volume", volume, parent=bare.image_id)
+    engine.meta.put("annotation", bare, parent=bare.image_id, index=annotation_index(volume))
+    events = []
+    engine.subscribe(events.append)
+    progress = []
+
+    summary = await engine.measurements_compute(
+        MeasurementsComputeRequest(query=AnnotationQuery(kind_ids=[kind_id])), HandlerContext(progress.append)
+    )
+    assert summary.measured == 1 and summary.cancelled is False and summary.job_id
+    assert progress[-1]["percent"] == 100
+    jobs = await engine.jobs_list()
+    assert jobs[-1].id == summary.job_id and jobs[-1].kind == "measurements" and jobs[-1].status == "succeeded"
+    updated = [event for event in events if event.type == "annotations/didUpdate"]
+    assert [update.id for event in updated for update in event.annotations] == [bare.id]
+    assert updated[0].annotations[0].partition == Partition.TRAINING
+
+    table = await engine.measurement_table(objects(kind_id, columns=[AREA, MEAN_0]))
+    at = {id: i for i, id in enumerate(table.ids)}
+    assert table.values[AREA][at[bare.id]] == table.values[AREA][at[source.annotation.id]]
+    assert table.values[MEAN_0][at[bare.id]] == table.values[MEAN_0][at[source.annotation.id]]
+    # The header kept its partition and mask; the volume-derived index too.
+    again = (await engine.annotations(AnnotationQuery(ids=[bare.id]), None, PageRequest(limit=1))).items[0]
+    assert again.annotation.partition == Partition.TRAINING and again.annotation.features
+    assert (await engine.masks([bare.id]))[bare.id] == bare.encoded_mask
+    assert (await engine.annotation_counts(AnnotationQuery(category_ids=[volume.category_id]))).total >= 1
+
+    # Nothing is left to measure, unless asked to measure everything again.
+    assert (await engine.measurements_compute(MeasurementsComputeRequest(query=AnnotationQuery(kind_ids=[kind_id])), HandlerContext(None))).measured == 0
+    forced = await engine.measurements_compute(
+        MeasurementsComputeRequest(query=AnnotationQuery(kind_ids=[kind_id]), force=True), HandlerContext(None)
+    )
+    assert forced.measured == listed.total + 1
+    assert (await engine.measurement_table(objects(kind_id, columns=[AREA]))).values[AREA] == table.values[AREA]

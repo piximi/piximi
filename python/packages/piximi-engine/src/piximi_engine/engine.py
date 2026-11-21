@@ -63,7 +63,12 @@ from piximi_schema.events import (
     ModelsDidChange,
 )
 from piximi_schema.jobs import Job, JobKind, JobStatus
-from piximi_schema.measurements import MeasurementTable, MeasurementTableRequest
+from piximi_schema.measurements import (
+    MeasurementsComputeRequest,
+    MeasurementsComputeSummary,
+    MeasurementTable,
+    MeasurementTableRequest,
+)
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
     AnnotationCountGroup,
@@ -113,7 +118,7 @@ from .decode import SUPPORTED_SUFFIXES, read_image
 from .dedup import MaskedBox, is_duplicate
 from .jobs import JobRegistry
 from .measure import channel_statistics, intensity_measurements, object_features
-from .measurements import measurement_table
+from .measurements import measure_annotations, measurement_table, unmeasured_ids
 from .models import ModelRegistry, SegmentationModel, default_registry
 from .models.base import apply_option_defaults
 from .query import (
@@ -486,6 +491,47 @@ class ReferenceEngine:
 
     async def measurement_table(self, request: MeasurementTableRequest) -> MeasurementTable:
         return measurement_table(self.meta, request)
+
+    async def measurements_compute(
+        self, request: MeasurementsComputeRequest, ctx: HandlerContext
+    ) -> MeasurementsComputeSummary:
+        """Measures in chunks on the loop (the store's connection is not
+        shared across threads; the masks are small), yielding between them
+        so other requests and a cancel get through."""
+        self._capture_loop()
+        ids = unmeasured_ids(self.meta, request.query, request.force)
+        if ctx.cancelled:
+            return MeasurementsComputeSummary(measured=0, cancelled=True)
+        job = self.jobs.start(JobKind.MEASUREMENTS, f"Measuring {len(ids)} objects")
+        self._run_contexts[job.id] = ctx
+        chunk_size = 200
+        measured = 0
+        cancelled = False
+        try:
+            for start in range(0, len(ids), chunk_size):
+                if ctx.cancelled or self.jobs.is_cancelling(job.id):
+                    cancelled = True
+                    break
+                updates = measure_annotations(self.meta, self.pixels, ids[start : start + chunk_size])
+                measured += len(updates)
+                if updates:
+                    self._emit(AnnotationsDidUpdate(type="annotations/didUpdate", volumes=[], annotations=updates))
+                percent = round(min(start + chunk_size, len(ids)) / len(ids) * 100)
+                message = f"Measured {measured}/{len(ids)} objects"
+                ctx.progress(ProgressValue(percent=percent, message=message).to_wire())
+                self.jobs.update(job.id, progress=percent, message=message)
+                await asyncio.sleep(0)
+        except Exception as error:
+            self.jobs.finish(job.id, JobStatus.FAILED, error=str(error))
+            raise
+        finally:
+            self._run_contexts.pop(job.id, None)
+        self.jobs.finish(
+            job.id,
+            JobStatus.CANCELLED if cancelled else JobStatus.SUCCEEDED,
+            message=f"Measured {measured} objects",
+        )
+        return MeasurementsComputeSummary(job_id=job.id, measured=measured, cancelled=cancelled)
 
     async def images_delete(self, query: ImageQuery) -> int:
         ids = self.meta.select_ids("image", where=image_clauses(query))
