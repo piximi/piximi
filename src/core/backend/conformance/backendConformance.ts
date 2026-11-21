@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -22,8 +26,29 @@ import type {
   AnnotationChangeSet,
   Backend,
   ChannelDisplay,
+  DimensionConfig,
+  ImageRecord,
   RenderRequest,
+  UploadFile,
 } from "../types";
+
+/* The engine's TIFF fixtures (`tests/vectors/gen_ingest.py`), shared so an
+ * upload is checked against the same bytes on every backend. */
+const TIFF_FIXTURES = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../../../python/packages/piximi-engine/tests/vectors/tiff",
+);
+
+const uploadFixture = (name: string): UploadFile => {
+  const bytes = readFileSync(path.join(TIFF_FIXTURES, name));
+  return {
+    name,
+    data: bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    ),
+  };
+};
 
 type ConformanceImage = {
   id: string;
@@ -109,6 +134,9 @@ export const describeBackendConformance = (
         );
         expect(backend.measurements !== undefined).toBe(
           hasCapability(backend.capabilities, "measurements"),
+        );
+        expect(backend.ingest !== undefined).toBe(
+          hasCapability(backend.capabilities, "ingest.upload"),
         );
       });
     });
@@ -1522,6 +1550,245 @@ export const describeBackendConformance = (
         unsubscribe();
         await backend.kinds.delete([kind.id]);
         await backend.annotations.delete({ ids: [annotation.id] });
+      });
+    });
+
+    describe("ingest", () => {
+      /*
+       * The fixture stacks are flat: N 4x4 uint16 pages, page k holding
+       * the constant (k + 1) * 100, so a channel's min value says which
+       * page it came from. The project's channel count decides which
+       * stack fits.
+       */
+      const pageValue = (k: number) => (k + 1) * 100;
+      const channelCount = async (): Promise<number> =>
+        (await ctx.backend.query.project()).experiment.channels ??
+        ctx.images[0].channelIds.length;
+      /* Channel meta ids in index order, as the project lists them. */
+      const metaIndex = async (): Promise<Map<string, number>> =>
+        new Map(
+          (await ctx.backend.query.project()).channelMetas.map((meta, i) => [
+            meta.id,
+            i,
+          ]),
+        );
+      const collectAdded = () => {
+        const events: Extract<BackendEvent, { type: "images/didAdd" }>[] = [];
+        const unsubscribe = ctx.backend.subscribe((event) => {
+          if (event.type === "images/didAdd") events.push(event);
+        });
+        return { events, unsubscribe };
+      };
+      const cleanUp = async (imageIds: string[]) => {
+        if (imageIds.length > 0)
+          await ctx.backend.images.delete({ ids: imageIds });
+      };
+      /* Page (z, c) of a stack, by the config's order. */
+      const valueAt = (
+        config: DimensionConfig,
+        z: number,
+        c: number,
+        t = 0,
+      ): number =>
+        pageValue(
+          config.dimensionOrder === "xyzct"
+            ? z + c * config.slices + t * config.slices * config.channels
+            : c + z * config.channels + t * config.channels * config.slices,
+        );
+      const checkStack = async (
+        record: ImageRecord,
+        config: DimensionConfig,
+        t = 0,
+      ) => {
+        const metas = await metaIndex();
+        const zOf = new Map(
+          record.planes.map((plane) => [plane.id, plane.zIndex]),
+        );
+        expect(record.image.shape.planes).toBe(config.slices);
+        expect(record.image.shape.channels).toBe(config.channels);
+        expect(record.channels).toHaveLength(config.slices * config.channels);
+        for (const channel of record.channels) {
+          const z = zOf.get(channel.planeId)!;
+          const c = metas.get(channel.channelMetaId)!;
+          expect(channel.minValue).toBe(valueAt(config, z, c, t));
+          expect(channel.maxValue).toBe(valueAt(config, z, c, t));
+        }
+      };
+
+      it("adds a single-page stack and reports an undecodable file alone", async () => {
+        const { backend } = ctx;
+        if (!backend.ingest) return;
+        const channels = await channelCount();
+        const before = (await backend.query.images({}, { limit: 1 })).total;
+        const { events, unsubscribe } = collectAdded();
+        const config: DimensionConfig = {
+          dimensionOrder: "xyczt",
+          channels,
+          slices: 1,
+          frames: 1,
+        };
+        const summary = await backend.ingest.upload([
+          { ...uploadFixture(`pages${channels}.tif`), dimensionConfig: config },
+          uploadFixture("garbage.bin"),
+        ]);
+        unsubscribe();
+        try {
+          expect(summary.cancelled).toBe(false);
+          expect(summary.jobId).toBeTruthy();
+          expect(summary.imageIds).toHaveLength(1);
+          expect(summary.failed.map((f) => f.name)).toEqual(["garbage.bin"]);
+          expect(summary.failed[0].error).toBeTruthy();
+          expect(events).toHaveLength(1);
+          const [record] = events[0].records;
+          expect(record.image.id).toBe(summary.imageIds[0]);
+          expect(record.image.name).toBe(`pages${channels}`);
+          expect(record.image.shape).toEqual({
+            planes: 1,
+            height: 4,
+            width: 4,
+            channels,
+          });
+          expect(record.image.bitDepth).toBe(16);
+          await checkStack(record, config);
+          const listed = await backend.query.images(
+            { ids: summary.imageIds },
+            { limit: 10 },
+          );
+          expect(listed.items.map((r) => r.image.id)).toEqual(summary.imageIds);
+          expect((await backend.query.images({}, { limit: 1 })).total).toBe(
+            before + 1,
+          );
+          const job = (await backend.jobs.list()).find(
+            (j) => j.id === summary.jobId,
+          );
+          expect(job?.status).toBe("succeeded");
+        } finally {
+          await cleanUp(summary.imageIds);
+        }
+      });
+
+      it("splits a stack into planes and channels by the dimension order", async () => {
+        const { backend } = ctx;
+        if (!backend.ingest) return;
+        const channels = await channelCount();
+        // Pages per fixture that the channel count divides into whole slices.
+        const pages = { 1: 3, 2: 6, 3: 12 }[channels] ?? 12;
+        const slices = pages / channels;
+        for (const dimensionOrder of ["xyzct", "xyczt"] as const) {
+          const config: DimensionConfig = {
+            dimensionOrder,
+            channels,
+            slices,
+            frames: 1,
+          };
+          const { events, unsubscribe } = collectAdded();
+          const summary = await backend.ingest.upload([
+            { ...uploadFixture(`pages${pages}.tif`), dimensionConfig: config },
+          ]);
+          unsubscribe();
+          try {
+            expect(summary.failed).toEqual([]);
+            expect(summary.imageIds).toHaveLength(1);
+            expect(events).toHaveLength(1);
+            const [record] = events[0].records;
+            await checkStack(record, config);
+            // The middle plane is the active one.
+            const middle = record.planes.find(
+              (plane) => plane.zIndex === Math.floor(slices / 2),
+            )!;
+            expect(record.image.activePlaneId).toBe(middle.id);
+          } finally {
+            await cleanUp(summary.imageIds);
+          }
+        }
+      });
+
+      it("makes one image per time frame, in one series", async () => {
+        const { backend } = ctx;
+        if (!backend.ingest) return;
+        const channels = await channelCount();
+        const [pages, slices, frames] = {
+          1: [6, 3, 2],
+          2: [12, 2, 3],
+          3: [12, 2, 2],
+        }[channels] ?? [12, 1, 1];
+        const config: DimensionConfig = {
+          dimensionOrder: "xyczt",
+          channels,
+          slices,
+          frames,
+        };
+        const { events, unsubscribe } = collectAdded();
+        const summary = await backend.ingest.upload([
+          { ...uploadFixture(`pages${pages}.tif`), dimensionConfig: config },
+        ]);
+        unsubscribe();
+        try {
+          expect(summary.failed).toEqual([]);
+          expect(summary.imageIds).toHaveLength(frames);
+          const records = events.flatMap((event) => event.records);
+          expect(records).toHaveLength(frames);
+          expect(new Set(records.map((r) => r.series.id)).size).toBe(1);
+          expect(records[0].series.timeSeries).toBe(true);
+          expect(records.map((r) => r.image.timepoint).sort()).toEqual(
+            Array.from({ length: frames }, (_, t) => t),
+          );
+          for (const record of records) {
+            expect(record.image.name).toBe(
+              `pages${pages}-t${record.image.timepoint}`,
+            );
+            await checkStack(record, config, record.image.timepoint);
+          }
+        } finally {
+          await cleanUp(summary.imageIds);
+        }
+      });
+
+      it("stops between files when aborted and reports what it added", async () => {
+        const { backend } = ctx;
+        if (!backend.ingest) return;
+        const channels = await channelCount();
+        const file = () => ({
+          ...uploadFixture(`pages${channels}.tif`),
+          dimensionConfig: {
+            dimensionOrder: "xyczt" as const,
+            channels,
+            slices: 1,
+            frames: 1,
+          },
+        });
+        const controller = new AbortController();
+        const unsubscribe = backend.subscribe((event) => {
+          if (event.type === "images/didAdd") controller.abort();
+        });
+        const summary = await backend.ingest.upload(
+          [file(), file(), file(), file()],
+          { signal: controller.signal },
+        );
+        unsubscribe();
+        try {
+          expect(summary.cancelled).toBe(true);
+          expect(summary.imageIds.length).toBeGreaterThanOrEqual(1);
+          expect(summary.imageIds.length).toBeLessThan(4);
+          const job = (await backend.jobs.list()).find(
+            (j) => j.id === summary.jobId,
+          );
+          expect(job?.status).toBe("cancelled");
+        } finally {
+          await cleanUp(summary.imageIds);
+        }
+      });
+
+      it("resolves at once when aborted before it starts", async () => {
+        const { backend } = ctx;
+        if (!backend.ingest) return;
+        const controller = new AbortController();
+        controller.abort();
+        const summary = await backend.ingest.upload(
+          [uploadFixture("pages1.tif")],
+          { signal: controller.signal },
+        );
+        expect(summary).toEqual({ imageIds: [], failed: [], cancelled: true });
       });
     });
 

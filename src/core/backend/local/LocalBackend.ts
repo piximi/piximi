@@ -1,4 +1,5 @@
 import { DataConnector } from "core/data-connector";
+import { workerImageDecoder } from "core/file-io/file-loader/decoders";
 import { generateUUID, representsUnknown } from "core/entities";
 import { getClassifierApi } from "core/dl/classification";
 import { getSegmenterApi } from "core/dl/segmentation/SegmenterApi";
@@ -29,6 +30,7 @@ import {
 } from "../query";
 import { LocalClassification } from "./LocalClassification";
 import { LocalEditing } from "./LocalEditing";
+import { LocalIngest } from "./LocalIngest";
 import { LocalMeasurements } from "./LocalMeasurements";
 import { LocalSegmentation } from "./LocalSegmentation";
 import { ThumbnailWorkerPool } from "./ThumbnailWorkerPool";
@@ -42,6 +44,7 @@ import type {
   Kind,
   StorageReference,
 } from "core/entities";
+import type { ImageDecoder } from "core/file-io/file-loader/decoders";
 import type { IClassifierApi } from "core/dl/classification/types";
 import type { ISegmenterApi } from "core/dl/segmentation/types";
 
@@ -80,6 +83,7 @@ import type {
   RenderRequest,
   RenderResult,
   RenderedImage,
+  BackendIngest,
 } from "../types";
 import type { MeasurementsProvider } from "./LocalSegmentation";
 import type { StoreHandle } from "./store";
@@ -93,6 +97,8 @@ type LocalBackendDeps = {
   segmenter?: () => ISegmenterApi;
   classifier?: () => IClassifierApi;
   measurements?: () => MeasurementsProvider;
+  /* Decodes uploaded files; defaults to a worker per file. */
+  decode?: ImageDecoder;
 };
 
 const groupBy = <T>(
@@ -165,6 +171,7 @@ export class LocalBackend implements Backend {
   readonly segmentation: BackendSegmentation;
   readonly classification: BackendClassification;
   readonly measurements: BackendMeasurements;
+  readonly ingest: BackendIngest;
   readonly #editing: LocalEditing;
 
   readonly #imageRows = new Derived((images: DataState["images"]) =>
@@ -222,6 +229,13 @@ export class LocalBackend implements Backend {
       images: (state, query) => this.#images(state, query),
       annotations: (state, query) => this.#annotations(state, query),
       measurements: deps.measurements ?? (() => MeasurementsApi.getInstance()),
+      jobs: this.#jobs,
+      bus: this.#bus,
+    });
+    this.ingest = new LocalIngest({
+      store: deps.store,
+      storage: this.#storage,
+      decode: deps.decode ?? workerImageDecoder,
       jobs: this.#jobs,
       bus: this.#bus,
     });

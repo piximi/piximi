@@ -10,7 +10,9 @@ import {
   representsUnknown,
 } from "core/entities";
 import { Partition } from "core/dl/enums";
-import { TaskCancelledError } from "core/dl/cancel";
+import { TaskCancelledError, isTaskCancelledError } from "core/dl/cancel";
+import { inlineImageDecoder } from "core/file-io/file-loader/decoders";
+import { inferMimeType } from "core/file-io/file-loader/fileInputUtils";
 import { defaultClassifier } from "core/dl/classification/utils";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
@@ -62,6 +64,7 @@ import type {
   EvaluationResult,
   Run,
 } from "core/dl/classification/types";
+import type { LoadAndPrepareOutput } from "core/file-io/file-loader/types";
 
 import type { StoredPixels } from "utils/image/compositeChannels";
 
@@ -116,6 +119,8 @@ import type {
   SegmentationRunRequest,
   SegmentationRunSummary,
   VolumeUpdate,
+  BackendIngest,
+  IngestFailure,
 } from "../types";
 
 type FakeImageSeed = {
@@ -211,6 +216,7 @@ export class FakeBackend implements Backend {
     "classification",
     "classification.train",
     "measurements",
+    "ingest.upload",
   ];
   readonly session: BackendSession = {
     id: generateUUID(),
@@ -242,6 +248,7 @@ export class FakeBackend implements Backend {
 
   constructor(seed: { images: FakeImageSeed[] }) {
     const channelCount = Math.max(0, ...seed.images.map((im) => im.channels));
+    if (channelCount > 0) this.#experiment.channels = channelCount;
     for (let c = 0; c < channelCount; c++) {
       this.#channelMetas.push({
         id: `meta-${c}`,
@@ -1233,6 +1240,169 @@ export class FakeBackend implements Backend {
   };
 
   // ── Measurements ───────────────────────────────────────────────────────────
+
+  // ── Ingest ──────────────────────────────────────────────────────────────
+
+  readonly ingest: BackendIngest = {
+    upload: async (files, options) => {
+      if (files.length === 0) {
+        return { imageIds: [], failed: [], cancelled: false };
+      }
+      if (options?.signal?.aborted) {
+        return { imageIds: [], failed: [], cancelled: true };
+      }
+      const job = this.#jobs.start(
+        "ingest",
+        `Adding ${files.length} image file${files.length === 1 ? "" : "s"}`,
+        options?.signal,
+      );
+      const signal = this.#jobs.signal(job.id);
+      const imageIds: string[] = [];
+      const failed: IngestFailure[] = [];
+      let cancelled = false;
+      for (let i = 0; i < files.length; i++) {
+        if (signal.aborted) {
+          cancelled = true;
+          break;
+        }
+        const file = files[i];
+        this.#jobs.update(job.id, {
+          progress: (i / files.length) * 100,
+          message: `Adding ${file.name} (${i + 1}/${files.length})`,
+        });
+        try {
+          const fileData =
+            file.data instanceof ArrayBuffer
+              ? file.data
+              : await file.data.arrayBuffer();
+          // The same decoding the browser's worker does, on this thread.
+          const output = await inlineImageDecoder(
+            {
+              fileData,
+              fileName: file.name,
+              mimeType: inferMimeType(file.name, file.mimeType),
+              dimConfig: file.dimensionConfig,
+            },
+            signal,
+            () => {},
+            this.#experiment.channels,
+          );
+          imageIds.push(...this.#addDecoded(output));
+        } catch (error) {
+          if (signal.aborted || isTaskCancelledError(error)) {
+            cancelled = true;
+            break;
+          }
+          failed.push({
+            name: file.name,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+      const added = imageIds.length;
+      if (cancelled) {
+        this.#jobs.finish(job.id, "cancelled", {
+          message: `Stopped after ${added} image${added === 1 ? "" : "s"}`,
+        });
+      } else if (failed.length > 0 && added === 0) {
+        this.#jobs.finish(job.id, "failed", {
+          message: "No images added",
+          error: failed[0].error,
+        });
+      } else {
+        this.#jobs.finish(job.id, "succeeded", {
+          message: `Added ${added} image${added === 1 ? "" : "s"}`,
+        });
+      }
+      return { jobId: job.id, imageIds, failed, cancelled };
+    },
+  };
+
+  /* Takes a decoded file in: one series, its images, planes, channels and
+   * pixels, with the metas matched by channel index and widened. */
+  #addDecoded(output: LoadAndPrepareOutput): string[] {
+    const channelCount = output.images[0].shape.channels;
+    if (this.#experiment.channels === undefined) {
+      this.#experiment = { ...this.#experiment, channels: channelCount };
+    }
+    const created: ChannelMeta[] = [];
+    const widened: ChannelMeta[] = [];
+    const metaFor = (index: number, incoming: ChannelMeta): ChannelMeta => {
+      const id = `meta-${index}`;
+      const existing = this.#channelMetas.find((meta) => meta.id === id);
+      if (!existing) {
+        const meta = { ...incoming, id, name: `Channel-${index}` };
+        this.#channelMetas.push(meta);
+        created.push(meta);
+        return meta;
+      }
+      if (
+        incoming.minValue < existing.minValue ||
+        incoming.maxValue > existing.maxValue
+      ) {
+        Object.assign(existing, {
+          minValue: Math.min(existing.minValue, incoming.minValue),
+          maxValue: Math.max(existing.maxValue, incoming.maxValue),
+          rampMinLimit: Math.min(existing.rampMinLimit, incoming.rampMinLimit),
+          rampMaxLimit: Math.max(existing.rampMaxLimit, incoming.rampMaxLimit),
+        });
+        widened.push({ ...existing });
+      }
+      return existing;
+    };
+    const metaById = new Map(
+      output.channelMetas.map((meta, index) => [meta.id, metaFor(index, meta)]),
+    );
+    const series: ImageSeries = {
+      ...output.imageSeries[0],
+      experimentId: this.#experiment.id,
+    };
+    this.#series.push(series);
+    this.#images.push(...output.images);
+    this.#planes.push(...output.planes);
+    const channels: Channel[] = output.channels.map(
+      ({ data, histogram: _histogram, ...channel }) => {
+        this.#pixels.set(channel.id, {
+          data,
+          width: channel.width,
+          height: channel.height,
+          bitDepth: channel.bitDepth,
+        });
+        return {
+          ...channel,
+          channelMetaId: metaById.get(channel.channelMetaId)!.id,
+          storageReference: {
+            storageId: channel.id,
+            storeName: STORES.CHANNEL_DATA,
+            width: channel.width,
+            height: channel.height,
+            dtype: channel.dtype,
+            byteSize: data.byteLength,
+          },
+        };
+      },
+    );
+    this.#channels.push(...channels);
+    const records: ImageRecord[] = output.images.map((image) => {
+      const planes = output.planes.filter(
+        (plane) => plane.imageId === image.id,
+      );
+      const planeIds = new Set(planes.map((plane) => plane.id));
+      return {
+        image,
+        series,
+        planes,
+        channels: channels.filter((channel) => planeIds.has(channel.planeId)),
+      };
+    });
+    this.#bus.emit({
+      type: "images/didAdd",
+      records,
+      channelMetas: created,
+      updatedChannelMetas: widened,
+    });
+    return output.images.map((image) => image.id);
+  }
 
   readonly measurements: BackendMeasurements = {
     table: async (

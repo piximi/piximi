@@ -1,54 +1,45 @@
 import { useCallback, useRef, useState } from "react";
 
-import { useDispatch, useStore } from "react-redux";
+import { useDispatch } from "react-redux";
 
-import { generateUUID } from "core/entities";
-import { FileLoader } from "core/file-io/file-loader";
-import { FILE } from "core/file-io/file-loader/types";
+import { useBackend } from "core/backend";
 import {
-  interpretFiles,
-  reconcileChannelMetas,
+  inferMimeType,
+  isTiffFile,
 } from "core/file-io/file-loader/fileInputUtils";
 import { prepareTiffConfigs } from "core/file-io/file-loader/readers/TiffReader";
 
-import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
-import { selectAllChannelMetas, selectExperiment } from "store/data/selectors";
-import { dataSlice } from "store/data";
-import { appTasksSlice } from "store/appTasks/appTasksSlice";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
-import type { ImageSeries } from "core/entities";
+import { AlertType } from "utils/enums";
+
+import type { UploadFile } from "core/backend";
 import type {
   TiffAnalysisResult,
   TiffDialogCallbackResult,
-  TiffImportConfig,
-  UploadOptionswithCallbacks,
 } from "core/file-io/file-loader/types";
 
-import type { RootState } from "store/rootReducer";
-import type { AppTask } from "store/appTasks/types";
+import type { AlertState } from "utils/types";
 
 type UseFileLoaderReturn = {
-  upload: (
-    files: FileList,
-    options?: UploadOptionswithCallbacks,
-  ) => Promise<void>;
+  upload: (files: File[]) => Promise<void>;
   isUploading: boolean;
   tiffDialogOpen: boolean;
   pendingTiffAnalysis: TiffAnalysisResult[] | null;
-
   handleConfirmTiffConfig: (config: TiffDialogCallbackResult) => void;
   handleCancelTiffConfig: () => void;
 };
 
-/**
- * Hook that orchestrates the upload pipeline
- *
- * Calls DataPipelineService for worker-based processing,
- * then dispatches the results to Redux
+/*
+ * Hands image files to the backend. TIFFs are looked at first, here in the
+ * browser: their metadata says how the frames map to channels, slices and
+ * time, and where it does not, a dialog asks. The config travels with each
+ * file; the backend decodes, stores and announces the images, and its
+ * `ingest` job is what the task toast shows.
  */
 export function useFileLoader(): UseFileLoaderReturn {
   const dispatch = useDispatch();
-  const store = useStore<RootState>();
+  const backend = useBackend();
   const [isUploading, setIsUploading] = useState(false);
   const [tiffDialogOpen, setTiffDialogOpen] = useState(false);
   const [pendingTiffAnalysis, setPendingTiffAnalysis] = useState<
@@ -73,141 +64,59 @@ export function useFileLoader(): UseFileLoaderReturn {
   }, []);
 
   const upload = useCallback(
-    async (files: FileList): Promise<void> => {
+    async (files: File[]): Promise<void> => {
+      const ingest = backend.ingest;
+      if (!ingest || files.length === 0) return;
       setIsUploading(true);
-      const taskId = generateUUID();
-      const newTask: AppTask = {
-        id: taskId,
-        type: "file-upload",
-        status: "running",
-        progress: 0,
-        label: "Uploading Files",
-        startedAt: Date.now(),
-      };
-      dispatch(appTasksSlice.actions.taskRegistered(newTask));
-      const experiment = selectExperiment(store.getState());
       try {
-        // 1. Run the pipeline (workers + IndexDB)
-        const interpretationResults = interpretFiles(files);
-        // TIFF-specific pre-analysis (the only format that needs a dialog)
-        let tiffConfigs: Map<string, TiffImportConfig> | undefined;
-        let cachedBuffers: Map<string, ArrayBuffer> | undefined;
-        if (interpretationResults.imageType === FILE.TIFF) {
-          const tiffPrep = await prepareTiffConfigs(
-            files,
-            (progress: { overallProgress: number }) => {
-              dispatch(
-                appTasksSlice.actions.taskUpdated({
-                  id: taskId,
-                  progress: progress.overallProgress,
-                }),
-              );
-            },
-            async (
-              analysis: TiffAnalysisResult[],
-            ): Promise<TiffDialogCallbackResult | null> => {
-              return new Promise((resolve) => {
+        const tiffs = files.filter((file) => isTiffFile(file.name));
+        let prepared: Awaited<ReturnType<typeof prepareTiffConfigs>> = null;
+        if (tiffs.length > 0) {
+          prepared = await prepareTiffConfigs(
+            tiffs,
+            () => {},
+            (analysis) =>
+              new Promise((resolve) => {
                 setPendingTiffAnalysis(analysis);
                 tiffResolverRef.current = resolve;
                 setTiffDialogOpen(true);
-              });
-            },
-          );
-          if (tiffPrep === null) {
-            dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
-            return;
-          }
-          tiffConfigs = tiffPrep.configs;
-          cachedBuffers = tiffPrep.buffers;
-        }
-        const fileLoader = new FileLoader(
-          interpretationResults,
-          tiffConfigs,
-          cachedBuffers,
-          experiment.channels,
-        );
-        taskCancelRegistry.register(taskId, () => fileLoader.cancel());
-        fileLoader.onProgress((progress) => {
-          dispatch(
-            appTasksSlice.actions.taskUpdated({
-              id: taskId,
-              progress: progress.overallProgress,
-            }),
-          );
-        });
-        const result = await fileLoader.uploadFiles(files);
-        if (!result.success) {
-          if (result.cancelled) {
-            dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
-          } else {
-            dispatch(
-              appTasksSlice.actions.taskFailed({
-                id: taskId,
-                error: result.error.message,
               }),
-            );
-          }
-          return;
-        }
-
-        const { imageSeries, images, planes, channels, channelMetas } =
-          result.data[0];
-
-        const reduxImageSeries: ImageSeries[] = [];
-        imageSeries.forEach((series) => {
-          reduxImageSeries.push({ ...series, experimentId: experiment.id });
-        });
-
-        if (!experiment.channels)
-          dispatch(
-            dataSlice.actions.setExperimentChannels(images[0].shape.channels),
           );
-
-        // ChannelMetas are shared project-wide (one per channel index). Reconcile
-        // the freshly-loaded per-series metas against any that already exist:
-        // reuse + widen existing metas, or add the canonical set on first load.
-        // Read state now (not via useSelector) so we see metas as they are at
-        // reconcile time, not at render time.
-        const {
-          metasToAdd,
-          metaUpdates,
-          channels: reconciledChannels,
-        } = reconcileChannelMetas(
-          selectAllChannelMetas(store.getState()),
-          channelMetas,
-          channels,
-          images[0].shape.channels,
-        );
-
-        dispatch(
-          dataSlice.actions.addImageSeries({
-            imageSeries: reduxImageSeries,
-            images,
-            planes,
-            channels: reconciledChannels,
-            channelMetas: metasToAdd,
-          }),
-        );
-        if (metaUpdates.length > 0)
-          dispatch(dataSlice.actions.batchUpdateChannelMeta(metaUpdates));
-        dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
-
-        return;
+          // The dialog was dismissed: nothing is sent.
+          if (prepared === null) return;
+        }
+        const uploads: UploadFile[] = files.map((file) => {
+          const config = prepared?.configs.get(file.name);
+          return {
+            name: file.name,
+            // Analysed TIFFs were read already; send those bytes.
+            data: prepared?.buffers.get(file.name) ?? file,
+            mimeType: inferMimeType(file.name, file.type),
+            dimensionConfig: config && {
+              dimensionOrder: config.dimensionOrder,
+              channels: config.channels,
+              slices: config.slices,
+              frames: config.frames,
+            },
+          };
+        });
+        await ingest.upload(uploads);
       } catch (err) {
+        const warning: AlertState = {
+          alertType: AlertType.Warning,
+          name: "Could not add images",
+          description: err instanceof Error ? err.message : String(err),
+        };
         dispatch(
-          appTasksSlice.actions.taskFailed({
-            id: taskId,
-            error:
-              err instanceof Error ? err.message : "Failed to upload files",
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
           }),
         );
-        return;
       } finally {
-        taskCancelRegistry.unregister(taskId);
         setIsUploading(false);
       }
     },
-    [dispatch, store],
+    [backend, dispatch],
   );
 
   return {

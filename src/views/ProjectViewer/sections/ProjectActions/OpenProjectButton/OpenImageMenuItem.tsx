@@ -25,10 +25,9 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
   } = useFileLoader();
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files) return;
-    const files: FileList = Object.assign([], event.currentTarget.files);
-
+    const files = Array.from(event.currentTarget.files);
+    // The menu stays open while a TIFF dialog may be shown from here.
     await upload(files);
-
     onCloseMenu();
   };
 

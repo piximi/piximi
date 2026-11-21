@@ -13,6 +13,7 @@ import { ModelTask, Partition } from "core/dl/enums";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 import { getDefaultModelParams } from "core/dl/classification/utils";
+import { inlineImageDecoder } from "core/file-io/file-loader/decoders";
 
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { classifierSlice } from "store/classifier";
@@ -433,6 +434,8 @@ const createLocalBackend = async () => {
     thumbnails: createMainThreadThumbnailRenderer(storage),
     segmenter: () => segmenter,
     classifier: () => classifier,
+    // Decodes on this thread: there is no Worker here.
+    decode: inlineImageDecoder,
     // The worker-free versions; the intensity one reads the same IndexedDB.
     measurements: () => ({
       computeFeatures: async (objects) => computeObjectFeatures(objects),

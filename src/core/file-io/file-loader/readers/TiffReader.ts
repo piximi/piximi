@@ -152,7 +152,7 @@ export const tiffReader: IFileReader = {
 };
 
 export async function prepareTiffConfigs(
-  files: FileList,
+  files: File[],
   updateProgress: (args: { overallProgress: number }) => void,
   handleTiffDialog?: TiffDialogCallback,
 ): Promise<TiffPrepResult | null> {
@@ -205,7 +205,7 @@ export async function prepareTiffConfigs(
  * 3. Return analysis results for UI decisions
  */
 async function analyzeTiffs(
-  files: FileList,
+  files: File[],
   updateProgress: (args: { overallProgress: number }) => void,
 ): Promise<{
   analyses: TiffAnalysisResult[];

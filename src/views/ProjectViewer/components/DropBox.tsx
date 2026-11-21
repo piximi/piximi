@@ -17,11 +17,10 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
     handleCancelTiffConfig,
   } = useFileLoader();
 
-  // Dropped files go into the local store; a backend that holds the
-  // project takes images another way.
+  // Only a backend that takes uploads accepts a drop.
   const canUpload = useCapability("ingest.upload");
   const handleDrop = async (files: FileList) => {
-    if (canUpload) await upload(files);
+    if (canUpload) await upload(Array.from(files));
   };
   const [{ isOver }, dropTarget] = useDndFileDrop(handleDrop);
   return (
@@ -41,15 +40,14 @@ export const DropBox = ({ children }: { children: ReactElement }) => {
       >
         {children}
       </Box>
-      {import.meta.env.VITE_USE_V2 === "true" &&
-        pendingTiffAnalysis !== null && (
-          <TiffConfigDialog
-            open={tiffDialogOpen}
-            analysisResult={pendingTiffAnalysis}
-            onCancel={handleCancelTiffConfig}
-            onConfirm={handleConfirmTiffConfig}
-          />
-        )}
+      {pendingTiffAnalysis !== null && (
+        <TiffConfigDialog
+          open={tiffDialogOpen}
+          analysisResult={pendingTiffAnalysis}
+          onCancel={handleCancelTiffConfig}
+          onConfirm={handleConfirmTiffConfig}
+        />
+      )}
     </>
   );
 };
