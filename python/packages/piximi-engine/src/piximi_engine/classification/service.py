@@ -134,6 +134,21 @@ class ClassificationService:
     def _announce(self) -> None:
         self.engine._emit(ClassifiersDidChange(type="classifiers/didChange", classifiers=self.list()))
 
+    def categories_changed(self, categories: list[Category]) -> None:
+        """A trained classifier's class map names the categories it ran with,
+        so once that set changes (a category added or deleted) continuing it
+        would train against classes it cannot represent; the record is marked
+        invalid, as the frontend marks its own, and a new classifier is the
+        way forward. Untrained records keep following the categories."""
+        targets = {IMAGE_TARGET_ID if category.type == "image" else category.kind_id for category in categories}
+        changed = False
+        for record in self.list():
+            if record.target_id in targets and record.runs and record.valid:
+                self.meta.put(KIND, record.model_copy(update={"valid": False}))
+                changed = True
+        if changed:
+            self._announce()
+
     def _architecture(self, architecture_id: str) -> ClassificationArchitecture:
         architecture = self.engine.models.classifiers.get(architecture_id)
         if architecture is None:
@@ -678,6 +693,12 @@ class ClassificationService:
         if run is None or model is None:
             raise BackendError("PREDICTION_FAILED", "The classifier has no run")
         class_ids = [record.class_map[key] for key in sorted(record.class_map, key=int)]
+        # A deleted category would otherwise come back as a dangling prediction.
+        known = {category.id for category in self._categories(record.target_id)}
+        if any(category_id not in known for category_id in class_ids):
+            raise BackendError(
+                "PREDICTION_FAILED", "The categories changed since the last run; create a new classifier"
+            )
         wanted = set(request.ids) if request.ids is not None else None
         items, samples = self._items(record.target_id)
         targets = [

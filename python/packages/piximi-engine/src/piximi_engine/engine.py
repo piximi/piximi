@@ -547,6 +547,7 @@ class ReferenceEngine:
         if categories:
             self.meta.put_many("category", [(category, None) for category in categories])
             self._categories_changed()
+            self.classification.categories_changed(categories)
         return categories
 
     async def categories_update(self, id: str, name: str | None, color: str | None) -> Category:
@@ -605,6 +606,7 @@ class ReferenceEngine:
         if volume_updates:
             self._emit(AnnotationsDidUpdate(type="annotations/didUpdate", volumes=volume_updates, annotations=[]))
         self._categories_changed()
+        self.classification.categories_changed(gone)
         return len(gone)
 
     def _reindex_annotations(

@@ -644,6 +644,7 @@ export class FakeBackend implements Backend {
       if (categories.length > 0) {
         this.#categories.push(...categories);
         this.#categoriesChanged();
+        this.#invalidateClassifiers(categories);
       }
       return categories;
     },
@@ -688,6 +689,7 @@ export class FakeBackend implements Backend {
           categoryId: volume.categoryId,
         });
       }
+      const goneCategories = this.#categories.filter((c) => gone.has(c.id));
       this.#categories = this.#categories.filter((c) => !gone.has(c.id));
       if (updates.length > 0) {
         this.#bus.emit({ type: "images/didUpdate", updates });
@@ -700,6 +702,7 @@ export class FakeBackend implements Backend {
         });
       }
       this.#categoriesChanged();
+      this.#invalidateClassifiers(goneCategories);
       return { deleted: gone.size };
     },
   };
@@ -861,6 +864,36 @@ export class FakeBackend implements Backend {
       type: "classifiers/didChange",
       classifiers: this.#classifiers.map((c) => structuredClone(c)),
     });
+  }
+
+  /* A classifier that has run is tied to the category set it ran with. */
+  #invalidateClassifiers(categories: Category[]): void {
+    const targets = new Set(
+      categories.map((c) =>
+        c.type === "image" ? IMAGE_CLASSIFIER_ID : c.kindId,
+      ),
+    );
+    let changed = false;
+    for (const classifier of this.#classifiers) {
+      if (
+        targets.has(classifier.targetId) &&
+        classifier.runs.length > 0 &&
+        classifier.valid
+      ) {
+        classifier.valid = false;
+        changed = true;
+      }
+    }
+    if (changed) this.#classifiersChanged();
+  }
+
+  #staleClassMap(classifier: Classifier): boolean {
+    const known = new Set(
+      this.#knownCategories(classifier.targetId).map((c) => c.id),
+    );
+    return Object.values(classifier.classMap ?? {}).some(
+      (id) => !known.has(id),
+    );
   }
 
   #knownCategories(targetId: string): Category[] {
@@ -1106,6 +1139,12 @@ export class FakeBackend implements Backend {
     ): Promise<ClassifierFitSummary> => {
       const classifier = this.#classifier(request.classifierId);
       if (options?.signal?.aborted) return { status: "stopped" };
+      if (!classifier.valid) {
+        throw new BackendError(
+          "TRAINING_FAILED",
+          "The categories changed since the last run; create a new classifier",
+        );
+      }
       const job = this.#jobs.start(
         "classifier-fit",
         `Training ${classifier.name}`,
@@ -1243,6 +1282,12 @@ export class FakeBackend implements Backend {
         throw new BackendError(
           "PREDICTION_FAILED",
           "The classifier has no run",
+        );
+      }
+      if (this.#staleClassMap(classifier)) {
+        throw new BackendError(
+          "PREDICTION_FAILED",
+          "The categories changed since the last run; create a new classifier",
         );
       }
       const job = this.#jobs.start(

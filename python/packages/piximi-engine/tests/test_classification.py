@@ -211,6 +211,56 @@ async def test_fit_stops_when_its_job_is_cancelled(classifying: ReferenceEngine)
     assert (await engine.jobs_list())[-1].status == "cancelled"
 
 
+async def test_category_changes_invalidate_trained_classifiers(classifying: ReferenceEngine):
+    engine = classifying
+    first, second = await label_images(engine)
+
+    def create(name: str) -> ClassifierCreateRequest:
+        return ClassifierCreateRequest(
+            target_id=IMAGE_TARGET_ID, name=name, architecture_id="logistic", hyperparameters=hyperparameters(epochs=1)
+        )
+
+    trained = await engine.classification_create(create("Shades"))
+    spare = await engine.classification_create(create("Spare"))
+
+    def category(name: str, color: str) -> ImageCategory:
+        return ImageCategory(type="image", id=generate_uuid(), color=color, name=name, is_unknown=False)
+
+    # Before any run the categories may change freely.
+    await engine.categories_create([category("Third", "#0000ff")])
+    assert all(record.valid for record in await engine.classification_list())
+    await engine.classification_fit(ClassifierFitRequest(classifier_id=trained.id, seed=7), ctx())
+    # Renaming changes nothing either.
+    await engine.categories_update(first.id, name="Primary", color=None)
+    assert all(record.valid for record in await engine.classification_list())
+
+    # Adding a category invalidates the classifiers that have run, and the
+    # change is announced; continuing one of them is refused.
+    events = []
+    engine.subscribe(events.append)
+    await engine.categories_create([category("Fourth", "#ffff00")])
+    assert {record.name: record.valid for record in await engine.classification_list()} == {
+        "Shades": False,
+        "Spare": True,
+    }
+    announced = [event for event in events if event.type == "classifiers/didChange"][-1]
+    assert {record.name: record.valid for record in announced.classifiers} == {"Shades": False, "Spare": True}
+    with pytest.raises(BackendError) as info:
+        await engine.classification_fit(ClassifierFitRequest(classifier_id=trained.id), ctx())
+    assert info.value.code == "TRAINING_FAILED"
+
+    # Predicting among the classes it knows still works...
+    predicted = await engine.classification_predict(ClassifierPredictRequest(classifier_id=trained.id), ctx())
+    assert predicted.predicted == 1
+    await engine.classification_clear_predictions(IMAGE_TARGET_ID)
+    # ...until one of them is gone, which would make the prediction dangle.
+    await engine.categories_delete([second.id])
+    with pytest.raises(BackendError) as info:
+        await engine.classification_predict(ClassifierPredictRequest(classifier_id=trained.id), ctx())
+    assert info.value.code == "PREDICTION_FAILED"
+    assert all(image.category_id != second.id for image in (await images_by_name(engine)).values())
+
+
 async def test_objects_of_a_kind(classifying: ReferenceEngine):
     engine = classifying
     images = await images_by_name(engine)

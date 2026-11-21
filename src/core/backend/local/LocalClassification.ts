@@ -680,6 +680,16 @@ export class LocalClassification implements BackendClassification {
     if (!run) {
       throw new BackendError("PREDICTION_FAILED", "The classifier has no run");
     }
+    // A deleted category would otherwise come back as a dangling prediction.
+    const known = new Set(
+      this.#knownCategories(record.targetId).map((c) => c.id),
+    );
+    if (Object.values(classMap).some((id) => !known.has(id))) {
+      throw new BackendError(
+        "PREDICTION_FAILED",
+        "The categories changed since the last run; create a new classifier",
+      );
+    }
     const wanted = request.ids && new Set(request.ids);
     const items = this.#items(record.targetId).filter(
       (item) =>

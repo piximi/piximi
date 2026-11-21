@@ -747,6 +747,83 @@ export const describeBackendConformance = (
         await backend.categories.delete([first.id, second.id]);
       });
 
+      it("invalidates trained classifiers when the categories change", async () => {
+        const { backend } = ctx;
+        const { classification } = backend;
+        if (!classification) return;
+        if (!hasCapability(backend.capabilities, "classification.train"))
+          return;
+        const [a, b, c, d] = ctx.images;
+        const [first, second] = await backend.categories.create([
+          generateCategory("First", "#ff0000", { type: "image" }),
+          generateCategory("Second", "#00ff00", { type: "image" }),
+        ]);
+        await backend.images.categorize({ ids: [a.id, b.id] }, first.id);
+        await backend.images.categorize({ ids: [c.id, d.id] }, second.id);
+        const [architecture] = (
+          await classification.listArchitectures()
+        ).filter((m) => m.tasks.includes("classification.train"));
+        const defaults = getDefaultModelParams();
+        const create = (name: string) =>
+          classification.create({
+            targetId: IMAGE_CLASSIFIER_ID,
+            name: `${name}-${Date.now()}`,
+            architectureId: architecture.name,
+            hyperparameters: {
+              preprocess: {
+                ...defaults.preprocessSettings,
+                trainingPercentage: 0.5,
+                shuffle: true,
+              },
+              optimizer: {
+                ...defaults.optimizerSettings,
+                epochs: 1,
+                batchSize: 2,
+              },
+            },
+            seed: 7,
+          });
+        const trained = await create("Stale");
+        const spare = await create("Spare");
+        const valid = async (id: string) =>
+          (await classification.list()).find((cl) => cl.id === id)!.valid;
+
+        const fit = await classification.fit({
+          classifierId: trained.id,
+          seed: 7,
+        });
+        expect(fit.status).toBe("completed");
+        // Renaming a category changes nothing...
+        await backend.categories.update(first.id, { name: "Primary" });
+        expect(await valid(trained.id)).toBe(true);
+        // ...adding one invalidates the classifiers that have run, which
+        // refuse to continue, while an untrained one keeps following along.
+        const [third] = await backend.categories.create([
+          generateCategory("Third", "#0000ff", { type: "image" }),
+        ]);
+        expect(await valid(trained.id)).toBe(false);
+        expect(await valid(spare.id)).toBe(true);
+        await expect(
+          classification.fit({ classifierId: trained.id }),
+        ).rejects.toMatchObject({ code: "TRAINING_FAILED" });
+        // Predicting among the classes it knows still works, until one of
+        // them is deleted and a prediction could dangle.
+        const predicted = await classification.predict({
+          classifierId: trained.id,
+        });
+        expect(predicted.cancelled).toBe(false);
+        expect(predicted.predicted).toBeGreaterThan(0);
+        await classification.clearPredictions(IMAGE_CLASSIFIER_ID);
+        await backend.categories.delete([second.id]);
+        await expect(
+          classification.predict({ classifierId: trained.id }),
+        ).rejects.toMatchObject({ code: "PREDICTION_FAILED" });
+
+        await classification.delete(trained.id);
+        await classification.delete(spare.id);
+        await backend.categories.delete([first.id, third.id]);
+      });
+
       it("resolves a fit cancelled before it starts without a run", async () => {
         const { classification } = ctx.backend;
         if (!classification) return;
