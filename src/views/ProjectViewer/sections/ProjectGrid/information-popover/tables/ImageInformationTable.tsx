@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
+import { useBackend } from "core/backend";
+
 import { TextFieldWithBlur } from "components/inputs";
 
 import { useParameterizedSelector } from "store/hooks";
@@ -49,6 +51,7 @@ export const ImagePopoverContent = ({
 
 const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
   const dispatch = useDispatch();
+  const backend = useBackend();
 
   const volumes = useParameterizedSelector(
     selectAnnotationVolumesByImageId,
@@ -74,16 +77,15 @@ const ImageInfoTable = ({ image }: { image: ExtendedImageObject }) => {
     );
   }, [dispatch, newImageName, image.id]);
 
+  // Through the backend, which owns the category and is where the grid and
+  // the sidebar's counts read from; a store-only change would show here alone.
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
-      dispatch(
-        dataSlice.actions.updateImageCategory({
-          id: image.id,
-          categoryId: categoryId,
-        }),
-      );
+      backend.images
+        .categorize({ ids: [image.id] }, categoryId)
+        .catch((error) => console.error("[ImageInfoTable] categorize", error));
     },
-    [dispatch, image],
+    [backend, image.id],
   );
 
   const handlePartitionSelect = useCallback(

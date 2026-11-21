@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 
 import { generateCategory } from "core/entities";
+import { useBackend } from "core/backend";
 
 import { useDialog } from "hooks";
 
@@ -79,6 +80,7 @@ const AnnotationInfoTable = ({
   annotation: ExtendedAnnotationObject;
 }) => {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const kinds = useSelector(selectKindEntities);
 
   const [targetKindId, setTargetKindId] = useState<string>();
@@ -92,16 +94,17 @@ const AnnotationInfoTable = ({
     setTargetKindId(undefined);
     handleKindDialogClose();
   };
+  // Through the backend, which owns the category and is where the grid and
+  // the sidebar's counts read from; a store-only change would show here alone.
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
-      dispatch(
-        dataSlice.actions.bubbleUpdateAnnotationCategory({
-          id: annotation.id,
-          categoryId: categoryId,
-        }),
-      );
+      backend.annotations
+        .categorize({ ids: [annotation.id] }, categoryId)
+        .catch((error) =>
+          console.error("[AnnotationInfoTable] categorize", error),
+        );
     },
-    [dispatch, annotation],
+    [backend, annotation.id],
   );
 
   const handlePartitionSelect = useCallback(
