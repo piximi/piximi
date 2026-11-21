@@ -39,7 +39,7 @@ import type { RootState } from "store/rootReducer";
  * annotations are not mirrored (a remote one) the session borrows them
  * into the store first and evicts them when it ends.
  */
-export type AnnotationSession = {
+type AnnotationSession = {
   imageIds: string[];
   /* The tables as the session found them; undefined until loaded. */
   snapshot: AnnotationSnapshot | undefined;

@@ -19,8 +19,6 @@ import type {
   Kind,
 } from "core/entities";
 
-import type { RootState } from "store/rootReducer";
-
 import type { EventBus } from "../events";
 import type {
   AnnotationChangeSet,
@@ -604,5 +602,3 @@ export class LocalEditing {
     return selectExperiment(store.getState());
   }
 }
-
-export type { RootState };
