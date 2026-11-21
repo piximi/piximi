@@ -141,10 +141,14 @@ def _values(meta: MetaStore, kind: str, ids: list[str], columns: Columns) -> dic
         for meta_id, wanted in by_meta.items():
             if kind == "annotation":
                 selects = ", ".join(f"json_extract(j.value, '$.{name}')" for _, name in wanted)
+                # CROSS JOIN fixes the order object -> unnested channel -> channel
+                # row, so the channel is found by its key; left to itself the
+                # planner puts the virtual table last and scans every channel
+                # per object (seconds per chunk instead of milliseconds).
                 fill(
-                    f"SELECT e.id, {selects} FROM entities e, "
-                    "json_each(json_extract(e.data, '$.intensityMeasurements')) AS j "
-                    "JOIN entities c ON c.kind = 'channel' AND c.id = j.key "
+                    f"SELECT e.id, {selects} FROM entities e "
+                    "CROSS JOIN json_each(json_extract(e.data, '$.intensityMeasurements')) AS j "
+                    "CROSS JOIN entities c ON c.kind = 'channel' AND c.id = j.key "
                     f"WHERE e.kind = 'annotation' AND e.id IN ({marks}) "
                     "AND json_extract(c.data, '$.channelMetaId') = ?",
                     (*chunk, meta_id),
