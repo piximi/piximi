@@ -6,7 +6,8 @@ export type JobKind =
   | "segmentation"
   | "model-load"
   | "classifier-fit"
-  | "classifier-predict";
+  | "classifier-predict"
+  | "measurements";
 
 export type JobStatus =
   | "queued"

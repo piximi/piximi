@@ -43,7 +43,12 @@ from piximi_schema.events import (
     ModelsDidChange,
 )
 from piximi_schema.jobs import Job
-from piximi_schema.measurements import MeasurementTable, MeasurementTableRequest
+from piximi_schema.measurements import (
+    MeasurementsComputeRequest,
+    MeasurementsComputeSummary,
+    MeasurementTable,
+    MeasurementTableRequest,
+)
 from piximi_schema.methods import RenderThumbnailsResult
 from piximi_schema.query import (
     AnnotationCountGroup,
@@ -125,6 +130,13 @@ class Engine(Protocol):
 
     async def measurement_table(self, request: MeasurementTableRequest) -> MeasurementTable:
         """A scope's measurements as columns; see ``piximi_schema.measurements``."""
+        ...
+
+    async def measurements_compute(
+        self, request: MeasurementsComputeRequest, ctx: HandlerContext
+    ) -> MeasurementsComputeSummary:
+        """Measures the matching objects as a job, announcing them as
+        updated; see ``piximi_schema.measurements``."""
         ...
 
     # ── Mutations ───────────────────────────────────────────────────────────

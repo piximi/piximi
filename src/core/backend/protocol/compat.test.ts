@@ -61,6 +61,7 @@ import type {
   MeasurementScope,
   MeasurementTable,
   MeasurementTableRequest,
+  MeasurementsComputeSummary,
   ImageSort,
   ImageUpdate,
   ModelDescriptor,
@@ -242,6 +243,7 @@ type Checks = [
       }
     >
   >,
+  Assert<Equivalent<P.MeasurementsComputeSummary, MeasurementsComputeSummary>>,
   Assert<
     Equivalent<
       P.MeasurementTable,

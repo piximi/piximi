@@ -27,7 +27,12 @@ from .classification import (
 from .entities import Category
 from .events import EVENT_TYPES
 from .jobs import Job
-from .measurements import MeasurementTable, MeasurementTableRequest
+from .measurements import (
+    MeasurementsComputeRequest,
+    MeasurementsComputeSummary,
+    MeasurementTable,
+    MeasurementTableRequest,
+)
 from .query import (
     AnnotationCountGroup,
     AnnotationPage,
@@ -147,6 +152,10 @@ class ClassifierPredictParams(ClassifierPredictRequest):
     progress_token: str | None = None
 
 
+class MeasurementsComputeParams(MeasurementsComputeRequest):
+    progress_token: str | None = None
+
+
 class RenderImageParams(WireModel):
     request: RenderRequest
 
@@ -215,6 +224,12 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("query/annotationCounts", AnnotationCountsParams, CountsResult),
     MethodSpec("query/masks", MasksParams, MasksResult),
     MethodSpec("measurements/table", MeasurementTableRequest, MeasurementTable),
+    MethodSpec(
+        "measurements/compute",
+        MeasurementsComputeParams,
+        MeasurementsComputeSummary,
+        progress=ProgressValue,
+    ),
     MethodSpec("images/delete", ImagesDeleteParams, DeletedResult),
     MethodSpec("annotations/delete", AnnotationsDeleteParams, DeletedResult),
     MethodSpec("images/categorize", ImagesCategorizeParams, ChangedResult),

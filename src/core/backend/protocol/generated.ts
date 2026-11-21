@@ -175,7 +175,8 @@ export type JobKind =
   | "segmentation"
   | "model-load"
   | "classifier-fit"
-  | "classifier-predict";
+  | "classifier-predict"
+  | "measurements";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "JobStatus".
@@ -1476,6 +1477,24 @@ export interface MeasurementTableRequest {
 export interface TablePageRequest {
   offset?: number;
   limit: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "MeasurementsComputeParams".
+ */
+export interface MeasurementsComputeParams {
+  query: AnnotationQuery;
+  force?: boolean;
+  progressToken?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "MeasurementsComputeSummary".
+ */
+export interface MeasurementsComputeSummary {
+  jobId?: string;
+  measured: number;
+  cancelled: boolean;
 }
 /**
  * The model list changed: one was registered, or its status moved (an

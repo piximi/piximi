@@ -27,7 +27,7 @@ from piximi_schema.classification import (
     ClassifiersResult,
     ClassifierUpdateRequest,
 )
-from piximi_schema.measurements import MeasurementTableRequest
+from piximi_schema.measurements import MeasurementsComputeRequest, MeasurementTableRequest
 from piximi_schema.methods import (
     AnnotationCountsParams,
     AnnotationIdsParams,
@@ -51,6 +51,7 @@ from piximi_schema.methods import (
     ListModelsResult,
     LoadModelParams,
     MasksParams,
+    MeasurementsComputeParams,
     RenderImageParams,
     RenderThumbnailsParams,
     SegmentationRunParams,
@@ -220,6 +221,10 @@ class SessionHub:
             await engine.segmentation_load_model(params.model_id, ctx)
             return None
 
+        async def measurements_compute(params: MeasurementsComputeParams, ctx: HandlerContext):
+            request = MeasurementsComputeRequest.model_validate(params.model_dump(exclude={"progress_token"}))
+            return await engine.measurements_compute(request, ctx)
+
         async def run(params: SegmentationRunParams, ctx: HandlerContext):
             request = SegmentationRunRequest.model_validate(
                 params.model_dump(exclude={"progress_token"})
@@ -269,6 +274,7 @@ class SessionHub:
         peer.on_request(
             "measurements/table", typed(MeasurementTableRequest, lambda p, _ctx: engine.measurement_table(p))
         )
+        peer.on_request("measurements/compute", typed(MeasurementsComputeParams, measurements_compute))
         peer.on_request("images/delete", typed(ImagesDeleteParams, images_delete))
         peer.on_request("annotations/delete", typed(AnnotationsDeleteParams, annotations_delete))
         peer.on_request("images/categorize", typed(ImagesCategorizeParams, images_categorize))

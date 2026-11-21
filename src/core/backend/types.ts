@@ -517,11 +517,31 @@ export type MeasurementTable = {
   total: number;
 };
 
+export type MeasurementsComputeRequest = {
+  query: AnnotationQuery;
+  /* Measure again what already has values. */
+  force?: boolean;
+};
+
+export type MeasurementsComputeSummary = {
+  /* Absent when cancelled before it started, so no job exists. */
+  jobId?: string;
+  measured: number;
+  cancelled: boolean;
+};
+
 export interface BackendMeasurements {
   table(
     request: MeasurementTableRequest,
     options?: CallOptions,
   ): Promise<MeasurementTable>;
+  /* Measures the matching objects that lack values (every feature and
+   * intensity, from the stored mask and pixels) as a `measurements` job,
+   * announcing them as updated. */
+  compute(
+    request: MeasurementsComputeRequest,
+    options?: CallOptions,
+  ): Promise<MeasurementsComputeSummary>;
 }
 
 export interface BackendClassification {

@@ -20,6 +20,7 @@ const taskType: Record<JobKind, AppTaskType> = {
   "model-load": "model-load",
   "classifier-fit": "image-classification",
   "classifier-predict": "image-classification",
+  measurements: "measurement",
 };
 
 /*

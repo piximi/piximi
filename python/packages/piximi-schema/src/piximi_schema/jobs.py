@@ -8,6 +8,7 @@ class JobKind(StrEnum):
     MODEL_LOAD = "model-load"
     CLASSIFIER_FIT = "classifier-fit"
     CLASSIFIER_PREDICT = "classifier-predict"
+    MEASUREMENTS = "measurements"
 
 
 class JobStatus(StrEnum):

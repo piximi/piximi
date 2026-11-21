@@ -93,3 +93,19 @@ class MeasurementTable(WireModel):
     """By column key, aligned with ``ids``."""
     total: int
     """Rows the scope and query match, not of the page."""
+
+
+class MeasurementsComputeRequest(WireModel):
+    """Measures objects that lack values (every feature and intensity is
+    computed from the stored mask and pixels), or all of them with
+    ``force``; runs as a ``measurements`` job."""
+
+    query: AnnotationQuery
+    force: bool = False
+
+
+class MeasurementsComputeSummary(WireModel):
+    job_id: str | None = None
+    """Absent when cancelled before it started, so no job exists."""
+    measured: int
+    cancelled: bool

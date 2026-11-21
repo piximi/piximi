@@ -2223,7 +2223,8 @@
         "segmentation",
         "model-load",
         "classifier-fit",
-        "classifier-predict"
+        "classifier-predict",
+        "measurements"
       ],
       "title": "JobKind",
       "type": "string"
@@ -2567,6 +2568,46 @@
         "columns"
       ],
       "title": "MeasurementTableRequest",
+      "type": "object"
+    },
+    "MeasurementsComputeParams": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/AnnotationQuery"
+        },
+        "force": {
+          "default": false,
+          "type": "boolean"
+        },
+        "progressToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "MeasurementsComputeParams",
+      "type": "object"
+    },
+    "MeasurementsComputeSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "jobId": {
+          "type": "string"
+        },
+        "measured": {
+          "type": "integer"
+        },
+        "cancelled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "measured",
+        "cancelled"
+      ],
+      "title": "MeasurementsComputeSummary",
       "type": "object"
     },
     "Metric": {
@@ -4076,6 +4117,12 @@
       "params": "#/$defs/MeasurementTableRequest",
       "result": "#/$defs/MeasurementTable",
       "progress": null
+    },
+    "measurements/compute": {
+      "direction": "client->server",
+      "params": "#/$defs/MeasurementsComputeParams",
+      "result": "#/$defs/MeasurementsComputeSummary",
+      "progress": "#/$defs/ProgressValue"
     },
     "images/delete": {
       "direction": "client->server",
