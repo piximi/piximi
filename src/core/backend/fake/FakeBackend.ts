@@ -18,6 +18,8 @@ import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 
 import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
+import { decodeRleArray } from "utils/image/rle";
+import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
 import { computeStatistics } from "utils/measurements/statistics";
 
 import {
@@ -43,6 +45,7 @@ import type {
   AnnotationCategory,
   AnnotationObject,
   AnnotationVolume,
+  BBox,
   Category,
   Channel,
   ChannelMeta,
@@ -71,6 +74,8 @@ import type {
   AnnotationQuery,
   AnnotationRecord,
   AnnotationSort,
+  AnnotationChangeSet,
+  AnnotationHeader,
   AnnotationUpdate,
   Backend,
   BackendClassification,
@@ -78,6 +83,8 @@ import type {
   BackendSession,
   CallOptions,
   Changed,
+  CommitConflict,
+  CommitResult,
   ClassifierCreateRequest,
   ClassifierFitRequest,
   ClassifierFitSummary,
@@ -87,6 +94,8 @@ import type {
   ModelDescriptor,
   Counts,
   Deleted,
+  EntityRef,
+  ImageChange,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
@@ -122,11 +131,27 @@ const FAKE_ARCHITECTURE_ID = "fake-majority";
 /* An item as the fake's classifier sees it, whatever the target. */
 type Labeled = { id: string; categoryId: string; partition: Partition };
 
-/* The statistics a real backend computes, over the fake's 8-bit pixels. */
+/* The statistics a real backend computes, over the fake's 8-bit pixels;
+ * with a mask and box, over the object's pixels alone. */
 const intensityStatistics = (
   pixels: StoredPixels,
+  region?: { mask: Uint8Array | Uint16Array; bbox: BBox },
 ): Partial<Record<IntensityMeasurement, number>> => {
-  const values = Array.from(new Uint8Array(pixels.data));
+  const all = new Uint8Array(pixels.data);
+  let values: number[];
+  if (region) {
+    const [x0, y0, x1, y1] = region.bbox;
+    values = [];
+    for (let y = y0; y < y1; y++) {
+      for (let x = x0; x < x1; x++) {
+        if (region.mask[(y - y0) * (x1 - x0) + (x - x0)]) {
+          values.push(all[y * pixels.width + x]);
+        }
+      }
+    }
+  } else {
+    values = Array.from(all);
+  }
   if (values.length < 4) return {};
   const { mean, median, std, min, max, lowerQuartile, upperQuartile } =
     computeStatistics(values);
@@ -206,6 +231,8 @@ export class FakeBackend implements Backend {
   #categories: Category[] = [UNKNOWN_IMAGE_CATEGORY, UNKNOWN_KIND_CATEGORY];
   #volumes: AnnotationVolume[] = [];
   #annotations: AnnotationObject[] = [];
+  /* One counter stamps every geometry, category and kind write. */
+  #rev = 0;
   #modelLoaded = false;
   #classifiers: Classifier[] = [];
   /* What each fitted classifier learned: the majority class and the shares. */
@@ -585,6 +612,52 @@ export class FakeBackend implements Backend {
       }
       return { changed: updates.length };
     },
+
+    update: async (updates: ImageChange[]): Promise<ImageObject[]> => {
+      const changed: ImageObject[] = [];
+      for (const update of updates) {
+        const image = this.#images.find((im) => im.id === update.id);
+        if (!image) {
+          throw new BackendError("NOT_FOUND", `Unknown image ${update.id}`);
+        }
+        let touched = false;
+        if (update.name !== undefined && update.name !== image.name) {
+          if (!update.name.trim()) {
+            throw new BackendError("NOT_SUPPORTED", "An image needs a name");
+          }
+          image.name = update.name;
+          touched = true;
+        }
+        if (
+          update.partition !== undefined &&
+          update.partition !== image.partition
+        ) {
+          image.partition = update.partition;
+          touched = true;
+        }
+        if (
+          update.activePlaneId !== undefined &&
+          update.activePlaneId !== image.activePlaneId
+        ) {
+          const plane = this.#planes.find((p) => p.id === update.activePlaneId);
+          if (!plane || plane.imageId !== image.id) {
+            throw new BackendError(
+              "NOT_FOUND",
+              `${update.activePlaneId} is not a plane of ${image.name}`,
+            );
+          }
+          image.activePlaneId = update.activePlaneId;
+          touched = true;
+        }
+        if (touched) changed.push(image);
+      }
+      if (changed.length > 0) {
+        this.#bus.emit({ type: "images/didChange", images: [...changed] });
+      }
+      return updates.map(
+        (update) => this.#images.find((im) => im.id === update.id)!,
+      );
+    },
   };
 
   readonly annotations = {
@@ -634,7 +707,394 @@ export class FakeBackend implements Backend {
         changed: rows.filter((row) => moved.has(row.volume.id)).length,
       };
     },
+
+    commit: async (
+      changeSet: AnnotationChangeSet,
+      options?: CallOptions,
+    ): Promise<CommitResult> => this.#commit(changeSet, options),
+
+    update: async (updates: AnnotationUpdate[]): Promise<Changed> => {
+      const changed: AnnotationUpdate[] = [];
+      for (const update of updates) {
+        const annotation = this.#annotations.find((a) => a.id === update.id);
+        if (!annotation) {
+          throw new BackendError(
+            "NOT_FOUND",
+            `Unknown annotation ${update.id}`,
+          );
+        }
+        if (annotation.partition === update.partition) continue;
+        annotation.partition = update.partition;
+        changed.push({ id: annotation.id, partition: annotation.partition });
+      }
+      if (changed.length > 0) {
+        this.#bus.emit({
+          type: "annotations/didUpdate",
+          volumes: [],
+          annotations: changed,
+        });
+      }
+      return { changed: changed.length };
+    },
   };
+
+  readonly kinds = {
+    create: async (
+      kinds: Array<{ kind: Kind; category: AnnotationCategory }>,
+    ): Promise<Kind[]> => {
+      const names = new Set(this.#kinds.map((kind) => kind.name));
+      for (const { kind, category } of kinds) {
+        if (this.#kinds.some((k) => k.id === kind.id)) {
+          throw new BackendError(
+            "NOT_SUPPORTED",
+            `A kind ${kind.id} already exists`,
+          );
+        }
+        if (names.has(kind.name)) {
+          throw new BackendError(
+            "NOT_SUPPORTED",
+            `A kind named ${JSON.stringify(kind.name)} already exists`,
+          );
+        }
+        if (
+          category.kindId !== kind.id ||
+          category.id !== kind.unknownCategoryId ||
+          !category.isUnknown
+        ) {
+          throw new BackendError(
+            "NOT_SUPPORTED",
+            `Kind ${JSON.stringify(kind.name)} must come with its unknown category`,
+          );
+        }
+        names.add(kind.name);
+      }
+      if (kinds.length > 0) {
+        this.#kinds.push(...kinds.map(({ kind }) => kind));
+        this.#categories.push(...kinds.map(({ category }) => category));
+        this.#bus.emit({ type: "kinds/didAdd", kinds });
+      }
+      return kinds.map(({ kind }) => kind);
+    },
+
+    update: async (id: string, name: string): Promise<Kind> => {
+      const kind = this.#kinds.find((k) => k.id === id);
+      if (!kind) throw new BackendError("NOT_FOUND", `Unknown kind ${id}`);
+      if (kind.id === UNKNOWN_KIND.id) {
+        throw new BackendError(
+          "NOT_SUPPORTED",
+          "The reserved unknown kind keeps its name",
+        );
+      }
+      if (!name.trim()) {
+        throw new BackendError("NOT_SUPPORTED", "A kind needs a name");
+      }
+      if (this.#kinds.some((k) => k.name === name && k.id !== id)) {
+        throw new BackendError(
+          "NOT_SUPPORTED",
+          `A kind named ${JSON.stringify(name)} already exists`,
+        );
+      }
+      if (name !== kind.name) {
+        kind.name = name;
+        this.#bus.emit({ type: "kinds/didChange", kinds: [...this.#kinds] });
+      }
+      return kind;
+    },
+
+    delete: async (ids: string[]): Promise<Deleted> => {
+      const gone = this.#kinds.filter(
+        (kind) => ids.includes(kind.id) && kind.id !== UNKNOWN_KIND.id,
+      );
+      if (gone.length === 0) return { deleted: 0 };
+      const kindIds = new Set(gone.map((kind) => kind.id));
+      const volumes: VolumeUpdate[] = [];
+      for (const volume of this.#volumes) {
+        if (!kindIds.has(volume.kindId)) continue;
+        volume.kindId = UNKNOWN_KIND.id;
+        volume.categoryId = UNKNOWN_KIND_CATEGORY.id;
+        volume.rev = ++this.#rev;
+        const { id, kindId, categoryId, predictionCorrected } = volume;
+        volumes.push({
+          id,
+          kindId,
+          categoryId,
+          ...(predictionCorrected && { predictionCorrected }),
+        });
+      }
+      this.#categories = this.#categories.filter(
+        (category) =>
+          category.type !== "annotation" || !kindIds.has(category.kindId),
+      );
+      this.#kinds = this.#kinds.filter((kind) => !kindIds.has(kind.id));
+      const classifiers = this.#classifiers.filter((classifier) =>
+        kindIds.has(classifier.targetId),
+      );
+      this.#classifiers = this.#classifiers.filter(
+        (classifier) => !kindIds.has(classifier.targetId),
+      );
+      if (volumes.length > 0) {
+        this.#bus.emit({
+          type: "annotations/didUpdate",
+          volumes,
+          annotations: [],
+        });
+      }
+      this.#categoriesChanged();
+      if (classifiers.length > 0) this.#classifiersChanged();
+      this.#bus.emit({ type: "kinds/didRemove", kindIds: [...kindIds] });
+      return { deleted: gone.length };
+    },
+  };
+
+  readonly project = {
+    rename: async (name: string): Promise<Experiment> => {
+      if (!name.trim()) {
+        throw new BackendError("NOT_SUPPORTED", "A project needs a name");
+      }
+      if (name !== this.#experiment.name) {
+        this.#experiment = { ...this.#experiment, name };
+        this.#bus.emit({
+          type: "project/didChange",
+          experiment: this.#experiment,
+        });
+      }
+      return this.#experiment;
+    },
+  };
+
+  /* Features and intensities of an object from its mask and the pixels. */
+  #measure(annotation: AnnotationObject): void {
+    const mask = Uint8Array.from(decodeRleArray(annotation.encodedMask));
+    annotation.features = computeObjectFeatures([
+      { ...annotation, decodedMask: mask },
+    ])[annotation.id];
+    annotation.intensityMeasurements = Object.fromEntries(
+      this.#channels
+        .filter((channel) => channel.planeId === annotation.planeId)
+        .flatMap((channel) => {
+          const pixels = this.#pixels.get(channel.id);
+          return pixels
+            ? [
+                [
+                  channel.id,
+                  intensityStatistics(pixels, {
+                    mask,
+                    bbox: annotation.boundingBox,
+                  }),
+                ],
+              ]
+            : [];
+        }),
+    );
+  }
+
+  async #commit(
+    changeSet: AnnotationChangeSet,
+    options?: CallOptions,
+  ): Promise<CommitResult> {
+    const imageIds = new Set(changeSet.imageIds);
+    for (const id of changeSet.imageIds) {
+      if (!this.#images.some((im) => im.id === id)) {
+        throw new BackendError("NOT_FOUND", `Unknown image ${id}`);
+      }
+    }
+    const { volumes: volumesIn, annotations: annotationsIn } = changeSet;
+    const area = ([x0, y0, x1, y1]: BBox) => (x1 - x0) * (y1 - y0);
+    const checkGeometry = (id: string, bbox: BBox, mask: number[]) => {
+      if (
+        area(bbox) <= 0 ||
+        mask.reduce((sum, run) => sum + run, 0) !== area(bbox)
+      ) {
+        throw new BackendError(
+          "NOT_SUPPORTED",
+          `Annotation ${id}: the mask does not cover its bounding box`,
+        );
+      }
+    };
+    for (const volume of volumesIn.created) {
+      if (!imageIds.has(volume.imageId)) {
+        throw new BackendError(
+          "NOT_SUPPORTED",
+          `Volume ${volume.id} is not on an image of the session`,
+        );
+      }
+      const category = this.#categories.find((c) => c.id === volume.categoryId);
+      if (
+        !category ||
+        category.type !== "annotation" ||
+        category.kindId !== volume.kindId
+      ) {
+        throw new BackendError(
+          "NOT_FOUND",
+          `Volume ${volume.id} names no category of its kind`,
+        );
+      }
+    }
+    const newVolumeIds = new Set(volumesIn.created.map((v) => v.id));
+    for (const annotation of annotationsIn.created) {
+      const plane = this.#planes.find((p) => p.id === annotation.planeId);
+      if (
+        !imageIds.has(annotation.imageId) ||
+        !plane ||
+        plane.imageId !== annotation.imageId
+      ) {
+        throw new BackendError(
+          "NOT_FOUND",
+          `Annotation ${annotation.id} is not on a plane of the session`,
+        );
+      }
+      if (
+        !newVolumeIds.has(annotation.volumeId) &&
+        !this.#volumes.some((v) => v.id === annotation.volumeId)
+      ) {
+        throw new BackendError(
+          "NOT_FOUND",
+          `Annotation ${annotation.id} names an unknown volume`,
+        );
+      }
+      checkGeometry(
+        annotation.id,
+        annotation.boundingBox,
+        annotation.encodedMask,
+      );
+    }
+    for (const change of annotationsIn.updated) {
+      checkGeometry(change.id, change.boundingBox, change.encodedMask);
+    }
+
+    const conflicts: CommitConflict[] = [];
+    const current = <T extends EntityRef>(
+      type: CommitConflict["type"],
+      refs: T[],
+      rows: Array<{ id: string; rev?: number }>,
+    ): T[] =>
+      refs.filter((ref) => {
+        const row = rows.find((r) => r.id === ref.id);
+        if (!row) {
+          conflicts.push({ type, id: ref.id, reason: "missing" });
+          return false;
+        }
+        if (
+          ref.baseRev !== undefined &&
+          row.rev !== undefined &&
+          row.rev !== ref.baseRev
+        ) {
+          conflicts.push({ type, id: ref.id, reason: "modified" });
+          return !!changeSet.force;
+        }
+        return true;
+      });
+    const volumeChanges = current("volume", volumesIn.updated, this.#volumes);
+    const volumeDeletions = current("volume", volumesIn.deleted, this.#volumes);
+    const geometryChanges = current(
+      "annotation",
+      annotationsIn.updated,
+      this.#annotations,
+    );
+    const annotationDeletions = current(
+      "annotation",
+      annotationsIn.deleted,
+      this.#annotations,
+    );
+    if (conflicts.length > 0 && !changeSet.force) {
+      return { created: 0, updated: 0, deleted: 0, conflicts };
+    }
+
+    const rev = ++this.#rev;
+    const createdVolumes = volumesIn.created.map((v) => ({ ...v, rev }));
+    const created = annotationsIn.created.map(
+      ({ decodedMask: _decoded, ...annotation }) => ({ ...annotation, rev }),
+    );
+    this.#volumes.push(...createdVolumes);
+    this.#annotations.push(...created);
+    const rewritten: AnnotationObject[] = [];
+    for (const change of geometryChanges) {
+      const annotation = this.#annotations.find((a) => a.id === change.id)!;
+      const [x0, y0, x1, y1] = change.boundingBox;
+      annotation.boundingBox = change.boundingBox;
+      annotation.encodedMask = change.encodedMask;
+      annotation.shape = {
+        ...annotation.shape,
+        width: x1 - x0,
+        height: y1 - y0,
+      };
+      annotation.rev = rev;
+      rewritten.push(annotation);
+    }
+    const movedVolumes: VolumeUpdate[] = [];
+    const moved = new Set<string>();
+    for (const change of volumeChanges) {
+      const volume = this.#volumes.find((v) => v.id === change.id)!;
+      if (volume.categoryId === change.categoryId) continue;
+      const category = this.#category(change.categoryId);
+      if (category.type !== "annotation") {
+        throw new BackendError("NOT_FOUND", "Not an object category");
+      }
+      moved.add(volume.id);
+      movedVolumes.push(this.#moveVolume(volume, category));
+    }
+    const partitions = [...moved].flatMap((volumeId) => {
+      const { categoryId } = this.#volumes.find((v) => v.id === volumeId)!;
+      return this.#repartition(new Set([volumeId]), categoryId);
+    });
+    const deletedIds = new Set(annotationDeletions.map((ref) => ref.id));
+    const candidates = new Set(
+      this.#annotations
+        .filter((a) => deletedIds.has(a.id))
+        .map((a) => a.volumeId),
+    );
+    this.#annotations = this.#annotations.filter((a) => !deletedIds.has(a.id));
+    const used = new Set(this.#annotations.map((a) => a.volumeId));
+    const dropped = new Set(
+      [...candidates, ...volumeDeletions.map((ref) => ref.id)].filter(
+        (id) => !used.has(id),
+      ),
+    );
+    this.#volumes = this.#volumes.filter((v) => !dropped.has(v.id));
+
+    const toMeasure = [...created, ...rewritten];
+    for (const [index, annotation] of toMeasure.entries()) {
+      this.#measure(annotation);
+      options?.onProgress?.({
+        percent: Math.round(((index + 1) / toMeasure.length) * 100),
+        message: `Measured ${index + 1}/${toMeasure.length} objects`,
+      });
+    }
+    if (created.length > 0) {
+      this.#bus.emit({
+        type: "annotations/didAdd",
+        volumes: createdVolumes.map((v) => ({ ...v })),
+        annotations: created.map((a) => ({ ...a })),
+      });
+    }
+    if (rewritten.length > 0 || moved.size > 0) {
+      this.#bus.emit({
+        type: "annotations/didUpdate",
+        volumes: movedVolumes,
+        annotations: partitions,
+        headers: rewritten.map(
+          ({ encodedMask: _mask, ...header }): AnnotationHeader => ({
+            ...header,
+          }),
+        ),
+      });
+    }
+    if (deletedIds.size > 0 || dropped.size > 0) {
+      this.#bus.emit({
+        type: "annotations/didRemove",
+        annotationIds: [...deletedIds],
+        volumeIds: [...dropped],
+      });
+    }
+    return {
+      created: created.length,
+      updated: rewritten.length + moved.size,
+      deleted: deletedIds.size,
+      conflicts: changeSet.force
+        ? conflicts.filter((c) => c.reason === "missing")
+        : [],
+    };
+  }
 
   #category(id: string): Category {
     const category = this.#categories.find((c) => c.id === id);
@@ -666,6 +1126,7 @@ export class FakeBackend implements Backend {
     );
     volume.categoryId = category.id;
     volume.kindId = category.kindId;
+    volume.rev = ++this.#rev;
     delete volume.predictionConfidence;
     delete volume.predictedAtRunId;
     const { id, kindId, categoryId, predictionCorrected } = volume;
@@ -744,6 +1205,7 @@ export class FakeBackend implements Backend {
         if (!gone.has(volume.categoryId)) continue;
         const kind = this.#kinds.find((k) => k.id === volume.kindId)!;
         volume.categoryId = kind.unknownCategoryId;
+        volume.rev = ++this.#rev;
         volumes.push({
           id: volume.id,
           kindId: volume.kindId,
@@ -1118,6 +1580,9 @@ export class FakeBackend implements Backend {
       }
 
       if (annotations.length > 0) {
+        const rev = ++this.#rev;
+        for (const volume of volumes) volume.rev = rev;
+        for (const annotation of annotations) annotation.rev = rev;
         this.#volumes.push(...volumes);
         this.#annotations.push(...annotations);
         this.#bus.emit({ type: "annotations/didAdd", volumes, annotations });

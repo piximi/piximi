@@ -9,9 +9,13 @@ import { RpcPeer } from "./rpc/peer";
 import { WebSocketTransport } from "./transports/websocket";
 
 import type {
+  AnnotationCategory,
   AnnotationObject,
   Category,
   Channel,
+  Experiment,
+  ImageObject,
+  Kind,
   Partition,
 } from "core/entities";
 import type {
@@ -25,6 +29,7 @@ import type { Job } from "../jobs";
 import type * as P from "../protocol/generated";
 import type { ProtocolMethods } from "../protocol/methods";
 import type {
+  AnnotationChangeSet,
   AnnotationCountGroup,
   AnnotationHeader,
   AnnotationQuery,
@@ -38,6 +43,7 @@ import type {
   BackendSession,
   CallOptions,
   Changed,
+  CommitResult,
   ClassifierCreateRequest,
   ClassifierExport,
   ClassifierFitRequest,
@@ -48,6 +54,7 @@ import type {
   ClassifierUpdateRequest,
   Counts,
   Deleted,
+  ImageChange,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
@@ -215,8 +222,35 @@ export class RemoteBackend implements Backend {
         type: "annotations/didUpdate",
         volumes: event.volumes,
         annotations: asDomain<AnnotationUpdate[]>(event.annotations),
+        ...(event.headers && {
+          headers: asDomain<AnnotationHeader[]>(event.headers),
+        }),
       });
     });
+    peer.onNotification("kinds/didChange", (params) =>
+      this.#bus.emit({
+        type: "kinds/didChange",
+        kinds: (params as P.KindsDidChange).kinds,
+      }),
+    );
+    peer.onNotification("kinds/didRemove", (params) =>
+      this.#bus.emit({
+        type: "kinds/didRemove",
+        kindIds: (params as P.KindsDidRemove).kindIds,
+      }),
+    );
+    peer.onNotification("images/didChange", (params) =>
+      this.#bus.emit({
+        type: "images/didChange",
+        images: asDomain<ImageObject[]>((params as P.ImagesDidChange).images),
+      }),
+    );
+    peer.onNotification("project/didChange", (params) =>
+      this.#bus.emit({
+        type: "project/didChange",
+        experiment: (params as P.ProjectDidChange).experiment,
+      }),
+    );
     peer.onNotification("categories/didChange", (params) =>
       this.#bus.emit({
         type: "categories/didChange",
@@ -456,6 +490,14 @@ export class RemoteBackend implements Backend {
         query: asWire<P.ImageQuery>(query),
         categoryId,
       }),
+    update: async (updates: ImageChange[]): Promise<ImageObject[]> =>
+      asDomain<ImageObject[]>(
+        (
+          await this.#call("images/update", {
+            updates: asWire<P.ImageChange[]>(updates),
+          })
+        ).images,
+      ),
   };
 
   readonly annotations = {
@@ -471,6 +513,45 @@ export class RemoteBackend implements Backend {
         query: asWire<P.AnnotationQuery>(query),
         categoryId,
       }),
+    commit: (
+      changeSet: AnnotationChangeSet,
+      options?: CallOptions,
+    ): Promise<CommitResult> =>
+      this.#call(
+        "annotations/commit",
+        {
+          imageIds: changeSet.imageIds,
+          volumes: changeSet.volumes,
+          annotations: asWire<P.AnnotationChanges>({
+            ...changeSet.annotations,
+            // The mask is the wire's; a decoded copy stays in the browser.
+            created: changeSet.annotations.created.map(
+              ({ decodedMask: _decoded, ...annotation }) => annotation,
+            ),
+          }),
+          force: changeSet.force ?? false,
+        },
+        { signal: options?.signal, onProgress: options?.onProgress },
+      ),
+    update: (updates: AnnotationUpdate[]): Promise<Changed> =>
+      this.#call("annotations/update", {
+        updates: asWire<P.AnnotationUpdate[]>(updates),
+      }),
+  };
+
+  readonly kinds = {
+    create: async (
+      kinds: Array<{ kind: Kind; category: AnnotationCategory }>,
+    ): Promise<Kind[]> => (await this.#call("kinds/create", { kinds })).kinds,
+    update: async (id: string, name: string): Promise<Kind> =>
+      (await this.#call("kinds/update", { id, name })).kinds[0],
+    delete: (ids: string[]): Promise<Deleted> =>
+      this.#call("kinds/delete", { ids }),
+  };
+
+  readonly project = {
+    rename: async (name: string): Promise<Experiment> =>
+      (await this.#call("project/update", { name })).experiment,
   };
 
   readonly categories = {

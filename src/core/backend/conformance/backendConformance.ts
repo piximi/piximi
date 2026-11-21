@@ -3,7 +3,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   Partition,
   UNKNOWN_IMAGE_CATEGORY_ID,
+  UNKNOWN_KIND_ID,
   generateCategory,
+  generateKind,
+  generateUUID,
   representsUnknown,
 } from "core/entities";
 import { getDefaultModelParams } from "core/dl/classification/utils";
@@ -15,7 +18,12 @@ import { featureColumn, intensityColumn } from "../measurements/columns";
 import { randomKey } from "../query";
 
 import type { BackendEvent } from "../events";
-import type { Backend, ChannelDisplay, RenderRequest } from "../types";
+import type {
+  AnnotationChangeSet,
+  Backend,
+  ChannelDisplay,
+  RenderRequest,
+} from "../types";
 
 type ConformanceImage = {
   id: string;
@@ -1099,6 +1107,424 @@ export const describeBackendConformance = (
     });
 
     // Last, since it removes from the project the earlier blocks count.
+    describe("editing", () => {
+      const empty = (): AnnotationChangeSet => ({
+        imageIds: [],
+        volumes: { created: [], updated: [], deleted: [] },
+        annotations: { created: [], updated: [], deleted: [] },
+      });
+      const changes = (
+        imageIds: string[],
+        partial: {
+          volumes?: Partial<AnnotationChangeSet["volumes"]>;
+          annotations?: Partial<AnnotationChangeSet["annotations"]>;
+          force?: boolean;
+        },
+      ): AnnotationChangeSet => {
+        const base = empty();
+        return {
+          imageIds,
+          volumes: { ...base.volumes, ...partial.volumes },
+          annotations: { ...base.annotations, ...partial.annotations },
+          ...(partial.force !== undefined && { force: partial.force }),
+        };
+      };
+      const record = async (backend: Backend, id: string) =>
+        (await backend.query.annotations({ ids: [id] }, { limit: 1 })).items[0];
+
+      it("commits a session's objects: made, redrawn, recategorized, deleted", async () => {
+        const { backend } = ctx;
+        const image = ctx.images[0];
+        const [imageRecord] = (
+          await backend.query.images({ ids: [image.id] }, { limit: 1 })
+        ).items;
+        const plane = imageRecord.planes[0];
+        const { kind, unknownCategory } = generateKind(`Edited-${Date.now()}`);
+        await backend.kinds.create([{ kind, category: unknownCategory }]);
+        const [round] = await backend.categories.create([
+          generateCategory("Round", "#00ff00", {
+            type: "annotation",
+            kindId: kind.id,
+          }),
+        ]);
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((e) => events.push(e));
+        const volume = {
+          id: generateUUID(),
+          imageId: image.id,
+          kindId: kind.id,
+          categoryId: unknownCategory.id,
+        };
+        const annotation = {
+          id: generateUUID(),
+          planeId: plane.id,
+          imageId: image.id,
+          volumeId: volume.id,
+          partition: Partition.Unassigned,
+          shape: { planes: 1, height: 2, width: 2, channels: 1 },
+          boundingBox: [0, 0, 2, 2] as [number, number, number, number],
+          encodedMask: [0, 4],
+        };
+
+        // Made: stored with its mask, measured, announced.
+        const made = await backend.annotations.commit(
+          changes([image.id], {
+            volumes: { created: [volume] },
+            annotations: { created: [annotation] },
+          }),
+        );
+        expect(made).toEqual({
+          created: 1,
+          updated: 0,
+          deleted: 0,
+          conflicts: [],
+        });
+        const added = events.find((e) => e.type === "annotations/didAdd");
+        expect(
+          added?.type === "annotations/didAdd" && added.volumes[0].id,
+        ).toBe(volume.id);
+        expect(
+          added?.type === "annotations/didAdd" &&
+            added.annotations[0].features?.area,
+        ).toBe(4);
+        let current = await record(backend, annotation.id);
+        expect(current.annotation.features?.area).toBe(4);
+        expect(
+          Object.keys(current.annotation.intensityMeasurements ?? {}).length,
+        ).toBeGreaterThan(0);
+        expect(await backend.query.masks([annotation.id])).toEqual({
+          [annotation.id]: [0, 4],
+        });
+
+        // Redrawn: new box and mask, measured again, announced as a header.
+        const redrawn = await backend.annotations.commit(
+          changes([image.id], {
+            annotations: {
+              updated: [
+                {
+                  id: annotation.id,
+                  baseRev: current.annotation.rev,
+                  boundingBox: [0, 0, 3, 2],
+                  encodedMask: [0, 6],
+                },
+              ],
+            },
+          }),
+        );
+        expect(redrawn).toMatchObject({ updated: 1, conflicts: [] });
+        const updated = events.find((e) => e.type === "annotations/didUpdate");
+        expect(
+          updated?.type === "annotations/didUpdate" &&
+            updated.headers?.[0].boundingBox,
+        ).toEqual([0, 0, 3, 2]);
+        current = await record(backend, annotation.id);
+        expect(current.annotation.boundingBox).toEqual([0, 0, 3, 2]);
+        expect(current.annotation.features?.area).toBe(6);
+        expect(current.annotation.shape.width).toBe(3);
+
+        // Recategorized through the volume; the kind's count follows.
+        const moved = await backend.annotations.commit(
+          changes([image.id], {
+            volumes: {
+              updated: [
+                {
+                  id: volume.id,
+                  baseRev: current.volume.rev,
+                  categoryId: round.id,
+                },
+              ],
+            },
+          }),
+        );
+        expect(moved).toMatchObject({ updated: 1, conflicts: [] });
+        current = await record(backend, annotation.id);
+        expect(current.volume.categoryId).toBe(round.id);
+        expect(
+          (await backend.query.annotationCounts({ categoryIds: [round.id] }))
+            .total,
+        ).toBe(1);
+
+        // A row read at a revision that has since moved is refused as a
+        // whole, and applied when forced; a row that is gone is missing.
+        if (current.annotation.rev !== undefined) {
+          const stale = changes([image.id], {
+            annotations: {
+              updated: [
+                {
+                  id: annotation.id,
+                  baseRev: current.annotation.rev - 1,
+                  boundingBox: [0, 0, 2, 2],
+                  encodedMask: [0, 4],
+                },
+              ],
+              deleted: [{ id: "nope", baseRev: 1 }],
+            },
+          });
+          const refused = await backend.annotations.commit(stale);
+          expect(refused).toMatchObject({ created: 0, updated: 0, deleted: 0 });
+          expect(refused.conflicts).toEqual(
+            expect.arrayContaining([
+              { type: "annotation", id: annotation.id, reason: "modified" },
+              { type: "annotation", id: "nope", reason: "missing" },
+            ]),
+          );
+          expect(
+            (await record(backend, annotation.id)).annotation.boundingBox,
+          ).toEqual([0, 0, 3, 2]);
+          const forced = await backend.annotations.commit({
+            ...stale,
+            force: true,
+          });
+          expect(forced).toMatchObject({ updated: 1, deleted: 0 });
+          expect(forced.conflicts).toEqual([
+            { type: "annotation", id: "nope", reason: "missing" },
+          ]);
+          current = await record(backend, annotation.id);
+          expect(current.annotation.boundingBox).toEqual([0, 0, 2, 2]);
+        } else {
+          const missing = await backend.annotations.commit(
+            changes([image.id], {
+              annotations: { deleted: [{ id: "nope" }] },
+            }),
+          );
+          expect(missing.conflicts).toEqual([
+            { type: "annotation", id: "nope", reason: "missing" },
+          ]);
+        }
+
+        // Deleted, taking its emptied volume along.
+        const deleted = await backend.annotations.commit(
+          changes([image.id], {
+            volumes: {
+              deleted: [{ id: volume.id, baseRev: current.volume.rev }],
+            },
+            annotations: {
+              deleted: [{ id: annotation.id, baseRev: current.annotation.rev }],
+            },
+          }),
+        );
+        unsubscribe();
+        expect(deleted).toMatchObject({ deleted: 1, conflicts: [] });
+        const removed = events.find((e) => e.type === "annotations/didRemove");
+        expect(
+          removed?.type === "annotations/didRemove" && removed.volumeIds,
+        ).toEqual([volume.id]);
+        expect(
+          (await backend.query.annotationCounts({ ids: [annotation.id] }))
+            .total,
+        ).toBe(0);
+        await backend.kinds.delete([kind.id]);
+      });
+
+      it("refuses a changeset that names what does not exist or fit", async () => {
+        const { backend } = ctx;
+        const image = ctx.images[0];
+        const [imageRecord] = (
+          await backend.query.images({ ids: [image.id] }, { limit: 1 })
+        ).items;
+        const { kind, unknownCategory } = generateKind(`Bad-${Date.now()}`);
+        await backend.kinds.create([{ kind, category: unknownCategory }]);
+        const volume = {
+          id: generateUUID(),
+          imageId: image.id,
+          kindId: kind.id,
+          categoryId: unknownCategory.id,
+        };
+        const annotation = {
+          id: generateUUID(),
+          planeId: imageRecord.planes[0].id,
+          imageId: image.id,
+          volumeId: volume.id,
+          partition: Partition.Unassigned,
+          shape: { planes: 1, height: 2, width: 2, channels: 1 },
+          boundingBox: [0, 0, 2, 2] as [number, number, number, number],
+          encodedMask: [0, 3],
+        };
+        await expect(
+          backend.annotations.commit(changes(["nope"], {})),
+        ).rejects.toMatchObject({ name: "BackendError" });
+        await expect(
+          backend.annotations.commit(
+            changes([image.id], {
+              volumes: { created: [volume] },
+              annotations: { created: [annotation] },
+            }),
+          ),
+        ).rejects.toMatchObject({ name: "BackendError" });
+        expect(
+          (await backend.query.annotationCounts({ ids: [annotation.id] }))
+            .total,
+        ).toBe(0);
+        await backend.kinds.delete([kind.id]);
+      });
+
+      it("creates, renames and deletes kinds, moving their objects to unknown", async () => {
+        const { backend } = ctx;
+        const image = ctx.images[1];
+        const [imageRecord] = (
+          await backend.query.images({ ids: [image.id] }, { limit: 1 })
+        ).items;
+        const name = `Kind-${Date.now()}`;
+        const { kind, unknownCategory } = generateKind(name);
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((e) => events.push(e));
+
+        expect(
+          await backend.kinds.create([{ kind, category: unknownCategory }]),
+        ).toEqual([kind]);
+        expect(events.at(-1)?.type).toBe("kinds/didAdd");
+        expect(
+          (await backend.query.project()).kinds.some((k) => k.id === kind.id),
+        ).toBe(true);
+        await expect(
+          backend.kinds.create([{ kind, category: unknownCategory }]),
+        ).rejects.toMatchObject({ name: "BackendError" });
+
+        const renamed = await backend.kinds.update(kind.id, `${name}-renamed`);
+        expect(renamed.name).toBe(`${name}-renamed`);
+        const change = events.at(-1);
+        expect(
+          change?.type === "kinds/didChange" &&
+            change.kinds.find((k) => k.id === kind.id)?.name,
+        ).toBe(`${name}-renamed`);
+        await expect(
+          backend.kinds.update(UNKNOWN_KIND_ID, "Other"),
+        ).rejects.toMatchObject({ name: "BackendError" });
+
+        const volume = {
+          id: generateUUID(),
+          imageId: image.id,
+          kindId: kind.id,
+          categoryId: unknownCategory.id,
+        };
+        const annotation = {
+          id: generateUUID(),
+          planeId: imageRecord.planes[0].id,
+          imageId: image.id,
+          volumeId: volume.id,
+          partition: Partition.Unassigned,
+          shape: { planes: 1, height: 2, width: 2, channels: 1 },
+          boundingBox: [0, 0, 2, 2] as [number, number, number, number],
+          encodedMask: [0, 4],
+        };
+        await backend.annotations.commit(
+          changes([image.id], {
+            volumes: { created: [volume] },
+            annotations: { created: [annotation] },
+          }),
+        );
+        const unknownBefore = (
+          await backend.query.annotationCounts({ kindIds: [UNKNOWN_KIND_ID] })
+        ).total;
+
+        expect(await backend.kinds.delete([kind.id, UNKNOWN_KIND_ID])).toEqual({
+          deleted: 1,
+        });
+        unsubscribe();
+        const types = events.map((e) => e.type);
+        expect(types.at(-1)).toBe("kinds/didRemove");
+        expect(types).toContain("annotations/didUpdate");
+        expect(types).toContain("categories/didChange");
+        const summary = await backend.query.project();
+        expect(summary.kinds.some((k) => k.id === kind.id)).toBe(false);
+        expect(
+          summary.categories.some(
+            (c) => c.type === "annotation" && c.kindId === kind.id,
+          ),
+        ).toBe(false);
+        expect(
+          (await backend.query.annotationCounts({ kindIds: [UNKNOWN_KIND_ID] }))
+            .total,
+        ).toBe(unknownBefore + 1);
+        expect((await record(backend, annotation.id)).volume.kindId).toBe(
+          UNKNOWN_KIND_ID,
+        );
+        await backend.annotations.delete({ ids: [annotation.id] });
+      });
+
+      it("updates images, annotation partitions and the project name", async () => {
+        const { backend } = ctx;
+        const image = ctx.images[2];
+        const [imageRecord] = (
+          await backend.query.images({ ids: [image.id] }, { limit: 1 })
+        ).items;
+        const events: BackendEvent[] = [];
+        const unsubscribe = backend.subscribe((e) => events.push(e));
+
+        const [renamed] = await backend.images.update([
+          {
+            id: image.id,
+            name: `${image.name}-renamed`,
+            partition: Partition.Training,
+          },
+        ]);
+        expect(renamed.name).toBe(`${image.name}-renamed`);
+        expect(renamed.partition).toBe(Partition.Training);
+        expect(events.at(-1)?.type).toBe("images/didChange");
+        expect(
+          (await backend.query.images({ ids: [image.id] }, { limit: 1 }))
+            .items[0].image.name,
+        ).toBe(`${image.name}-renamed`);
+        await expect(
+          backend.images.update([{ id: image.id, activePlaneId: "nope" }]),
+        ).rejects.toMatchObject({ name: "BackendError" });
+        await backend.images.update([
+          { id: image.id, name: image.name, partition: Partition.Unassigned },
+        ]);
+
+        const { kind, unknownCategory } = generateKind(`Part-${Date.now()}`);
+        await backend.kinds.create([{ kind, category: unknownCategory }]);
+        const volume = {
+          id: generateUUID(),
+          imageId: image.id,
+          kindId: kind.id,
+          categoryId: unknownCategory.id,
+        };
+        const annotation = {
+          id: generateUUID(),
+          planeId: imageRecord.planes[0].id,
+          imageId: image.id,
+          volumeId: volume.id,
+          partition: Partition.Unassigned,
+          shape: { planes: 1, height: 2, width: 2, channels: 1 },
+          boundingBox: [0, 0, 2, 2] as [number, number, number, number],
+          encodedMask: [0, 4],
+        };
+        await backend.annotations.commit(
+          changes([image.id], {
+            volumes: { created: [volume] },
+            annotations: { created: [annotation] },
+          }),
+        );
+        expect(
+          await backend.annotations.update([
+            { id: annotation.id, partition: Partition.Validation },
+          ]),
+        ).toEqual({ changed: 1 });
+        expect(
+          (await record(backend, annotation.id)).annotation.partition,
+        ).toBe(Partition.Validation);
+        expect(
+          await backend.annotations.update([
+            { id: annotation.id, partition: Partition.Validation },
+          ]),
+        ).toEqual({ changed: 0 });
+
+        const before = (await backend.query.project()).experiment.name;
+        expect((await backend.project.rename("Renamed project")).name).toBe(
+          "Renamed project",
+        );
+        expect(events.at(-1)?.type).toBe("project/didChange");
+        expect((await backend.query.project()).experiment.name).toBe(
+          "Renamed project",
+        );
+        await backend.project.rename(before);
+        unsubscribe();
+        await backend.kinds.delete([kind.id]);
+        await backend.annotations.delete({ ids: [annotation.id] });
+      });
+    });
+
     describe("mutations", () => {
       it("deletes annotations by query and announces what went", async () => {
         const { backend } = ctx;

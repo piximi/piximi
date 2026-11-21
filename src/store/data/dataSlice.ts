@@ -15,7 +15,7 @@ import {
 
 import { projectReset } from "store/actions";
 
-import type { PayloadAction } from "@reduxjs/toolkit";
+import type { EntityState, PayloadAction } from "@reduxjs/toolkit";
 
 import type { Partition } from "core/dl/enums";
 import type {
@@ -498,6 +498,46 @@ export const dataSlice = createSlice({
     },
     batchAddCategory(state, action: PayloadAction<Array<Category>>) {
       categoryAdapter.addMany(state.categories, action.payload);
+    },
+    /* Images as a backend announces them whole (renamed, re-partitioned,
+     * another active plane); ids the store lacks are skipped. */
+    updateImages(state, action: PayloadAction<Array<ImageObject>>) {
+      imageAdapter.updateMany(
+        state.images,
+        action.payload
+          .filter((image) => state.images.entities[image.id])
+          .map(({ id, ...changes }) => ({ id, changes })),
+      );
+    },
+    /* Fields a backend rewrote on volumes it holds (a category change, a
+     * prediction); the mirror follows for the volumes it has. */
+    applyVolumeUpdates(
+      state,
+      action: PayloadAction<
+        Array<
+          Omit<Predictable, "partition"> & {
+            id: string;
+            kindId: string;
+            categoryId: string;
+          }
+        >
+      >,
+    ) {
+      annotationVolumeAdapter.updateMany(
+        state.annotationVolumes,
+        action.payload
+          .filter((update) => state.annotationVolumes.entities[update.id])
+          .map(({ id, ...changes }) => ({
+            id,
+            changes: {
+              kindId: changes.kindId,
+              categoryId: changes.categoryId,
+              predictionConfidence: changes.predictionConfidence,
+              predictedAtRunId: changes.predictedAtRunId,
+              predictionCorrected: changes.predictionCorrected,
+            },
+          })),
+      );
     },
     addAnnotation(state, action: PayloadAction<AnnotationObject>) {
       annotationAdapter.addOne(state.annotations, action.payload);
@@ -1218,6 +1258,66 @@ export const dataSlice = createSlice({
       cascadeDeleteAnnotationVolume(state, annVol);
 
       annotationVolumeAdapter.removeOne(state.annotationVolumes, annVol.id);
+    },
+    /*
+     * Drops the annotations and volumes of some images from the mirror
+     * without any cascade: what a viewing session loaded for a remote
+     * project goes back out when the session ends.
+     */
+    evictImageAnnotations(state, action: PayloadAction<Array<string>>) {
+      const imageIds = new Set(action.payload);
+      annotationAdapter.removeMany(
+        state.annotations,
+        state.annotations.ids.filter((id) =>
+          imageIds.has(state.annotations.entities[id].imageId),
+        ),
+      );
+      annotationVolumeAdapter.removeMany(
+        state.annotationVolumes,
+        state.annotationVolumes.ids.filter((id) =>
+          imageIds.has(state.annotationVolumes.entities[id].imageId),
+        ),
+      );
+    },
+    /*
+     * Puts the annotation tables back as a viewing session found them,
+     * discarding its edits. The taxonomy may have moved meanwhile (a
+     * category deleted through the backend while the session was open), so
+     * a restored volume naming a category or kind that is gone returns to
+     * the unknown one, as the deletion's own cascade would have sent it.
+     */
+    restoreAnnotationTables(
+      state,
+      action: PayloadAction<{
+        annotations: EntityState<AnnotationObject, string>;
+        annotationVolumes: EntityState<AnnotationVolume, string>;
+      }>,
+    ) {
+      state.annotations = action.payload.annotations;
+      state.annotationVolumes = action.payload.annotationVolumes;
+      const updates: Array<{
+        id: string;
+        changes: { kindId: string; categoryId: string };
+      }> = [];
+      for (const id of state.annotationVolumes.ids) {
+        const volume = state.annotationVolumes.entities[id];
+        const kind = state.kinds.entities[volume.kindId];
+        if (!kind) {
+          updates.push({
+            id,
+            changes: {
+              kindId: UNKNOWN_KIND_ID,
+              categoryId: UNKNOWN_KIND_CATEGORY_ID,
+            },
+          });
+        } else if (!state.categories.entities[volume.categoryId]) {
+          updates.push({
+            id,
+            changes: { kindId: kind.id, categoryId: kind.unknownCategoryId },
+          });
+        }
+      }
+      annotationVolumeAdapter.updateMany(state.annotationVolumes, updates);
     },
     batchDeleteAnnotationVolume(state, action: PayloadAction<Array<string>>) {
       const annVols = action.payload

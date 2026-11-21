@@ -131,6 +131,33 @@ const applyBackendEvent = (
     case "kinds/didAdd":
       store.dispatch(dataSlice.actions.batchAddKind(event.kinds));
       break;
+    case "kinds/didChange":
+      // Only renames travel this way; the per-kind UI state follows the
+      // rename action, so each changed name is dispatched as one.
+      if (remote) {
+        const { kinds } = store.getState().data;
+        for (const kind of event.kinds) {
+          const known = kinds.entities[kind.id];
+          if (known && known.name !== kind.name) {
+            store.dispatch(
+              dataSlice.actions.updateKindName({
+                kindId: kind.id,
+                name: kind.name,
+              }),
+            );
+          }
+        }
+      }
+      break;
+    case "kinds/didRemove":
+      // The reducer's cascade mirrors the backend's: volumes to the unknown
+      // kind, the kind's categories dropped, per-kind UI state cleared.
+      if (remote) {
+        for (const id of event.kindIds) {
+          store.dispatch(dataSlice.actions.deleteKind(id));
+        }
+      }
+      break;
     case "annotations/didAdd":
       if (!remote) {
         store.dispatch(
@@ -164,12 +191,35 @@ const applyBackendEvent = (
         store.dispatch(dataSlice.actions.applyImageUpdates(event.updates));
       }
       break;
+    case "images/didChange":
+      if (remote) {
+        store.dispatch(dataSlice.actions.updateImages(event.images));
+      }
+      break;
     case "annotations/didUpdate":
-      // Not mirrored for a remote project; the revision refreshes the grids.
+      // A remote project's annotations are mirrored only while a viewing
+      // session holds them. The session's copy follows category and
+      // partition changes (so a category deleted elsewhere does not leave
+      // it naming a ghost) but never geometry or removals: a concurrent
+      // edit of the same object surfaces as a conflict when the session
+      // commits, rather than being merged into it unseen.
+      if (remote) {
+        store.dispatch(dataSlice.actions.applyVolumeUpdates(event.volumes));
+        store.dispatch(
+          dataSlice.actions.batchUpdateAnnotationPartition(event.annotations),
+        );
+      }
       break;
     case "categories/didChange":
       if (remote) {
         store.dispatch(dataSlice.actions.setCategories(event.categories));
+      }
+      break;
+    case "project/didChange":
+      if (remote) {
+        store.dispatch(
+          dataSlice.actions.updateExperimentName(event.experiment.name),
+        );
       }
       break;
     case "classifiers/didChange":

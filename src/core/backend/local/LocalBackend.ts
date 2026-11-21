@@ -28,12 +28,20 @@ import {
   sortImages,
 } from "../query";
 import { LocalClassification } from "./LocalClassification";
+import { LocalEditing } from "./LocalEditing";
 import { LocalMeasurements } from "./LocalMeasurements";
 import { LocalSegmentation } from "./LocalSegmentation";
 import { ThumbnailWorkerPool } from "./ThumbnailWorkerPool";
 import { imageUpdate, volumeUpdate } from "./updates";
 
-import type { Category, ImageObject, StorageReference } from "core/entities";
+import type {
+  AnnotationCategory,
+  Category,
+  Experiment,
+  ImageObject,
+  Kind,
+  StorageReference,
+} from "core/entities";
 import type { IClassifierApi } from "core/dl/classification/types";
 import type { ISegmenterApi } from "core/dl/segmentation/types";
 
@@ -44,10 +52,12 @@ import type { BackendEventListener } from "../events";
 import type { Job } from "../jobs";
 import type { AnnotationContext, AnnotationRow, ImageContext } from "../query";
 import type {
+  AnnotationChangeSet,
   AnnotationCountGroup,
   AnnotationQuery,
   AnnotationRecord,
   AnnotationSort,
+  AnnotationUpdate,
   Backend,
   BackendSegmentation,
   BackendClassification,
@@ -55,8 +65,10 @@ import type {
   BackendSession,
   CallOptions,
   Changed,
+  CommitResult,
   Counts,
   Deleted,
+  ImageChange,
   ImageCountGroup,
   ImageQuery,
   ImageRecord,
@@ -153,6 +165,7 @@ export class LocalBackend implements Backend {
   readonly segmentation: BackendSegmentation;
   readonly classification: BackendClassification;
   readonly measurements: BackendMeasurements;
+  readonly #editing: LocalEditing;
 
   readonly #imageRows = new Derived((images: DataState["images"]) =>
     images.ids.map((id) => images.entities[id]),
@@ -210,6 +223,12 @@ export class LocalBackend implements Backend {
       annotations: (state, query) => this.#annotations(state, query),
       measurements: deps.measurements ?? (() => MeasurementsApi.getInstance()),
       jobs: this.#jobs,
+      bus: this.#bus,
+    });
+    this.#editing = new LocalEditing({
+      store: deps.store,
+      measurements: deps.measurements ?? (() => MeasurementsApi.getInstance()),
+      classification: () => this.classification,
       bus: this.#bus,
     });
   }
@@ -549,6 +568,9 @@ export class LocalBackend implements Backend {
       }
       return { changed: updates.length };
     },
+
+    update: (updates: ImageChange[]): Promise<ImageObject[]> =>
+      this.#editing.updateImages(updates),
   };
 
   readonly annotations = {
@@ -618,6 +640,28 @@ export class LocalBackend implements Backend {
         changed: ids.filter((id) => moved.has(volumeOf(id) ?? "")).length,
       };
     },
+
+    commit: (
+      changeSet: AnnotationChangeSet,
+      options?: CallOptions,
+    ): Promise<CommitResult> => this.#editing.commit(changeSet, options),
+
+    update: (updates: AnnotationUpdate[]): Promise<Changed> =>
+      this.#editing.updateAnnotations(updates),
+  };
+
+  readonly kinds = {
+    create: (
+      kinds: Array<{ kind: Kind; category: AnnotationCategory }>,
+    ): Promise<Kind[]> => this.#editing.createKinds(kinds),
+    update: (id: string, name: string): Promise<Kind> =>
+      this.#editing.updateKind(id, name),
+    delete: (ids: string[]): Promise<Deleted> => this.#editing.deleteKinds(ids),
+  };
+
+  readonly project = {
+    rename: (name: string): Promise<Experiment> =>
+      this.#editing.renameProject(name),
   };
 
   #categoriesChanged(): void {
