@@ -13,6 +13,7 @@ from piximi_engine.notebook import serve
 from piximi_link import Peer
 from piximi_link.transports.websocket import connect
 from piximi_schema import PROTOCOL_VERSION
+from piximi_schema.entities import AnnotationVolume
 
 
 async def test_add_images_reaches_a_connected_peer(engine: ReferenceEngine, tmp_path: Path):
@@ -66,3 +67,38 @@ async def test_notebook_session_renders_and_serves(images_dir: Path):
         assert session.port > 0
     finally:
         await session.stop()
+
+
+async def test_project_api_edits_objects_and_kinds(engine: ReferenceEngine):
+    import pytest
+
+    from piximi_engine.api import CommitConflictError
+    from piximi_schema.unknown import UNKNOWN_KIND_ID
+
+    project = Project(engine)
+    kind = await project.create_kind("Nucleus")
+    assert project.kind("Nucleus").id == kind.id
+    assert (await project.rename_kind(kind, "Nuclei")).name == "Nuclei"
+
+    image = project.image("a")
+    mask = np.zeros((image.shape.height, image.shape.width), dtype=bool)
+    mask[2:6, 3:8] = True
+    added = await project.add_annotation(image, mask, kind="Nuclei")
+    assert added.bounding_box == (3, 2, 8, 6) and added.features["area"] == 20 and added.rev is not None
+    assert project.labels(image, kind="Nuclei").max() == 1
+
+    # Redrawn in place; a stale copy is refused, then forced through.
+    stale = added
+    redrawn = await project.set_mask(added, np.ones((2, 3), dtype=bool), bbox=(0, 0, 3, 2))
+    assert redrawn.bounding_box == (0, 0, 3, 2) and redrawn.rev > stale.rev
+    with pytest.raises(CommitConflictError, match="modified"):
+        await project.set_mask(stale, np.ones((2, 2), dtype=bool), bbox=(1, 1, 3, 3))
+    forced = await project.set_mask(stale, np.ones((2, 2), dtype=bool), bbox=(1, 1, 3, 3), force=True)
+    assert forced.bounding_box == (1, 1, 3, 3)
+
+    assert (await project.rename("Edited")).name == "Edited"
+    assert await project.delete_kind("Nuclei") == 1
+    assert project.annotation(added.id).id == added.id
+    assert engine.meta.get("volume", added.volume_id, AnnotationVolume).kind_id == UNKNOWN_KIND_ID
+    assert await project.delete_annotations([added.id]) == 1
+    assert project.annotations(image) == []

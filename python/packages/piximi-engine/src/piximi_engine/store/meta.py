@@ -4,8 +4,9 @@ Every entity is stored as its wire JSON under its kind and id, next to the
 handful of fields queries filter and sort on, copied into indexed columns
 when the row is written (see ``_INDEXED``). Annotation masks sit in their own
 column so listing annotations never parses them. Rows keep their rowid across
-updates, so insertion order is stable. Revisions arrive with the editing
-phase.
+updates, so insertion order is stable. Revisions (``rev`` on annotations and
+volumes) are stamps from one persisted counter (``next_rev``), kept in the
+row's JSON like any other wire field.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from collections.abc import Iterable, Iterator, Sequence
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, TypeVar
@@ -76,6 +78,10 @@ CREATE INDEX IF NOT EXISTS entities_margin ON entities (kind, margin);
 CREATE TABLE IF NOT EXISTS sources (
   path TEXT PRIMARY KEY,
   image_ids TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS counters (
+  name  TEXT PRIMARY KEY,
+  value INTEGER NOT NULL
 );
 PRAGMA user_version = {SCHEMA_VERSION};
 """
@@ -143,6 +149,7 @@ class MetaStore:
         self._check_version(path)
         self._db.executescript(_SCHEMA)
         self._db.create_function("piximi_rand", 2, random_key, deterministic=True)
+        self._transaction_depth = 0
 
     def _check_version(self, path: Path) -> None:
         has_tables = (
@@ -159,6 +166,52 @@ class MetaStore:
 
     def close(self) -> None:
         self._db.close()
+
+    # ── Transactions and revisions ───────────────────────────────────────────
+
+    @contextmanager
+    def transaction(self) -> Iterator[None]:
+        """Groups writes into one transaction: committed at the end, rolled
+        back on an exception. Writes made inside join it instead of
+        committing on their own, and nested uses join the outermost."""
+        if self._transaction_depth > 0:
+            self._transaction_depth += 1
+            try:
+                yield
+            finally:
+                self._transaction_depth -= 1
+            return
+        self._db.execute("BEGIN")
+        self._transaction_depth = 1
+        try:
+            yield
+        except BaseException:
+            self._db.execute("ROLLBACK")
+            raise
+        else:
+            self._db.execute("COMMIT")
+        finally:
+            self._transaction_depth = 0
+
+    @contextmanager
+    def _writing(self) -> Iterator[None]:
+        """A write's own transaction, unless one is open around it."""
+        if self._transaction_depth > 0:
+            yield
+        else:
+            with self._db:
+                yield
+
+    def next_rev(self) -> int:
+        """The next revision stamp: one persisted, monotonic counter shared by
+        every entity, so stamps compare across restarts and a batch written
+        together may share one."""
+        with self._writing():
+            self._db.execute(
+                "INSERT INTO counters (name, value) VALUES ('rev', 1) "
+                "ON CONFLICT (name) DO UPDATE SET value = value + 1"
+            )
+            return self._db.execute("SELECT value FROM counters WHERE name = 'rev'").fetchone()[0]
 
     # ── Entities ─────────────────────────────────────────────────────────────
 
@@ -201,7 +254,7 @@ class MetaStore:
                     *(columns[column] for column in (*_INDEXED.values(), *_EXTRA)),
                 )
             )
-        with self._db:
+        with self._writing():
             self._db.executemany(_UPSERT, rows)
 
     def update_many(
@@ -232,7 +285,7 @@ class MetaStore:
                     wire["id"],
                 )
             )
-        with self._db:
+        with self._writing():
             self._db.executemany(_UPDATE, rows)
 
     @staticmethod
@@ -306,7 +359,7 @@ class MetaStore:
         return [row[0] for row in rows]
 
     def delete(self, kind: str, ids: Iterable[str]) -> None:
-        with self._db:
+        with self._writing():
             self._db.executemany(
                 "DELETE FROM entities WHERE kind = ? AND id = ?", [(kind, id) for id in ids]
             )
@@ -336,7 +389,7 @@ class MetaStore:
     def execute(self, sql: str, params: Sequence[Any] = ()) -> int:
         """Runs a statement that writes, in its own transaction; returns the
         rows it changed."""
-        with self._db:
+        with self._writing():
             return self._db.execute(sql, tuple(params)).rowcount
 
     def select_ids(
@@ -392,7 +445,7 @@ class MetaStore:
         return None if row is None else json.loads(row[0])
 
     def record_source(self, path: str, image_ids: list[str]) -> None:
-        with self._db:
+        with self._writing():
             self._db.execute(
                 "INSERT OR REPLACE INTO sources (path, image_ids) VALUES (?, ?)",
                 (path, json.dumps(image_ids)),

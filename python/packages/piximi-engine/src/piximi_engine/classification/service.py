@@ -418,12 +418,24 @@ class ClassificationService:
 
     def delete(self, classifier_id: str) -> None:
         self.record(classifier_id)
+        self._remove(classifier_id)
+        self._announce()
+
+    def kinds_deleted(self, kind_ids: list[str]) -> None:
+        """A kind's classifiers go with it: their target no longer exists."""
+        targets = set(kind_ids)
+        gone = [record for record in self.list() if record.target_id in targets]
+        for record in gone:
+            self._remove(record.id)
+        if gone:
+            self._announce()
+
+    def _remove(self, classifier_id: str) -> None:
         self.meta.delete(KIND, [classifier_id])
         self._models.pop(classifier_id, None)
         path = self._weights_path(classifier_id)
         if path.is_file():
             path.unlink()
-        self._announce()
 
     async def fit(self, request: ClassifierFitRequest, ctx: HandlerContext) -> ClassifierFitSummary:
         engine = self.engine

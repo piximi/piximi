@@ -33,7 +33,28 @@ from piximi_schema.classification import (
     OptimizerSettings,
     PreprocessSettings,
 )
-from piximi_schema.entities import AnnotationObject, AnnotationVolume, Channel, ImageObject, Kind, Shape
+from piximi_schema.editing import (
+    AnnotationChanges,
+    AnnotationChangeSet,
+    AnnotationGeometryChange,
+    CommitResult,
+    EntityRef,
+    VolumeChanges,
+)
+from piximi_schema.entities import (
+    AnnotationObject,
+    AnnotationVolume,
+    BBox,
+    Channel,
+    Experiment,
+    ImageObject,
+    Kind,
+    Partition,
+    Plane,
+    Shape,
+)
+from piximi_schema.events import KindWithCategory
+from piximi_schema.unknown import generate_kind, generate_uuid
 from piximi_schema.segmentation import (
     ModelDescriptor,
     SegmentationRunRequest,
@@ -42,7 +63,35 @@ from piximi_schema.segmentation import (
 
 from .decode import SUPPORTED_SUFFIXES
 from .engine import ReferenceEngine
-from .rle import decode_mask
+from .rle import decode_mask, encode_mask
+
+
+class CommitConflictError(RuntimeError):
+    """A commit was refused because something it touched changed meanwhile."""
+
+    def __init__(self, result: CommitResult) -> None:
+        super().__init__(
+            "Refused: "
+            + ", ".join(f"{conflict.type} {conflict.id} {conflict.reason}" for conflict in result.conflicts)
+        )
+        self.result = result
+
+
+def _crop(mask: np.ndarray, bbox: BBox | None) -> tuple[BBox, np.ndarray]:
+    """A boolean mask as the engine stores it: the box it covers and the
+    mask cropped to it. A full-image mask is boxed by its foreground."""
+    mask = np.asarray(mask).astype(bool)
+    if bbox is None:
+        rows, cols = np.nonzero(mask)
+        if rows.size == 0:
+            raise ValueError("The mask has no foreground")
+        bbox = (int(cols.min()), int(rows.min()), int(cols.max()) + 1, int(rows.max()) + 1)
+        x0, y0, x1, y1 = bbox
+        return bbox, mask[y0:y1, x0:x1]
+    x0, y0, x1, y1 = bbox
+    if mask.shape != (y1 - y0, x1 - x0):
+        raise ValueError(f"The mask is {mask.shape}, not the {y1 - y0}x{x1 - x0} of its box")
+    return bbox, mask
 
 
 class Project:
@@ -118,6 +167,139 @@ class Project:
             region = labels[y0:y1, x0:x1]
             region[mask & (region == 0)] = label
         return labels
+
+    def kind(self, name_or_id: str) -> Kind:
+        for kind in self.kinds:
+            if name_or_id in (kind.id, kind.name):
+                return kind
+        raise KeyError(f"No kind {name_or_id!r}")
+
+    def annotation(self, id: str) -> AnnotationObject:
+        annotation = self.engine.meta.get("annotation", id, AnnotationObject)
+        if annotation is None:
+            raise KeyError(f"No annotation {id!r}")
+        return annotation
+
+    # ── Editing ──────────────────────────────────────────────────────────────
+    #
+    # Edits go through the same commit the annotator uses, so connected tabs
+    # see them, and an object changed in a tab meanwhile is reported as a
+    # conflict (``CommitConflictError``) rather than overwritten, unless
+    # ``force`` is given.
+
+    async def _commit(self, changeset: AnnotationChangeSet) -> CommitResult:
+        result = await self.engine.annotations_commit(changeset, HandlerContext(None))
+        if result.conflicts and not changeset.force:
+            raise CommitConflictError(result)
+        return result
+
+    async def create_kind(self, name: str) -> Kind:
+        kind, category = generate_kind(name)
+        [created] = await self.engine.kinds_create([KindWithCategory(kind=kind, category=category)])
+        return created
+
+    async def rename_kind(self, kind: str | Kind, name: str) -> Kind:
+        record = self.kind(kind) if isinstance(kind, str) else kind
+        return await self.engine.kinds_update(record.id, name)
+
+    async def delete_kind(self, kind: str | Kind) -> int:
+        """Removes the kind with its categories and classifiers; its objects
+        return to the unknown kind."""
+        record = self.kind(kind) if isinstance(kind, str) else kind
+        return await self.engine.kinds_delete([record.id])
+
+    async def add_annotation(
+        self,
+        image: str | ImageObject,
+        mask: np.ndarray,
+        *,
+        kind: str | Kind = "Unknown",
+        category: str | None = None,
+        bbox: BBox | None = None,
+        plane: int = 0,
+    ) -> AnnotationObject:
+        """Adds an object from a boolean mask (the whole image, or the box
+        ``bbox`` covers), of a kind (by name) and optionally one of its
+        categories (by name); returns it measured."""
+        record = self.image(image) if isinstance(image, str) else image
+        kind_record = self.kind(kind) if isinstance(kind, str) else kind
+        category_id = kind_record.unknown_category_id
+        if category is not None:
+            categories = [
+                c
+                for c in self.engine._categories()
+                if c.type == "annotation" and c.kind_id == kind_record.id and c.name == category
+            ]
+            if not categories:
+                raise KeyError(f"Kind {kind_record.name!r} has no category {category!r}")
+            category_id = categories[0].id
+        planes = sorted(self.engine.meta.list("plane", Plane, parent=record.id), key=lambda p: p.z_index)
+        plane_id = planes[plane].id
+        box, cropped = _crop(mask, bbox)
+        x0, y0, x1, y1 = box
+        volume = AnnotationVolume(
+            id=generate_uuid(), image_id=record.id, kind_id=kind_record.id, category_id=category_id
+        )
+        annotation = AnnotationObject(
+            id=generate_uuid(),
+            plane_id=plane_id,
+            image_id=record.id,
+            volume_id=volume.id,
+            partition=Partition.UNASSIGNED,
+            shape=Shape(planes=1, height=y1 - y0, width=x1 - x0, channels=record.shape.channels),
+            bounding_box=box,
+            encoded_mask=encode_mask(cropped),
+        )
+        await self._commit(
+            AnnotationChangeSet(
+                image_ids=[record.id],
+                volumes=VolumeChanges(created=[volume]),
+                annotations=AnnotationChanges(created=[annotation]),
+            )
+        )
+        return self.annotation(annotation.id)
+
+    async def set_mask(
+        self,
+        annotation: str | AnnotationObject,
+        mask: np.ndarray,
+        *,
+        bbox: BBox | None = None,
+        force: bool = False,
+    ) -> AnnotationObject:
+        """Redraws an object; refused if it changed since it was read."""
+        record = self.annotation(annotation) if isinstance(annotation, str) else annotation
+        box, cropped = _crop(mask, bbox)
+        await self._commit(
+            AnnotationChangeSet(
+                image_ids=[record.image_id],
+                annotations=AnnotationChanges(
+                    updated=[
+                        AnnotationGeometryChange(
+                            id=record.id, base_rev=record.rev, bounding_box=box, encoded_mask=encode_mask(cropped)
+                        )
+                    ]
+                ),
+                force=force,
+            )
+        )
+        return self.annotation(record.id)
+
+    async def delete_annotations(self, annotations: Iterable[str | AnnotationObject], *, force: bool = False) -> int:
+        records = [self.annotation(a) if isinstance(a, str) else a for a in annotations]
+        if not records:
+            return 0
+        result = await self._commit(
+            AnnotationChangeSet(
+                image_ids=sorted({record.image_id for record in records}),
+                annotations=AnnotationChanges(deleted=[EntityRef(id=r.id, base_rev=r.rev) for r in records]),
+                force=force,
+            )
+        )
+        return result.deleted
+
+    async def rename(self, name: str) -> Experiment:
+        return await self.engine.project_update(name)
 
     # ── Models ───────────────────────────────────────────────────────────────
 

@@ -107,3 +107,26 @@ def _fnv1a(data: bytes) -> int:
     for b in data:
         h = ((h ^ b) * 0x01000193) & 0xFFFFFFFF
     return h
+
+
+def test_revisions_come_from_one_persisted_counter(tmp_path: Path):
+    store = MetaStore(tmp_path / "meta.sqlite")
+    assert [store.next_rev(), store.next_rev()] == [1, 2]
+    store.close()
+    assert MetaStore(tmp_path / "meta.sqlite").next_rev() == 3
+
+
+def test_transaction_rolls_back_every_write_on_failure(tmp_path: Path):
+    store = MetaStore(tmp_path / "meta.sqlite")
+    store.put("image", image("keep", "keep"))
+    with pytest.raises(RuntimeError):
+        with store.transaction():
+            store.put("image", image("gone", "gone"))
+            store.delete("image", ["keep"])
+            with store.transaction():  # nested joins the outer one
+                store.put("image", image("also-gone", "also-gone"))
+            raise RuntimeError("boom")
+    assert store.ids("image") == ["keep"]
+    with store.transaction():
+        store.put("image", image("new", "new"))
+    assert store.ids("image") == ["keep", "new"]
