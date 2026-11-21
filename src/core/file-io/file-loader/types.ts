@@ -18,7 +18,7 @@ export type AnalyzeTiffOutput = {
   metadata: Record<string, string | number | undefined | string[]>;
 };
 
-export const DimensionOrder = [
+export const DIMENSION_ORDERS = [
   "xyczt",
   "xyctz",
   "xyzct",
@@ -35,7 +35,7 @@ export type OMEDims = {
   sizet: number;
   unit: string;
   pixeltype: string;
-  dimensionorder: (typeof DimensionOrder)[number];
+  dimensionorder: DimensionOrder;
   pixelsizex: number;
   pixelsizey: number;
   pixelsizez: number;
@@ -118,8 +118,9 @@ type UploadOptions = {
   skipPrepare?: boolean;
 };
 
+export type DimensionOrder = (typeof DIMENSION_ORDERS)[number];
 export type DimensionConfig = {
-  dimensionOrder: (typeof DimensionOrder)[number];
+  dimensionOrder: DimensionOrder;
   channels: number;
   slices: number;
   frames: number;

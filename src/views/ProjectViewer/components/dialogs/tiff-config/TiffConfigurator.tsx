@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import { DimensionOrder } from "core/file-io/file-loader/types";
+import { DIMENSION_ORDERS } from "core/file-io/file-loader/types";
 
 import { StyledSelect } from "components/inputs";
 
@@ -203,8 +203,8 @@ export const TiffConfigurator = ({
                   onChange={handleChangeDimensions("dimensionOrder")}
                   disabled={!!dims?.dimensionorder && !override}
                 >
-                  {DimensionOrder.map(
-                    (order: (typeof DimensionOrder)[number]) => (
+                  {DIMENSION_ORDERS.map(
+                    (order: (typeof DIMENSION_ORDERS)[number]) => (
                       <MenuItem
                         key={`tiff-dimension-order-${order}`}
                         value={order}

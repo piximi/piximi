@@ -16,6 +16,7 @@ import type {
   ImageSeriesResult,
   ReadStage,
   DimensionConfig,
+  DimensionOrder,
 } from "./types";
 
 // ============================================================
@@ -47,117 +48,56 @@ export async function loadImageFromBuffer(
   return forceStack(image);
 }
 
+/*
+ * Where frame (c, z, t) sits in a flat stack whose dimensions after x and y
+ * vary in `order`, the first listed fastest: the OME convention, so `xyczt`
+ * stores every channel of a plane together and the planes of a timepoint
+ * together (also how ImageJ writes hyperstacks). The engine's
+ * `frame_index` agrees, pinned by the shared `dims.json` vectors.
+ */
+export const frameIndex = (
+  order: DimensionOrder,
+  c: number,
+  z: number,
+  t: number,
+  sizes: { channels: number; slices: number; frames: number },
+): number => {
+  const size = { c: sizes.channels, z: sizes.slices, t: sizes.frames };
+  const coord = { c, z, t };
+  let index = 0;
+  let stride = 1;
+  for (const axis of order.slice(2).split("") as Array<"c" | "z" | "t">) {
+    index += coord[axis] * stride;
+    stride *= size[axis];
+  }
+  return index;
+};
+
 export const applyDimensionsToStack = (
   imageStack: IJSStack,
   dimensonSpec: DimensionConfig,
 ): Map<number, Map<number, Map<number, IJSImage>>> => {
   const { dimensionOrder, channels, slices, frames } = dimensonSpec;
-
-  const imageMap: Map<number, Map<number, Map<number, IJSImage>>> = new Map();
-
-  const addToStructure = (t: number, z: number, c: number, data: IJSImage) => {
-    if (imageMap.has(t)) {
-      const planes = imageMap.get(t)!;
-      if (planes.has(z)) {
-        const channels = planes.get(z)!;
-        if (channels.has(c)) {
-          throw new Error("duplicate Channel");
-        }
-        channels.set(c, data);
-      } else {
-        planes.set(z, new Map([[c, data]]));
-      }
-    } else {
-      imageMap.set(t, new Map([[z, new Map([[c, data]])]]));
-    }
-  };
-  switch (dimensionOrder) {
-    case "xyctz":
-      for (let c = 0; c < channels; c++) {
-        const cOffset = c * frames * slices;
-        for (let t = 0; t < frames; t++) {
-          const tOffset = t * slices;
-          for (let z = 0; z < slices; z++) {
-            // create empty array of expected size
-            const index = tOffset + cOffset + z;
-            const image = imageStack.getImage(index);
-            addToStructure(t, z, c, image);
-          }
-        }
-      }
-      break;
-    case "xyczt":
-      for (let c = 0; c < channels; c++) {
-        const cOffset = c * frames * slices;
-        for (let z = 0; z < slices; z++) {
-          const zOffset = z * frames;
-          for (let t = 0; t < frames; t++) {
-            // create empty array of expected size
-            const index = t + cOffset + zOffset;
-            const image = imageStack.getImage(index);
-            addToStructure(t, z, c, image);
-          }
-        }
-      }
-      break;
-    case "xytcz":
-      for (let t = 0; t < frames; t++) {
-        const tOffset = t * slices * channels;
-        for (let c = 0; c < channels; c++) {
-          const cOffset = c * slices;
-          for (let z = 0; z < slices; z++) {
-            // create empty array of expected size
-            const index = tOffset + cOffset + z;
-            const image = imageStack.getImage(index);
-            addToStructure(t, z, c, image);
-          }
-        }
-      }
-      break;
-    case "xytzc":
-      for (let t = 0; t < frames; t++) {
-        const tOffset = t * slices * channels;
-        for (let z = 0; z < slices; z++) {
-          const zOffset = z * channels;
-          for (let c = 0; c < channels; c++) {
-            // create empty array of expected size
-            const index = tOffset + zOffset + c;
-            const image = imageStack.getImage(index);
-            addToStructure(t, z, c, image);
-          }
-        }
-      }
-      break;
-    case "xyzct":
-      for (let z = 0; z < slices; z++) {
-        const zOffset = z * frames * channels;
-        for (let c = 0; c < channels; c++) {
-          const cOffset = c * frames;
-          for (let t = 0; t < frames; t++) {
-            // create empty array of expected size
-            const index = t + zOffset + cOffset;
-            const image = imageStack.getImage(index);
-            addToStructure(t, z, c, image);
-          }
-        }
-      }
-      break;
-    case "xyztc":
-      for (let z = 0; z < slices; z++) {
-        const zOffset = z * frames * channels;
-        for (let t = 0; t < frames; t++) {
-          const tOffset = t * channels;
-          for (let c = 0; c < channels; c++) {
-            // create empty array of expected size
-            const index = tOffset + zOffset + c;
-            const image = imageStack.getImage(index);
-            addToStructure(t, z, c, image);
-          }
-        }
-      }
-      break;
+  const expected = channels * slices * frames;
+  if (imageStack.size !== expected) {
+    throw new Error(
+      `${channels} channels x ${slices} slices x ${frames} frames needs ${expected} frames; the file has ${imageStack.size}`,
+    );
   }
 
+  const imageMap: Map<number, Map<number, Map<number, IJSImage>>> = new Map();
+  for (let t = 0; t < frames; t++) {
+    const planes = new Map<number, Map<number, IJSImage>>();
+    for (let z = 0; z < slices; z++) {
+      const channelMap = new Map<number, IJSImage>();
+      for (let c = 0; c < channels; c++) {
+        const index = frameIndex(dimensionOrder, c, z, t, dimensonSpec);
+        channelMap.set(c, imageStack.getImage(index));
+      }
+      planes.set(z, channelMap);
+    }
+    imageMap.set(t, planes);
+  }
   return imageMap;
 };
 
@@ -189,7 +129,7 @@ export const experimentFromStack = (
     name: `${name}-series`,
     bitDepth: config.bitDepth,
     shape: config.shape,
-    timeSeries: false,
+    timeSeries: imageSeriesMap.size > 1,
     activeImageId: "",
   };
   const channelMeta: ChannelMeta[] = Array.from(
@@ -218,7 +158,7 @@ export const experimentFromStack = (
   imageSeriesMap.forEach((imageMap, imageIDX) => {
     const image: ImageResult = {
       id: generateUUID(),
-      name: `${name}`,
+      name: series.timeSeries ? `${name}-t${imageIDX}` : name,
       seriesId: series.id,
       shape: config.shape,
       categoryId: UNKNOWN_IMAGE_CATEGORY_ID,

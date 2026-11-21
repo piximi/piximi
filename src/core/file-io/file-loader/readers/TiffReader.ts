@@ -4,7 +4,7 @@ import { XMLParser } from "fast-xml-parser";
 import { parseError } from "utils/logUtils";
 
 import { loadImageFromBuffer } from "../imageReaderUtils";
-import { MIME } from "../types";
+import { DIMENSION_ORDERS, MIME } from "../types";
 import { overallProgress } from "../progress";
 
 import type { GeoTIFFImage } from "geotiff";
@@ -12,6 +12,7 @@ import type { GeoTIFFImage } from "geotiff";
 import type { TaskError } from "utils/types";
 
 import type {
+  DimensionOrder,
   OMEDims,
   AnalyzeTiffOutput,
   IFileReader,
@@ -73,7 +74,12 @@ function getOMEDims(imageObj: Record<string, any>): Partial<OMEDims> {
   dims.sizet = Number(pixels.SizeT);
   dims.unit = pixels.PhysicalSizeXUnit ?? "";
   dims.pixeltype = pixels.Type ?? "";
-  dims.dimensionorder = pixels.DimensionOrder ?? "xyzct";
+  // OME writes the order in capitals ("XYCZT"); the loader's vocabulary is
+  // lower case, and anything outside it is left for the dialog to settle.
+  const order = String(pixels.DimensionOrder ?? "").toLowerCase();
+  dims.dimensionorder = (DIMENSION_ORDERS as readonly string[]).includes(order)
+    ? (order as DimensionOrder)
+    : undefined;
   dims.pixelsizex = Number(pixels.PhysicalSizeX);
   dims.pixelsizey = Number(pixels.PhysicalSizeY);
   dims.pixelsizez = Number(pixels.PhysicalSizeZ);
