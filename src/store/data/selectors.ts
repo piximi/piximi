@@ -242,35 +242,6 @@ export const selectExtendedImageByIds = createSelector(
     return extendedImages;
   },
 );
-export const selectExtendedImageEntities = createSelector(
-  [
-    planeSelectors.selectEntities,
-    channelMetaSelectors.selectEntities,
-    selectChannelsByPlane,
-    categorySelectors.selectEntities,
-    imageSelectors.selectAll,
-  ],
-  (
-    planeDict,
-    chMetaDict,
-    channelsByPlane,
-    catDict,
-    images,
-  ): Record<string, ExtendedImageObject> => {
-    const extIms: Record<string, ExtendedImageObject> = {};
-    images.forEach((image) => {
-      const ext = buildExtendedImage(
-        image,
-        planeDict,
-        chMetaDict,
-        channelsByPlane,
-        catDict,
-      );
-      if (ext) extIms[ext.id] = ext;
-    });
-    return extIms;
-  },
-);
 export const selectExtendedImages = createSelector(
   [
     planeSelectors.selectEntities,
@@ -391,41 +362,6 @@ const buildExtendedAnnotation = (
     ...volProps,
   };
 };
-export const selectExtendedAnnotationEntities = createSelector(
-  [
-    annotationSelectors.selectAll,
-    annotationVolumeSelectors.selectEntities,
-    imageSelectors.selectEntities,
-    planeSelectors.selectEntities,
-    channelMetaSelectors.selectEntities,
-    selectChannelsByPlane,
-    categorySelectors.selectEntities,
-  ],
-  (
-    anns,
-    annVols,
-    imageDict,
-    planeDict,
-    chMetaDict,
-    channelsByPlane,
-    catDict,
-  ): Record<string, ExtendedAnnotationObject> => {
-    const exts: Record<string, ExtendedAnnotationObject> = {};
-    anns.forEach((a) => {
-      const ext = buildExtendedAnnotation(
-        a,
-        annVols,
-        imageDict,
-        planeDict,
-        chMetaDict,
-        channelsByPlane,
-        catDict,
-      );
-      if (ext) exts[ext.id] = ext;
-    });
-    return exts;
-  },
-);
 export const selectAllExtendedAnnotations = createSelector(
   [
     annotationSelectors.selectAll,
