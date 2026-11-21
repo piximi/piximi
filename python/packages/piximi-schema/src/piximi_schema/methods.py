@@ -24,6 +24,19 @@ from .classification import (
     ClassifierUpdateRequest,
     EvaluationResult,
 )
+from .editing import (
+    AnnotationsCommitParams,
+    AnnotationsUpdateParams,
+    CommitResult,
+    ExperimentResult,
+    ImagesResult,
+    ImagesUpdateParams,
+    KindsCreateParams,
+    KindsDeleteParams,
+    KindsResult,
+    KindUpdateParams,
+    ProjectUpdateParams,
+)
 from .entities import Category
 from .events import EVENT_TYPES
 from .jobs import Job
@@ -237,6 +250,13 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("categories/create", CategoriesCreateParams, CategoriesResult),
     MethodSpec("categories/update", CategoryUpdateParams, CategoriesResult),
     MethodSpec("categories/delete", CategoriesDeleteParams, DeletedResult),
+    MethodSpec("annotations/commit", AnnotationsCommitParams, CommitResult, progress=ProgressValue),
+    MethodSpec("annotations/update", AnnotationsUpdateParams, ChangedResult),
+    MethodSpec("images/update", ImagesUpdateParams, ImagesResult),
+    MethodSpec("kinds/create", KindsCreateParams, KindsResult),
+    MethodSpec("kinds/update", KindUpdateParams, KindsResult),
+    MethodSpec("kinds/delete", KindsDeleteParams, DeletedResult),
+    MethodSpec("project/update", ProjectUpdateParams, ExperimentResult),
     MethodSpec("render/image", RenderImageParams, RenderedImage),
     MethodSpec(
         "render/thumbnails",

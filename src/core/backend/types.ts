@@ -1,4 +1,5 @@
 import type {
+  AnnotationCategory,
   AnnotationObject,
   AnnotationVolume,
   BBox,
@@ -59,6 +60,8 @@ export interface Backend {
   readonly images: BackendImages;
   readonly annotations: BackendAnnotations;
   readonly categories: BackendCategories;
+  readonly kinds: BackendKinds;
+  readonly project: BackendProject;
   readonly segmentation?: BackendSegmentation;
   readonly classification?: BackendClassification;
   readonly measurements?: BackendMeasurements;
@@ -285,13 +288,83 @@ export type VolumeUpdate = Omit<Predictable, "partition"> & {
 
 export type AnnotationUpdate = { id: string; partition: Partition };
 
+/* Fields of an image a user edits directly; absent ones stay. */
+export type ImageChange = {
+  id: string;
+  name?: string;
+  partition?: Partition;
+  activePlaneId?: string;
+};
+
 export interface BackendImages {
   /* Each image with its planes, channels and objects. */
   delete(query: ImageQuery): Promise<Deleted>;
   /* Moves every match to the category. A hand-made change: the shared
    * partition and correction rules apply (`core/entities/prediction.ts`). */
   categorize(query: ImageQuery, categoryId: string): Promise<Changed>;
+  /* Renames, re-partitions or changes the active plane; announced as
+   * `images/didChange`. Resolves with the images as they are now. */
+  update(updates: ImageChange[]): Promise<ImageObject[]>;
 }
+
+// ── Editing ──────────────────────────────────────────────────────────────────
+//
+// A viewing session edits a copy of a few images' annotations and commits
+// the difference in one changeset. Entries that touch existing rows carry
+// the revision they were read at (`baseRev`); the backend refuses the whole
+// set with the conflicts when any has moved meanwhile, unless `force`d.
+
+/* An existing row and the revision it was read at; without `baseRev` the
+ * check is skipped (a backend without revisions). */
+export type EntityRef = { id: string; baseRev?: number };
+
+/* A recategorized object: the kind follows the category and every
+ * annotation of the volume follows the partition rule, as `categorize`. */
+export type VolumeCategoryChange = EntityRef & { categoryId: string };
+
+/* A redrawn object: the box and the mask cropped to it. The backend derives
+ * the shape and measures the object again. */
+export type AnnotationGeometryChange = EntityRef & {
+  boundingBox: BBox;
+  encodedMask: number[];
+};
+
+export type AnnotationChangeSet = {
+  /* The images the session edited; every entry belongs to one of them. */
+  imageIds: string[];
+  volumes: {
+    /* Made by the caller with fresh ids; kept as given. */
+    created: AnnotationVolume[];
+    updated: VolumeCategoryChange[];
+    /* A volume left without annotations goes regardless. */
+    deleted: EntityRef[];
+  };
+  annotations: {
+    /* With their masks; measured by the backend. */
+    created: AnnotationObject[];
+    updated: AnnotationGeometryChange[];
+    deleted: EntityRef[];
+  };
+  /* Apply even where a `baseRev` is stale; an entry whose row is gone is
+   * skipped and listed. */
+  force?: boolean;
+};
+
+export type CommitConflict = {
+  type: "annotation" | "volume";
+  id: string;
+  /* `modified`: the row moved past `baseRev`; `missing`: the row is gone. */
+  reason: "modified" | "missing";
+};
+
+/* A non-empty `conflicts` means nothing was applied, unless the changeset
+ * was forced, when it lists what was skipped as missing. */
+export type CommitResult = {
+  created: number;
+  updated: number;
+  deleted: number;
+  conflicts: CommitConflict[];
+};
 
 export interface BackendAnnotations {
   /* Each annotation, and any volume left without one. */
@@ -299,6 +372,34 @@ export interface BackendAnnotations {
   /* Moves the volume of every match to the category, which also sets its
    * kind; every annotation of the volume follows the partition rule. */
   categorize(query: AnnotationQuery, categoryId: string): Promise<Changed>;
+  /* Applies a session's changes atomically and measures what it made or
+   * redrew, announcing `annotations/didAdd`, `annotations/didUpdate` (with
+   * `headers` for redrawn objects) and `annotations/didRemove`. Progress
+   * covers the measuring. */
+  commit(
+    changeSet: AnnotationChangeSet,
+    options?: CallOptions,
+  ): Promise<CommitResult>;
+  /* Partitions set by hand; announced as `annotations/didUpdate`. */
+  update(updates: AnnotationUpdate[]): Promise<Changed>;
+}
+
+export interface BackendKinds {
+  /* Each with its unknown category, made by the caller with fresh ids;
+   * announced as `kinds/didAdd`. */
+  create(
+    kinds: Array<{ kind: Kind; category: AnnotationCategory }>,
+  ): Promise<Kind[]>;
+  /* Renames; announced as `kinds/didChange`. */
+  update(id: string, name: string): Promise<Kind>;
+  /* Objects of a deleted kind return to the reserved unknown kind; its
+   * categories and classifiers go with it. The reserved kind stays. */
+  delete(ids: string[]): Promise<Deleted>;
+}
+
+export interface BackendProject {
+  /* Renames the project; announced as `project/didChange`. */
+  rename(name: string): Promise<Experiment>;
 }
 
 export interface BackendCategories {

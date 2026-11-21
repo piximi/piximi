@@ -15,6 +15,7 @@ from typing import Protocol
 
 from piximi_schema.capabilities import Capability
 from piximi_schema.classification import (
+    AnnotationUpdate,
     ChangedResult,
     Classifier,
     ClassifierCreateRequest,
@@ -27,7 +28,12 @@ from piximi_schema.classification import (
     ClassifierUpdateRequest,
     EvaluationResult,
 )
-from piximi_schema.entities import Category
+from piximi_schema.editing import (
+    AnnotationChangeSet,
+    CommitResult,
+    ImageChange,
+)
+from piximi_schema.entities import Category, Experiment, ImageObject, Kind
 from piximi_schema.events import (
     AnnotationsDidAdd,
     AnnotationsDidRemove,
@@ -36,11 +42,16 @@ from piximi_schema.events import (
     ClassifiersDidChange,
     ClassifiersDidEpoch,
     ImagesDidAdd,
+    ImagesDidChange,
     ImagesDidRemove,
     ImagesDidUpdate,
     JobsDidUpdate,
     KindsDidAdd,
+    KindsDidChange,
+    KindsDidRemove,
+    KindWithCategory,
     ModelsDidChange,
+    ProjectDidChange,
 )
 from piximi_schema.jobs import Job
 from piximi_schema.measurements import (
@@ -74,15 +85,19 @@ from .peer import HandlerContext
 
 BackendEvent = (
     KindsDidAdd
+    | KindsDidChange
+    | KindsDidRemove
     | AnnotationsDidAdd
     | JobsDidUpdate
     | ImagesDidAdd
+    | ImagesDidChange
     | ModelsDidChange
     | ImagesDidRemove
     | AnnotationsDidRemove
     | ImagesDidUpdate
     | AnnotationsDidUpdate
     | CategoriesDidChange
+    | ProjectDidChange
     | ClassifiersDidChange
     | ClassifiersDidEpoch
 )
@@ -172,6 +187,44 @@ class Engine(Protocol):
     async def categories_delete(self, ids: list[str]) -> int:
         """Removes categories, returning their items to the unknown one of
         their kind; the reserved unknown categories stay. Returns how many."""
+        ...
+
+    # ── Editing ─────────────────────────────────────────────────────────────
+
+    async def annotations_commit(self, changeset: AnnotationChangeSet, ctx: HandlerContext) -> CommitResult:
+        """Applies a viewing session's changes atomically, refusing the whole
+        set with the conflicts when a ``baseRev`` has moved (unless forced);
+        measures created and redrawn objects; announces ``annotations/didAdd``,
+        ``annotations/didUpdate`` (headers for redrawn objects) and
+        ``annotations/didRemove``. See ``piximi_schema.editing``."""
+        ...
+
+    async def annotations_update(self, updates: list[AnnotationUpdate]) -> int:
+        """Sets partitions by hand; announces ``annotations/didUpdate``."""
+        ...
+
+    async def images_update(self, updates: list[ImageChange]) -> list[ImageObject]:
+        """Renames, re-partitions or changes the active plane of images;
+        announces ``images/didChange``; returns the images as they are now."""
+        ...
+
+    async def kinds_create(self, kinds: list[KindWithCategory]) -> list[Kind]:
+        """Adds kinds with their unknown categories; announces ``kinds/didAdd``."""
+        ...
+
+    async def kinds_update(self, id: str, name: str) -> Kind:
+        """Renames a kind; announces ``kinds/didChange``."""
+        ...
+
+    async def kinds_delete(self, ids: list[str]) -> int:
+        """Removes kinds with their categories and classifiers, moving their
+        objects to the reserved unknown kind; the reserved kind stays.
+        Announces ``annotations/didUpdate``, ``categories/didChange``,
+        ``classifiers/didChange`` and ``kinds/didRemove``. Returns how many."""
+        ...
+
+    async def project_update(self, name: str) -> Experiment:
+        """Renames the project; announces ``project/didChange``."""
         ...
 
     # ── Render ──────────────────────────────────────────────────────────────

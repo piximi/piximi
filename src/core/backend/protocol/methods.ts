@@ -4,7 +4,7 @@
  */
 import type * as P from "./generated";
 
-export const PROTOCOL_VERSION = "2.1.0";
+export const PROTOCOL_VERSION = "2.2.0";
 
 /* Requests, keyed by method name. `progress` is the `$/progress` payload. */
 export type ProtocolMethods = {
@@ -119,6 +119,48 @@ export type ProtocolMethods = {
   "categories/delete": {
     params: P.CategoriesDeleteParams;
     result: P.DeletedResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "annotations/commit": {
+    params: P.AnnotationsCommitParams;
+    result: P.CommitResult;
+    progress: P.ProgressValue;
+    direction: "client->server";
+  };
+  "annotations/update": {
+    params: P.AnnotationsUpdateParams;
+    result: P.ChangedResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "images/update": {
+    params: P.ImagesUpdateParams;
+    result: P.ImagesResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "kinds/create": {
+    params: P.KindsCreateParams;
+    result: P.KindsResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "kinds/update": {
+    params: P.KindUpdateParams;
+    result: P.KindsResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "kinds/delete": {
+    params: P.KindsDeleteParams;
+    result: P.DeletedResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "project/update": {
+    params: P.ProjectUpdateParams;
+    result: P.ExperimentResult;
     progress: void;
     direction: "client->server";
   };
@@ -245,12 +287,18 @@ export type ProtocolNotifications = {
   "$/progress": { params: P.ProgressParams; direction: "server->client" };
   "$/ping": { params: void; direction: "client->server" };
   "kinds/didAdd": { params: P.KindsDidAdd; direction: "server->client" };
+  "kinds/didChange": { params: P.KindsDidChange; direction: "server->client" };
+  "kinds/didRemove": { params: P.KindsDidRemove; direction: "server->client" };
   "annotations/didAdd": {
     params: P.AnnotationsDidAdd;
     direction: "server->client";
   };
   "jobs/didUpdate": { params: P.JobsDidUpdate; direction: "server->client" };
   "images/didAdd": { params: P.ImagesDidAdd; direction: "server->client" };
+  "images/didChange": {
+    params: P.ImagesDidChange;
+    direction: "server->client";
+  };
   "models/didChange": {
     params: P.ModelsDidChange;
     direction: "server->client";
@@ -273,6 +321,10 @@ export type ProtocolNotifications = {
   };
   "categories/didChange": {
     params: P.CategoriesDidChange;
+    direction: "server->client";
+  };
+  "project/didChange": {
+    params: P.ProjectDidChange;
     direction: "server->client";
   };
   "classifiers/didChange": {

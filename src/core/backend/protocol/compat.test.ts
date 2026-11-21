@@ -45,11 +45,18 @@ import type { Capability } from "../capabilities";
 import type { BackendEvent } from "../events";
 import type { Job } from "../jobs";
 import type {
+  AnnotationChangeSet,
   AnnotationCountGroup,
+  AnnotationGeometryChange,
   AnnotationQuery,
   AnnotationSort,
   AnnotationUpdate,
   Changed,
+  CommitConflict,
+  CommitResult,
+  EntityRef,
+  ImageChange,
+  VolumeCategoryChange,
   ChannelDisplay,
   ClassifierCreateRequest,
   ClassifierExport,
@@ -226,6 +233,66 @@ type Checks = [
       Extract<BackendEvent, { type: "annotations/didRemove" }>
     >
   >,
+  Assert<
+    Equivalent<
+      P.KindsDidChange,
+      Extract<BackendEvent, { type: "kinds/didChange" }>
+    >
+  >,
+  Assert<
+    Equivalent<
+      P.KindsDidRemove,
+      Extract<BackendEvent, { type: "kinds/didRemove" }>
+    >
+  >,
+  Assert<
+    Equivalent<
+      P.ImagesDidChange,
+      Omit<Extract<BackendEvent, { type: "images/didChange" }>, "images"> & {
+        images: WithPartition<ImageObject>[];
+      }
+    >
+  >,
+  Assert<
+    Equivalent<
+      P.ProjectDidChange,
+      Extract<BackendEvent, { type: "project/didChange" }>
+    >
+  >,
+  Assert<
+    Equivalent<
+      Omit<P.AnnotationsDidUpdate, "annotations" | "headers">,
+      Omit<
+        Extract<BackendEvent, { type: "annotations/didUpdate" }>,
+        "annotations" | "headers"
+      >
+    >
+  >,
+
+  // ── Editing ───────────────────────────────────────────────────────────────
+  Assert<Equivalent<P.EntityRef, EntityRef>>,
+  Assert<Equivalent<P.VolumeCategoryChange, VolumeCategoryChange>>,
+  Assert<Equivalent<P.AnnotationGeometryChange, AnnotationGeometryChange>>,
+  Assert<Equivalent<P.CommitConflict, CommitConflict>>,
+  Assert<Equivalent<P.CommitResult, CommitResult>>,
+  // The wire defaults each list to empty; the domain spells them out.
+  Assert<Equivalent<P.AnnotationsCommitParams["imageIds"], string[]>>,
+  Assert<Equivalent<P.AnnotationsCommitParams["force"], boolean | undefined>>,
+  Assert<Equivalent<Required<P.VolumeChanges>, AnnotationChangeSet["volumes"]>>,
+  Assert<
+    Equivalent<
+      Required<Omit<P.AnnotationChanges, "created">>,
+      Omit<AnnotationChangeSet["annotations"], "created">
+    >
+  >,
+  Assert<
+    Equivalent<
+      P.ImageChange,
+      Omit<ImageChange, "partition"> & { partition?: Values<Partition> }
+    >
+  >,
+  Assert<Equivalent<P.KindsResult, { kinds: Kind[] }>>,
+  Assert<Equivalent<P.ExperimentResult, { experiment: Experiment }>>,
 
   // ── Query and render ──────────────────────────────────────────────────────
   Assert<Equivalent<P.PageRequest, PageRequest>>,

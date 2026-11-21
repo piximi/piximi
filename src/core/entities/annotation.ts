@@ -9,6 +9,10 @@ export type AnnotationVolume = Omit<Predictable, "partition"> & {
   kindId: string;
   categoryId: string;
   timepoint?: number;
+  /* The backend's revision of the category and kind, sent back as a
+   * commit's `baseRev` so a change made elsewhere meanwhile is noticed;
+   * absent on a backend that keeps no revisions. */
+  rev?: number;
 };
 export type AnnotationVolumeEntities = Record<string, AnnotationVolume>;
 
@@ -41,6 +45,9 @@ export type AnnotationObject = {
     string,
     Partial<Record<IntensityMeasurement, number>>
   >;
+  /* The backend's revision of the geometry (bounding box and mask);
+   * measurements and partitions do not move it. See `AnnotationVolume.rev`. */
+  rev?: number;
 };
 
 export type ExtendedAnnotationObject = AnnotationObject &

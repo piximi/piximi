@@ -4,12 +4,15 @@ import type {
   AnnotationVolume,
   Category,
   ChannelMeta,
+  Experiment,
+  ImageObject,
   Kind,
 } from "core/entities";
 import type { Classifier, RunHistoryEpoch } from "core/dl/classification/types";
 
 import type { Job } from "./jobs";
 import type {
+  AnnotationHeader,
   AnnotationUpdate,
   ImageRecord,
   ImageUpdate,
@@ -28,6 +31,11 @@ export type BackendEvent =
       type: "kinds/didAdd";
       kinds: Array<{ kind: Kind; category: AnnotationCategory }>;
     }
+  /* A kind was renamed; carries the whole list. */
+  | { type: "kinds/didChange"; kinds: Kind[] }
+  /* Kinds are gone with their categories and classifiers; their objects
+   * moved to the reserved unknown kind (announced as `annotations/didUpdate`). */
+  | { type: "kinds/didRemove"; kindIds: string[] }
   | {
       type: "annotations/didAdd";
       volumes: AnnotationVolume[];
@@ -55,13 +63,19 @@ export type BackendEvent =
     }
   /* Images were categorized, or had partitions or predictions written. */
   | { type: "images/didUpdate"; updates: ImageUpdate[] }
+  /* Images were renamed, re-partitioned by hand or had their active plane
+   * changed; carries each one whole. */
+  | { type: "images/didChange"; images: ImageObject[] }
   | {
       type: "annotations/didUpdate";
       volumes: VolumeUpdate[];
       annotations: AnnotationUpdate[];
+      /* Objects redrawn or measured by a commit, whole; masks on demand. */
+      headers?: AnnotationHeader[];
     }
   /* A category was created, edited or deleted; carries the whole list. */
   | { type: "categories/didChange"; categories: Category[] }
+  | { type: "project/didChange"; experiment: Experiment }
   /* A classifier was created, updated, trained, deleted or imported, or a
    * job began or finished with it; carries every classifier. */
   | { type: "classifiers/didChange"; classifiers: Classifier[] }

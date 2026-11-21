@@ -15,10 +15,13 @@ from .classification import (
 )
 from .entities import (
     AnnotationCategory,
+    AnnotationHeader,
     AnnotationObject,
     AnnotationVolume,
     Category,
     ChannelMeta,
+    Experiment,
+    ImageObject,
     Kind,
 )
 from .jobs import Job
@@ -90,11 +93,42 @@ class ImagesDidUpdate(WireModel):
 class AnnotationsDidUpdate(WireModel):
     """Objects were categorized or had partitions or predictions written:
     the category and prediction live on the volume, the partition on each
-    annotation."""
+    annotation. Objects redrawn or measured by a commit come as whole
+    headers; their masks are fetched on demand."""
 
     type: Literal["annotations/didUpdate"]
     volumes: list[VolumeUpdate]
     annotations: list[AnnotationUpdate]
+    headers: list[AnnotationHeader] | None = None
+
+
+class KindsDidChange(WireModel):
+    """A kind was renamed. Carries the whole list, which is short."""
+
+    type: Literal["kinds/didChange"]
+    kinds: list[Kind]
+
+
+class KindsDidRemove(WireModel):
+    """Kinds are gone with their categories and classifiers; their objects
+    were moved to the reserved unknown kind (announced separately as
+    ``annotations/didUpdate``)."""
+
+    type: Literal["kinds/didRemove"]
+    kind_ids: list[str]
+
+
+class ImagesDidChange(WireModel):
+    """Images were renamed, re-partitioned by hand or had their active
+    plane changed; carries each one whole."""
+
+    type: Literal["images/didChange"]
+    images: list[ImageObject]
+
+
+class ProjectDidChange(WireModel):
+    type: Literal["project/didChange"]
+    experiment: Experiment
 
 
 class CategoriesDidChange(WireModel):
@@ -124,15 +158,19 @@ class ClassifiersDidEpoch(WireModel):
 
 BackendEvent = Annotated[
     KindsDidAdd
+    | KindsDidChange
+    | KindsDidRemove
     | AnnotationsDidAdd
     | JobsDidUpdate
     | ImagesDidAdd
+    | ImagesDidChange
     | ModelsDidChange
     | ImagesDidRemove
     | AnnotationsDidRemove
     | ImagesDidUpdate
     | AnnotationsDidUpdate
     | CategoriesDidChange
+    | ProjectDidChange
     | ClassifiersDidChange
     | ClassifiersDidEpoch,
     Field(discriminator="type"),
@@ -140,15 +178,19 @@ BackendEvent = Annotated[
 
 EVENT_TYPES: tuple[type[WireModel], ...] = (
     KindsDidAdd,
+    KindsDidChange,
+    KindsDidRemove,
     AnnotationsDidAdd,
     JobsDidUpdate,
     ImagesDidAdd,
+    ImagesDidChange,
     ModelsDidChange,
     ImagesDidRemove,
     AnnotationsDidRemove,
     ImagesDidUpdate,
     AnnotationsDidUpdate,
     CategoriesDidChange,
+    ProjectDidChange,
     ClassifiersDidChange,
     ClassifiersDidEpoch,
 )

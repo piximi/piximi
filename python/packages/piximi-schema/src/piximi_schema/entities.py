@@ -200,6 +200,10 @@ class AnnotationVolume(WireModel):
     prediction_confidence: float | None = None
     predicted_at_run_id: str | None = None
     prediction_corrected: PredictionCorrection | None = None
+    rev: int | None = None
+    """The backend's revision of the volume's category and kind, carried
+    back as ``baseRev`` by a commit so a change made elsewhere meanwhile is
+    noticed; absent on a backend that does not track revisions."""
 
 
 class AnnotationHeader(WireModel):
@@ -214,6 +218,10 @@ class AnnotationHeader(WireModel):
     bounding_box: BBox
     features: dict[ObjectFeature, float] | None = None
     intensity_measurements: dict[str, dict[IntensityMeasurement, float]] | None = None
+    rev: int | None = None
+    """The backend's revision of the annotation's geometry (bounding box and
+    mask); measurements and partitions do not move it. See
+    ``AnnotationVolume.rev``."""
 
 
 class AnnotationObject(AnnotationHeader):

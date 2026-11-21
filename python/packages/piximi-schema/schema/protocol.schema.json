@@ -5,7 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {},
-  "protocolVersion": "2.1.0",
+  "protocolVersion": "2.2.0",
   "$defs": {
     "AnnotationCategory": {
       "additionalProperties": false,
@@ -41,6 +41,34 @@
       "title": "AnnotationCategory",
       "type": "object"
     },
+    "AnnotationChanges": {
+      "additionalProperties": false,
+      "properties": {
+        "created": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AnnotationObject"
+          },
+          "type": "array"
+        },
+        "updated": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AnnotationGeometryChange"
+          },
+          "type": "array"
+        },
+        "deleted": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EntityRef"
+          },
+          "type": "array"
+        }
+      },
+      "title": "AnnotationChanges",
+      "type": "object"
+    },
     "AnnotationCountGroup": {
       "enum": [
         "category",
@@ -64,6 +92,51 @@
         "query"
       ],
       "title": "AnnotationCountsParams",
+      "type": "object"
+    },
+    "AnnotationGeometryChange": {
+      "additionalProperties": false,
+      "description": "A redrawn object: the bounding box and the mask cropped to it. The\nbackend derives the shape and measures the object again.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "baseRev": {
+          "type": "integer"
+        },
+        "boundingBox": {
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array",
+          "items": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "additionalItems": false
+        },
+        "encodedMask": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "boundingBox",
+        "encodedMask"
+      ],
+      "title": "AnnotationGeometryChange",
       "type": "object"
     },
     "AnnotationHeader": {
@@ -128,6 +201,9 @@
             "type": "object"
           },
           "type": "object"
+        },
+        "rev": {
+          "type": "integer"
         }
       },
       "required": [
@@ -219,6 +295,9 @@
             "type": "object"
           },
           "type": "object"
+        },
+        "rev": {
+          "type": "integer"
         },
         "encodedMask": {
           "items": {
@@ -401,6 +480,9 @@
         },
         "predictionCorrected": {
           "$ref": "#/$defs/PredictionCorrection"
+        },
+        "rev": {
+          "type": "integer"
         }
       },
       "required": [
@@ -427,6 +509,35 @@
         "categoryId"
       ],
       "title": "AnnotationsCategorizeParams",
+      "type": "object"
+    },
+    "AnnotationsCommitParams": {
+      "additionalProperties": false,
+      "properties": {
+        "imageIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "volumes": {
+          "$ref": "#/$defs/VolumeChanges"
+        },
+        "annotations": {
+          "$ref": "#/$defs/AnnotationChanges"
+        },
+        "force": {
+          "default": false,
+          "type": "boolean"
+        },
+        "progressToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "imageIds"
+      ],
+      "title": "AnnotationsCommitParams",
       "type": "object"
     },
     "AnnotationsDeleteParams": {
@@ -500,7 +611,7 @@
     },
     "AnnotationsDidUpdate": {
       "additionalProperties": false,
-      "description": "Objects were categorized or had partitions or predictions written:\nthe category and prediction live on the volume, the partition on each\nannotation.",
+      "description": "Objects were categorized or had partitions or predictions written:\nthe category and prediction live on the volume, the partition on each\nannotation. Objects redrawn or measured by a commit come as whole\nheaders; their masks are fetched on demand.",
       "properties": {
         "type": {
           "const": "annotations/didUpdate",
@@ -515,6 +626,12 @@
         "annotations": {
           "items": {
             "$ref": "#/$defs/AnnotationUpdate"
+          },
+          "type": "array"
+        },
+        "headers": {
+          "items": {
+            "$ref": "#/$defs/AnnotationHeader"
           },
           "type": "array"
         }
@@ -545,6 +662,22 @@
         "page"
       ],
       "title": "AnnotationsParams",
+      "type": "object"
+    },
+    "AnnotationsUpdateParams": {
+      "additionalProperties": false,
+      "properties": {
+        "updates": {
+          "items": {
+            "$ref": "#/$defs/AnnotationUpdate"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "updates"
+      ],
+      "title": "AnnotationsUpdateParams",
       "type": "object"
     },
     "Auth": {
@@ -1467,6 +1600,63 @@
       "title": "ClassifiersResult",
       "type": "object"
     },
+    "CommitConflict": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "annotation",
+            "volume"
+          ],
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "modified",
+            "missing"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "reason"
+      ],
+      "title": "CommitConflict",
+      "type": "object"
+    },
+    "CommitResult": {
+      "additionalProperties": false,
+      "properties": {
+        "created": {
+          "type": "integer"
+        },
+        "updated": {
+          "type": "integer"
+        },
+        "deleted": {
+          "type": "integer"
+        },
+        "conflicts": {
+          "items": {
+            "$ref": "#/$defs/CommitConflict"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "created",
+        "updated",
+        "deleted",
+        "conflicts"
+      ],
+      "title": "CommitResult",
+      "type": "object"
+    },
     "ConfidenceRange": {
       "additionalProperties": false,
       "description": "Keeps items whose prediction confidence lies strictly between ``min``\nand ``max``; items without one are left out.",
@@ -1550,6 +1740,23 @@
         "deleted"
       ],
       "title": "DeletedResult",
+      "type": "object"
+    },
+    "EntityRef": {
+      "additionalProperties": false,
+      "description": "An existing row and the revision it was read at; a missing\n``baseRev`` skips the check (a backend without revisions).",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "baseRev": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "EntityRef",
       "type": "object"
     },
     "ErrorCode": {
@@ -1659,6 +1866,19 @@
       "title": "Experiment",
       "type": "object"
     },
+    "ExperimentResult": {
+      "additionalProperties": false,
+      "properties": {
+        "experiment": {
+          "$ref": "#/$defs/Experiment"
+        }
+      },
+      "required": [
+        "experiment"
+      ],
+      "title": "ExperimentResult",
+      "type": "object"
+    },
     "IdsResult": {
       "additionalProperties": false,
       "properties": {
@@ -1703,6 +1923,29 @@
         "isUnknown"
       ],
       "title": "ImageCategory",
+      "type": "object"
+    },
+    "ImageChange": {
+      "additionalProperties": false,
+      "description": "Fields of an image a user edits directly; absent ones stay.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "partition": {
+          "$ref": "#/$defs/Partition"
+        },
+        "activePlaneId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "ImageChange",
       "type": "object"
     },
     "ImageCountGroup": {
@@ -2040,6 +2283,28 @@
       "title": "ImagesDidAdd",
       "type": "object"
     },
+    "ImagesDidChange": {
+      "additionalProperties": false,
+      "description": "Images were renamed, re-partitioned by hand or had their active\nplane changed; carries each one whole.",
+      "properties": {
+        "type": {
+          "const": "images/didChange",
+          "type": "string"
+        },
+        "images": {
+          "items": {
+            "$ref": "#/$defs/ImageObject"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "images"
+      ],
+      "title": "ImagesDidChange",
+      "type": "object"
+    },
     "ImagesDidRemove": {
       "additionalProperties": false,
       "description": "Images are gone, with everything under them; the ids are enough for\na client to drop what it mirrors.",
@@ -2102,6 +2367,38 @@
         "page"
       ],
       "title": "ImagesParams",
+      "type": "object"
+    },
+    "ImagesResult": {
+      "additionalProperties": false,
+      "properties": {
+        "images": {
+          "items": {
+            "$ref": "#/$defs/ImageObject"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "images"
+      ],
+      "title": "ImagesResult",
+      "type": "object"
+    },
+    "ImagesUpdateParams": {
+      "additionalProperties": false,
+      "properties": {
+        "updates": {
+          "items": {
+            "$ref": "#/$defs/ImageChange"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "updates"
+      ],
+      "title": "ImagesUpdateParams",
       "type": "object"
     },
     "InitializeParams": {
@@ -2309,6 +2606,23 @@
       "title": "Kind",
       "type": "object"
     },
+    "KindUpdateParams": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "KindUpdateParams",
+      "type": "object"
+    },
     "KindWithCategory": {
       "additionalProperties": false,
       "properties": {
@@ -2324,6 +2638,38 @@
         "category"
       ],
       "title": "KindWithCategory",
+      "type": "object"
+    },
+    "KindsCreateParams": {
+      "additionalProperties": false,
+      "properties": {
+        "kinds": {
+          "items": {
+            "$ref": "#/$defs/KindWithCategory"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kinds"
+      ],
+      "title": "KindsCreateParams",
+      "type": "object"
+    },
+    "KindsDeleteParams": {
+      "additionalProperties": false,
+      "properties": {
+        "ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "title": "KindsDeleteParams",
       "type": "object"
     },
     "KindsDidAdd": {
@@ -2345,6 +2691,66 @@
         "kinds"
       ],
       "title": "KindsDidAdd",
+      "type": "object"
+    },
+    "KindsDidChange": {
+      "additionalProperties": false,
+      "description": "A kind was renamed. Carries the whole list, which is short.",
+      "properties": {
+        "type": {
+          "const": "kinds/didChange",
+          "type": "string"
+        },
+        "kinds": {
+          "items": {
+            "$ref": "#/$defs/Kind"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "kinds"
+      ],
+      "title": "KindsDidChange",
+      "type": "object"
+    },
+    "KindsDidRemove": {
+      "additionalProperties": false,
+      "description": "Kinds are gone with their categories and classifiers; their objects\nwere moved to the reserved unknown kind (announced separately as\n``annotations/didUpdate``).",
+      "properties": {
+        "type": {
+          "const": "kinds/didRemove",
+          "type": "string"
+        },
+        "kindIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "kindIds"
+      ],
+      "title": "KindsDidRemove",
+      "type": "object"
+    },
+    "KindsResult": {
+      "additionalProperties": false,
+      "properties": {
+        "kinds": {
+          "items": {
+            "$ref": "#/$defs/Kind"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kinds"
+      ],
+      "title": "KindsResult",
       "type": "object"
     },
     "ListModelsResult": {
@@ -3312,6 +3718,24 @@
       "title": "ProjectCounts",
       "type": "object"
     },
+    "ProjectDidChange": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "project/didChange",
+          "type": "string"
+        },
+        "experiment": {
+          "$ref": "#/$defs/Experiment"
+        }
+      },
+      "required": [
+        "type",
+        "experiment"
+      ],
+      "title": "ProjectDidChange",
+      "type": "object"
+    },
     "ProjectSummary": {
       "additionalProperties": false,
       "properties": {
@@ -3362,6 +3786,19 @@
         "counts"
       ],
       "title": "ProjectSummary",
+      "type": "object"
+    },
+    "ProjectUpdateParams": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ProjectUpdateParams",
       "type": "object"
     },
     "RenderImageParams": {
@@ -4026,6 +4463,55 @@
       "title": "ThumbnailsPartial",
       "type": "object"
     },
+    "VolumeCategoryChange": {
+      "additionalProperties": false,
+      "description": "A recategorized object; the kind follows the category and every\nannotation of the volume follows the partition rule, as\n``annotations/categorize`` does.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "baseRev": {
+          "type": "integer"
+        },
+        "categoryId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "categoryId"
+      ],
+      "title": "VolumeCategoryChange",
+      "type": "object"
+    },
+    "VolumeChanges": {
+      "additionalProperties": false,
+      "properties": {
+        "created": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AnnotationVolume"
+          },
+          "type": "array"
+        },
+        "updated": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/VolumeCategoryChange"
+          },
+          "type": "array"
+        },
+        "deleted": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EntityRef"
+          },
+          "type": "array"
+        }
+      },
+      "title": "VolumeChanges",
+      "type": "object"
+    },
     "VolumeUpdate": {
       "additionalProperties": false,
       "properties": {
@@ -4172,6 +4658,48 @@
       "result": "#/$defs/DeletedResult",
       "progress": null
     },
+    "annotations/commit": {
+      "direction": "client->server",
+      "params": "#/$defs/AnnotationsCommitParams",
+      "result": "#/$defs/CommitResult",
+      "progress": "#/$defs/ProgressValue"
+    },
+    "annotations/update": {
+      "direction": "client->server",
+      "params": "#/$defs/AnnotationsUpdateParams",
+      "result": "#/$defs/ChangedResult",
+      "progress": null
+    },
+    "images/update": {
+      "direction": "client->server",
+      "params": "#/$defs/ImagesUpdateParams",
+      "result": "#/$defs/ImagesResult",
+      "progress": null
+    },
+    "kinds/create": {
+      "direction": "client->server",
+      "params": "#/$defs/KindsCreateParams",
+      "result": "#/$defs/KindsResult",
+      "progress": null
+    },
+    "kinds/update": {
+      "direction": "client->server",
+      "params": "#/$defs/KindUpdateParams",
+      "result": "#/$defs/KindsResult",
+      "progress": null
+    },
+    "kinds/delete": {
+      "direction": "client->server",
+      "params": "#/$defs/KindsDeleteParams",
+      "result": "#/$defs/DeletedResult",
+      "progress": null
+    },
+    "project/update": {
+      "direction": "client->server",
+      "params": "#/$defs/ProjectUpdateParams",
+      "result": "#/$defs/ExperimentResult",
+      "progress": null
+    },
     "render/image": {
       "direction": "client->server",
       "params": "#/$defs/RenderImageParams",
@@ -4308,6 +4836,14 @@
       "direction": "server->client",
       "params": "#/$defs/KindsDidAdd"
     },
+    "kinds/didChange": {
+      "direction": "server->client",
+      "params": "#/$defs/KindsDidChange"
+    },
+    "kinds/didRemove": {
+      "direction": "server->client",
+      "params": "#/$defs/KindsDidRemove"
+    },
     "annotations/didAdd": {
       "direction": "server->client",
       "params": "#/$defs/AnnotationsDidAdd"
@@ -4319,6 +4855,10 @@
     "images/didAdd": {
       "direction": "server->client",
       "params": "#/$defs/ImagesDidAdd"
+    },
+    "images/didChange": {
+      "direction": "server->client",
+      "params": "#/$defs/ImagesDidChange"
     },
     "models/didChange": {
       "direction": "server->client",
@@ -4343,6 +4883,10 @@
     "categories/didChange": {
       "direction": "server->client",
       "params": "#/$defs/CategoriesDidChange"
+    },
+    "project/didChange": {
+      "direction": "server->client",
+      "params": "#/$defs/ProjectDidChange"
     },
     "classifiers/didChange": {
       "direction": "server->client",

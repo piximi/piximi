@@ -27,6 +27,19 @@ from piximi_schema.classification import (
     ClassifiersResult,
     ClassifierUpdateRequest,
 )
+from piximi_schema.editing import (
+    AnnotationChangeSet,
+    AnnotationsCommitParams,
+    AnnotationsUpdateParams,
+    ExperimentResult,
+    ImagesResult,
+    ImagesUpdateParams,
+    KindsCreateParams,
+    KindsDeleteParams,
+    KindsResult,
+    KindUpdateParams,
+    ProjectUpdateParams,
+)
 from piximi_schema.measurements import MeasurementsComputeRequest, MeasurementTableRequest
 from piximi_schema.methods import (
     AnnotationCountsParams,
@@ -201,6 +214,28 @@ class SessionHub:
         async def categories_delete(params: CategoriesDeleteParams, _ctx: HandlerContext):
             return DeletedResult(deleted=await engine.categories_delete(params.ids))
 
+        async def annotations_commit(params: AnnotationsCommitParams, ctx: HandlerContext):
+            changeset = AnnotationChangeSet.model_validate(params.model_dump(exclude={"progress_token"}))
+            return await engine.annotations_commit(changeset, ctx)
+
+        async def annotations_update(params: AnnotationsUpdateParams, _ctx: HandlerContext):
+            return ChangedResult(changed=await engine.annotations_update(params.updates))
+
+        async def images_update(params: ImagesUpdateParams, _ctx: HandlerContext):
+            return ImagesResult(images=await engine.images_update(params.updates))
+
+        async def kinds_create(params: KindsCreateParams, _ctx: HandlerContext):
+            return KindsResult(kinds=await engine.kinds_create(params.kinds))
+
+        async def kinds_update(params: KindUpdateParams, _ctx: HandlerContext):
+            return KindsResult(kinds=[await engine.kinds_update(params.id, params.name)])
+
+        async def kinds_delete(params: KindsDeleteParams, _ctx: HandlerContext):
+            return DeletedResult(deleted=await engine.kinds_delete(params.ids))
+
+        async def project_update(params: ProjectUpdateParams, _ctx: HandlerContext):
+            return ExperimentResult(experiment=await engine.project_update(params.name))
+
         async def render_image(params: RenderImageParams, _ctx: HandlerContext):
             return await engine.render_image(params.request)
 
@@ -282,6 +317,13 @@ class SessionHub:
         peer.on_request("categories/create", typed(CategoriesCreateParams, categories_create))
         peer.on_request("categories/update", typed(CategoryUpdateParams, categories_update))
         peer.on_request("categories/delete", typed(CategoriesDeleteParams, categories_delete))
+        peer.on_request("annotations/commit", typed(AnnotationsCommitParams, annotations_commit))
+        peer.on_request("annotations/update", typed(AnnotationsUpdateParams, annotations_update))
+        peer.on_request("images/update", typed(ImagesUpdateParams, images_update))
+        peer.on_request("kinds/create", typed(KindsCreateParams, kinds_create))
+        peer.on_request("kinds/update", typed(KindUpdateParams, kinds_update))
+        peer.on_request("kinds/delete", typed(KindsDeleteParams, kinds_delete))
+        peer.on_request("project/update", typed(ProjectUpdateParams, project_update))
         peer.on_request("render/image", typed(RenderImageParams, render_image))
         peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
         peer.on_request("jobs/list", typed(None, jobs_list))

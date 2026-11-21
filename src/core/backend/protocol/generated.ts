@@ -5,14 +5,14 @@
 
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
- * via the `definition` "AnnotationCountGroup".
- */
-export type AnnotationCountGroup = "category" | "partition" | "kind";
-/**
- * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "Partition".
  */
 export type Partition = "Training" | "Validation" | "Inference" | "Unassigned";
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationCountGroup".
+ */
+export type AnnotationCountGroup = "category" | "partition" | "kind";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "AnnotationSortKey".
@@ -247,6 +247,80 @@ export interface AnnotationCategory {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationChanges".
+ */
+export interface AnnotationChanges {
+  created?: AnnotationObject[];
+  updated?: AnnotationGeometryChange[];
+  deleted?: EntityRef[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationObject".
+ */
+export interface AnnotationObject {
+  id: string;
+  planeId: string;
+  imageId: string;
+  volumeId: string;
+  partition: Partition;
+  shape: Shape;
+  /**
+   * @minItems 4
+   * @maxItems 4
+   */
+  boundingBox: [number, number, number, number];
+  features?: {
+    [k: string]: number;
+  };
+  intensityMeasurements?: {
+    [k: string]: {
+      [k: string]: number;
+    };
+  };
+  rev?: number;
+  encodedMask: number[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "Shape".
+ */
+export interface Shape {
+  planes: number;
+  height: number;
+  width: number;
+  channels: number;
+}
+/**
+ * A redrawn object: the bounding box and the mask cropped to it. The
+ * backend derives the shape and measures the object again.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationGeometryChange".
+ */
+export interface AnnotationGeometryChange {
+  id: string;
+  baseRev?: number;
+  /**
+   * @minItems 4
+   * @maxItems 4
+   */
+  boundingBox: [number, number, number, number];
+  encodedMask: number[];
+}
+/**
+ * An existing row and the revision it was read at; a missing
+ * ``baseRev`` skips the check (a backend without revisions).
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "EntityRef".
+ */
+export interface EntityRef {
+  id: string;
+  baseRev?: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "AnnotationCountsParams".
  */
 export interface AnnotationCountsParams {
@@ -304,16 +378,7 @@ export interface AnnotationHeader {
       [k: string]: number;
     };
   };
-}
-/**
- * This interface was referenced by `PiximiProtocol`'s JSON-Schema
- * via the `definition` "Shape".
- */
-export interface Shape {
-  planes: number;
-  height: number;
-  width: number;
-  channels: number;
+  rev?: number;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -331,32 +396,6 @@ export interface AnnotationSort {
   key?: AnnotationSortKey;
   direction?: SortDirection;
   seed?: number;
-}
-/**
- * This interface was referenced by `PiximiProtocol`'s JSON-Schema
- * via the `definition` "AnnotationObject".
- */
-export interface AnnotationObject {
-  id: string;
-  planeId: string;
-  imageId: string;
-  volumeId: string;
-  partition: Partition;
-  shape: Shape;
-  /**
-   * @minItems 4
-   * @maxItems 4
-   */
-  boundingBox: [number, number, number, number];
-  features?: {
-    [k: string]: number;
-  };
-  intensityMeasurements?: {
-    [k: string]: {
-      [k: string]: number;
-    };
-  };
-  encodedMask: number[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -387,6 +426,7 @@ export interface AnnotationVolume {
   predictionConfidence?: number;
   predictedAtRunId?: string;
   predictionCorrected?: PredictionCorrection;
+  rev?: number;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -412,6 +452,39 @@ export interface AnnotationUpdate {
  */
 export interface AnnotationsCategorizeParams {
   query: AnnotationQuery;
+  categoryId: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationsCommitParams".
+ */
+export interface AnnotationsCommitParams {
+  imageIds: string[];
+  volumes?: VolumeChanges;
+  annotations?: AnnotationChanges;
+  force?: boolean;
+  progressToken?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "VolumeChanges".
+ */
+export interface VolumeChanges {
+  created?: AnnotationVolume[];
+  updated?: VolumeCategoryChange[];
+  deleted?: EntityRef[];
+}
+/**
+ * A recategorized object; the kind follows the category and every
+ * annotation of the volume follows the partition rule, as
+ * ``annotations/categorize`` does.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "VolumeCategoryChange".
+ */
+export interface VolumeCategoryChange {
+  id: string;
+  baseRev?: number;
   categoryId: string;
 }
 /**
@@ -442,7 +515,8 @@ export interface AnnotationsDidRemove {
 /**
  * Objects were categorized or had partitions or predictions written:
  * the category and prediction live on the volume, the partition on each
- * annotation.
+ * annotation. Objects redrawn or measured by a commit come as whole
+ * headers; their masks are fetched on demand.
  *
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "AnnotationsDidUpdate".
@@ -451,6 +525,7 @@ export interface AnnotationsDidUpdate {
   type: "annotations/didUpdate";
   volumes: VolumeUpdate[];
   annotations: AnnotationUpdate[];
+  headers?: AnnotationHeader[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -480,6 +555,13 @@ export interface AnnotationsParams {
 export interface PageRequest {
   offset?: number;
   limit: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "AnnotationsUpdateParams".
+ */
+export interface AnnotationsUpdateParams {
+  updates: AnnotationUpdate[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -968,6 +1050,25 @@ export interface ClassifiersResult {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CommitConflict".
+ */
+export interface CommitConflict {
+  type: "annotation" | "volume";
+  id: string;
+  reason: "modified" | "missing";
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "CommitResult".
+ */
+export interface CommitResult {
+  created: number;
+  updated: number;
+  deleted: number;
+  conflicts: CommitConflict[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "CountsResult".
  */
 export interface CountsResult {
@@ -1011,10 +1112,29 @@ export interface Experiment {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ExperimentResult".
+ */
+export interface ExperimentResult {
+  experiment: Experiment;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "IdsResult".
  */
 export interface IdsResult {
   ids: string[];
+}
+/**
+ * Fields of an image a user edits directly; absent ones stay.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImageChange".
+ */
+export interface ImageChange {
+  id: string;
+  name?: string;
+  partition?: Partition;
+  activePlaneId?: string;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -1151,6 +1271,17 @@ export interface ImagesDidAdd {
   channelMetas: ChannelMeta[];
 }
 /**
+ * Images were renamed, re-partitioned by hand or had their active
+ * plane changed; carries each one whole.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImagesDidChange".
+ */
+export interface ImagesDidChange {
+  type: "images/didChange";
+  images: ImageObject[];
+}
+/**
  * Images are gone, with everything under them; the ids are enough for
  * a client to drop what it mirrors.
  *
@@ -1180,6 +1311,20 @@ export interface ImagesParams {
   query: ImageQuery;
   sort?: ImageSort;
   page: PageRequest;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImagesResult".
+ */
+export interface ImagesResult {
+  images: ImageObject[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ImagesUpdateParams".
+ */
+export interface ImagesUpdateParams {
+  updates: ImageChange[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -1259,6 +1404,14 @@ export interface Kind {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "KindUpdateParams".
+ */
+export interface KindUpdateParams {
+  id: string;
+  name: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "KindWithCategory".
  */
 export interface KindWithCategory {
@@ -1267,11 +1420,54 @@ export interface KindWithCategory {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "KindsCreateParams".
+ */
+export interface KindsCreateParams {
+  kinds: KindWithCategory[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "KindsDeleteParams".
+ */
+export interface KindsDeleteParams {
+  ids: string[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "KindsDidAdd".
  */
 export interface KindsDidAdd {
   type: "kinds/didAdd";
   kinds: KindWithCategory[];
+}
+/**
+ * A kind was renamed. Carries the whole list, which is short.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "KindsDidChange".
+ */
+export interface KindsDidChange {
+  type: "kinds/didChange";
+  kinds: Kind[];
+}
+/**
+ * Kinds are gone with their categories and classifiers; their objects
+ * were moved to the reserved unknown kind (announced separately as
+ * ``annotations/didUpdate``).
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "KindsDidRemove".
+ */
+export interface KindsDidRemove {
+  type: "kinds/didRemove";
+  kindIds: string[];
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "KindsResult".
+ */
+export interface KindsResult {
+  kinds: Kind[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -1546,6 +1742,14 @@ export interface ProjectCounts {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectDidChange".
+ */
+export interface ProjectDidChange {
+  type: "project/didChange";
+  experiment: Experiment;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ProjectSummary".
  */
 export interface ProjectSummary {
@@ -1554,6 +1758,13 @@ export interface ProjectSummary {
   categories: (ImageCategory | AnnotationCategory)[];
   channelMetas: ChannelMeta[];
   counts: ProjectCounts;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectUpdateParams".
+ */
+export interface ProjectUpdateParams {
+  name: string;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
