@@ -130,17 +130,20 @@ export const useFitClassifier = () => {
         throw new Error("ModelCreationError", { cause: result.reason.cause });
       }
       modelInfo.initSeed = seed;
+      // Key everything by the name the worker registered, not the one we asked
+      // for: the worker de-duplicates against its own registry, which can hold
+      // a name the store no longer does (e.g. after a failed dispose).
       dispatch(
         classifierSlice.actions.addModelInfo({
           targetId: kindClassifier.modelTargetId,
-          modelName: newModelName,
+          modelName: model.name,
           modelInfo: modelInfo,
         }),
       );
       dispatch(
         classifierSlice.actions.setActiveModel({
           targetId: kindClassifier.modelTargetId,
-          modelName: newModelName,
+          modelName: model.name,
         }),
       );
 
