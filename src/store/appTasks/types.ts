@@ -4,6 +4,7 @@ export type AppTaskType =
   | "project-load"
   | "project-download"
   | "classifier-download"
+  | "classifier-clone"
   | "image-classification"
   | "image-segmentation"
   | "measurement";

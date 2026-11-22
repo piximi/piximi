@@ -205,48 +205,58 @@ export class RemoteClassifier extends SequentialClassifier {
   }
 }
 
+/**
+ * An in-memory copy of another layers model: same topology, same trained
+ * weights, same preprocessing/optimizer settings and classes. Built from the
+ * source's `getModelArtifacts()`, so nothing leaves the worker.
+ *
+ * Training a clone never touches the source — `loadLayersModel` allocates new
+ * weight tensors from the artifact buffers.
+ */
 export class ClonedClassifier extends SequentialClassifier {
   protected _sourceModelArtifacts: io.ModelArtifacts;
   protected _loadState: LoadState;
 
-  /*
-   * whether from src, or the descFile, the JSON file should contain 'modelTopology' and 'weightsManifest
-   *
-   * 'modelTopology': A JSON object that can be either of:
-   *   1) a model architecture JSON consistent with the format of the return value of keras.Model.to_json()
-   *   2) a full model JSON in the format of keras.models.save_model().
-   *
-   * 'weightsManifest': A TensorFlow.js weights manifest.
-   *   See the Python converter function save_model() for more details.
-   *   It is also assumed that model weights (.bin files) can be accessed
-   *   from relative paths described by the paths fields in weights manifest.
-   */
   constructor({
     modelArtifacts,
+    preprocessingSettings,
+    optimizerSettings,
+    classes,
     ...modelArgs
   }: {
     modelArtifacts: io.ModelArtifacts;
+    preprocessingSettings?: SequentialClassifier["preprocessingSettings"];
+    optimizerSettings?: OptimizerSettings;
+    classes: string[];
   } & ConstructorParameters<typeof Model>[0]) {
     super(modelArgs);
 
     this._sourceModelArtifacts = modelArtifacts;
+    this._preprocessingSettings = preprocessingSettings
+      ? structuredClone(preprocessingSettings)
+      : undefined;
+    this._optimizerSettings = optimizerSettings
+      ? structuredClone(optimizerSettings)
+      : undefined;
+    this.classes = [...classes];
     this._loadState = LoadState.Unloaded;
   }
 
   public async loadModel() {
-    if (this._loadState === LoadState.Unloaded) {
-      try {
-        this._model = await loadLayersModel(
-          io.fromMemory(
-            this._sourceModelArtifacts,
-            this._sourceModelArtifacts.weightSpecs,
-          ),
-        );
-      } catch (err) {
-        throw new Error("Error creating model from artifacts.", err as Error);
-      }
+    if (this._loadState !== LoadState.Unloaded) return;
+    try {
+      this._model = await loadLayersModel(
+        io.fromMemory(this._sourceModelArtifacts),
+      );
+    } catch (err) {
+      throw new Error("Error creating model from artifacts.", { cause: err });
     }
-
+    // Saved artifacts carry no compile state; training needs it.
+    if (this._optimizerSettings) {
+      (this._model as LayersModel).compile(
+        createCompileArgs(this._optimizerSettings),
+      );
+    }
     this._loadState = LoadState.Loaded;
   }
 }

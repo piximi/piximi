@@ -12,15 +12,21 @@ import {
 } from "@mui/material";
 
 import { useClassifierApi } from "core/dl/classification";
+import { generateUUID } from "core/entities";
 
 import { WithLabel, TextFieldWithBlur, StyledSelect } from "components/inputs";
 
 import { classifierSlice } from "store/classifier";
+import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { useParameterizedSelector } from "store/hooks";
-import { selectKindClassifier } from "store/classifier/selectors";
+import {
+  selectAllCreatedModelNames,
+  selectKindClassifier,
+} from "store/classifier/selectors";
 import { HelpItem } from "help/HelpContent";
 
 import { logger } from "utils/logUtils";
+import { getUniqueName } from "utils/stringUtils";
 
 import { selectActiveClassifierModelTarget } from "@ProjectViewer/state/selectors";
 import {
@@ -33,6 +39,23 @@ import { useClassificationModel } from "@ProjectViewer/hooks";
 import type { SelectChangeEvent } from "@mui/material";
 
 import type { ModelArch, ModelInfoDTO } from "core/dl/classification/types";
+
+/**
+ * The name to request for a copy of `sourceName`. The worker still
+ * de-duplicates against its own registry, so this only has to read well and
+ * avoid the names the store already knows (`existingNames`, across all
+ * classifiers).
+ */
+export const suggestCloneName = (
+  sourceName: string,
+  existingNames: string[],
+): string => {
+  return getUniqueName(
+    `${sourceName}-copy`,
+    existingNames,
+    (base, n) => `${base}${n}`,
+  );
+};
 
 export const ModelPicker = () => {
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
@@ -174,8 +197,87 @@ const PretrainedModelOptions = ({
 }) => {
   const dispatch = useDispatch();
   const modelTarget = useSelector(selectActiveClassifierModelTarget);
-  const { shouldWarnClearPredictions } = useClassifierStatus();
+  const kindClassifier = useParameterizedSelector(
+    selectKindClassifier,
+    modelTarget,
+  );
+  const existingModelNames = useSelector(selectAllCreatedModelNames);
+  const { shouldWarnClearPredictions, classifierStatus } =
+    useClassifierStatus();
   const cfApi = useClassifierApi();
+  const [isCloning, setIsCloning] = useState(false);
+  const isTraining = classifierStatus === "training";
+
+  /*
+   * Copy the selected model, trained weights included, and continue with the
+   * copy. The source is left untouched, so it can be compared against or
+   * returned to. Run history is copied so the copy's lineage stays visible.
+   */
+  const handleCloneModel = async () => {
+    if (!activeModel || !kindClassifier) return;
+    const sourceInfo = kindClassifier.modelInfoDict[activeModel.name];
+    if (!sourceInfo) return;
+
+    const taskId = generateUUID();
+    dispatch(
+      appTasksSlice.actions.taskRegistered({
+        id: taskId,
+        type: "classifier-clone",
+        status: "running",
+        progress: -1,
+        label: `Copying ${activeModel.name}`,
+        startedAt: Date.now(),
+      }),
+    );
+    setIsCloning(true);
+    try {
+      const result = await cfApi.cloneModel(
+        activeModel.name,
+        suggestCloneName(activeModel.name, existingModelNames),
+      );
+      if (!result.success) {
+        dispatch(
+          appTasksSlice.actions.taskFailed({
+            id: taskId,
+            error: result.reason.message,
+          }),
+        );
+        return;
+      }
+      // The worker de-duplicates against its own registry, so its name is
+      // the one to key the store by.
+      const cloneName = result.data.name;
+      dispatch(
+        classifierSlice.actions.addModelInfo({
+          targetId: modelTarget,
+          modelName: cloneName,
+          modelInfo: structuredClone(sourceInfo),
+        }),
+      );
+      dispatch(
+        classifierSlice.actions.setActiveModel({
+          targetId: modelTarget,
+          modelName: cloneName,
+        }),
+      );
+      dispatch(
+        appTasksSlice.actions.taskCompleted({
+          id: taskId,
+          label: `Created ${cloneName}`,
+        }),
+      );
+    } catch (e) {
+      dispatch(
+        appTasksSlice.actions.taskFailed({
+          id: taskId,
+          error: (e as Error).message,
+        }),
+      );
+    } finally {
+      setIsCloning(false);
+    }
+  };
+
   const handleDisposeModel = async () => {
     if (!activeModel) return;
 
@@ -245,14 +347,15 @@ const PretrainedModelOptions = ({
         </TooltipWithDisable>
         <TooltipWithDisable
           title={
-            shouldWarnClearPredictions
-              ? "Clear or accept predictions before clearing"
-              : "Clear the current model"
+            isTraining
+              ? "Wait for training to complete before cloning"
+              : "Copy this model, weights included, and continue with the copy"
           }
           placement="bottom"
         >
           <Button
-            onClick={handleDisposeModel}
+            onClick={handleCloneModel}
+            disabled={isTraining || isCloning}
             disableFocusRipple
             color="primary"
             variant="text"

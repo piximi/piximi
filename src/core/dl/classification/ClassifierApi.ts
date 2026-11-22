@@ -61,6 +61,9 @@ class ClassifierApi implements IClassifierApi {
   async createNewModel(name: string, arch: any, seed: number) {
     return this.backend.createNewModel(name, arch, seed);
   }
+  async cloneModel(sourceName: string, cloneName: string) {
+    return this.backend.cloneModel(sourceName, cloneName);
+  }
   async removeModel(name: string) {
     return this.backend.removeModel(name);
   }

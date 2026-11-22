@@ -218,6 +218,11 @@ export interface IClassifierApi {
     arch: ModelArch,
     seed: number,
   ): Promise<ApiResult<ModelInfoDTO>>;
+  /** Copy a loaded model (weights included) under a new, de-duplicated name. */
+  cloneModel(
+    sourceName: string,
+    cloneName: string,
+  ): Promise<ApiResult<ModelInfoDTO>>;
   removeModel(name: string): Promise<ApiResult<string>>;
   removeAllModels(): Promise<ApiResult<void>>;
 

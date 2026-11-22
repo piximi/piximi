@@ -5,6 +5,7 @@ import { recursiveAssign } from "utils/objectUtils";
 import { getUniqueName } from "utils/stringUtils";
 
 import {
+  ClonedClassifier,
   RemoteClassifier,
   UploadedClassifier,
   MobileNet,
@@ -101,6 +102,50 @@ export class ClassifierHandler implements IClassifierApi {
       Object.entries(models).forEach(([name, model]) => {
         this._availableClassificationModels[name] = model;
       });
+    }
+  }
+
+  public async cloneModel(
+    sourceName: string,
+    cloneName: string,
+  ): Promise<ApiResult<ModelInfoDTO>> {
+    const source = this.resolveModel(sourceName);
+    if (!source)
+      return err(
+        "MODEL_NOT_FOUND",
+        `No model registered with name "${sourceName}"`,
+      );
+    // Graph models can't be re-saved or trained, and an unbuilt model has no
+    // weights to copy.
+    if (source.graph || !source.modelLoaded)
+      return err(
+        "MODEL_CLONE_FAILED",
+        `Model "${sourceName}" cannot be cloned: ${source.graph ? "graph models are not supported" : "it has not been built yet"}`,
+      );
+
+    const uniqueName = getUniqueName(
+      cloneName,
+      Object.keys(this._availableClassificationModels),
+    );
+    try {
+      const clone = new ClonedClassifier({
+        modelArtifacts: await source.getModelArtifacts(),
+        name: uniqueName,
+        task: source.task,
+        graph: false,
+        pretrained: source.pretrained,
+        trainable: source.trainable,
+        requiredChannels: source.requiredChannels,
+        modelArch: source.modelArch,
+        preprocessingSettings: source.preprocessingSettings,
+        optimizerSettings: source.optimizerSettings,
+        classes: source.classes,
+      });
+      await clone.loadModel();
+      this._availableClassificationModels[uniqueName] = clone;
+      return ok(this.buildModelInfoDTO(clone));
+    } catch (e) {
+      return err("MODEL_CLONE_FAILED", "Failed to clone model", e);
     }
   }
 

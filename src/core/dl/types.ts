@@ -38,6 +38,7 @@ export type SerializedModels = Record<string, SerializedModelData>;
 export type ErrorCode =
   | "MODEL_NOT_FOUND"
   | "MODEL_CREATE_FAILED"
+  | "MODEL_CLONE_FAILED"
   | "TF_LOAD_FAILED"
   | "LOAD_CANCELLED"
   | "PREPROCESS_FAILED"
