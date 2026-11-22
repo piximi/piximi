@@ -5,6 +5,11 @@ import {
 } from "core/dl/classification/types";
 
 import {
+  IMAGE_CLASSIFIER_ID,
+  IMAGE_CLASSIFIER_NAME,
+} from "store/classifier/constants";
+
+import {
   getAttr,
   getGroup,
   hasNode,
@@ -225,7 +230,10 @@ export const readV2 = async (
   onProgress(STAGES.annotations.end);
 
   const classifierGroup = await getGroup(rootGroup, ZARR_V2_GROUP.Classifier);
-  const classifier = await readClassifier(classifierGroup);
+  const classifier = await readClassifier(classifierGroup, [
+    { id: IMAGE_CLASSIFIER_ID, name: IMAGE_CLASSIFIER_NAME },
+    ...kinds.ids.map((id) => ({ id, name: kinds.entities[id]!.name })),
+  ]);
   const segmenterGroup = await getGroup(rootGroup, ZARR_V2_GROUP.Segmenter);
   const segmenter = await readSegmenter(segmenterGroup);
   onProgress(STAGES.classifier.end);
@@ -717,8 +725,15 @@ const readSegmenter = async (
   };
 };
 
+/*
+ * `targets` are the image target and every kind the file holds: the
+ * classifier slice keeps an entry for each and its selectors throw on a
+ * kind without one, so a file that lists fewer (the engine wrote only
+ * targets with classifiers for a while) gets empty entries for the rest.
+ */
 const readClassifier = async (
   classifierGroup: Group,
+  targets: Array<{ id: string; name: string }>,
 ): Promise<ClassifierState> => {
   const kindIds = (await getAttr(
     classifierGroup,
@@ -730,6 +745,16 @@ const readClassifier = async (
     kindClassifiers[kindId] = await readKindClassifier(
       await getGroup(classifierGroup, kindId),
     );
+  }
+  for (const target of targets) {
+    kindClassifiers[target.id] ??= {
+      modelTargetId: target.id,
+      modelTargetName: target.name,
+      activeModel: undefined,
+      newModelArch: ARCHITECTURE_IDS[ModelArch.SIMPLE_CNN],
+      modelInfoDict: {},
+      status: "idle",
+    };
   }
 
   return { kindClassifiers };

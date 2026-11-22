@@ -7,6 +7,8 @@ import JSZip from "jszip";
 import { useBackend } from "core/backend";
 import { generateUUID } from "core/entities";
 import { isTaskCancelledError } from "core/dl/cancel";
+import { ProjectLoader } from "core/file-io/project-loader/ProjectLoader";
+import { isCurrentProjectArchive } from "core/file-io/project-loader/upgradeProject";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
@@ -64,13 +66,51 @@ export function useProjectLoader(): UseProjectLoaderReturn {
       const controller = new AbortController();
       taskCancelRegistry.register(taskId, () => controller.abort());
       try {
-        await backend.project.import(data, name, {
+        // A remote backend reads only the current layout; the browser's
+        // own loader still understands every older one, so an old archive
+        // (every bundled example) is rewritten here before it is sent.
+        let payload: Blob | Uint8Array = data;
+        if (
+          backend.kind === "remote" &&
+          !(await isCurrentProjectArchive(data))
+        ) {
+          const loader = new ProjectLoader();
+          controller.signal.addEventListener("abort", () => loader.cancel(), {
+            once: true,
+          });
+          loader.onProgress(({ overallProgress }) =>
+            dispatch(
+              appTasksSlice.actions.taskUpdated({
+                id: taskId,
+                progress: Math.round(overallProgress * 50),
+                label: "Upgrading the project file",
+              }),
+            ),
+          );
+          // The loader tells an archive from an unzipped folder by the
+          // file's type or extension, so the wrapper must say which it is.
+          const upgraded = await loader.upgradeProject([
+            new File([data], "project.piximi", { type: "application/zip" }),
+          ]);
+          payload = upgraded.data;
+          name ??= upgraded.name;
+          dispatch(
+            appTasksSlice.actions.taskUpdated({
+              id: taskId,
+              progress: 50,
+              label,
+            }),
+          );
+        }
+        await backend.project.import(payload, name, {
           signal: controller.signal,
           onProgress: ({ percent }) =>
             dispatch(
               appTasksSlice.actions.taskUpdated({
                 id: taskId,
-                progress: Math.round(percent),
+                progress: Math.round(
+                  payload === data ? percent : 50 + percent / 2,
+                ),
               }),
             ),
         });

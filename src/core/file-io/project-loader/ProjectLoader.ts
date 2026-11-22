@@ -70,12 +70,45 @@ const workerRun: LoadProjectRun = async (input, cancel, onProgress) => {
   }
 };
 
+/* Rewrites an older archive as a current one, somewhere: a worker by default. */
+export type UpgradeProjectRun = (
+  input: LoadProjectInput,
+  cancel: CancelSource,
+  onProgress: (progress: { value: number }) => void,
+) => Promise<{ data: Uint8Array; name: string }>;
+
+const workerUpgrade: UpgradeProjectRun = async (input, cancel, onProgress) => {
+  const worker = new Worker(
+    new URL("./worker/loadProjectWorker.ts", import.meta.url),
+    { type: "module" },
+  );
+  const proxy = Comlink.wrap<LoadImageWorkerAPI>(worker);
+  try {
+    return await Promise.race([
+      proxy.upgradeProject(
+        input,
+        Comlink.proxy(cancel.token),
+        Comlink.proxy(onProgress),
+      ),
+      cancel.whenSignaled,
+    ]);
+  } finally {
+    proxy[Comlink.releaseProxy]();
+    worker.terminate();
+  }
+};
+
 interface LoadImageWorkerAPI {
   loadProject(
     payload: LoadProjectInput,
     cancelToken: Token,
     onProgress: OnProgressCallback<object>,
   ): Promise<LoadProjectOutput>;
+  upgradeProject(
+    input: LoadProjectInput,
+    cancelToken: Token,
+    onProgress: (progress: { value: number }) => void,
+  ): Promise<{ data: Uint8Array; name: string }>;
 }
 /**
  * ProjectSerializationService
@@ -100,6 +133,7 @@ export class ProjectLoader implements IProjectLoader {
   private cancelSource: CancelSource | null = null;
 
   readonly #run: LoadProjectRun;
+  readonly #upgrade: UpgradeProjectRun;
   readonly #classifier: () => IClassifierApi;
 
   /* `run` stands in for the worker (tests run `loadProject` on this thread);
@@ -107,17 +141,37 @@ export class ProjectLoader implements IProjectLoader {
   constructor(
     deps: {
       run?: LoadProjectRun;
+      upgrade?: UpgradeProjectRun;
       classifier?: () => IClassifierApi;
       storage?: DataConnector;
     } = {},
   ) {
     this.storage = deps.storage ?? DataConnector.getInstance();
     this.#run = deps.run ?? workerRun;
+    this.#upgrade = deps.upgrade ?? workerUpgrade;
     this.#classifier = deps.classifier ?? getClassifierApi;
   }
   // ============================================================
   // Deserialization (project file → structured data)
   // ============================================================
+
+  /*
+   * An older archive rewritten in the current layout, for a backend that
+   * reads only that (the engine). Resolves with the bytes and the
+   * project's name; rejects with `TaskCancelledError` on cancel.
+   */
+  async upgradeProject(
+    files: File[],
+  ): Promise<{ data: Uint8Array; name: string }> {
+    this.resetProgress();
+    const cancelSource = this.cancelSource!;
+    this.updateProgress({ stage: "deserializing" });
+    const result = await this.#upgrade({ files }, cancelSource, ({ value }) =>
+      this.updateProgress({ overallProgress: value, stageProgress: value }),
+    );
+    this.updateProgress({ stage: "complete", overallProgress: 1 });
+    return result;
+  }
 
   async uploadProject(files: File[]): Promise<DeserializedProjectResult> {
     this.resetProgress();

@@ -36,6 +36,12 @@ describe("engine-written .piximi", () => {
       data.images.ids.map((id) => data.images.entities[id]!.name).sort(),
     ).toEqual(["a", "b", "c", "d", "e"]);
     expect(data.kinds.ids.length).toBeGreaterThanOrEqual(2);
+    // The classifier slice needs an entry for the image target and every
+    // kind, whether or not the engine had classifiers for them.
+    const targets = Object.keys(project.classifier.kindClassifiers).sort();
+    expect(targets).toEqual(
+      ["11111111-0000-0000-0000-000000000000", ...data.kinds.ids].sort(),
+    );
     expect(data.annotations.ids).toHaveLength(1);
     const [annotationId] = data.annotations.ids;
     const annotation = data.annotations.entities[annotationId]!;

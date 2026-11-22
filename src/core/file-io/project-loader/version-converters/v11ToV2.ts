@@ -234,7 +234,10 @@ function convertCategories(
       v11Kinds[v11Cat.kind].displayName === "Image"
         ? { type: "image" as const }
         : { type: "annotation" as const, kindId: v11Cat.kind };
-    v2Categories.entities[v11Cat.id] = {
+    // Keyed by the id the entry carries: an unknown image category is
+    // renamed to the reserved id above, and a map keyed by the old id would
+    // list an entry under one id while it says another.
+    v2Categories.entities[v11CatId] = {
       id: v11CatId,
       name: v11Cat.name,
       color: v11Cat.color,

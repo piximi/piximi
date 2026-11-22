@@ -647,7 +647,19 @@ describe("v2 project round trip", () => {
     const { fixture, store } = await writeFixture();
     const result = await readV2(store, () => {});
 
-    expect(result.classifier).toEqual(fixture.classifier);
+    // The reader also fills an entry for the image target and every kind
+    // the file holds, so what was written is a subset of what comes back.
+    expect(result.classifier.kindClassifiers).toMatchObject(
+      fixture.classifier.kindClassifiers,
+    );
+    const written = Object.keys(fixture.classifier.kindClassifiers);
+    for (const [target, entry] of Object.entries(
+      result.classifier.kindClassifiers,
+    )) {
+      if (written.includes(target)) continue;
+      expect(entry.modelInfoDict).toEqual({});
+      expect(entry.modelTargetId).toBe(target);
+    }
   });
 
   it("preserves segmenter channel mappings and option values", async () => {
