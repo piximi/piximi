@@ -157,6 +157,9 @@ export const describeBackendConformance = (
         expect(backend.export !== undefined).toBe(
           hasCapability(backend.capabilities, "export.annotations"),
         );
+        expect(typeof backend.project.list === "function").toBe(
+          hasCapability(backend.capabilities, "project.workspace"),
+        );
       });
     });
 
@@ -2206,6 +2209,97 @@ export const describeBackendConformance = (
         expect(await backend.images.delete({ ids: [target.id] })).toEqual({
           deleted: 0,
         });
+      });
+    });
+
+    // Last: creating, importing and opening projects replace the open one,
+    // so this block puts the original back before it ends.
+    describe("project", () => {
+      const names = async () =>
+        (await ctx.backend.query.images({}, { limit: 1000 })).items
+          .map((r) => r.image.name)
+          .sort();
+
+      it("exports the open project as a .piximi archive", async () => {
+        const { backend } = ctx;
+        const file = await backend.project.export("conformance");
+        expect(file.fileName).toBe("conformance.piximi");
+        expect(file.mime).toBe("application/zip");
+        const zip = await JSZip.loadAsync(file.data);
+        expect(Object.keys(zip.files)).toContain("conformance.zarr/zarr.json");
+        expect(zip.folder(/\.zarr\/$/)).toHaveLength(1);
+        const root = JSON.parse(
+          await zip.file("conformance.zarr/zarr.json")!.async("string"),
+        ) as { attributes: { version: string } };
+        expect(root.attributes.version.split(".")[0]).toBe("2");
+      });
+
+      it("replaces the open project on create and import, announcing a reset", async () => {
+        const { backend } = ctx;
+        const original = await names();
+        const summary = await backend.query.project();
+        const originalId = (await backend.project.list?.())?.find(
+          (p) => p.current,
+        )?.id;
+        const file = await backend.project.export("conformance");
+
+        const resets: string[] = [];
+        const unsubscribe = backend.subscribe((event) => {
+          if (event.type === "project/didReset")
+            resets.push(event.experiment.name);
+        });
+        try {
+          const created = await backend.project.create("Empty");
+          expect(created.current).toBe(true);
+          expect(created.name).toBe("Empty");
+          expect((await backend.query.project()).experiment.name).toBe("Empty");
+          expect((await backend.query.images({}, { limit: 1 })).total).toBe(0);
+          expect(resets).toEqual(["Empty"]);
+
+          const imported = await backend.project.import(file.data, "Back");
+          expect(imported.current).toBe(true);
+          expect(imported.name).toBe("Back");
+          expect(resets).toEqual(["Empty", "Back"]);
+          const back = await backend.query.project();
+          expect(back.experiment.name).toBe("Back");
+          expect(back.counts.images).toBe(original.length);
+          expect(back.kinds.map((k) => k.id).sort()).toEqual(
+            summary.kinds.map((k) => k.id).sort(),
+          );
+          expect(await names()).toEqual(original);
+
+          if (
+            backend.project.list &&
+            backend.project.open &&
+            backend.project.delete
+          ) {
+            const listed = await backend.project.list();
+            expect(listed.filter((p) => p.current)).toHaveLength(1);
+            expect(listed.map((p) => p.name)).toEqual(
+              expect.arrayContaining(["Empty", "Back"]),
+            );
+            const empty = listed.find((p) => p.name === "Empty")!;
+            const backEntry = listed.find((p) => p.name === "Back")!;
+            expect(backEntry.current).toBe(true);
+            expect(backEntry.images).toBe(original.length);
+            await expect(
+              backend.project.delete(backEntry.id),
+            ).rejects.toMatchObject({
+              code: "NOT_SUPPORTED",
+            });
+            // Back to where the other blocks left things.
+            await backend.project.open(originalId!);
+            expect(resets.at(-1)).toBe(summary.experiment.name);
+            expect(await names()).toEqual(original);
+            await backend.project.delete(empty.id);
+            await backend.project.delete(backEntry.id);
+            expect((await backend.project.list()).map((p) => p.id)).toEqual([
+              originalId,
+            ]);
+          }
+        } finally {
+          unsubscribe();
+        }
       });
     });
   });

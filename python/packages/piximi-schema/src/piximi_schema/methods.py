@@ -40,6 +40,14 @@ from .editing import (
 from .entities import Category
 from .events import EVENT_TYPES
 from .exports import AnnotationsExportRequest, FileExport
+from .project import (
+    ProjectCreateParams,
+    ProjectExportParams,
+    ProjectIdParams,
+    ProjectImportParams,
+    ProjectInfo,
+    ProjectsResult,
+)
 from .ingest import (
     AddPathsParams,
     BrowseParams,
@@ -278,6 +286,12 @@ METHODS: tuple[MethodSpec, ...] = (
     MethodSpec("ingest/inspect", InspectParams, InspectResult),
     MethodSpec("ingest/addPaths", AddPathsParams, IngestSummary, progress=ProgressValue),
     MethodSpec("export/annotations", AnnotationsExportRequest, FileExport, progress=ProgressValue),
+    MethodSpec("project/list", None, ProjectsResult),
+    MethodSpec("project/create", ProjectCreateParams, ProjectInfo),
+    MethodSpec("project/open", ProjectIdParams, ProjectInfo),
+    MethodSpec("project/delete", ProjectIdParams, None),
+    MethodSpec("project/import", ProjectImportParams, ProjectInfo, progress=ProgressValue),
+    MethodSpec("project/export", ProjectExportParams, FileExport, progress=ProgressValue),
     MethodSpec("render/image", RenderImageParams, RenderedImage),
     MethodSpec(
         "render/thumbnails",

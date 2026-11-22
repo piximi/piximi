@@ -16,5 +16,7 @@ class Capability(StrEnum):
     INGEST_PATHS = "ingest.paths"
     EXPORT_ANNOTATIONS = "export.annotations"
     PROJECT_IO = "project.io"
+    # The backend keeps several projects and can switch between them.
+    PROJECT_WORKSPACE = "project.workspace"
     ANNOTATIONS_COMMIT = "annotations.commit"
     EVENTS_PUSH = "events.push"

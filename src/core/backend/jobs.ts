@@ -8,7 +8,9 @@ export type JobKind =
   | "classifier-fit"
   | "classifier-predict"
   | "measurements"
-  | "ingest";
+  | "ingest"
+  | "project-import"
+  | "project-export";
 
 export type JobStatus =
   | "queued"

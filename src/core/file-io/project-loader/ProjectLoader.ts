@@ -16,6 +16,7 @@ import { logger, parseError } from "utils/logUtils";
 
 import type { StorageInput } from "core/data-connector/types";
 import type { ExtractedModelFileMap } from "core/dl/types";
+import type { IClassifierApi } from "core/dl/classification/types";
 import type { Token } from "core/dl/cancel";
 
 import type { Progress, TaskError } from "utils/types";
@@ -39,6 +40,36 @@ const STAGES = {
 type OnProgressCallback<TExtra = object> = (
   args: { value: number } & TExtra,
 ) => void;
+/* Reads the archive, somewhere: a worker by default. */
+export type LoadProjectRun = (
+  input: LoadProjectInput,
+  cancel: CancelSource,
+  onProgress: (progress: { value: number }) => void,
+) => Promise<LoadProjectOutput>;
+
+const workerRun: LoadProjectRun = async (input, cancel, onProgress) => {
+  const worker = new Worker(
+    new URL("./worker/loadProjectWorker.ts", import.meta.url),
+    { type: "module" },
+  );
+  const proxy = Comlink.wrap<LoadImageWorkerAPI>(worker);
+  try {
+    // Raced so a cancel settles the call even if the worker is mid-read;
+    // `finally` then terminates it.
+    return await Promise.race([
+      proxy.loadProject(
+        input,
+        Comlink.proxy(cancel.token),
+        Comlink.proxy(onProgress),
+      ),
+      cancel.whenSignaled,
+    ]);
+  } finally {
+    proxy[Comlink.releaseProxy]();
+    worker.terminate();
+  }
+};
+
 interface LoadImageWorkerAPI {
   loadProject(
     payload: LoadProjectInput,
@@ -68,8 +99,21 @@ export class ProjectLoader implements IProjectLoader {
   private progressListeners: Set<(progress: Progress) => void> = new Set();
   private cancelSource: CancelSource | null = null;
 
-  constructor() {
-    this.storage = DataConnector.getInstance();
+  readonly #run: LoadProjectRun;
+  readonly #classifier: () => IClassifierApi;
+
+  /* `run` stands in for the worker (tests run `loadProject` on this thread);
+   * `classifier` is where tfjs models from the archive are registered. */
+  constructor(
+    deps: {
+      run?: LoadProjectRun;
+      classifier?: () => IClassifierApi;
+      storage?: DataConnector;
+    } = {},
+  ) {
+    this.storage = deps.storage ?? DataConnector.getInstance();
+    this.#run = deps.run ?? workerRun;
+    this.#classifier = deps.classifier ?? getClassifierApi;
   }
   // ============================================================
   // Deserialization (project file → structured data)
@@ -79,27 +123,17 @@ export class ProjectLoader implements IProjectLoader {
     this.resetProgress();
     const cancelSource = this.cancelSource!;
 
-    const worker = new Worker(
-      new URL("./worker/loadProjectWorker.ts", import.meta.url),
-      { type: "module" },
-    );
-    const proxy = Comlink.wrap<LoadImageWorkerAPI>(worker);
     try {
-      // Raced so a cancel settles the call even if the worker is mid-read;
-      // `finally` then terminates it.
-      const { project: v2Raw, modelFiles } = await Promise.race([
-        proxy.loadProject(
-          { files },
-          Comlink.proxy(cancelSource.token),
-          Comlink.proxy(({ value }) => {
-            this.updateProgress({
-              overallProgress: STAGES.loadProject.end * value,
-              stageProgress: value,
-            });
-          }),
-        ),
-        cancelSource.whenSignaled,
-      ]);
+      const { project: v2Raw, modelFiles } = await this.#run(
+        { files },
+        cancelSource,
+        ({ value }) => {
+          this.updateProgress({
+            overallProgress: STAGES.loadProject.end * value,
+            stageProgress: value,
+          });
+        },
+      );
 
       this.updateProgress({ stageProgress: 0 });
       const channels = await this.storeChannels(v2Raw.data.channels.entities);
@@ -145,9 +179,6 @@ export class ProjectLoader implements IProjectLoader {
         return { success: false, cancelled: true };
       }
       return { success: false, cancelled: false, error: parseError(e) };
-    } finally {
-      proxy[Comlink.releaseProxy]();
-      worker.terminate();
     }
   }
 
@@ -186,7 +217,7 @@ export class ProjectLoader implements IProjectLoader {
     modelFileMap: ExtractedModelFileMap,
     onProgress: (p: number) => void,
   ): Promise<void> {
-    const cfApi = getClassifierApi();
+    const cfApi = this.#classifier();
     const modelFileArr = Object.entries(modelFileMap);
 
     let modelIdx = 0;

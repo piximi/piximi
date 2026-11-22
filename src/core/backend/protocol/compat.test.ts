@@ -67,6 +67,7 @@ import type {
   AddPathsRequest,
   AnnotationsExportRequest,
   ExportedFile,
+  ProjectInfo,
   DimensionConfig,
   DimensionHint,
   DimensionOrder,
@@ -340,6 +341,15 @@ type Checks = [
     Equivalent<
       P.AnnotationsExportRequest["query"],
       WithPartitions<AnnotationQuery> | undefined
+    >
+  >,
+
+  // ── Projects ──────────────────────────────────────────────────────────────
+  Assert<Equivalent<P.ProjectInfo, ProjectInfo>>,
+  Assert<
+    Equivalent<
+      P.ProjectDidReset,
+      Extract<BackendEvent, { type: "project/didReset" }>
     >
   >,
 

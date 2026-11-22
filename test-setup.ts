@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import { createCanvas, createImageData } from "canvas";
 import "fake-indexeddb/auto";
 
@@ -29,3 +30,7 @@ if (typeof window !== "undefined") {
   // @ts-ignore - TS2339: Property 'ImageData' does not exist on type 'Window & typeof globalThis'.
   window.ImageData = ImageData;
 }
+
+// The project writer stamps `import.meta.env.VITE_APP_VERSION`, which the npm
+// scripts supply from package.json but vitest does not.
+vi.stubEnv("VITE_APP_VERSION", "2.0.0");

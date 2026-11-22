@@ -5,6 +5,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
+from .project import ProjectDidReset
 from .base import WireModel
 from .classification import (
     AnnotationUpdate,
@@ -179,6 +180,7 @@ BackendEvent = Annotated[
 ]
 
 EVENT_TYPES: tuple[type[WireModel], ...] = (
+    ProjectDidReset,
     KindsDidAdd,
     KindsDidChange,
     KindsDidRemove,

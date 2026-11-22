@@ -10,6 +10,8 @@ class JobKind(StrEnum):
     CLASSIFIER_PREDICT = "classifier-predict"
     MEASUREMENTS = "measurements"
     INGEST = "ingest"
+    PROJECT_IMPORT = "project-import"
+    PROJECT_EXPORT = "project-export"
 
 
 class JobStatus(StrEnum):

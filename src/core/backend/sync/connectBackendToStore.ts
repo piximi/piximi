@@ -1,10 +1,14 @@
+import { projectReset } from "store/actions";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { backendSyncSlice } from "store/backendSync";
 import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 
+import { clearCache } from "utils/renderedSrcsCache";
+
 import { isTerminal } from "../jobs";
+import { hydrateStoreFromBackend } from "./hydrateStoreFromBackend";
 
 import type { ChannelMeta, ImageSeries } from "core/entities";
 
@@ -22,6 +26,8 @@ const taskType: Record<JobKind, AppTaskType> = {
   "classifier-predict": "image-classification",
   measurements: "measurement",
   ingest: "file-upload",
+  "project-import": "project-load",
+  "project-export": "project-download",
 };
 
 /*
@@ -242,6 +248,19 @@ const applyBackendEvent = (
       if (remote) {
         store.dispatch(
           dataSlice.actions.updateExperimentName(event.experiment.name),
+        );
+      }
+      break;
+    case "project/didReset":
+      // The local backend wrote the new project into the store itself; a
+      // remote one is mirrored again from scratch.
+      if (remote) {
+        clearCache();
+        store.dispatch(projectReset());
+        void hydrateStoreFromBackend(backend, store.dispatch).catch(
+          (error: unknown) => {
+            console.error("Could not load the project again", error);
+          },
         );
       }
       break;

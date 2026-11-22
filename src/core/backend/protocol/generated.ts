@@ -98,6 +98,7 @@ export type Capability =
   | "ingest.paths"
   | "export.annotations"
   | "project.io"
+  | "project.workspace"
   | "annotations.commit"
   | "events.push";
 /**
@@ -209,7 +210,9 @@ export type JobKind =
   | "classifier-fit"
   | "classifier-predict"
   | "measurements"
-  | "ingest";
+  | "ingest"
+  | "project-import"
+  | "project-export";
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "JobStatus".
@@ -1959,11 +1962,69 @@ export interface ProjectCounts {
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectCreateParams".
+ */
+export interface ProjectCreateParams {
+  name: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
  * via the `definition` "ProjectDidChange".
  */
 export interface ProjectDidChange {
   type: "project/didChange";
   experiment: Experiment;
+}
+/**
+ * The open project was replaced (opened, created or imported); every
+ * client starts over from ``query/project``.
+ *
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectDidReset".
+ */
+export interface ProjectDidReset {
+  type: "project/didReset";
+  experiment: Experiment;
+  project: ProjectInfo;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectInfo".
+ */
+export interface ProjectInfo {
+  id: string;
+  name: string;
+  createdAt: number;
+  openedAt?: number;
+  current?: boolean;
+  images?: number;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectExportParams".
+ */
+export interface ProjectExportParams {
+  name?: string;
+  progressToken?: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectIdParams".
+ */
+export interface ProjectIdParams {
+  id: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectImportParams".
+ */
+export interface ProjectImportParams {
+  /**
+   * msgpack binary
+   */
+  data: Uint8Array;
+  name?: string;
+  progressToken?: string;
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema
@@ -1982,6 +2043,13 @@ export interface ProjectSummary {
  */
 export interface ProjectUpdateParams {
   name: string;
+}
+/**
+ * This interface was referenced by `PiximiProtocol`'s JSON-Schema
+ * via the `definition` "ProjectsResult".
+ */
+export interface ProjectsResult {
+  projects: ProjectInfo[];
 }
 /**
  * This interface was referenced by `PiximiProtocol`'s JSON-Schema

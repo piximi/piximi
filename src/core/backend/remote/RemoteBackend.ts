@@ -77,6 +77,7 @@ import type {
   IngestSummary,
   PathInspection,
   BackendExport,
+  BackendProject,
 } from "../types";
 
 type Methods = ProtocolMethods;
@@ -158,6 +159,7 @@ export class RemoteBackend implements Backend {
   measurements?: BackendMeasurements;
   ingest?: BackendIngest;
   export?: BackendExport;
+  project!: BackendProject;
 
   readonly #peer: RpcPeer;
   readonly #bus = new EventBus();
@@ -266,6 +268,14 @@ export class RemoteBackend implements Backend {
         experiment: (params as P.ProjectDidChange).experiment,
       }),
     );
+    peer.onNotification("project/didReset", (params) => {
+      const event = params as P.ProjectDidReset;
+      this.#bus.emit({
+        type: "project/didReset",
+        experiment: event.experiment,
+        project: event.project,
+      });
+    });
     peer.onNotification("categories/didChange", (params) =>
       this.#bus.emit({
         type: "categories/didChange",
@@ -337,6 +347,7 @@ export class RemoteBackend implements Backend {
     this.ingest = hasCapability(this.capabilities, "ingest.upload")
       ? this.#ingest()
       : undefined;
+    this.project = this.#project();
     this.export = hasCapability(this.capabilities, "export.annotations")
       ? {
           annotations: (request, options) =>
@@ -580,10 +591,35 @@ export class RemoteBackend implements Backend {
       this.#call("kinds/delete", { ids }),
   };
 
-  readonly project = {
-    rename: async (name: string): Promise<Experiment> =>
-      (await this.#call("project/update", { name })).experiment,
-  };
+  #project(): BackendProject {
+    return {
+      rename: async (name: string): Promise<Experiment> =>
+        (await this.#call("project/update", { name })).experiment,
+      create: async (name) => this.#call("project/create", { name }),
+      export: async (name, options) =>
+        this.#call("project/export", { name }, progress(options)),
+      import: async (data, name, options) =>
+        this.#call(
+          "project/import",
+          {
+            data:
+              data instanceof Blob
+                ? new Uint8Array(await data.arrayBuffer())
+                : data,
+            name,
+          },
+          progress(options),
+        ),
+      ...(hasCapability(this.capabilities, "project.workspace") && {
+        list: async () =>
+          (await this.#call("project/list", undefined)).projects,
+        open: async (id: string) => this.#call("project/open", { id }),
+        delete: async (id: string) => {
+          await this.#call("project/delete", { id });
+        },
+      }),
+    };
+  }
 
   readonly categories = {
     create: async (categories: Category[]): Promise<Category[]> =>

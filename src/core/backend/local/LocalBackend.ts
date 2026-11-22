@@ -32,6 +32,7 @@ import {
 import { LocalClassification } from "./LocalClassification";
 import { LocalEditing } from "./LocalEditing";
 import { LocalIngest } from "./LocalIngest";
+import { LocalProject, defaultLoader, defaultSaver } from "./LocalProject";
 import { LocalMeasurements } from "./LocalMeasurements";
 import { LocalSegmentation } from "./LocalSegmentation";
 import { ThumbnailWorkerPool } from "./ThumbnailWorkerPool";
@@ -47,6 +48,8 @@ import type {
 } from "core/entities";
 import type { ImageDecoder } from "core/file-io/file-loader/decoders";
 import type { ExportedAnnotation } from "core/file-io/export/types";
+import type { ProjectLoader } from "core/file-io/project-loader/ProjectLoader";
+import type { ProjectSaver } from "core/file-io/project-saver/ProjectSaver";
 import type { IClassifierApi } from "core/dl/classification/types";
 import type { ISegmenterApi } from "core/dl/segmentation/types";
 
@@ -87,6 +90,7 @@ import type {
   RenderedImage,
   BackendIngest,
   BackendExport,
+  BackendProject,
 } from "../types";
 import type { MeasurementsProvider } from "./LocalSegmentation";
 import type { StoreHandle } from "./store";
@@ -102,6 +106,9 @@ type LocalBackendDeps = {
   measurements?: () => MeasurementsProvider;
   /* Decodes uploaded files; defaults to a worker per file. */
   decode?: ImageDecoder;
+  /* Project file workers; tests run them on this thread. */
+  saver?: () => ProjectSaver;
+  loader?: () => ProjectLoader;
 };
 
 const groupBy = <T>(
@@ -177,6 +184,7 @@ export class LocalBackend implements Backend {
   readonly measurements: BackendMeasurements;
   readonly ingest: BackendIngest;
   readonly #editing: LocalEditing;
+  readonly #project: LocalProject;
 
   readonly #imageRows = new Derived((images: DataState["images"]) =>
     images.ids.map((id) => images.entities[id]),
@@ -241,6 +249,12 @@ export class LocalBackend implements Backend {
       storage: this.#storage,
       decode: deps.decode ?? workerImageDecoder,
       jobs: this.#jobs,
+      bus: this.#bus,
+    });
+    this.#project = new LocalProject({
+      store: deps.store,
+      saver: deps.saver ?? defaultSaver,
+      loader: deps.loader ?? defaultLoader,
       bus: this.#bus,
     });
     this.#editing = new LocalEditing({
@@ -677,7 +691,10 @@ export class LocalBackend implements Backend {
     delete: (ids: string[]): Promise<Deleted> => this.#editing.deleteKinds(ids),
   };
 
-  readonly project = {
+  readonly project: BackendProject = {
+    create: (name) => this.#project.create(name),
+    export: (name, options) => this.#project.export(name, options),
+    import: (data, name, options) => this.#project.import(data, name, options),
     rename: (name: string): Promise<Experiment> =>
       this.#editing.renameProject(name),
   };

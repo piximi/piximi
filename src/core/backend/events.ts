@@ -17,6 +17,7 @@ import type {
   ImageRecord,
   ImageUpdate,
   ModelDescriptor,
+  ProjectInfo,
   VolumeUpdate,
 } from "./types";
 
@@ -78,6 +79,9 @@ export type BackendEvent =
   /* A category was created, edited or deleted; carries the whole list. */
   | { type: "categories/didChange"; categories: Category[] }
   | { type: "project/didChange"; experiment: Experiment }
+  /* The open project was replaced (opened, created or imported); every
+   * client starts over from `query/project`. */
+  | { type: "project/didReset"; experiment: Experiment; project: ProjectInfo }
   /* A classifier was created, updated, trained, deleted or imported, or a
    * job began or finished with it; carries every classifier. */
   | { type: "classifiers/didChange"; classifiers: Classifier[] }

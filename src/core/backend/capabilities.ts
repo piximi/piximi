@@ -19,6 +19,8 @@ export const CAPABILITIES = [
   "ingest.paths",
   "export.annotations",
   "project.io",
+  // The backend keeps several projects and can switch between them.
+  "project.workspace",
   "annotations.commit",
   // The backend can originate changes (notebook, other clients) and pushes
   // them as events, rather than only echoing this client's own operations.

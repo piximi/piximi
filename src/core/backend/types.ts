@@ -405,9 +405,44 @@ export interface BackendKinds {
   delete(ids: string[]): Promise<Deleted>;
 }
 
+/* A project a backend keeps; a backend without a workspace has one. */
+export type ProjectInfo = {
+  id: string;
+  name: string;
+  /* Milliseconds since the epoch. */
+  createdAt: number;
+  openedAt?: number;
+  /* The one the session has open. */
+  current?: boolean;
+  images?: number;
+};
+
+/*
+ * The open project, and with `project.workspace` the others the backend
+ * keeps. Creating, opening or importing one replaces what every client
+ * holds, which they learn from `project/didReset` and answer by loading
+ * the project again from scratch.
+ */
 export interface BackendProject {
   /* Renames the project; announced as `project/didChange`. */
   rename(name: string): Promise<Experiment>;
+  /* An empty project takes the open one's place (a workspace keeps the old
+   * one); announced as `project/didReset`. */
+  create(name: string): Promise<ProjectInfo>;
+  /* The open project as a `.piximi` file. */
+  export(name?: string, options?: CallOptions): Promise<ExportedFile>;
+  /* A `.piximi` file takes the open project's place (a workspace adds it
+   * beside the others); announced as `project/didReset`. */
+  import(
+    data: Uint8Array | Blob,
+    name?: string,
+    options?: CallOptions,
+  ): Promise<ProjectInfo>;
+  /* The three below only with `project.workspace`. */
+  list?(): Promise<ProjectInfo[]>;
+  open?(id: string): Promise<ProjectInfo>;
+  /* Not the open one. */
+  delete?(id: string): Promise<void>;
 }
 
 export interface BackendCategories {

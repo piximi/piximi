@@ -867,6 +867,7 @@
         "ingest.paths",
         "export.annotations",
         "project.io",
+        "project.workspace",
         "annotations.commit",
         "events.push"
       ],
@@ -2924,7 +2925,9 @@
         "classifier-fit",
         "classifier-predict",
         "measurements",
-        "ingest"
+        "ingest",
+        "project-import",
+        "project-export"
       ],
       "title": "JobKind",
       "type": "string"
@@ -4152,6 +4155,19 @@
       "title": "ProjectCounts",
       "type": "object"
     },
+    "ProjectCreateParams": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ProjectCreateParams",
+      "type": "object"
+    },
     "ProjectDidChange": {
       "additionalProperties": false,
       "properties": {
@@ -4168,6 +4184,107 @@
         "experiment"
       ],
       "title": "ProjectDidChange",
+      "type": "object"
+    },
+    "ProjectDidReset": {
+      "additionalProperties": false,
+      "description": "The open project was replaced (opened, created or imported); every\nclient starts over from ``query/project``.",
+      "properties": {
+        "type": {
+          "const": "project/didReset",
+          "type": "string"
+        },
+        "experiment": {
+          "$ref": "#/$defs/Experiment"
+        },
+        "project": {
+          "$ref": "#/$defs/ProjectInfo"
+        }
+      },
+      "required": [
+        "type",
+        "experiment",
+        "project"
+      ],
+      "title": "ProjectDidReset",
+      "type": "object"
+    },
+    "ProjectExportParams": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "progressToken": {
+          "type": "string"
+        }
+      },
+      "title": "ProjectExportParams",
+      "type": "object"
+    },
+    "ProjectIdParams": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "ProjectIdParams",
+      "type": "object"
+    },
+    "ProjectImportParams": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "tsType": "Uint8Array",
+          "description": "msgpack binary"
+        },
+        "name": {
+          "type": "string"
+        },
+        "progressToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "title": "ProjectImportParams",
+      "type": "object"
+    },
+    "ProjectInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        },
+        "openedAt": {
+          "type": "number"
+        },
+        "current": {
+          "default": false,
+          "type": "boolean"
+        },
+        "images": {
+          "default": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "createdAt"
+      ],
+      "title": "ProjectInfo",
       "type": "object"
     },
     "ProjectSummary": {
@@ -4233,6 +4350,22 @@
         "name"
       ],
       "title": "ProjectUpdateParams",
+      "type": "object"
+    },
+    "ProjectsResult": {
+      "additionalProperties": false,
+      "properties": {
+        "projects": {
+          "items": {
+            "$ref": "#/$defs/ProjectInfo"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "projects"
+      ],
+      "title": "ProjectsResult",
       "type": "object"
     },
     "RenderImageParams": {
@@ -5203,6 +5336,42 @@
       "result": "#/$defs/FileExport",
       "progress": "#/$defs/ProgressValue"
     },
+    "project/list": {
+      "direction": "client->server",
+      "params": null,
+      "result": "#/$defs/ProjectsResult",
+      "progress": null
+    },
+    "project/create": {
+      "direction": "client->server",
+      "params": "#/$defs/ProjectCreateParams",
+      "result": "#/$defs/ProjectInfo",
+      "progress": null
+    },
+    "project/open": {
+      "direction": "client->server",
+      "params": "#/$defs/ProjectIdParams",
+      "result": "#/$defs/ProjectInfo",
+      "progress": null
+    },
+    "project/delete": {
+      "direction": "client->server",
+      "params": "#/$defs/ProjectIdParams",
+      "result": null,
+      "progress": null
+    },
+    "project/import": {
+      "direction": "client->server",
+      "params": "#/$defs/ProjectImportParams",
+      "result": "#/$defs/ProjectInfo",
+      "progress": "#/$defs/ProgressValue"
+    },
+    "project/export": {
+      "direction": "client->server",
+      "params": "#/$defs/ProjectExportParams",
+      "result": "#/$defs/FileExport",
+      "progress": "#/$defs/ProgressValue"
+    },
     "render/image": {
       "direction": "client->server",
       "params": "#/$defs/RenderImageParams",
@@ -5334,6 +5503,10 @@
     "$/ping": {
       "direction": "client->server",
       "params": null
+    },
+    "project/didReset": {
+      "direction": "server->client",
+      "params": "#/$defs/ProjectDidReset"
     },
     "kinds/didAdd": {
       "direction": "server->client",

@@ -8,6 +8,7 @@ import { INITIAL_PROGRESS } from "utils/types";
 
 import type { SerializedModels } from "core/dl/types";
 import type { Token } from "core/dl/cancel";
+import type { IClassifierApi } from "core/dl/classification/types";
 
 import type { ClassifierState } from "store/classifier/types";
 
@@ -35,6 +36,37 @@ interface SaveProjectWorkerAPI {
   ): Promise<{ blob: Blob }>;
 }
 
+/* Writes the archive, somewhere: a worker by default. */
+export type SaveProjectRun = (
+  input: SaveProjectWorkerInput,
+  cancel: CancelSource,
+  onProgress: OnProgressCallback,
+) => Promise<{ blob: Blob }>;
+
+/* The token is proxied so the worker's checks see the live source; a
+ * terminated worker never answers, so the call is raced against the
+ * source's rejection and the worker is terminated when done. */
+const workerRun: SaveProjectRun = async (input, cancel, onProgress) => {
+  const worker = new Worker(
+    new URL("./worker/saveProjectWorker.ts", import.meta.url),
+    { type: "module" },
+  );
+  const proxy = Comlink.wrap<SaveProjectWorkerAPI>(worker);
+  try {
+    return await Promise.race([
+      proxy.saveProject(
+        input,
+        Comlink.proxy(cancel.token),
+        Comlink.proxy(onProgress),
+      ),
+      cancel.whenSignaled,
+    ]);
+  } finally {
+    proxy[Comlink.releaseProxy]();
+    worker.terminate();
+  }
+};
+
 /**
  * ProjectSaver
  *
@@ -51,15 +83,21 @@ export class ProjectSaver implements IProjectSaver {
   private progressListeners: Set<(progress: Progress) => void> = new Set();
   private cancelSource: CancelSource | null = null;
 
+  readonly #run: SaveProjectRun;
+  readonly #classifier: () => IClassifierApi;
+
+  /* `run` stands in for the worker (tests run `saveProject` on this thread);
+   * `classifier` is where the tfjs weights are collected from. */
+  constructor(
+    deps: { run?: SaveProjectRun; classifier?: () => IClassifierApi } = {},
+  ) {
+    this.#run = deps.run ?? workerRun;
+    this.#classifier = deps.classifier ?? getClassifierApi;
+  }
+
   async saveProject(input: SaveProjectInput): Promise<SaveProjectResult> {
     this.resetProgress();
     const cancelSource = this.cancelSource!;
-
-    const worker = new Worker(
-      new URL("./worker/saveProjectWorker.ts", import.meta.url),
-      { type: "module" },
-    );
-    const proxy = Comlink.wrap<SaveProjectWorkerAPI>(worker);
 
     try {
       this.updateProgress({ stage: "serializing" });
@@ -70,23 +108,18 @@ export class ProjectSaver implements IProjectSaver {
         stageProgress: 1,
       });
 
-      // Raced so a cancel settles the call even mid-write; `finally` then
-      // terminates the worker.
-      const { blob } = await Promise.race([
-        proxy.saveProject(
-          { ...input, models },
-          Comlink.proxy(cancelSource.token),
-          Comlink.proxy(({ value }: { value: number }) => {
-            this.updateProgress({
-              overallProgress:
-                STAGES.writeProject.start +
-                (STAGES.writeProject.end - STAGES.writeProject.start) * value,
-              stageProgress: value,
-            });
-          }),
-        ),
-        cancelSource.whenSignaled,
-      ]);
+      const { blob } = await this.#run(
+        { ...input, models },
+        cancelSource,
+        ({ value }) => {
+          this.updateProgress({
+            overallProgress:
+              STAGES.writeProject.start +
+              (STAGES.writeProject.end - STAGES.writeProject.start) * value,
+            stageProgress: value,
+          });
+        },
+      );
 
       this.updateProgress({ stage: "complete", overallProgress: 1 });
       return { success: true, blob };
@@ -96,9 +129,6 @@ export class ProjectSaver implements IProjectSaver {
       }
       this.updateProgress({ stage: "error" });
       return { success: false, cancelled: false, error: parseError(e) };
-    } finally {
-      proxy[Comlink.releaseProxy]();
-      worker.terminate();
     }
   }
 
@@ -113,7 +143,7 @@ export class ProjectSaver implements IProjectSaver {
   private async collectModels(
     classifier: ClassifierState,
   ): Promise<SerializedModels> {
-    const cfApi = getClassifierApi();
+    const cfApi = this.#classifier();
     const modelNames = new Set<string>();
     // The worker keys its models by the name the classifier was created
     // with, which is the local backend's id.

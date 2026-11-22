@@ -14,11 +14,16 @@ import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 import { getDefaultModelParams } from "core/dl/classification/utils";
 import { inlineImageDecoder } from "core/file-io/file-loader/decoders";
+import { ProjectLoader } from "core/file-io/project-loader/ProjectLoader";
+import { loadProject } from "core/file-io/project-loader/loadProject";
+import { ProjectSaver } from "core/file-io/project-saver/ProjectSaver";
+import { saveProject } from "core/file-io/project-saver/saveProject";
 
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
 import { classifierSlice } from "store/classifier";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
 import { dataSlice } from "store/data";
+import { segmenterSlice } from "store/segmenter";
 
 import { computeObjectFeatures } from "utils/measurements/computeObjectFeatures";
 import { computeStatistics } from "utils/measurements/statistics";
@@ -338,7 +343,12 @@ const makeStorageInput = (im: ImageSeed, c: number): ChannelStorageInput => {
   const { storageReference: _ref, ...channel } = makeChannel(im, c);
   const data = new Uint8Array(im.width * im.height);
   for (let i = 0; i < data.length; i++) data[i] = pixelValue(i, c);
-  return { ...channel, data: data.buffer, histogram: new Uint8Array(1).buffer };
+  // A real-shaped histogram: the project writer views it as 32-bit words.
+  return {
+    ...channel,
+    data: data.buffer,
+    histogram: new Uint32Array(256).buffer,
+  };
 };
 
 const makeProject = () => ({
@@ -420,6 +430,7 @@ const createLocalBackend = async () => {
       data: dataSlice.reducer,
       appTasks: appTasksSlice.reducer,
       classifier: classifierSlice.reducer,
+      segmenter: segmenterSlice.reducer,
     },
     middleware: (getDefault) => getDefault({ serializableCheck: false }),
   });
@@ -436,6 +447,20 @@ const createLocalBackend = async () => {
     classifier: () => classifier,
     // Decodes on this thread: there is no Worker here.
     decode: inlineImageDecoder,
+    // The project file workers, run on this thread the same way.
+    saver: () =>
+      new ProjectSaver({
+        run: (input, cancel, onProgress) =>
+          saveProject(input, cancel.token, onProgress),
+        classifier: () => classifier,
+      }),
+    loader: () =>
+      new ProjectLoader({
+        run: (input, cancel, onProgress) =>
+          loadProject(input, cancel.token, onProgress),
+        classifier: () => classifier,
+        storage,
+      }),
     // The worker-free versions; the intensity one reads the same IndexedDB.
     measurements: () => ({
       computeFeatures: async (objects) => computeObjectFeatures(objects),

@@ -10,7 +10,14 @@ import {
   representsUnknown,
 } from "core/entities";
 import { Partition } from "core/dl/enums";
-import { TaskCancelledError, isTaskCancelledError } from "core/dl/cancel";
+import {
+  CancelSource,
+  TaskCancelledError,
+  isTaskCancelledError,
+} from "core/dl/cancel";
+import { loadProject } from "core/file-io/project-loader/loadProject";
+import { writeV2 } from "core/file-io/project-saver/version-writers/writeV2";
+import { PiximiStore } from "core/file-io/zarr/stores";
 import { inlineImageDecoder } from "core/file-io/file-loader/decoders";
 import {
   inferMimeType,
@@ -23,7 +30,9 @@ import { defaultClassifier } from "core/dl/classification/utils";
 import { CHANNEL_MODE } from "core/dl/segmentation/optionUtils";
 import { OUTPUT_MODE } from "core/dl/segmentation/models/consts";
 
+import { classifierSlice } from "store/classifier";
 import { IMAGE_CLASSIFIER_ID } from "store/classifier/constants";
+import { segmenterSlice } from "store/segmenter";
 
 import { compositeChannelsToDataUrl } from "utils/image/compositeChannels";
 import { decodeRleArray } from "utils/image/rle";
@@ -72,6 +81,10 @@ import type {
 } from "core/dl/classification/types";
 import type { LoadAndPrepareOutput } from "core/file-io/file-loader/types";
 import type { ExportedAnnotation } from "core/file-io/export/types";
+import type {
+  ChannelDataAccessor,
+  SerializableProject,
+} from "core/file-io/project-saver/types";
 
 import type { StoredPixels } from "utils/image/compositeChannels";
 
@@ -135,7 +148,32 @@ import type {
   PathInspection,
   UploadFile,
   BackendExport,
+  BackendProject,
+  ProjectInfo,
 } from "../types";
+
+type FakeSnapshot = {
+  experiment: Experiment;
+  series: ImageSeries[];
+  images: ImageObject[];
+  planes: Plane[];
+  channels: Channel[];
+  channelMetas: ChannelMeta[];
+  pixels: Map<string, StoredPixels>;
+  kinds: Kind[];
+  categories: Category[];
+  volumes: AnnotationVolume[];
+  annotations: AnnotationObject[];
+  classifiers: Classifier[];
+};
+
+type FakeProjectEntry = {
+  name: string;
+  createdAt: number;
+  openedAt?: number;
+  /* Absent for the open project, whose state is the backend's own. */
+  snapshot: FakeSnapshot | null;
+};
 
 type FakeImageSeed = {
   id: string;
@@ -280,8 +318,16 @@ export class FakeBackend implements Backend {
       "measurements",
       "ingest.upload",
       "export.annotations",
+      "project.io",
+      "project.workspace",
       ...(seed.files ? (["ingest.paths"] as const) : []),
     ];
+    this.#projectId = generateUUID();
+    this.#workspace.set(this.#projectId, {
+      name: this.#experiment.name,
+      createdAt: Date.now(),
+      snapshot: null,
+    });
     this.ingest = {
       upload: (files, options) => this.#runIngest(files, options),
       ...(seed.files && {
@@ -895,19 +941,223 @@ export class FakeBackend implements Backend {
     },
   };
 
-  readonly project = {
-    rename: async (name: string): Promise<Experiment> => {
-      if (!name.trim()) {
-        throw new BackendError("NOT_SUPPORTED", "A project needs a name");
-      }
-      if (name !== this.#experiment.name) {
-        this.#experiment = { ...this.#experiment, name };
-        this.#bus.emit({
-          type: "project/didChange",
-          experiment: this.#experiment,
-        });
-      }
+  // ── Projects ────────────────────────────────────────────────────────────
+  //
+  // A pretend workspace: the open project lives in the arrays above, the
+  // others as snapshots of them. Export and import run the browser's own
+  // writer and reader on this thread, so the file is the real format.
+
+  readonly #workspace = new Map<string, FakeProjectEntry>();
+  #projectId = "";
+
+  #snapshot(): FakeSnapshot {
+    return {
+      experiment: this.#experiment,
+      series: [...this.#series],
+      images: [...this.#images],
+      planes: [...this.#planes],
+      channels: [...this.#channels],
+      channelMetas: [...this.#channelMetas],
+      pixels: new Map(this.#pixels),
+      kinds: [...this.#kinds],
+      categories: [...this.#categories],
+      volumes: [...this.#volumes],
+      annotations: [...this.#annotations],
+      classifiers: [...this.#classifiers],
+    };
+  }
+
+  #restore(snapshot: FakeSnapshot | null, name: string) {
+    this.#experiment = snapshot?.experiment ?? {
+      id: generateUUID(),
+      name,
+    };
+    this.#series = snapshot?.series ?? [];
+    this.#images = snapshot?.images ?? [];
+    this.#planes = snapshot?.planes ?? [];
+    this.#channels = snapshot?.channels ?? [];
+    this.#channelMetas = snapshot?.channelMetas ?? [];
+    this.#pixels = snapshot?.pixels ?? new Map();
+    this.#kinds = snapshot?.kinds ?? [UNKNOWN_KIND];
+    this.#categories = snapshot?.categories ?? [
+      UNKNOWN_IMAGE_CATEGORY,
+      UNKNOWN_KIND_CATEGORY,
+    ];
+    this.#volumes = snapshot?.volumes ?? [];
+    this.#annotations = snapshot?.annotations ?? [];
+    this.#classifiers = snapshot?.classifiers ?? [];
+  }
+
+  #projectInfo(id: string): ProjectInfo {
+    const entry = this.#workspace.get(id)!;
+    const current = id === this.#projectId;
+    return {
+      id,
+      name: current ? this.#experiment.name : entry.name,
+      createdAt: entry.createdAt,
+      openedAt: entry.openedAt,
+      current,
+      images: current
+        ? this.#images.length
+        : (entry.snapshot?.images.length ?? 0),
+    };
+  }
+
+  #switchTo(id: string, snapshot: FakeSnapshot | null, name: string) {
+    // Park the open project, then take the other one's place.
+    const open = this.#workspace.get(this.#projectId);
+    if (open) {
+      open.snapshot = this.#snapshot();
+      open.name = this.#experiment.name;
+    }
+    this.#projectId = id;
+    const entry = this.#workspace.get(id)!;
+    entry.openedAt = Date.now();
+    this.#restore(snapshot, name);
+    this.#bus.emit({
+      type: "project/didReset",
+      experiment: this.#experiment,
+      project: this.#projectInfo(id),
+    });
+  }
+
+  #entityState<T extends { id: string }>(items: T[]) {
+    return {
+      ids: items.map((item) => item.id),
+      entities: Object.fromEntries(items.map((item) => [item.id, item])),
+    };
+  }
+
+  readonly project: BackendProject = {
+    rename: async (name) => {
+      this.#experiment = { ...this.#experiment, name };
+      this.#bus.emit({
+        type: "project/didChange",
+        experiment: this.#experiment,
+      });
       return this.#experiment;
+    },
+    create: async (name) => {
+      const id = generateUUID();
+      this.#workspace.set(id, { name, createdAt: Date.now(), snapshot: null });
+      this.#switchTo(id, null, name);
+      return this.#projectInfo(id);
+    },
+    export: async (name) => {
+      const fileName = (name ?? this.#experiment.name).replace(/[./\\]/g, "_");
+      const store = new PiximiStore(fileName);
+      const project: SerializableProject = {
+        data: {
+          experiment: this.#experiment,
+          imageSeries: this.#entityState(this.#series),
+          images: this.#entityState(this.#images),
+          planes: this.#entityState(this.#planes),
+          kinds: this.#entityState(this.#kinds),
+          categories: this.#entityState(this.#categories),
+          channels: this.#entityState(this.#channels),
+          channelMetas: this.#entityState(this.#channelMetas),
+          annotationVolumes: this.#entityState(this.#volumes),
+          annotations: this.#entityState(this.#annotations),
+        },
+        classifier: classifierSlice.getInitialState(),
+        segmenter: segmenterSlice.getInitialState(),
+      };
+      const accessor: ChannelDataAccessor = async (ids) =>
+        new Map(
+          ids.map((id) => {
+            const stored = this.#pixels.get(id)!;
+            return [
+              id,
+              { data: stored.data, histogram: new Uint32Array(256).buffer },
+            ];
+          }),
+        );
+      await writeV2(store, project, accessor, () => {});
+      const data = await store.zip.generateAsync({ type: "uint8array" });
+      return { fileName: `${fileName}.piximi`, mime: "application/zip", data };
+    },
+    import: async (data, name) => {
+      const bytes =
+        data instanceof Blob ? new Uint8Array(await data.arrayBuffer()) : data;
+      const file = new File([bytes.slice()], "import.piximi", {
+        type: "application/zip",
+      });
+      const { project } = await loadProject(
+        { files: [file] },
+        new CancelSource().token,
+        () => {},
+      );
+      const d = project.data;
+      const pixels = new Map<string, StoredPixels>();
+      const channels: Channel[] = [];
+      for (const v2 of Object.values(d.channels.entities)) {
+        if (!v2) continue;
+        const { data: buffer, histogram: _histogram, ...rest } = v2;
+        pixels.set(v2.id, {
+          data: buffer,
+          width: v2.width,
+          height: v2.height,
+          bitDepth: v2.bitDepth,
+        });
+        channels.push({
+          ...rest,
+          storageReference: {
+            storageId: v2.id,
+            storeName: STORES.CHANNEL_DATA,
+            width: v2.width,
+            height: v2.height,
+            dtype: v2.dtype,
+            byteSize: buffer.byteLength,
+          },
+        } as Channel);
+      }
+      const rows = <T>(state: {
+        ids: string[];
+        entities: Record<string, T | undefined>;
+      }) => state.ids.map((id) => state.entities[id]!);
+      const projectName = name ?? d.experiment.name;
+      const snapshot: FakeSnapshot = {
+        experiment: { ...d.experiment, name: projectName },
+        series: rows(d.imageSeries) as ImageSeries[],
+        images: rows(d.images) as ImageObject[],
+        planes: rows(d.planes),
+        channels,
+        channelMetas: rows(d.channelMetas) as ChannelMeta[],
+        pixels,
+        kinds: rows(d.kinds),
+        categories: rows(d.categories),
+        volumes: rows(d.annotationVolumes),
+        annotations: rows(d.annotations) as AnnotationObject[],
+        classifiers: [],
+      };
+      const id = generateUUID();
+      this.#workspace.set(id, {
+        name: projectName,
+        createdAt: Date.now(),
+        snapshot,
+      });
+      this.#switchTo(id, snapshot, projectName);
+      return this.#projectInfo(id);
+    },
+    list: async () =>
+      [...this.#workspace.keys()].map((id) => this.#projectInfo(id)),
+    open: async (id) => {
+      const entry = this.#workspace.get(id);
+      if (!entry) throw new BackendError("NOT_FOUND", `No project ${id}`);
+      if (id !== this.#projectId)
+        this.#switchTo(id, entry.snapshot, entry.name);
+      return this.#projectInfo(id);
+    },
+    delete: async (id) => {
+      if (id === this.#projectId) {
+        throw new BackendError(
+          "NOT_SUPPORTED",
+          "Open another project before deleting this one",
+        );
+      }
+      if (!this.#workspace.delete(id)) {
+        throw new BackendError("NOT_FOUND", `No project ${id}`);
+      }
     },
   };
 

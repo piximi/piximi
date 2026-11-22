@@ -206,6 +206,42 @@ export type ProtocolMethods = {
     progress: P.ProgressValue;
     direction: "client->server";
   };
+  "project/list": {
+    params: void;
+    result: P.ProjectsResult;
+    progress: void;
+    direction: "client->server";
+  };
+  "project/create": {
+    params: P.ProjectCreateParams;
+    result: P.ProjectInfo;
+    progress: void;
+    direction: "client->server";
+  };
+  "project/open": {
+    params: P.ProjectIdParams;
+    result: P.ProjectInfo;
+    progress: void;
+    direction: "client->server";
+  };
+  "project/delete": {
+    params: P.ProjectIdParams;
+    result: void;
+    progress: void;
+    direction: "client->server";
+  };
+  "project/import": {
+    params: P.ProjectImportParams;
+    result: P.ProjectInfo;
+    progress: P.ProgressValue;
+    direction: "client->server";
+  };
+  "project/export": {
+    params: P.ProjectExportParams;
+    result: P.FileExport;
+    progress: P.ProgressValue;
+    direction: "client->server";
+  };
   "render/image": {
     params: P.RenderImageParams;
     result: P.RenderedImage;
@@ -328,6 +364,10 @@ export type ProtocolNotifications = {
   "$/cancelRequest": { params: P.CancelParams; direction: "client->server" };
   "$/progress": { params: P.ProgressParams; direction: "server->client" };
   "$/ping": { params: void; direction: "client->server" };
+  "project/didReset": {
+    params: P.ProjectDidReset;
+    direction: "server->client";
+  };
   "kinds/didAdd": { params: P.KindsDidAdd; direction: "server->client" };
   "kinds/didChange": { params: P.KindsDidChange; direction: "server->client" };
   "kinds/didRemove": { params: P.KindsDidRemove; direction: "server->client" };
