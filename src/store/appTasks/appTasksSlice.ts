@@ -7,6 +7,10 @@ import type { AppTask, AppTasksState, AppTaskStatus } from "./types";
 
 const initialState: AppTasksState = { tasks: {} };
 
+/** Running from the user's point of view — "stopping" is still in flight. */
+export const isActiveStatus = (status: AppTaskStatus) =>
+  status === "pending" || status === "running" || status === "stopping";
+
 export const appTasksSlice = createSlice({
   name: "tasks",
   initialState,
@@ -51,6 +55,8 @@ export const appTasksSlice = createSlice({
       task.status = "error";
       task.error = action.payload.error;
       task.completedAt = Date.now();
+      // A failure must never go unseen, even if the user hid the task.
+      task.dismissed = false;
     },
     taskCancelled(state, action: PayloadAction<{ id: string }>) {
       const task = state.tasks[action.payload.id];
@@ -60,10 +66,19 @@ export const appTasksSlice = createSlice({
       task.completedAt = Date.now();
     },
     taskDismissed(state, action: PayloadAction<{ id: string }>) {
-      state.tasks[action.payload.id].dismissed = true;
+      const task = state.tasks[action.payload.id];
+      if (task) task.dismissed = true;
     },
     taskShow(state, action: PayloadAction<string>) {
-      state.tasks[action.payload].dismissed = false;
+      const task = state.tasks[action.payload];
+      if (task) task.dismissed = false;
+    },
+    // Restore every hidden task that is still running (the tray chip's click).
+    hiddenActiveTasksShown(state) {
+      for (const task of Object.values(state.tasks)) {
+        if (task.dismissed && isActiveStatus(task.status))
+          task.dismissed = false;
+      }
     },
     completedTasksPurged(state) {
       // Call periodically to avoid unbounded growth

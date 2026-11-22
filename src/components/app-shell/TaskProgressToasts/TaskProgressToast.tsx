@@ -15,11 +15,12 @@ import {
   IconButton,
   LinearProgress,
   Paper,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import { Remove as Rm } from "@mui/icons-material";
+import { Close, Remove as Rm } from "@mui/icons-material";
 
-import { appTasksSlice } from "store/appTasks/appTasksSlice";
+import { appTasksSlice, isActiveStatus } from "store/appTasks/appTasksSlice";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { taskTypeDisplayLookup } from "store/appTasks/utils";
 
@@ -57,9 +58,11 @@ export const TaskProgressToast = ({ task }: { task: AppTask }) => {
   const dispatch = useDispatch();
   const isActive = task.status === "pending" || task.status === "running";
 
+  // Hiding is display-only. The cancel fn must survive it so Stop still works
+  // when the task is restored from the tray; the task's own hook unregisters
+  // it when the work settles.
   const dismissTask = useCallback(() => {
     dispatch(appTasksSlice.actions.taskDismissed({ id: task.id }));
-    taskCancelRegistry.unregister(task.id);
   }, [dispatch, task.id]);
 
   const progressBar = useMemo(() => {
@@ -125,7 +128,10 @@ export const TaskProgressToast = ({ task }: { task: AppTask }) => {
         >
           {taskTypeDisplayLookup[task.type]}
         </Typography>
-        <ActionButton dismissTask={dismissTask} />
+        <ActionButton
+          dismissTask={dismissTask}
+          minimise={isActiveStatus(task.status)}
+        />
       </Box>
       <Box>
         <Typography
@@ -162,22 +168,39 @@ export const TaskProgressToast = ({ task }: { task: AppTask }) => {
   );
 };
 
-const ActionButton = ({ dismissTask }: { dismissTask: () => void }) => {
+/**
+ * Minus while the task runs (it can be restored from the tray chip), × once it
+ * has finished (closing is final).
+ */
+const ActionButton = ({
+  dismissTask,
+  minimise,
+}: {
+  dismissTask: () => void;
+  minimise: boolean;
+}) => {
+  const label = minimise ? "Minimise" : "Close";
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
-      <IconButton
-        size="small"
-        aria-label="dismiss notification"
-        color="inherit"
-        onClick={dismissTask}
-        sx={(theme) => ({
-          p: 0,
-          border: `1px solid ${theme.palette.text.primary}`,
-          borderRadius: 1,
-        })}
-      >
-        <Rm viewBox="0 3 24 18" sx={{ fontSize: "1rem", height: "12px" }} />
-      </IconButton>
+      <Tooltip title={label} placement="left">
+        <IconButton
+          size="small"
+          aria-label={label}
+          color="inherit"
+          onClick={dismissTask}
+          sx={(theme) => ({
+            p: 0,
+            border: `1px solid ${theme.palette.text.primary}`,
+            borderRadius: 1,
+          })}
+        >
+          {minimise ? (
+            <Rm viewBox="0 3 24 18" sx={{ fontSize: "1rem", height: "12px" }} />
+          ) : (
+            <Close sx={{ fontSize: "1rem", height: "12px" }} />
+          )}
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };

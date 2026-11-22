@@ -1,5 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 
+import { isActiveStatus } from "./appTasksSlice";
+
 import type { RootState } from "store/rootReducer";
 
 import type { AppTaskType } from "./types";
@@ -35,6 +37,11 @@ export const selectHasRunningTasks = createSelector(
 // start order — drives the toast stack.
 export const selectDisplayableTasks = createSelector(selectAllTasks, (tasks) =>
   tasks.filter((t) => !t.dismissed).sort((a, b) => a.startedAt - b.startedAt),
+);
+
+// Tasks the user minimised that are still running — drives the tray chip.
+export const selectHiddenActiveTasks = createSelector(selectAllTasks, (tasks) =>
+  tasks.filter((t) => t.dismissed && isActiveStatus(t.status)),
 );
 
 // Progress is stored on a 0-100 scale; -1 marks an indeterminate task.

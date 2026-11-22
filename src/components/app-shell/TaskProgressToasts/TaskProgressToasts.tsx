@@ -2,14 +2,19 @@ import { useSelector } from "react-redux";
 
 import { Stack } from "@mui/material";
 
-import { selectDisplayableTasks } from "store/appTasks/selectors";
+import {
+  selectDisplayableTasks,
+  selectHiddenActiveTasks,
+} from "store/appTasks/selectors";
 
 import { TaskProgressToast } from "./TaskProgressToast";
+import { TaskTrayChip } from "./TaskTrayChip";
 
 export const TaskProgressToasts = () => {
   const tasks = useSelector(selectDisplayableTasks);
+  const hiddenActive = useSelector(selectHiddenActiveTasks);
 
-  if (tasks.length === 0) return null;
+  if (tasks.length === 0 && hiddenActive.length === 0) return null;
 
   return (
     <Stack
@@ -30,6 +35,7 @@ export const TaskProgressToasts = () => {
       {tasks.map((task) => (
         <TaskProgressToast key={task.id} task={task} />
       ))}
+      <TaskTrayChip />
     </Stack>
   );
 };
