@@ -508,8 +508,16 @@ def _write_settings(z: ZarrZipWriter, path: str, hyperparameters: dict[str, Any]
     )
 
 
+DEFAULT_ARCHITECTURE = "simple-cnn"
+"""The browser's default pick for a new classifier; it falls back to the
+backend's first architecture when it does not know this one."""
+
+
 def _write_classifiers(z: ZarrZipWriter, classifiers: list[Classifier], kind_names: dict[str, str]) -> None:
-    by_target: dict[str, list[Classifier]] = {}
+    # The browser keeps a classifier entry for the image target and every
+    # kind, and its selectors throw on a kind without one, so every target
+    # gets a group here, with or without models. ``kind_names`` lists them.
+    by_target: dict[str, list[Classifier]] = {target: [] for target in kind_names}
     for classifier in classifiers:
         by_target.setdefault(classifier.target_id, []).append(classifier)
     z.group(G["classifier"], {"classifier_kinds": list(by_target)})
@@ -522,7 +530,7 @@ def _write_classifiers(z: ZarrZipWriter, classifiers: list[Classifier], kind_nam
                 "model_target_id": target_id,
                 "model_target_name": kind_names.get(target_id, target_id),
                 "active_model": None,
-                "new_model_arch": group[0].architecture_id,
+                "new_model_arch": group[0].architecture_id if group else DEFAULT_ARCHITECTURE,
                 "status": "idle",
             },
         )
@@ -605,6 +613,11 @@ def _write_classifiers(z: ZarrZipWriter, classifiers: list[Classifier], kind_nam
 def read_project(data: bytes) -> ProjectContents:
     """A ``.piximi`` archive's contents; pixels are read when asked for."""
     archive = zipfile.ZipFile(io.BytesIO(data))
+    if any(name.endswith("/.zgroup") or name.endswith("/.zarray") for name in archive.namelist()):
+        raise ValueError(
+            "This project file is in an older layout (zarr v2) the engine does not read. "
+            "Open it in the browser app and save it again to upgrade it."
+        )
     z = ZarrZipReader(archive)
     version = str(z.attrs("").get("version", ""))
     if version.split(".")[0] != "2":

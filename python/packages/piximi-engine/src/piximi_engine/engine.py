@@ -399,8 +399,7 @@ class ReferenceEngine:
         name = params.name or self.experiment.name or "project"
         ctx.progress(ProgressValue(percent=0, message="Gathering the project").to_wire())
         contents = self._project_contents()
-        kind_names = {kind.id: kind.name for kind in contents.kinds}
-        kind_names["image"] = "Image"
+        kind_names = {"image": "Image", **{kind.id: kind.name for kind in contents.kinds}}
         self._capture_loop()
         loop = self._loop
 

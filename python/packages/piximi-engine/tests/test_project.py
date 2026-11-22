@@ -158,3 +158,28 @@ def test_a_browser_written_project_reads_back():
     pixels = contents.pixels(channel.id)
     assert pixels.shape == (4, 6) and pixels.dtype == np.uint8
     assert contents.classifiers == []
+
+
+async def test_export_writes_a_classifier_group_for_every_target(engine: ReferenceEngine):
+    project = Project(engine)
+    await project.create_kind("Cell")
+    exported = await engine.project_export(ProjectExportParams(name="targets"), HandlerContext(None))
+    with zipfile.ZipFile(io.BytesIO(exported.data)) as archive:
+        reader = ZarrZipReader(archive)
+        targets = reader.attrs("classifier")["classifier_kinds"]
+        kind_ids = reader.attrs("data/kinds")["kind_id"]
+        assert targets[0] == "image" and sorted(targets[1:]) == sorted(kind_ids)
+        for target in targets:
+            attrs = reader.attrs(f"classifier/{target}")
+            assert attrs["models"] == [] and attrs["model_target_id"] == target and attrs["new_model_arch"]
+        assert reader.attrs("classifier/image")["model_target_name"] == "Image"
+
+
+async def test_import_refuses_a_zarr_v2_archive_with_a_pointer(engine: ReferenceEngine):
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("old.zarr/", b"")
+        archive.writestr("old.zarr/.zgroup", json.dumps({"zarr_format": 2}))
+        archive.writestr("old.zarr/.zattrs", json.dumps({"version": "1.1.0"}))
+    with pytest.raises(ValueError, match="older layout"):
+        await engine.project_import(ProjectImportParams(data=buffer.getvalue()), HandlerContext(None))
