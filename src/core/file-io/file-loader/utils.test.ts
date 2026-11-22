@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { reconcileChannelMetas } from "./fileInputUtils";
+import { isZipArchive, reconcileChannelMetas } from "./fileInputUtils";
 
 import type { Channel, ChannelMeta } from "../../entities/channel";
 
@@ -168,5 +168,30 @@ describe("reconcileChannelMetas", () => {
       "e0",
       "e2",
     ]);
+  });
+});
+
+describe("isZipArchive", () => {
+  it("takes the extension's word over a browser's type", () => {
+    expect(isZipArchive({ name: "p.piximi", type: "" })).toBe(true);
+    expect(isZipArchive({ name: "P.PIXIMI" })).toBe(true);
+    expect(isZipArchive({ name: "p.zip", type: "application/zip" })).toBe(true);
+    // Windows registers .zip under a vendor type
+    expect(
+      isZipArchive({ name: "p.zip", type: "application/x-zip-compressed" }),
+    ).toBe(true);
+    expect(isZipArchive({ name: "p.zip", type: "" })).toBe(true);
+  });
+  it("accepts a zip type on a file with any other name", () => {
+    expect(
+      isZipArchive({ name: "project", type: "application/x-zip-compressed" }),
+    ).toBe(true);
+    expect(isZipArchive({ name: "project.bin", type: "application/zip" })).toBe(
+      true,
+    );
+  });
+  it("rejects anything else", () => {
+    expect(isZipArchive({ name: "image.png", type: "image/png" })).toBe(false);
+    expect(isZipArchive({ name: "folder" })).toBe(false);
   });
 });

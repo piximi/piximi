@@ -12,6 +12,7 @@ import {
 import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-material";
 
 import { useCapability } from "core/backend";
+import { PROJECT_ARCHIVE_ACCEPT } from "core/file-io/file-loader/fileInputUtils";
 
 import { useDialogHotkey, useProjectLoader } from "hooks";
 
@@ -172,7 +173,7 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
       />
       <input
         ref={zipInputRef}
-        accept=".piximi, application/zip"
+        accept={PROJECT_ARCHIVE_ACCEPT}
         hidden
         id="open-project-zip"
         onChange={handleInputChange}

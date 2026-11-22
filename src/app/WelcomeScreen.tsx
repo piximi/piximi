@@ -14,6 +14,7 @@ import {
 
 import { useBackend } from "core/backend";
 import { leaveSession } from "core/backend/bootstrap";
+import { PROJECT_ARCHIVE_ACCEPT } from "core/file-io/file-loader/fileInputUtils";
 
 import {
   useDialogHotkey,
@@ -156,7 +157,7 @@ export const WelcomeScreen = () => {
               ref={fileInputRef}
               type="file"
               hidden
-              accept=".piximi, application/zip"
+              accept={PROJECT_ARCHIVE_ACCEPT}
               onChange={handleOpenProject}
               data-testid="upload-project-file"
             />

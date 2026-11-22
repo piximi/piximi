@@ -36,6 +36,33 @@ export const inferMimeType = (fileName: string, type?: string): MimeType => {
 export const isTiffFile = (fileName: string): boolean =>
   inferMimeType(fileName) === MIME.TIFF;
 
+/* Browsers do not agree on a zip's type: Chrome and Firefox report
+ * "application/zip", Windows registers ".zip" as
+ * "application/x-zip-compressed", and ".piximi" is unknown to all of them, so
+ * the extension decides and the type only confirms. */
+const ZIP_MIME_TYPES = [
+  "application/zip",
+  "application/x-zip-compressed",
+  "application/x-zip",
+  "multipart/x-zip",
+];
+export const PROJECT_ARCHIVE_ACCEPT = [
+  ".piximi",
+  ".zip",
+  ...ZIP_MIME_TYPES,
+].join(",");
+export const isZipArchive = (file: {
+  name: string;
+  type?: string;
+}): boolean => {
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  return (
+    ext === "zip" ||
+    ext === "piximi" ||
+    (!!file.type && ZIP_MIME_TYPES.includes(file.type.toLowerCase()))
+  );
+};
+
 export const zipInputToBuffer = async (
   input: JSZip | File | Blob | ArrayBuffer,
 ): Promise<ArrayBuffer> => {

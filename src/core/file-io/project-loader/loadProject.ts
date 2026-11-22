@@ -2,6 +2,7 @@ import JSZip from "jszip";
 import { clean, eq, lt, lte, valid } from "semver";
 
 import { MODEL_MANIFEST_FILENAME } from "core/file-io/consts";
+import { isZipArchive } from "core/file-io/file-loader/fileInputUtils";
 import { CancelSource } from "core/dl/cancel";
 
 import { logger } from "utils/logUtils";
@@ -166,10 +167,7 @@ async function openStore(
   files: File[],
 ): Promise<{ store: CustomStore; modelFiles: ExtractedModelFileMap }> {
   const f = files[0];
-  if (
-    files.length === 1 &&
-    (f.type === "application/zip" || f.name.toLowerCase().endsWith(".piximi"))
-  ) {
+  if (files.length === 1 && isZipArchive(f)) {
     return createStoreFromZip(files[0]);
   }
   return createStoreFromFileList(files);
