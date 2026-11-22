@@ -57,7 +57,8 @@ async def serve(
             roots=list(roots) if roots is not None else [folder or Path.cwd()],
         )
         if folder is not None:
-            engine.ingest_folder(folder)
+            engine.scan_folder = folder
+            engine.scan_if_default()
     static_dir = find_frontend(str(frontend) if frontend else None)
     stale = frontend_version_warning(static_dir) if static_dir is not None else None
     if stale:

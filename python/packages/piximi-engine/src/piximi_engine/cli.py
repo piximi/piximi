@@ -67,7 +67,8 @@ async def _serve(args: argparse.Namespace) -> None:
         data_dir, gpu=not args.no_gpu, models_dirs=args.models_dir or [], roots=roots or [Path.cwd()]
     )
     if images is not None:
-        added = engine.ingest_folder(images)
+        engine.scan_folder = images
+        added = engine.scan_if_default()
         print(f"Imported {len(added)} new image(s) from {images}", flush=True)
 
     auth = Auth(None if args.no_auth else (args.token or Auth.generate_token()))

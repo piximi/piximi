@@ -42,6 +42,13 @@ from piximi_schema.editing import (
     ProjectUpdateParams,
 )
 from piximi_schema.exports import AnnotationsExportRequest
+from piximi_schema.project import (
+    ProjectCreateParams,
+    ProjectExportParams,
+    ProjectIdParams,
+    ProjectImportParams,
+    ProjectsResult,
+)
 from piximi_schema.ingest import (
     AddPathsParams,
     BrowseParams,
@@ -264,7 +271,9 @@ class SessionHub:
             return DeletedResult(deleted=await engine.kinds_delete(params.ids))
 
         async def project_update(params: ProjectUpdateParams, _ctx: HandlerContext):
-            return ExperimentResult(experiment=await engine.project_update(params.name))
+            # An engine with a workspace renames its registry entry as well.
+            rename = getattr(engine, "project_rename", engine.project_update)
+            return ExperimentResult(experiment=await rename(params.name))
 
         async def render_image(params: RenderImageParams, _ctx: HandlerContext):
             return await engine.render_image(params.request)
@@ -350,6 +359,25 @@ class SessionHub:
         async def export_annotations(params: AnnotationsExportRequest, ctx: HandlerContext):
             return await engine.export_annotations(params, ctx)
 
+        async def project_list(_ctx: HandlerContext):
+            return ProjectsResult(projects=await engine.project_list())
+
+        async def project_create(params: ProjectCreateParams, _ctx: HandlerContext):
+            return await engine.project_create(params.name)
+
+        async def project_open(params: ProjectIdParams, _ctx: HandlerContext):
+            return await engine.project_open(params.id)
+
+        async def project_delete(params: ProjectIdParams, _ctx: HandlerContext):
+            await engine.project_delete(params.id)
+            return None
+
+        async def project_import(params: ProjectImportParams, ctx: HandlerContext):
+            return await engine.project_import(params, ctx)
+
+        async def project_export(params: ProjectExportParams, ctx: HandlerContext):
+            return await engine.project_export(params, ctx)
+
         peer.on_request("initialize", typed(InitializeParams, initialize))
         peer.on_request("shutdown", typed(None, shutdown))
         peer.on_request("query/project", typed(None, lambda _ctx: engine.project()))
@@ -385,6 +413,12 @@ class SessionHub:
         peer.on_request("ingest/inspect", typed(InspectParams, ingest_inspect))
         peer.on_request("ingest/addPaths", typed(AddPathsParams, ingest_add_paths))
         peer.on_request("export/annotations", typed(AnnotationsExportRequest, export_annotations))
+        peer.on_request("project/list", typed(None, project_list))
+        peer.on_request("project/create", typed(ProjectCreateParams, project_create))
+        peer.on_request("project/open", typed(ProjectIdParams, project_open))
+        peer.on_request("project/delete", typed(ProjectIdParams, project_delete))
+        peer.on_request("project/import", typed(ProjectImportParams, project_import))
+        peer.on_request("project/export", typed(ProjectExportParams, project_export))
         peer.on_request("render/image", typed(RenderImageParams, render_image))
         peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
         peer.on_request("jobs/list", typed(None, jobs_list))

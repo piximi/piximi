@@ -54,6 +54,7 @@ from piximi_schema.events import (
     ProjectDidChange,
 )
 from piximi_schema.exports import AnnotationsExportRequest, FileExport
+from piximi_schema.project import ProjectExportParams, ProjectImportParams, ProjectInfo
 from piximi_schema.ingest import (
     AddPathsParams,
     DirectoryListing,
@@ -202,6 +203,30 @@ class Engine(Protocol):
     async def export_annotations(self, request: AnnotationsExportRequest, ctx: HandlerContext) -> FileExport:
         """The matching objects as a file in one of the export formats
         (``export.annotations``); see ``piximi_schema.exports``."""
+        ...
+
+    # ── Projects (``project.io``; several of them with ``project.workspace``) ─
+
+    async def project_list(self) -> list[ProjectInfo]: ...
+
+    async def project_create(self, name: str) -> ProjectInfo:
+        """Makes an empty project and opens it; announces ``project/didReset``."""
+        ...
+
+    async def project_open(self, project_id: str) -> ProjectInfo:
+        """Switches the session to the project; announces ``project/didReset``."""
+        ...
+
+    async def project_delete(self, project_id: str) -> None:
+        """Removes a project that is not open."""
+        ...
+
+    async def project_import(self, params: ProjectImportParams, ctx: HandlerContext) -> ProjectInfo:
+        """Unpacks a ``.piximi`` file into a new project and opens it."""
+        ...
+
+    async def project_export(self, params: ProjectExportParams, ctx: HandlerContext) -> FileExport:
+        """The open project as a ``.piximi`` file."""
         ...
 
     # ── Mutations ───────────────────────────────────────────────────────────

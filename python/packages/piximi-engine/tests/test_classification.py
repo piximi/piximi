@@ -123,7 +123,7 @@ async def test_fit_predict_settle_and_archive(classifying: ReferenceEngine):
     jobs = await engine.jobs_list()
     assert jobs[-1].kind == "classifier-fit" and jobs[-1].status == "succeeded"
     # Weights are on disk, so another engine on this directory can predict.
-    assert (engine.data_dir / "classifiers" / f"{record.id}.bin").is_file()
+    assert (engine.project_dir / "classifiers" / f"{record.id}.bin").is_file()
 
     predicted = await engine.classification_predict(ClassifierPredictRequest(classifier_id=record.id), ctx())
     assert predicted.predicted == 1 and predicted.cancelled is False
@@ -167,7 +167,7 @@ async def test_fit_predict_settle_and_archive(classifying: ReferenceEngine):
 
     await engine.classification_delete(record.id)
     assert [c.name for c in await engine.classification_list()] == ["Shades copy"]
-    assert not (engine.data_dir / "classifiers" / f"{record.id}.bin").exists()
+    assert not (engine.project_dir / "classifiers" / f"{record.id}.bin").exists()
     with pytest.raises(BackendError):
         await engine.classification_delete(record.id)
 

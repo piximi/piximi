@@ -122,6 +122,7 @@ from piximi_schema.render import (
 )
 from piximi_schema.errors import BackendErrorData
 from piximi_schema.exports import AnnotationsExportRequest, ExportedAnnotation, FileExport
+from piximi_schema.project import ProjectDidReset, ProjectExportParams, ProjectImportParams, ProjectInfo
 from piximi_schema.rpc import ProgressValue
 from piximi_schema.segmentation import (
     ModelDescriptor,
@@ -150,6 +151,8 @@ from .measure import channel_statistics, intensity_measurements, object_features
 from .measurements import measure_annotations, measure_images, measurement_table, unmeasured_ids
 from .exports import build_export
 from .paths import PathPolicy
+from .project_file import ProjectContents, read_project, write_project
+from .workspace import ProjectEntry, Workspace
 from .models import ModelRegistry, SegmentationModel, default_registry
 from .models.base import apply_option_defaults
 from .query import (
@@ -202,8 +205,9 @@ class ReferenceEngine:
         self.data_dir = Path(data_dir)
         self.paths = PathPolicy(roots)
         """Folders a client may browse and add images from (``ingest.paths``)."""
-        self.meta = MetaStore(self.data_dir / "meta.sqlite")
-        self.pixels = PixelStore(self.data_dir / "pixels.zarr")
+        self.workspace = Workspace(self.data_dir)
+        self.scan_folder: Path | None = None
+        """The served folder, scanned for new files whenever the default project opens."""
         if isinstance(models, ModelRegistry):
             self.models = models
         elif models is None:
@@ -224,8 +228,10 @@ class ReferenceEngine:
         self._uploads: dict[str, _Upload] = {}
         """Browser uploads in progress, by upload id."""
         self.jobs = JobRegistry(self._emit)
-        self.classification = ClassificationService(self)
-        self._ensure_project()
+        entry = self.workspace.current or (self.workspace.projects[0] if self.workspace.projects else None)
+        if entry is None:
+            entry = self.workspace.create(self.data_dir.parent.name or "Project", default=True)
+        self._open_project(entry.id)
 
     # ── Engine protocol: session ────────────────────────────────────────────
 
@@ -235,6 +241,8 @@ class ReferenceEngine:
             Capability.MEASUREMENTS,
             Capability.INGEST_UPLOAD,
             Capability.EXPORT_ANNOTATIONS,
+            Capability.PROJECT_IO,
+            Capability.PROJECT_WORKSPACE,
             Capability.ANNOTATIONS_COMMIT,
             Capability.EVENTS_PUSH,
         ]
@@ -255,7 +263,7 @@ class ReferenceEngine:
 
     async def close(self) -> None:
         await self.models.close()
-        self.meta.close()
+        self._close_project()
 
     def _emit(self, event: BackendEvent) -> None:
         for listener in list(self._listeners):
@@ -281,9 +289,8 @@ class ReferenceEngine:
 
     # ── Project setup and ingest ────────────────────────────────────────────
 
-    def _ensure_project(self) -> None:
+    def _ensure_project(self, name: str) -> None:
         if self.meta.get("experiment", "experiment", _ExperimentRow) is None:
-            name = self.data_dir.parent.name or "Project"
             self.meta.put("experiment", _ExperimentRow(id="experiment", experiment=Experiment(id=generate_uuid(), name=name)))
         if self.meta.get("kind", UNKNOWN_KIND.id, Kind) is None:
             self.meta.put("kind", UNKNOWN_KIND)
@@ -301,6 +308,203 @@ class ReferenceEngine:
     @property
     def experiment(self) -> Experiment:
         return self.meta.get("experiment", "experiment", _ExperimentRow).experiment  # type: ignore[union-attr]
+
+    # ── Workspace: the open project ─────────────────────────────────────────
+
+    @property
+    def project_dir(self) -> Path:
+        return self.workspace.dir(self.project_id)
+
+    def _open_project(self, project_id: str) -> None:
+        """Points the stores at a project; the caller announces the change."""
+        entry = self.workspace.mark_opened(project_id)
+        self.project_id = project_id
+        self.meta = MetaStore(self.project_dir / "meta.sqlite")
+        self.pixels = PixelStore(self.project_dir / "pixels.zarr")
+        self.classification = ClassificationService(self)
+        self._ensure_project(entry.name)
+        self._uploads.clear()
+
+    def _close_project(self) -> None:
+        self.meta.close()
+
+    def scan_if_default(self) -> list[str]:
+        """Imports the served folder's new files into the default project,
+        which is the only one that follows that folder."""
+        entry = self.workspace.get(self.project_id)
+        if self.scan_folder is None or entry is None or not entry.default:
+            return []
+        return self.ingest_folder(self.scan_folder)
+
+    def _project_info(self, entry: ProjectEntry) -> ProjectInfo:
+        current = entry.id == self.project_id
+        return ProjectInfo(
+            id=entry.id,
+            name=entry.name,
+            created_at=entry.created_at,
+            opened_at=entry.opened_at,
+            current=current,
+            images=self.meta.count("image") if current else _count_images(self.workspace.dir(entry.id)),
+        )
+
+    def _announce_reset(self) -> None:
+        entry = self.workspace.get(self.project_id)
+        assert entry is not None
+        self._emit(ProjectDidReset(type="project/didReset", experiment=self.experiment, project=self._project_info(entry)))
+
+    def _require_idle(self) -> None:
+        active = {JobStatus.QUEUED, JobStatus.RUNNING, JobStatus.STOPPING}
+        running = [job for job in self.jobs.list() if job.status in active]
+        if running:
+            raise BackendError("NOT_SUPPORTED", f"Wait for {len(running)} running job(s) to finish before switching projects")
+
+    async def project_list(self) -> list[ProjectInfo]:
+        return [self._project_info(entry) for entry in self.workspace.projects]
+
+    async def project_create(self, name: str) -> ProjectInfo:
+        self._require_idle()
+        entry = self.workspace.create(name.strip() or "New Project")
+        self._close_project()
+        self._open_project(entry.id)
+        self._announce_reset()
+        return self._project_info(entry)
+
+    async def project_open(self, project_id: str) -> ProjectInfo:
+        entry = self.workspace.get(project_id)
+        if entry is None:
+            raise BackendError("NOT_FOUND", f"No project {project_id}")
+        if project_id != self.project_id:
+            self._require_idle()
+            self._close_project()
+            self._open_project(project_id)
+            self.scan_if_default()
+            self._announce_reset()
+        return self._project_info(entry)
+
+    async def project_delete(self, project_id: str) -> None:
+        if project_id == self.project_id:
+            raise BackendError("NOT_SUPPORTED", "Open another project before deleting this one")
+        if self.workspace.get(project_id) is None:
+            raise BackendError("NOT_FOUND", f"No project {project_id}")
+        self.workspace.delete(project_id)
+
+    async def project_rename(self, name: str) -> Experiment:
+        experiment = await self.project_update(name)
+        self.workspace.rename(self.project_id, name)
+        return experiment
+
+    async def project_export(self, params: ProjectExportParams, ctx: HandlerContext) -> FileExport:
+        """The open project as a ``.piximi`` file, built off the loop from a
+        snapshot of the rows (the pixels are read as it goes)."""
+        name = params.name or self.experiment.name or "project"
+        ctx.progress(ProgressValue(percent=0, message="Gathering the project").to_wire())
+        contents = self._project_contents()
+        kind_names = {kind.id: kind.name for kind in contents.kinds}
+        kind_names["image"] = "Image"
+        self._capture_loop()
+        loop = self._loop
+
+        def report(fraction: float) -> None:
+            if loop is not None and not loop.is_closed():
+                loop.call_soon_threadsafe(
+                    ctx.progress, ProgressValue(percent=fraction * 100, message="Writing the project").to_wire()
+                )
+
+        data = await asyncio.to_thread(
+            write_project, contents, name, app_version=f"{self.name} {self.version}", kind_names=kind_names, on_progress=report
+        )
+        return FileExport(file_name=f"{_file_stem(name)}.piximi", mime="application/zip", data=data)
+
+    def _project_contents(self) -> ProjectContents:
+        pixels = self.pixels
+        classifiers = self.classification.list()
+        weights: dict[str, bytes] = {}
+        for classifier in classifiers:
+            path = self.classification.weights_dir / f"{classifier.id}.bin"
+            if path.is_file():
+                weights[classifier.id] = path.read_bytes()
+        return ProjectContents(
+            experiment=self.experiment,
+            series=self.meta.list("series", ImageSeries),
+            images=self.meta.list("image", ImageObject),
+            planes=self.meta.list("plane", Plane),
+            kinds=self.meta.list("kind", Kind),
+            categories=self._categories(),
+            channel_metas=self.meta.list("channel_meta", ChannelMeta),
+            channels=self.meta.list("channel", Channel),
+            volumes=self.meta.list("volume", AnnotationVolume),
+            annotations=self.meta.list("annotation", AnnotationObject),
+            classifiers=classifiers,
+            weights=weights,
+            _pixels=lambda channel_id: pixels.get(channel_id),
+        )
+
+    async def project_import(self, params: ProjectImportParams, ctx: HandlerContext) -> ProjectInfo:
+        """Unpacks a ``.piximi`` file into a new project and opens it."""
+        self._require_idle()
+        ctx.progress(ProgressValue(percent=-1, message="Reading the project file").to_wire())
+        contents = await asyncio.to_thread(read_project, params.data)
+        name = params.name or contents.experiment.name or "Imported project"
+        entry = self.workspace.create(name)
+        self._close_project()
+        self._open_project(entry.id)
+        self._capture_loop()
+        try:
+            await asyncio.to_thread(self._fill_project, contents, name, ctx)
+        except Exception:
+            self._close_project()
+            self.workspace.delete(entry.id)
+            fallback = self.workspace.projects[0] if self.workspace.projects else self.workspace.create("Project", default=True)
+            self._open_project(fallback.id)
+            raise
+        self._announce_reset()
+        return self._project_info(entry)
+
+    def _fill_project(self, contents: ProjectContents, name: str, ctx: HandlerContext) -> None:
+        """Writes a file's contents into the (fresh) open project. The pixels
+        go in from the calling thread; the rows are written on the loop,
+        where the store's connection lives."""
+        pixels = self.pixels
+        loop = self._loop
+        total = len(contents.channels)
+        for index, channel in enumerate(contents.channels):
+            pixels.put(channel.id, contents.pixels(channel.id))
+            if index % 16 == 0 and loop is not None and not loop.is_closed():
+                loop.call_soon_threadsafe(
+                    ctx.progress, ProgressValue(percent=(index + 1) / max(total, 1) * 90, message="Storing images").to_wire()
+                )
+
+        def write_rows() -> None:
+            meta = self.meta
+            with meta.transaction():
+                experiment = contents.experiment.model_copy(update={"name": name})
+                meta.put("experiment", _ExperimentRow(id="experiment", experiment=experiment))
+                for kind in contents.kinds:
+                    if kind.id != UNKNOWN_KIND.id:
+                        meta.put("kind", kind)
+                for category in contents.categories:
+                    if category.id not in (UNKNOWN_IMAGE_CATEGORY.id, UNKNOWN_KIND_CATEGORY.id):
+                        meta.put("category", category)
+                meta.put_many("channel_meta", [(m, None) for m in contents.channel_metas])
+                meta.put_many("series", [(s, None) for s in contents.series])
+                meta.put_many("image", [(i, i.series_id) for i in contents.images])
+                meta.put_many("plane", [(p, p.image_id) for p in contents.planes])
+                meta.put_many("channel", [(c, c.plane_id) for c in contents.channels])
+                volumes = {v.id: v for v in contents.volumes}
+                meta.put_many("volume", [(v, v.image_id) for v in contents.volumes])
+                meta.put_many(
+                    "annotation",
+                    [(a, a.volume_id) for a in contents.annotations],
+                    index={a.id: annotation_index(volumes[a.volume_id]) for a in contents.annotations},
+                )
+                for classifier in contents.classifiers:
+                    self.classification.restore(classifier, contents.weights.get(classifier.id))
+
+        if loop is not None and not loop.is_closed():
+            future = asyncio.run_coroutine_threadsafe(_call(write_rows), loop)
+            future.result()
+        else:
+            write_rows()
 
     def ingest_folder(self, folder: Path | str) -> list[str]:
         """Imports every supported file not yet imported; returns new image ids."""
@@ -1822,6 +2026,28 @@ def _volume_update(volume: AnnotationVolume) -> VolumeUpdate:
         prediction_corrected=volume.prediction_corrected,
         rev=volume.rev,
     )
+
+
+async def _call(fn: Callable[[], None]) -> None:
+    fn()
+
+
+def _count_images(project_dir: Path) -> int:
+    """How many images a project that is not open holds, from its store."""
+    import sqlite3
+
+    path = project_dir / "meta.sqlite"
+    if not path.is_file():
+        return 0
+    try:
+        with sqlite3.connect(f"file:{path}?mode=ro", uri=True) as db:
+            return int(db.execute("SELECT COUNT(*) FROM entities WHERE kind = 'image'").fetchone()[0])
+    except sqlite3.Error:
+        return 0
+
+
+def _file_stem(name: str) -> str:
+    return name.replace("/", "_").replace("\\", "_") or "project"
 
 
 # ── Ingest bookkeeping ───────────────────────────────────────────────────────

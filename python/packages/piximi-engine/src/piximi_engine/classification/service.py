@@ -107,7 +107,7 @@ def _margin(probabilities: np.ndarray) -> float:
 class ClassificationService:
     def __init__(self, engine: ReferenceEngine) -> None:
         self.engine = engine
-        self.weights_dir = engine.data_dir / "classifiers"
+        self.weights_dir = engine.project_dir / "classifiers"
         self._models: dict[str, ClassificationModel] = {}
         """Live models by classifier id; built or loaded on first use."""
 
@@ -174,6 +174,19 @@ class ClassificationService:
     def _save(self, record: Classifier, model: ClassificationModel) -> None:
         self.weights_dir.mkdir(parents=True, exist_ok=True)
         self._weights_path(record.id).write_bytes(model.save())
+
+    def restore(self, record: Classifier, weights: bytes | None) -> Classifier:
+        """Puts a record from a project file back, with its weights when
+        this engine has the architecture to run them; otherwise the record
+        stays but counts as untrained, since nothing here can load it."""
+        usable = weights is not None and record.architecture_id in self.engine.models.classifiers
+        if usable:
+            self.weights_dir.mkdir(parents=True, exist_ok=True)
+            self._weights_path(record.id).write_bytes(weights)  # type: ignore[arg-type]
+        else:
+            record = record.model_copy(update={"trained": False, "busy": None})
+        self.meta.put(KIND, record)
+        return record
 
     # ── Items of a target ───────────────────────────────────────────────────
 
