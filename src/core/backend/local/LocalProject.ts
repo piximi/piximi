@@ -14,7 +14,7 @@ import type { EventBus } from "../events";
 import type { CallOptions, ExportedFile, ProjectInfo } from "../types";
 import type { StoreHandle } from "./store";
 
-export type LocalProjectDeps = {
+type LocalProjectDeps = {
   store: StoreHandle;
   saver: () => ProjectSaver;
   loader: () => ProjectLoader;
@@ -22,7 +22,7 @@ export type LocalProjectDeps = {
 };
 
 /* The browser keeps one project, so this is its id for the listing. */
-export const LOCAL_PROJECT_ID = "local";
+const LOCAL_PROJECT_ID = "local";
 
 /*
  * The in-browser project: one at a time, in the Redux data slice and

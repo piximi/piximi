@@ -18,7 +18,7 @@ import type { ExportedAnnotation } from "./types";
  * object `k` as `(k & 255, k >> 8 & 255, k >> 16 & 255)`.
  */
 
-export type LabelImage = {
+type LabelImage = {
   data: Uint8Array | Uint16Array;
   width: number;
   height: number;
@@ -72,7 +72,7 @@ const paint = (
 
 /* Which files an export writes and what each object paints into them;
  * paths are relative to the export's top folder. */
-export const layoutMaskExport = (
+const layoutMaskExport = (
   annotations: ExportedAnnotation[],
   exportType: AnnotationExportType,
 ): Map<string, LabelImage> => {
@@ -157,7 +157,7 @@ export const layoutMaskExport = (
 };
 
 /* An uncompressed multi-page TIFF, one strip per page. */
-export const encodeLabelTiff = (image: LabelImage): Uint8Array => {
+const encodeLabelTiff = (image: LabelImage): Uint8Array => {
   const utif = new TiffIO();
   const bytesPerSample = image.data.BYTES_PER_ELEMENT;
   const template: BaseIFD = {
