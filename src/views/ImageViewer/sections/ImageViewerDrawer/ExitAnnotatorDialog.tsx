@@ -47,7 +47,9 @@ type Saving = { percent: number; message: string };
  * tables back to the snapshot first and lets the commit re-apply them
  * through the same path a remote one takes (which is also what measures
  * them). A commit the backend refuses because something changed elsewhere
- * meanwhile asks whether to overwrite, keep what changed, or stay.
+ * meanwhile asks whether to overwrite, keep what changed, or stay. What a
+ * session borrowed from a remote backend is evicted by the session itself
+ * when it ends (`DataProvider`), so leaving is enough here.
  */
 export const ExitAnnotatorDialog = ({
   onClose,
@@ -72,9 +74,7 @@ export const ExitAnnotatorDialog = ({
   };
 
   const discard = () => {
-    if (session.borrowed) {
-      dispatch(dataSlice.actions.evictImageAnnotations(session.imageIds));
-    } else if (session.snapshot) {
+    if (!session.borrowed && session.snapshot) {
       dispatch(dataSlice.actions.restoreAnnotationTables(session.snapshot));
     }
     leave();
@@ -95,9 +95,6 @@ export const ExitAnnotatorDialog = ({
         setSaving(null);
         setConflict({ changeSet, result });
         return;
-      }
-      if (session.borrowed) {
-        dispatch(dataSlice.actions.evictImageAnnotations(session.imageIds));
       }
       leave();
     } catch (failure) {
@@ -120,9 +117,6 @@ export const ExitAnnotatorDialog = ({
       session.imageIds,
     );
     if (isEmptyChangeSet(changeSet)) {
-      if (session.borrowed) {
-        dispatch(dataSlice.actions.evictImageAnnotations(session.imageIds));
-      }
       leave();
       return;
     }

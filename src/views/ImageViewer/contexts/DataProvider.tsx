@@ -225,6 +225,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     })();
     return () => {
       cancelled = true;
+      // What the session borrowed goes back out with it, whichever way it
+      // ends: a save or discard through the exit dialog, the plain return
+      // when nothing changed, the browser's back button. Left behind, the
+      // copies would outlive deletions made elsewhere (those are never
+      // mirrored) and surface again next to the next session's load.
+      if (borrowed) {
+        dispatch(dataSlice.actions.evictImageAnnotations(initialImageIds));
+      }
     };
   }, [routerLocation.state, dispatch, store, backend, borrowed]);
 
