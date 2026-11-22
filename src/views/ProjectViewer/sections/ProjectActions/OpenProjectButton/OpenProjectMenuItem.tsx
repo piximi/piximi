@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import {
   ListItemText,
@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-material";
 
+import { useCapability } from "core/backend";
+
 import { useDialogHotkey, useProjectLoader } from "hooks";
 
 import { ExampleProjectDialog } from "components/dialogs";
@@ -19,6 +21,7 @@ import { HelpItem } from "help/HelpContent";
 
 import { HotkeyContext } from "utils/enums";
 
+import { ProjectsDialog } from "@ProjectViewer/components/dialogs";
 import { useConfirmReplaceDialog } from "@ProjectViewer/hooks";
 
 import type React from "react";
@@ -53,6 +56,8 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
   } = useDialogHotkey(HotkeyContext.ExampleProjectDialog);
   const { getConfirmation } = useConfirmReplaceDialog();
   const { loadProject } = useProjectLoader();
+  const workspace = useCapability("project.workspace");
+  const [projectsOpen, setProjectsOpen] = useState(false);
 
   const handleCloseDialog = () => {
     handleCloseCloseExampleProjectDialog();
@@ -115,6 +120,15 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
             <MenuItem onClick={handleConfirmedOpenExampleProjectDialog} dense>
               Load Example
             </MenuItem>
+            {workspace && (
+              <MenuItem
+                onClick={() => setProjectsOpen(true)}
+                dense
+                data-testid="open-backend-projects"
+              >
+                Projects on this Backend
+              </MenuItem>
+            )}
           </MenuList>
         }
         placement="right-start"
@@ -168,6 +182,15 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
         onClose={handleCloseDialog}
         open={ExampleProjectOpen}
       />
+      {projectsOpen && (
+        <ProjectsDialog
+          open
+          onClose={() => {
+            setProjectsOpen(false);
+            onClose();
+          }}
+        />
+      )}
     </>
   );
 };

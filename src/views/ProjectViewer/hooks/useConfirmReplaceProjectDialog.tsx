@@ -13,6 +13,8 @@ import {
   FormControlLabel,
 } from "@mui/material";
 
+import { useCapability } from "core/backend";
+
 import { DialogTitleBar } from "components/ui/DialogTitleBar";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
@@ -29,6 +31,8 @@ const ConfirmReplaceDialog = ({
   onConfirm: (result: boolean) => void;
   onDismiss: () => void;
 }) => {
+  // A backend with a workspace keeps the project; only the browser loses it.
+  const workspace = useCapability("project.workspace");
   const dispatch = useDispatch();
   const showSaveProjectDialog = useSelector(selectShowSaveProjectDialog);
   const handleToggleSaveDialog = () => {
@@ -45,14 +49,16 @@ const ConfirmReplaceDialog = ({
       data-testid="confirm-replace-dialog"
     >
       <DialogTitleBar
-        title="Current Project will be lost"
+        title={
+          workspace ? "Open another project?" : "Current Project will be lost"
+        }
         closeDialog={onDismiss}
       />
       <DialogContent>
         <DialogContentText>
-          {
-            "Opening another project will cause the the current project data to be lost. Do you want to continue?"
-          }
+          {workspace
+            ? "The open project stays on the backend; the other one takes its place for everyone connected to this session. Do you want to continue?"
+            : "Opening another project will cause the current project data to be lost. Do you want to continue?"}
         </DialogContentText>
         <FormControl size="small">
           <FormControlLabel

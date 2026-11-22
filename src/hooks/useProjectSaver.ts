@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react";
 
-import { useDispatch, useStore } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { saveAs } from "file-saver";
 
+import { useBackend } from "core/backend";
 import { generateUUID } from "core/entities";
-import { ProjectSaver } from "core/file-io/project-saver/ProjectSaver";
+import { isTaskCancelledError } from "core/dl/cancel";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
@@ -14,7 +15,6 @@ import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
 import { AlertType } from "utils/enums";
 
 import type { AppTask } from "store/appTasks/types";
-import type { RootState } from "store/rootReducer";
 
 import type { AlertState } from "utils/types";
 
@@ -23,24 +23,21 @@ type UseProjectSaverReturn = {
   isSaving: boolean;
 };
 
-/**
- * Hook that orchestrates the project save pipeline.
- *
- * Mirrors {@link useProjectLoader}: registers a cancellable AppTask, hands the
- * work to ProjectSaver (workers + IndexedDB), and triggers the download.
+/*
+ * Downloads the open project as a `.piximi` file. The backend writes it
+ * (the browser's own workers, or the engine), reporting progress into a
+ * cancellable task; the hook saves what comes back.
  */
 export const useProjectSaver = (): UseProjectSaverReturn => {
   const dispatch = useDispatch();
-  // Read state at click time rather than subscribing — a save needs a snapshot
-  // of the whole data slice, and selecting it would re-render on every edit.
-  const store = useStore<RootState>();
+  const backend = useBackend();
   const [isSaving, setIsSaving] = useState(false);
 
   const saveProject = useCallback(
     async (name: string): Promise<void> => {
       setIsSaving(true);
       const taskId = generateUUID();
-      const newTask: AppTask = {
+      const task: AppTask = {
         id: taskId,
         type: "project-download",
         status: "running",
@@ -49,68 +46,53 @@ export const useProjectSaver = (): UseProjectSaverReturn => {
         cancellable: true,
         startedAt: Date.now(),
       };
-      dispatch(appTasksSlice.actions.taskRegistered(newTask));
-
-      const projectSaver = new ProjectSaver();
-      taskCancelRegistry.register(taskId, () => projectSaver.cancel());
-
+      dispatch(appTasksSlice.actions.taskRegistered(task));
+      const controller = new AbortController();
+      taskCancelRegistry.register(taskId, () => controller.abort());
       try {
-        projectSaver.onProgress((progress) => {
-          dispatch(
-            appTasksSlice.actions.taskUpdated({
-              id: taskId,
-              progress: Math.round(progress.overallProgress * 100),
-            }),
-          );
-        });
-
-        const { data, classifier, segmenter } = store.getState();
-        const result = await projectSaver.saveProject({
-          name,
-          project: { data, classifier, segmenter },
-        });
-
-        if (!result.success) {
-          if (result.cancelled) {
-            dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
-          } else {
+        const file = await backend.project.export(name, {
+          signal: controller.signal,
+          onProgress: ({ percent }) =>
             dispatch(
-              appTasksSlice.actions.taskFailed({
+              appTasksSlice.actions.taskUpdated({
                 id: taskId,
-                error: `Error while saving the project: ${result.error.name}\n${result.error.message}`,
+                progress: Math.round(percent),
               }),
-            );
-            const warning: AlertState = {
-              alertType: AlertType.Warning,
-              name: "Could not save project",
-              description: `Error while saving the project: ${result.error.name}\n${result.error.message}`,
-            };
-            dispatch(
-              applicationSettingsSlice.actions.updateAlertState({
-                alertState: warning,
-              }),
-            );
-          }
-          return;
-        }
-
-        saveAs(result.blob, `${name}.piximi`);
+            ),
+        });
+        saveAs(
+          new Blob([file.data.slice()], { type: file.mime }),
+          file.fileName,
+        );
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
       } catch (err) {
+        if (controller.signal.aborted || isTaskCancelledError(err)) {
+          dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
+          return;
+        }
+        const message = err instanceof Error ? err.message : String(err);
         dispatch(
           appTasksSlice.actions.taskFailed({
             id: taskId,
-            error:
-              err instanceof Error ? err.message : "Failed to save project",
+            error: `Error while saving the project: ${message}`,
           }),
         );
-        throw err;
+        const warning: AlertState = {
+          alertType: AlertType.Warning,
+          name: "Could not save project",
+          description: `Error while saving the project: ${message}`,
+        };
+        dispatch(
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
+          }),
+        );
       } finally {
         taskCancelRegistry.unregister(taskId);
         setIsSaving(false);
       }
     },
-    [dispatch, store],
+    [backend, dispatch],
   );
 
   return { saveProject, isSaving };

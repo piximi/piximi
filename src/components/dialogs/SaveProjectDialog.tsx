@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 
 import { Grid, TextField } from "@mui/material";
 
+import { useBackend } from "core/backend";
+
 import { useProjectSaver } from "hooks";
 
 import { selectExperiment } from "store/data/selectors";
@@ -24,6 +26,7 @@ export const SaveProjectDialog = ({
   const experiment = useSelector(selectExperiment);
   const [experimentName, setExperimentName] = useState<string>(experiment.name);
   const { saveProject } = useProjectSaver();
+  const remote = useBackend().kind === "remote";
 
   const onSaveProjectClick = async () => {
     // Close first: the save reports progress through the AppTask tray, so
@@ -44,7 +47,7 @@ export const SaveProjectDialog = ({
     <ConfirmationDialog
       isOpen={open}
       onClose={onCancel}
-      title="Save Project"
+      title={remote ? "Download Project" : "Save Project"}
       content={
         <Grid container spacing={1}>
           <Grid size={{ xs: 10 }}>
@@ -62,7 +65,7 @@ export const SaveProjectDialog = ({
         </Grid>
       }
       onConfirm={onSaveProjectClick}
-      confirmText="Save Project"
+      confirmText={remote ? "Download" : "Save Project"}
     />
   );
 };

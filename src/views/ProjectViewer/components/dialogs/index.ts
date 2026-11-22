@@ -3,3 +3,4 @@ export { SaveFittedModelDialog } from "./SaveFittedModelDialog";
 export { TiffConfigDialog } from "./tiff-config/TiffConfigDialog";
 export { DialogTransitionSlide } from "./DialogTransitionSlide";
 export { ServerFilesDialog } from "./ServerFilesDialog";
+export { ProjectsDialog } from "./ProjectsDialog";

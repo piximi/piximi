@@ -1,21 +1,18 @@
 import { useCallback, useState } from "react";
 
-import { batch, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
+import JSZip from "jszip";
+
+import { useBackend } from "core/backend";
 import { generateUUID } from "core/entities";
-import { ProjectLoader } from "core/file-io/project-loader/ProjectLoader";
+import { isTaskCancelledError } from "core/dl/cancel";
 
 import { applicationSettingsSlice } from "store/applicationSettings";
 import { appTasksSlice } from "store/appTasks/appTasksSlice";
-import { classifierSlice } from "store/classifier";
-import { dataSlice } from "store/data";
-import { segmenterSlice } from "store/segmenter";
-import { hydrateSegmenterState } from "store/segmenter/hydrate";
 import { taskCancelRegistry } from "store/appTasks/taskCancelRegistry";
-import { projectReset } from "store/actions";
 
 import { AlertType } from "utils/enums";
-import { clearCache } from "utils/renderedSrcsCache";
 
 import type { AppTask } from "store/appTasks/types";
 
@@ -23,259 +20,144 @@ import type { AlertState } from "utils/types";
 
 type UseProjectLoaderReturn = {
   loadExample: (examplePath: string, projectName: string) => Promise<void>;
-  loadProject: (files: FileList) => Promise<void>;
+  loadProject: (files: FileList | File[]) => Promise<void>;
   isLoading: boolean;
 };
 
-/**
- * Hook that orchestrates the upload pipeline
- *
- * Calls DataPipelineService for worker-based processing,
- * then dispatches the results to Redux
+/*
+ * A `.zarr` folder picked with `webkitdirectory` arrives as its files; the
+ * backend takes one archive, so they are zipped here (stored, not deflated:
+ * pixel arrays barely compress and the backend reads it at once).
+ */
+const archiveFolder = async (files: File[]): Promise<Blob> => {
+  const zip = new JSZip();
+  for (const file of files) {
+    zip.file(file.webkitRelativePath || file.name, file);
+  }
+  return zip.generateAsync({ type: "blob" });
+};
+
+/*
+ * Opens a project from a file (or a fetched example) through the backend:
+ * the browser's own loader locally, the engine's importer remotely. Either
+ * way the backend announces `project/didReset` and the store follows.
  */
 export function useProjectLoader(): UseProjectLoaderReturn {
   const dispatch = useDispatch();
+  const backend = useBackend();
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadProject = useCallback(
-    async (files: FileList): Promise<void> => {
+  const importProject = useCallback(
+    async (data: Blob, name: string | undefined, label: string) => {
       setIsLoading(true);
       const taskId = generateUUID();
-      const newTask: AppTask = {
+      const task: AppTask = {
         id: taskId,
         type: "project-load",
         status: "running",
         progress: -1,
-        label: "Loading Project",
+        label,
         cancellable: true,
         startedAt: Date.now(),
       };
-      dispatch(appTasksSlice.actions.taskRegistered(newTask));
-
-      if (
-        files.length > 1 &&
-        files[0].webkitRelativePath.split("/")[0].split(".").at(-1) !== "zarr"
-      ) {
-        dispatch(
-          appTasksSlice.actions.taskFailed({
-            id: taskId,
-            error: "Uploaded folder must be .zarr",
-          }),
-        );
-        return;
-      }
-
-      let projectLoader: ProjectLoader;
+      dispatch(appTasksSlice.actions.taskRegistered(task));
+      const controller = new AbortController();
+      taskCancelRegistry.register(taskId, () => controller.abort());
       try {
-        projectLoader = new ProjectLoader();
-        taskCancelRegistry.register(taskId, () => projectLoader.cancel());
-      } catch (err) {
-        dispatch(
-          appTasksSlice.actions.taskFailed({
-            id: taskId,
-            error:
-              err instanceof Error
-                ? err.message
-                : "Failed to initialize loader",
-          }),
-        );
-        return;
-      }
-
-      try {
-        // 1. Run the pipeline (workers + IndexDB)
-        projectLoader.onProgress((progress) => {
-          dispatch(
-            appTasksSlice.actions.taskUpdated({
-              id: taskId,
-              progress: Math.round(progress.overallProgress * 100),
-            }),
-          );
-        });
-        const result = await projectLoader.uploadProject([...files]);
-        if (!result.success) {
-          if (result.cancelled) {
-            dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
-          } else {
+        await backend.project.import(data, name, {
+          signal: controller.signal,
+          onProgress: ({ percent }) =>
             dispatch(
-              appTasksSlice.actions.taskFailed({
+              appTasksSlice.actions.taskUpdated({
                 id: taskId,
-                error: `Error while parsing the project file: ${result.error.name}\n${result.error.message}`,
+                progress: Math.round(percent),
               }),
-            );
-            const warning: AlertState = {
-              alertType: AlertType.Warning,
-              name: "Could not parse project file",
-              description: `Error while parsing the project file: ${result.error.name}\n${result.error.message}`,
-            };
-
-            dispatch(
-              applicationSettingsSlice.actions.updateAlertState({
-                alertState: warning,
-              }),
-            );
-          }
-          return;
-        }
-        const { data, classifier, segmenter } = result.project;
-        clearCache();
-        batch(() => {
-          dispatch(projectReset());
-          dispatch(
-            classifierSlice.actions.setClassifier({
-              classifier: classifier,
-            }),
-          );
-          dispatch(dataSlice.actions.setState(data));
-          // After projectReset, which wipes the slice back to defaults.
-          dispatch(
-            segmenterSlice.actions.setSegmenter({
-              segmenter: hydrateSegmenterState(
-                segmenter,
-                data.channelMetas.map((meta) => meta.id),
-              ),
-            }),
-          );
+            ),
         });
-
         dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
       } catch (err) {
+        if (controller.signal.aborted || isTaskCancelledError(err)) {
+          dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
+          return;
+        }
+        const message = err instanceof Error ? err.message : String(err);
         dispatch(
           appTasksSlice.actions.taskFailed({
             id: taskId,
-            error:
-              err instanceof Error ? err.message : "Failed to load project",
+            error: `Error while loading the project: ${message}`,
           }),
         );
-        throw err;
+        const warning: AlertState = {
+          alertType: AlertType.Warning,
+          name: "Could not load project",
+          description: `Error while loading the project: ${message}`,
+        };
+        dispatch(
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
+          }),
+        );
       } finally {
         taskCancelRegistry.unregister(taskId);
         setIsLoading(false);
       }
     },
-    [dispatch],
+    [backend, dispatch],
   );
+
+  const loadProject = useCallback(
+    async (input: FileList | File[]): Promise<void> => {
+      const files = Array.from(input);
+      if (files.length === 0) return;
+      if (files.length === 1) {
+        await importProject(files[0], undefined, "Loading Project");
+        return;
+      }
+      const folder = files[0].webkitRelativePath.split("/")[0];
+      if (!folder.endsWith(".zarr")) {
+        const warning: AlertState = {
+          alertType: AlertType.Warning,
+          name: "Could not load project",
+          description: "Uploaded folder must be .zarr",
+        };
+        dispatch(
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
+          }),
+        );
+        return;
+      }
+      await importProject(
+        await archiveFolder(files),
+        undefined,
+        "Loading Project",
+      );
+    },
+    [dispatch, importProject],
+  );
+
   const loadExample = useCallback(
     async (examplePath: string, projectName: string): Promise<void> => {
-      setIsLoading(true);
-      const taskId = generateUUID();
-      const newTask: AppTask = {
-        id: taskId,
-        type: "project-load",
-        status: "running",
-        progress: 0,
-        label: "Loading Project",
-        startedAt: Date.now(),
-      };
-      dispatch(appTasksSlice.actions.taskRegistered(newTask));
-      let projectLoader: ProjectLoader;
+      let blob: Blob;
       try {
-        projectLoader = new ProjectLoader();
-        taskCancelRegistry.register(taskId, () => projectLoader.cancel());
+        blob = await (await fetch(examplePath)).blob();
       } catch (err) {
+        const warning: AlertState = {
+          alertType: AlertType.Warning,
+          name: "Could not fetch the example project",
+          description: err instanceof Error ? err.message : String(err),
+        };
         dispatch(
-          appTasksSlice.actions.taskFailed({
-            id: taskId,
-            error:
-              err instanceof Error
-                ? err.message
-                : "Failed to initialize loader",
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
           }),
         );
         return;
       }
-      try {
-        const exampleProjectFileList = await fetch(examplePath)
-          .then((res) => res.blob())
-          .then((blob) => [new File([blob], projectName, blob)])
-          .catch((err: any) => {
-            import.meta.env.PROD &&
-              import.meta.env.VITE_APP_LOG_LEVEL === "1" &&
-              console.error(err);
-            throw err;
-          });
-        // 1. Run the pipeline (workers + IndexDB)
-
-        projectLoader = new ProjectLoader();
-        taskCancelRegistry.register(taskId, () => projectLoader.cancel());
-        projectLoader.onProgress((progress) => {
-          dispatch(
-            appTasksSlice.actions.taskUpdated({
-              id: taskId,
-              progress: Math.round(progress.overallProgress * 100),
-            }),
-          );
-        });
-        const result = await projectLoader.uploadProject(
-          exampleProjectFileList,
-        );
-        if (!result.success) {
-          if (result.cancelled) {
-            dispatch(appTasksSlice.actions.taskCancelled({ id: taskId }));
-          } else {
-            dispatch(
-              appTasksSlice.actions.taskFailed({
-                id: taskId,
-                error: `Error while parsing the project file: ${result.error.name}\n${result.error.message}`,
-              }),
-            );
-            const warning: AlertState = {
-              alertType: AlertType.Warning,
-              name: "Could not parse project file",
-              description: `Error while parsing the project file: ${result.error.name}\n${result.error.message}`,
-            };
-
-            dispatch(
-              applicationSettingsSlice.actions.updateAlertState({
-                alertState: warning,
-              }),
-            );
-          }
-          return;
-        }
-        const { data, classifier, segmenter } = result.project;
-
-        clearCache();
-        batch(() => {
-          dispatch(projectReset());
-          dispatch(
-            classifierSlice.actions.setClassifier({
-              classifier: classifier,
-            }),
-          );
-          dispatch(dataSlice.actions.setState(data));
-          // After projectReset, which wipes the slice back to defaults.
-          dispatch(
-            segmenterSlice.actions.setSegmenter({
-              segmenter: hydrateSegmenterState(
-                segmenter,
-                data.channelMetas.map((meta) => meta.id),
-              ),
-            }),
-          );
-        });
-
-        dispatch(appTasksSlice.actions.taskCompleted({ id: taskId }));
-      } catch (err) {
-        dispatch(
-          appTasksSlice.actions.taskFailed({
-            id: taskId,
-            error:
-              err instanceof Error ? err.message : "Failed to load project",
-          }),
-        );
-        throw err;
-      } finally {
-        taskCancelRegistry.unregister(taskId);
-        setIsLoading(false);
-      }
+      await importProject(blob, projectName, `Loading ${projectName}`);
     },
-    [dispatch],
+    [dispatch, importProject],
   );
 
-  return {
-    loadExample,
-    loadProject,
-    isLoading,
-  };
+  return { loadExample, loadProject, isLoading };
 }
