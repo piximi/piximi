@@ -1,6 +1,7 @@
 """The HTTP/WebSocket server.
 
-- ``/ws`` speaks the protocol to the session hub.
+- ``/ws`` speaks the protocol to the session hub, or, on a gateway, forwards
+  each session to the engine upstream (see ``gateway``).
 - ``POST /session`` exchanges the launch token for a ticket (see ``auth``).
 - With a frontend bundle configured, everything else serves it as a
   single-page app, with the backend's location injected into ``index.html``
@@ -31,6 +32,7 @@ from starlette.routing import Route, WebSocketRoute
 from starlette.websockets import WebSocket
 
 from .auth import Auth
+from .gateway import Upstream, forward
 from .peer import Peer
 from .session import SessionHub
 from .transports.asgi import AsgiWebSocketTransport
@@ -82,13 +84,18 @@ def inject_config(index_html: str, config: dict) -> str:
 
 
 def create_app(
-    hub: SessionHub,
+    hub: SessionHub | None,
     *,
     auth: Auth | None = None,
     static_dir: Path | None = None,
     allowed_origins: set[str] | None = None,
     base_path: str | None = None,
+    upstream: Upstream | None = None,
 ) -> Starlette:
+    """The app that serves ``hub``, or, given an ``upstream`` instead, a
+    gateway that forwards each session there (see ``gateway``)."""
+    if (hub is None) == (upstream is None):
+        raise ValueError("Serve either a hub or an upstream")
     auth = auth or Auth(None)
     allowed = allowed_origins or set()
     fixed_prefix = normalize_prefix(base_path) if base_path is not None else None
@@ -103,7 +110,8 @@ def create_app(
         ticket = auth.issue_ticket(body.get("token") if isinstance(body, dict) else None)
         if ticket is None:
             return JSONResponse({"error": "invalid token"}, status_code=403)
-        return JSONResponse({"ticket": ticket, "sessionId": hub.session_id})
+        # A gateway's sessions get their id from the engine, in `initialize`.
+        return JSONResponse({"ticket": ticket, "sessionId": hub.session_id if hub else None})
 
     async def ws_endpoint(websocket: WebSocket) -> None:
         if not origin_allowed(
@@ -112,6 +120,9 @@ def create_app(
             await websocket.close(code=4403, reason="origin not allowed")
             return
         await websocket.accept()
+        if upstream is not None:
+            await forward(AsgiWebSocketTransport(websocket), upstream, auth)
+            return
         peer = Peer(AsgiWebSocketTransport(websocket))
         async with peer:
             hub.attach(peer)
@@ -178,7 +189,7 @@ class Served:
 
 
 async def serve(
-    hub: SessionHub,
+    hub: SessionHub | None,
     host: str = "127.0.0.1",
     port: int = 0,
     *,
@@ -186,6 +197,7 @@ async def serve(
     static_dir: Path | None = None,
     allowed_origins: set[str] | None = None,
     base_path: str | None = None,
+    upstream: Upstream | None = None,
 ) -> Served:
     """Starts serving on the running loop and returns once the port is bound,
     so a caller can print it or connect to it. ``port=0`` picks a free one."""
@@ -195,6 +207,7 @@ async def serve(
         static_dir=static_dir,
         allowed_origins=allowed_origins,
         base_path=base_path,
+        upstream=upstream,
     )
     config = uvicorn.Config(app, host=host, port=port, log_level="warning", ws="websockets")
     server = uvicorn.Server(config)

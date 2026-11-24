@@ -33,3 +33,15 @@ def test_frontend_is_found_and_its_stamp_checked(tmp_path: Path, monkeypatch):
     assert frontend_version_warning(tmp_path) is None
     stamp.write_text(json.dumps({"protocolVersion": "0.0.1"}))
     assert "speaks protocol 0.0.1" in frontend_version_warning(tmp_path)
+
+
+def test_connect_refuses_what_only_a_local_engine_uses(tmp_path: Path):
+    with pytest.raises(SystemExit) as exit:
+        cli.main(["serve", str(tmp_path), "--connect", "ws://elsewhere/ws", "--no-gpu"])
+    assert "drop a folder of images, --no-gpu" in str(exit.value.code)
+
+
+def test_connect_wants_an_engine_url():
+    with pytest.raises(SystemExit) as exit:
+        cli.main(["serve", "--connect", "elsewhere:8000"])
+    assert "ws:// or wss:// URL" in str(exit.value.code)

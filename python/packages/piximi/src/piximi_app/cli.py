@@ -1,5 +1,7 @@
 """``piximi serve <images>``: import a folder of images and serve them, with
-the frontend if a build is available."""
+the frontend if a build is available. ``piximi serve --connect <engine>``
+serves the frontend here and forwards every session to an engine on
+another machine instead."""
 
 from __future__ import annotations
 
@@ -9,9 +11,11 @@ import importlib.util
 import logging
 import os
 import sys
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from piximi_link.auth import Auth
+from piximi_link.gateway import Upstream, WebSocketUpstream
 from piximi_link.server import serve
 from piximi_link.session import SessionHub
 
@@ -20,10 +24,38 @@ from .bundle import find_frontend, frontend_version_warning
 # Mirrors `piximi_engine.paths.ROOTS_ENV`, which this module must not import
 # eagerly: the engine is an optional dependency.
 ROOTS_ENV = "PIXIMI_ROOTS"
+CONNECT_TOKEN_ENV = "PIXIMI_CONNECT_TOKEN"
 ENGINE_MISSING = "The reference engine is not installed here; install `piximi[engine]` to serve images from this machine."
 
 
+# What only an engine on this machine uses, refused with --connect.
+ENGINE_ONLY = {
+    "images": "a folder of images",
+    "data_dir": "--data-dir",
+    "root": "--root",
+    "no_gpu": "--no-gpu",
+    "models_dir": "--models-dir",
+    "envs_dir": "--envs-dir",
+}
+
+
+def upstream_for(target: str, token: str | None) -> Upstream:
+    """The engine a gateway forwards to, from what ``--connect`` was given."""
+    if target.startswith(("ws://", "wss://")):
+        return WebSocketUpstream(target, token=token)
+    raise SystemExit(f"--connect takes an engine's ws:// or wss:// URL, not {target!r}")
+
+
 async def _serve(args: argparse.Namespace) -> None:
+    auth = Auth(None if args.no_auth else (args.token or Auth.generate_token()))
+    if args.connect:
+        given = [flag for name, flag in ENGINE_ONLY.items() if getattr(args, name)]
+        if given:
+            raise SystemExit(f"--connect serves an engine elsewhere; drop {', '.join(given)}")
+        upstream = upstream_for(args.connect, args.connect_token or os.environ.get(CONNECT_TOKEN_ENV))
+        await _run(args, auth, hub=None, upstream=upstream, cleanup=[upstream.close])
+        return
+
     # Only "not installed" gets the friendly message; a broken install
     # should fail with its own import error.
     if importlib.util.find_spec("piximi_engine") is None:
@@ -49,12 +81,24 @@ async def _serve(args: argparse.Namespace) -> None:
         added = engine.scan_if_default()
         print(f"Imported {len(added)} new image(s) from {images}", flush=True)
 
-    auth = Auth(None if args.no_auth else (args.token or Auth.generate_token()))
+    hub = SessionHub(engine, auth=auth)
+    await _run(args, auth, hub=hub, upstream=None, cleanup=[hub.close, engine.close])
+
+
+async def _run(
+    args: argparse.Namespace,
+    auth: Auth,
+    *,
+    hub: SessionHub | None,
+    upstream: Upstream | None,
+    cleanup: list[Callable[[], Awaitable[None]]],
+) -> None:
+    """Serves ``hub`` (or forwards to ``upstream``) with the frontend until
+    stopped, then runs ``cleanup`` in order."""
     frontend = find_frontend(args.frontend)
     warning = frontend_version_warning(frontend) if frontend is not None else None
     if warning:
         print(f"Warning: {warning}", file=sys.stderr, flush=True)
-    hub = SessionHub(engine, auth=auth)
     served = await serve(
         hub,
         host=args.host,
@@ -63,12 +107,15 @@ async def _serve(args: argparse.Namespace) -> None:
         static_dir=frontend,
         allowed_origins=set(args.allow_origin or []),
         base_path=args.base_path,
+        upstream=upstream,
     )
 
     host = args.host
     query = f"?token={auth.token}" if auth.token else ""
     print(f"PORT {served.port}", flush=True)
     print(f"Backend: ws://{host}:{served.port}/ws", flush=True)
+    if upstream is not None:
+        print(f"Forwarding sessions to {upstream.describe()}", flush=True)
     if frontend is not None:
         print(f"Open: http://{host}:{served.port}/{query}", flush=True)
     else:
@@ -81,8 +128,8 @@ async def _serve(args: argparse.Namespace) -> None:
     try:
         await served.wait()
     finally:
-        await hub.close()
-        await engine.close()
+        for step in cleanup:
+            await step()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -126,6 +173,17 @@ def main(argv: list[str] | None = None) -> int:
         "--envs-dir",
         metavar="DIR",
         help="Where plugin environments are built (default: APPOSE_ENVS_DIR or ~/.local/share/appose)",
+    )
+    run.add_argument(
+        "--connect",
+        metavar="ENGINE",
+        help="Serve the frontend here and forward every session to an engine elsewhere "
+        "(its ws:// or wss:// URL) instead of running one",
+    )
+    run.add_argument(
+        "--connect-token",
+        metavar="TOKEN",
+        help=f"The remote engine's launch token, if it has one (also {CONNECT_TOKEN_ENV})",
     )
     run.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)

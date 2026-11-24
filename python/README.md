@@ -37,6 +37,27 @@ package (`piximi_app/frontend/`), so an installed `piximi serve` needs no
 served page runs its models on the engine; `node scripts/packageFrontend.mjs
 --full` keeps them so the "Continue locally" fallback has every model too.
 
+## The engine on another machine
+
+The frontend and the engine need not share a machine. On the machine with
+the data and the GPU, serve the engine as usual; on the one you work at,
+`piximi serve --connect` serves the frontend and forwards every session to
+it, so the browser only ever talks to a local server:
+
+```sh
+# compute node: pip install 'piximi[engine]'
+piximi serve /path/to/images --host 0.0.0.0 --port 8000 --token <secret>
+
+# interact node: pip install piximi
+piximi serve --connect ws://compute-node:8000/ws --connect-token <secret>
+```
+
+The gateway checks the page's own launch token and trades the engine's for
+a ticket per session (`PIXIMI_CONNECT_TOKEN` works instead of the flag);
+everything after a session's `initialize` crosses untouched. Any route to
+the engine's port works: the same network, an `ssh -L` tunnel (then
+`--connect ws://127.0.0.1:<port>/ws`), or a TLS proxy (`wss://`).
+
 ## From a notebook
 
 Jupyter and marimo run cells on an asyncio loop, and the server shares it,

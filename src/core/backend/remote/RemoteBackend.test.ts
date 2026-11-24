@@ -19,24 +19,24 @@ import type { ChildProcess } from "node:child_process";
 
 /*
  * The remote backend against a real `piximi serve` over a WebSocket, through
- * the same conformance suite the local and fake backends pass. Needs `uv`
- * and the python/ workspace, so it only runs with PIXIMI_REMOTE_TEST=1.
+ * the same conformance suite the local and fake backends pass, both directly
+ * and through a second `piximi serve --connect` forwarding to it (a gateway,
+ * as on an interact node). Needs `uv` and the python/ workspace, so it only
+ * runs with PIXIMI_REMOTE_TEST=1.
  */
 const enabled = process.env.PIXIMI_REMOTE_TEST === "1";
 const root = path.resolve(__dirname, "../../../..");
 const uv = (args: string[]) =>
   ["uv", ["run", "--project", "python", ...args]] as const;
 
-const startServer = (imagesDir: string) =>
+const startServer = (serveArgs: string[]) =>
   new Promise<{ process: ChildProcess; url: string }>((resolve, reject) => {
     const [command, args] = uv([
       "piximi",
       "serve",
-      imagesDir,
+      ...serveArgs,
       "--port",
       "0",
-      "--no-gpu",
-      "--no-auth",
     ]);
     const child = spawn(command, args, {
       cwd: root,
@@ -63,47 +63,65 @@ afterAll(() => {
     rmSync(folder, { recursive: true, force: true });
 });
 
+/* A fixture folder for the engine, and the engine serving it. */
+const startEngine = async (serveArgs: string[]) => {
+  const imagesDir = mkdtempSync(path.join(tmpdir(), "piximi-images-"));
+  folders.push(imagesDir);
+  const [command, args] = uv([
+    "python",
+    "-m",
+    "piximi_engine.testing.fixtures",
+    imagesDir,
+  ]);
+  execFileSync(command, args, { cwd: root, stdio: "inherit" });
+  // A subfolder the startup scan leaves alone, for `ingest.paths`.
+  const stacks = path.join(imagesDir, "stacks");
+  mkdirSync(stacks);
+  for (const name of ["pages6.tif", "pages12.tif", "garbage.bin"]) {
+    copyFileSync(
+      path.join(root, "python/packages/piximi-engine/tests/vectors/tiff", name),
+      path.join(stacks, name),
+    );
+  }
+
+  const server = await startServer([imagesDir, "--no-gpu", ...serveArgs]);
+  processes.push(server.process);
+  return { imagesDir, url: server.url };
+};
+
+const fixtureFor = async (backend: RemoteBackend, imagesDir: string) => {
+  const page = await backend.query.images({}, { limit: 100 });
+  return {
+    backend,
+    serverFiles: { root: realpathSync(imagesDir) },
+    images: page.items.map((record) => ({
+      id: record.image.id,
+      name: record.image.name,
+      width: record.image.shape.width,
+      height: record.image.shape.height,
+      channelIds: record.channels.map((c) => c.id),
+    })),
+  };
+};
+
 if (enabled) {
   describeBackendConformance("RemoteBackend", async () => {
-    const imagesDir = mkdtempSync(path.join(tmpdir(), "piximi-images-"));
-    folders.push(imagesDir);
-    const [command, args] = uv([
-      "python",
-      "-m",
-      "piximi_engine.testing.fixtures",
-      imagesDir,
+    const { imagesDir, url } = await startEngine(["--no-auth"]);
+    return fixtureFor(await RemoteBackend.connect(url), imagesDir);
+  });
+
+  describeBackendConformance("RemoteBackend through a gateway", async () => {
+    // The engine keeps its token; the gateway trades it per session.
+    const { imagesDir, url } = await startEngine(["--token", "engine-token"]);
+    const gateway = await startServer([
+      "--connect",
+      url,
+      "--connect-token",
+      "engine-token",
+      "--no-auth",
     ]);
-    execFileSync(command, args, { cwd: root, stdio: "inherit" });
-    // A subfolder the startup scan leaves alone, for `ingest.paths`.
-    const stacks = path.join(imagesDir, "stacks");
-    mkdirSync(stacks);
-    for (const name of ["pages6.tif", "pages12.tif", "garbage.bin"]) {
-      copyFileSync(
-        path.join(
-          root,
-          "python/packages/piximi-engine/tests/vectors/tiff",
-          name,
-        ),
-        path.join(stacks, name),
-      );
-    }
-
-    const server = await startServer(imagesDir);
-    processes.push(server.process);
-    const backend = await RemoteBackend.connect(server.url);
-
-    const page = await backend.query.images({}, { limit: 100 });
-    return {
-      backend,
-      serverFiles: { root: realpathSync(imagesDir) },
-      images: page.items.map((record) => ({
-        id: record.image.id,
-        name: record.image.name,
-        width: record.image.shape.width,
-        height: record.image.shape.height,
-        channelIds: record.channels.map((c) => c.id),
-      })),
-    };
+    processes.push(gateway.process);
+    return fixtureFor(await RemoteBackend.connect(gateway.url), imagesDir);
   });
 }
 
