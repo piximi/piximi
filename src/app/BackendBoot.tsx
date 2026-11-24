@@ -4,7 +4,7 @@ import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
 import {
   appPath,
-  forgetSession,
+  chooseLocal,
   installLocalBackend,
   installRemoteBackend,
   rememberSession,
@@ -78,7 +78,7 @@ export const BackendBoot = ({
   );
 
   const connectLocal = useCallback(() => {
-    forgetSession();
+    chooseLocal();
     stripSessionParams();
     return installLocalBackend(store).then((backend) =>
       setPhase({ status: "ready", backend }),

@@ -75,6 +75,28 @@ describe("resolveSessionConfig", () => {
     ).toEqual(remembered);
   });
 
+  it("stays local once the tab chose to, even on a served page", () => {
+    const local = storage({
+      "piximi.session": JSON.stringify({ local: true }),
+    });
+    expect(resolveSessionConfig(location, { url: "/ws" }, local)).toBeNull();
+    // Unless the URL itself asks to join.
+    expect(
+      resolveSessionConfig(
+        { ...location, search: "?token=t" },
+        { url: "/ws" },
+        local,
+      ),
+    ).toEqual({ url: "wss://app.example/ws", token: "t" });
+    expect(
+      resolveSessionConfig(
+        { ...location, search: "?backend=ws://h:1/ws" },
+        undefined,
+        local,
+      ),
+    ).toEqual({ url: "ws://h:1/ws", token: undefined });
+  });
+
   it("means local when nothing names a session", () => {
     expect(resolveSessionConfig(location, undefined, storage())).toBeNull();
     expect(resolveSessionConfig(location, undefined, null)).toBeNull();

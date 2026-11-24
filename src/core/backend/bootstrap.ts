@@ -20,7 +20,12 @@ declare global {
   }
 }
 
+/*
+ * What this tab chose, kept across its reloads: the session it joined, or to
+ * work locally even on a page a serving backend would otherwise connect.
+ */
 const STORAGE_KEY = "piximi.session";
+type Remembered = SessionConfig | { local: true };
 
 const sessionStorageOrNull = (): Storage | null => {
   try {
@@ -58,7 +63,8 @@ export const appPath = (path: string, basePath = resolveBasePath()): string =>
  * The session this page should join: its URL from `?backend=`, else the
  * config a serving backend injected, else what this tab remembered; and its
  * token from `?token=`, else the remembered one when it belongs to that same
- * URL. `null` means run locally.
+ * URL. `null` means run locally, as it does once the tab has chosen to,
+ * unless the URL itself asks to join.
  */
 export const resolveSessionConfig = (
   location: Pick<Location, "search" | "protocol" | "host"> = window.location,
@@ -66,13 +72,16 @@ export const resolveSessionConfig = (
   storage: Storage | null = sessionStorageOrNull(),
 ): SessionConfig | null => {
   const params = new URLSearchParams(location.search);
-  let remembered: SessionConfig | null = null;
+  let stored: Remembered | null = null;
   try {
-    const stored = storage?.getItem(STORAGE_KEY);
-    remembered = stored ? (JSON.parse(stored) as SessionConfig) : null;
+    const item = storage?.getItem(STORAGE_KEY);
+    stored = item ? (JSON.parse(item) as Remembered) : null;
   } catch {
-    remembered = null;
+    stored = null;
   }
+  const askedToJoin = params.has("backend") || params.has("token");
+  if (stored && "local" in stored && !askedToJoin) return null;
+  const remembered = stored && "url" in stored ? stored : null;
 
   const fromUrl = params.get("backend");
   const url = fromUrl
@@ -97,11 +106,15 @@ export const rememberSession = (config: SessionConfig): void => {
   }
 };
 
-export const forgetSession = (): void => {
+/* Keeps this tab local across reloads, even where a backend serves the page. */
+export const chooseLocal = (): void => {
   try {
-    sessionStorageOrNull()?.removeItem(STORAGE_KEY);
+    sessionStorageOrNull()?.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ local: true } satisfies Remembered),
+    );
   } catch {
-    // Nothing to do.
+    // Nothing to do: a served page will connect again on reload.
   }
 };
 
@@ -155,7 +168,7 @@ export const sessionLink = (config: SessionConfig): string => {
 
 /* Leaves the remote session for a fresh local start. */
 export const leaveSession = (): void => {
-  forgetSession();
+  chooseLocal();
   window.location.assign(appPath("/"));
 };
 
