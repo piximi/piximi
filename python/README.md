@@ -84,7 +84,8 @@ installed next to `piximi[engine]`, JupyterLab shows a **Piximi** tile that
 starts the engine (through the server's own interpreter, so nothing has to
 be on `PATH`) and proxies it under `<jupyter>/piximi/`. Set `PIXIMI_IMAGES`
 (and optionally `PIXIMI_DATA_DIR`, `PIXIMI_MODELS_DIR`) in the Jupyter
-server's environment to choose the folder; Jupyter authenticates the path,
+server's environment to choose the folder, or `PIXIMI_CONNECT` (and
+`PIXIMI_CONNECT_TOKEN`) to forward to an engine elsewhere instead; Jupyter authenticates the path,
 so the engine itself runs without a token, on loopback. From this
 workspace, without installing anything permanently:
 

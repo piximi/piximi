@@ -14,6 +14,7 @@ def test_launcher_entry_point_is_registered():
 def test_command_takes_the_proxied_port_and_optional_folder(monkeypatch):
     monkeypatch.delenv("PIXIMI_IMAGES", raising=False)
     monkeypatch.delenv("PIXIMI_DATA_DIR", raising=False)
+    monkeypatch.delenv("PIXIMI_CONNECT", raising=False)
     config = setup_piximi()
     # The server's own interpreter, so no `piximi` executable has to be on PATH.
     assert config["command"] == [sys.executable, "-m", "piximi_app.cli", "serve", "--port", "{port}", "--no-auth"]
@@ -23,3 +24,11 @@ def test_command_takes_the_proxied_port_and_optional_folder(monkeypatch):
     monkeypatch.setenv("PIXIMI_DATA_DIR", "/data/project")
     command = setup_piximi()["command"]
     assert command[4] == "/data/images" and command[-2:] == ["--data-dir", "/data/project"]
+
+
+def test_with_an_engine_elsewhere_the_tile_only_forwards(monkeypatch):
+    monkeypatch.setenv("PIXIMI_IMAGES", "/data/images")
+    monkeypatch.setenv("PIXIMI_CONNECT", "ws://compute:8000/ws")
+    command = setup_piximi()["command"]
+    assert command[-2:] == ["--connect", "ws://compute:8000/ws"]
+    assert "/data/images" not in command, "no local engine to give a folder to"

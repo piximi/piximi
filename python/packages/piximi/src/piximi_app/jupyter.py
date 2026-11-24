@@ -9,7 +9,9 @@ Jupyter authenticates the proxied path, so the engine itself runs without
 a launch token, listening on loopback only. Point it at a folder with
 ``PIXIMI_IMAGES`` in the Jupyter server's environment (and optionally
 ``PIXIMI_DATA_DIR`` and ``PIXIMI_MODELS_DIR``); otherwise it serves an
-empty project.
+empty project. With ``PIXIMI_CONNECT`` (an engine's URL or ticket, see
+``piximi serve --connect``) the tile runs no engine and forwards to that
+one instead, with ``PIXIMI_CONNECT_TOKEN`` if the engine wants a token.
 """
 
 from __future__ import annotations
@@ -24,6 +26,10 @@ def setup_piximi() -> dict:
     # whatever environment layering (uv run --with, a kernel's venv) is in
     # play.
     command = [sys.executable, "-m", "piximi_app.cli", "serve", "--port", "{port}", "--no-auth"]
+    connect = os.environ.get("PIXIMI_CONNECT")
+    if connect:
+        # The token, if any, is read from PIXIMI_CONNECT_TOKEN by the command.
+        return _entry(command + ["--connect", connect])
     images = os.environ.get("PIXIMI_IMAGES")
     if images:
         command.insert(4, images)
@@ -33,6 +39,10 @@ def setup_piximi() -> dict:
     models_dir = os.environ.get("PIXIMI_MODELS_DIR")
     if models_dir:
         command += ["--models-dir", models_dir]
+    return _entry(command)
+
+
+def _entry(command: list[str]) -> dict:
     return {
         "command": command,
         "timeout": 60,
