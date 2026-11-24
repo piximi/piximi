@@ -5,6 +5,10 @@ description = "Transport and RPC layer between the Piximi frontend and a backend
 requires-python = ">=3.12"
 dependencies = ["piximi-schema", "msgpack>=1.1", "websockets>=14", "starlette>=0.41", "uvicorn>=0.30"]
 
+[project.optional-dependencies]
+# Reaching an engine on another machine over iroh (see piximi_link.iroh).
+iroh = ["iroh>=1.2,<2"]
+
 [project.scripts]
 piximi-link-echo = "piximi_link.testing.echo_server:main"
 

@@ -1,6 +1,10 @@
 version = 1
 revision = 5
 requires-python = ">=3.12"
+resolution-markers = [
+    "platform_machine != 'x86_64' or sys_platform != 'darwin'",
+    "platform_machine == 'x86_64' and sys_platform == 'darwin'",
+]
 
 [manifest]
 members = [
@@ -188,6 +192,28 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/01/e1/2069291243c926a2ff1cd706c7f3eeb9b62144bf60f77c9fb9ff2fb26bd3/iniconfig-2.3.1.tar.gz", hash = "sha256:67f4b9c50da0dedf52af349e7749a80a9057a5031199791b906c3bb3ae878960", size = 21209, upload-time = "2026-10-06T22:48:38.076Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/56/43/4ca9e49d27a1fcf6bece6f6aec0ea46bb9112489b93d4b688fb415457bdb/iniconfig-2.3.1-py3-none-any.whl", hash = "sha256:9121e2c1fdb355232495be3194c8dfe87ccc2d5dee45947b78e68f499790d7a7", size = 7552, upload-time = "2026-10-06T22:48:36.959Z" },
+]
+
+[[package]]
+name = "iroh"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "platform_machine != 'x86_64' or sys_platform != 'darwin'",
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/47/562411d054f7b15e8aaca8fd965c42e8d61acae0c58773c3a2d0266a03ef/iroh-1.2.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:d7c407d9483c8e0c7680e569f906e892a19d4c13af537ba9127f7de130c0d399", size = 5752039, upload-time = "2026-10-22T19:40:22.634Z" },
+    { url = "https://files.pythonhosted.org/packages/61/5d/7082a1eafa89da2ff72800344d179a89619b69f924b1a9e717784ad5b472/iroh-1.2.0-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:049eef820a5710093cb0cc9d645da00f69dfbf5b0ac7647741da2168b79d0c10", size = 6950433, upload-time = "2026-10-22T19:40:25.237Z" },
+    { url = "https://files.pythonhosted.org/packages/9e/09/15cf50f36f90e364cde73b4df392d7bb91cec412455b06226c2ec660716a/iroh-1.2.0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:61222adc81745009f34ca1fed42633f6cac865c9ed35a4701eb8c0174cb8399a", size = 7198245, upload-time = "2026-10-22T19:40:27.434Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/c0/f0fe409eee4b0afaee56ae9a8cb6a15d2f4d443d1e12ef5529141a7b0a62/iroh-1.2.0-py3-none-win_amd64.whl", hash = "sha256:1eedafeb906f57d4252b69379673b039894e28a35bbb9b54ddfdcae83411cfa5", size = 6048862, upload-time = "2026-10-22T19:40:29.281Z" },
+]
+
+[[package]]
+name = "iroh"
+version = "1.2.0"
+source = { git = "https://github.com/n0-computer/iroh-ffi?tag=v1.2.0#66a8d619a4d791d458d582f312df6e0ab42bc541" }
+resolution-markers = [
+    "platform_machine == 'x86_64' and sys_platform == 'darwin'",
 ]
 
 [[package]]
@@ -566,6 +592,9 @@ cellcast = [
 engine = [
     { name = "piximi-engine" },
 ]
+iroh = [
+    { name = "piximi-link", extra = ["iroh"] },
+]
 
 [package.metadata]
 requires-dist = [
@@ -573,9 +602,10 @@ requires-dist = [
     { name = "piximi-engine", extras = ["appose"], marker = "extra == 'appose'", editable = "packages/piximi-engine" },
     { name = "piximi-engine", extras = ["cellcast"], marker = "extra == 'cellcast'", editable = "packages/piximi-engine" },
     { name = "piximi-link", editable = "packages/piximi-link" },
+    { name = "piximi-link", extras = ["iroh"], marker = "extra == 'iroh'", editable = "packages/piximi-link" },
     { name = "piximi-schema", editable = "packages/piximi-schema" },
 ]
-provides-extras = ["engine", "appose", "cellcast"]
+provides-extras = ["engine", "iroh", "appose", "cellcast"]
 
 [[package]]
 name = "piximi-engine"
@@ -631,14 +661,23 @@ dependencies = [
     { name = "websockets" },
 ]
 
+[package.optional-dependencies]
+iroh = [
+    { name = "iroh", version = "1.2.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
+    { name = "iroh", version = "1.2.0", source = { git = "https://github.com/n0-computer/iroh-ffi?tag=v1.2.0#66a8d619a4d791d458d582f312df6e0ab42bc541" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
+]
+
 [package.metadata]
 requires-dist = [
+    { name = "iroh", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin' and extra == 'iroh'", git = "https://github.com/n0-computer/iroh-ffi?tag=v1.2.0" },
+    { name = "iroh", marker = "(platform_machine != 'x86_64' and extra == 'iroh') or (sys_platform != 'darwin' and extra == 'iroh')", specifier = ">=1.2,<2" },
     { name = "msgpack", specifier = ">=1.1" },
     { name = "piximi-schema", editable = "packages/piximi-schema" },
     { name = "starlette", specifier = ">=0.41" },
     { name = "uvicorn", specifier = ">=0.30" },
     { name = "websockets", specifier = ">=14" },
 ]
+provides-extras = ["iroh"]
 
 [[package]]
 name = "piximi-model-sdk"
@@ -679,6 +718,7 @@ dev = [
     { name = "appose" },
     { name = "cellcast" },
     { name = "httpx" },
+    { name = "piximi-link", extra = ["iroh"] },
     { name = "pytest" },
     { name = "pytest-asyncio" },
 ]
@@ -697,6 +737,7 @@ dev = [
     { name = "appose", git = "https://github.com/apposed/appose-python?rev=5f5a1b1101e7ca6679f0eee0dc172f92fb84c654" },
     { name = "cellcast", specifier = ">=0.3" },
     { name = "httpx", specifier = ">=0.27" },
+    { name = "piximi-link", extras = ["iroh"], editable = "packages/piximi-link" },
     { name = "pytest", specifier = ">=8.3" },
     { name = "pytest-asyncio", specifier = ">=0.25" },
 ]
