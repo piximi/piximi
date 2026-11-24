@@ -29,30 +29,37 @@ const root = path.resolve(__dirname, "../../../..");
 const uv = (args: string[]) =>
   ["uv", ["run", "--project", "python", ...args]] as const;
 
-const startServer = (serveArgs: string[]) =>
-  new Promise<{ process: ChildProcess; url: string }>((resolve, reject) => {
-    const [command, args] = uv([
-      "piximi",
-      "serve",
-      ...serveArgs,
-      "--port",
-      "0",
-    ]);
-    const child = spawn(command, args, {
-      cwd: root,
-      stdio: ["ignore", "pipe", "inherit"],
-    });
-    let output = "";
-    child.stdout!.on("data", (chunk: Buffer) => {
-      output += chunk.toString();
-      const match = /PORT (\d+)/.exec(output);
-      if (match)
-        resolve({ process: child, url: `ws://127.0.0.1:${match[1]}/ws` });
-    });
-    child.on("exit", (code) =>
-      reject(new Error(`piximi serve exited with ${code} before listening`)),
-    );
-  });
+const startServer = (serveArgs: string[], env: NodeJS.ProcessEnv = {}) =>
+  new Promise<{ process: ChildProcess; url: string; output: () => string }>(
+    (resolve, reject) => {
+      const [command, args] = uv([
+        "piximi",
+        "serve",
+        ...serveArgs,
+        "--port",
+        "0",
+      ]);
+      const child = spawn(command, args, {
+        cwd: root,
+        env: { ...process.env, ...env },
+        stdio: ["ignore", "pipe", "inherit"],
+      });
+      let output = "";
+      child.stdout!.on("data", (chunk: Buffer) => {
+        output += chunk.toString();
+        const match = /PORT (\d+)/.exec(output);
+        if (match)
+          resolve({
+            process: child,
+            url: `ws://127.0.0.1:${match[1]}/ws`,
+            output: () => output,
+          });
+      });
+      child.on("exit", (code) =>
+        reject(new Error(`piximi serve exited with ${code} before listening`)),
+      );
+    },
+  );
 
 const processes: ChildProcess[] = [];
 const folders: string[] = [];
@@ -86,7 +93,7 @@ const startEngine = async (serveArgs: string[]) => {
 
   const server = await startServer([imagesDir, "--no-gpu", ...serveArgs]);
   processes.push(server.process);
-  return { imagesDir, url: server.url };
+  return { imagesDir, url: server.url, output: server.output };
 };
 
 const fixtureFor = async (backend: RemoteBackend, imagesDir: string) => {
@@ -123,6 +130,35 @@ if (enabled) {
     processes.push(gateway.process);
     return fixtureFor(await RemoteBackend.connect(gateway.url), imagesDir);
   });
+
+  // Needs piximi-link[iroh], which has no wheel for every platform.
+  if (process.env.PIXIMI_IROH_TEST === "1") {
+    describeBackendConformance(
+      "RemoteBackend through a gateway over iroh",
+      async () => {
+        // Relays off: the ticket carries this machine's own addresses.
+        const engine = await startEngine([
+          "--no-auth",
+          "--iroh",
+          "--relay",
+          "disabled",
+        ]);
+        const ticket = /Iroh ticket: (\S+)/.exec(engine.output())?.[1];
+        if (!ticket) throw new Error("The engine printed no iroh ticket");
+        const configDir = mkdtempSync(path.join(tmpdir(), "piximi-gateway-"));
+        folders.push(configDir);
+        const gateway = await startServer(
+          ["--connect", ticket, "--relay", "disabled", "--no-auth"],
+          { PIXIMI_CONFIG_DIR: configDir },
+        );
+        processes.push(gateway.process);
+        return fixtureFor(
+          await RemoteBackend.connect(gateway.url),
+          engine.imagesDir,
+        );
+      },
+    );
+  }
 }
 
 describe.runIf(enabled)("RemoteBackend", () => {

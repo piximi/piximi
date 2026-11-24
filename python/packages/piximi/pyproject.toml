@@ -8,6 +8,8 @@ dependencies = ["piximi-schema", "piximi-link"]
 [project.optional-dependencies]
 # The reference engine on this machine (`piximi serve <folder>`).
 engine = ["piximi-engine"]
+# Serving to, or forwarding to, an engine on another machine over iroh.
+iroh = ["piximi-link[iroh]"]
 # Model plugins in their own environments.
 appose = ["piximi-engine[appose]"]
 # StarDist2D in the engine's own process.

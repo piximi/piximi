@@ -39,11 +39,42 @@ ENGINE_ONLY = {
 }
 
 
-def upstream_for(target: str, token: str | None) -> Upstream:
+def upstream_for(target: str, token: str | None, relay: str = "default") -> Upstream:
     """The engine a gateway forwards to, from what ``--connect`` was given."""
     if target.startswith(("ws://", "wss://")):
         return WebSocketUpstream(target, token=token)
-    raise SystemExit(f"--connect takes an engine's ws:// or wss:// URL, not {target!r}")
+    if target.startswith("piximi1."):
+        require_iroh()
+        from piximi_link.iroh.pairing import Ticket
+        from piximi_link.iroh.upstream import IrohUpstream
+
+        try:
+            return IrohUpstream(Ticket.parse(target), relay=relay)
+        except ValueError as error:
+            raise SystemExit(str(error)) from None
+    raise SystemExit(f"--connect takes an engine's ws:// or wss:// URL or its piximi1.… ticket, not {target!r}")
+
+
+def require_iroh() -> None:
+    from piximi_link.iroh import INSTALL_HINT, available
+
+    if not available():
+        raise SystemExit(INSTALL_HINT)
+
+
+async def _start_iroh_host(hub: SessionHub, state_dir: Path, relay: str) -> Callable[[], Awaitable[None]]:
+    """Serves ``hub`` over iroh too, prints the ticket, and returns how to stop."""
+    require_iroh()
+    from piximi_link.iroh.host import IrohHost
+
+    def paired(label: str, ticket) -> None:
+        print(f"Paired with {label}. A ticket for the next machine: {ticket}", flush=True)
+
+    host = IrohHost(hub, state_dir, relay=relay, on_paired=paired)
+    await host.start()
+    print(f"Iroh ticket: {host.ticket()}", flush=True)
+    print(f"Paired machines are kept in {host.allowlist.path}", flush=True)
+    return host.close
 
 
 async def _serve(args: argparse.Namespace) -> None:
@@ -52,7 +83,17 @@ async def _serve(args: argparse.Namespace) -> None:
         given = [flag for name, flag in ENGINE_ONLY.items() if getattr(args, name)]
         if given:
             raise SystemExit(f"--connect serves an engine elsewhere; drop {', '.join(given)}")
-        upstream = upstream_for(args.connect, args.connect_token or os.environ.get(CONNECT_TOKEN_ENV))
+        if args.iroh:
+            raise SystemExit("--iroh serves an engine on this machine; --connect forwards to one elsewhere")
+        upstream = upstream_for(args.connect, args.connect_token or os.environ.get(CONNECT_TOKEN_ENV), args.relay)
+        connect = getattr(upstream, "connect", None)
+        if connect is not None:
+            # Dial and pair now, so a bad ticket shows before a browser does.
+            try:
+                await connect()
+            except Exception as error:
+                await upstream.close()
+                raise SystemExit(f"Could not reach the engine: {error}") from None
         await _run(args, auth, hub=None, upstream=upstream, cleanup=[upstream.close])
         return
 
@@ -82,7 +123,15 @@ async def _serve(args: argparse.Namespace) -> None:
         print(f"Imported {len(added)} new image(s) from {images}", flush=True)
 
     hub = SessionHub(engine, auth=auth)
-    await _run(args, auth, hub=hub, upstream=None, cleanup=[hub.close, engine.close])
+    cleanup = [hub.close, engine.close]
+    if args.iroh:
+        try:
+            cleanup.insert(0, await _start_iroh_host(hub, data_dir / "iroh", args.relay))
+        except BaseException:
+            await hub.close()
+            await engine.close()
+            raise
+    await _run(args, auth, hub=hub, upstream=None, cleanup=cleanup)
 
 
 async def _run(
@@ -178,7 +227,20 @@ def main(argv: list[str] | None = None) -> int:
         "--connect",
         metavar="ENGINE",
         help="Serve the frontend here and forward every session to an engine elsewhere "
-        "(its ws:// or wss:// URL) instead of running one",
+        "(its ws:// or wss:// URL, or the piximi1.… ticket `--iroh` prints) instead of running one",
+    )
+    run.add_argument(
+        "--iroh",
+        action="store_true",
+        help="Also serve the engine over iroh, to gateways on other machines; prints a ticket to "
+        "pass to `piximi serve --connect` (needs piximi[iroh])",
+    )
+    run.add_argument(
+        "--relay",
+        default="default",
+        metavar="RELAY",
+        help="iroh relay: default (n0's public relays, rate-limited), disabled, or the URL of "
+        "your own iroh-relay",
     )
     run.add_argument(
         "--connect-token",

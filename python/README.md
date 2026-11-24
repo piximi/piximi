@@ -58,6 +58,40 @@ everything after a session's `initialize` crosses untouched. Any route to
 the engine's port works: the same network, an `ssh -L` tunnel (then
 `--connect ws://127.0.0.1:<port>/ws`), or a TLS proxy (`wss://`).
 
+### Over iroh: no open port on the engine's machine
+
+A compute node behind NAT or a firewall (an HPC node, a lab workstation)
+usually can't take a connection from you. With the `iroh` extra on both
+machines, the gateway dials the engine by its public key instead, through
+[iroh](https://iroh.computer): direct when the networks allow it, through a
+relay when not, encrypted end to end either way.
+
+```sh
+# compute node: pip install 'piximi[engine,iroh]'
+piximi serve /path/to/images --iroh
+#   Iroh ticket: piximi1.endpoint….…
+
+# interact node: pip install 'piximi[iroh]'
+piximi serve --connect piximi1.endpoint….…
+```
+
+The ticket's last part is a pairing secret that admits one machine: the
+engine records that machine's key in `<data dir>/iroh/authorized.json`
+(delete an entry to revoke it) and prints a fresh ticket for the next one.
+The paired machine keeps using the same ticket; its key, kept in
+`~/.config/piximi/iroh/key` (or `PIXIMI_CONFIG_DIR`), is what admits it
+from then on. The engine's own key lives next to the allowlist, so its
+tickets survive restarts.
+
+`--relay` picks the relay on both sides: `default` uses n0's public relays,
+which are rate-limited and meant for trying things out; run
+[`iroh-relay`](https://github.com/n0-computer/iroh) somewhere both machines
+can reach and pass its URL for real use, or `disabled` on one network.
+iroh publishes no wheel (and no source distribution) for Intel Macs; there,
+install it from its repository first, which needs a Rust toolchain:
+`pip install 'iroh @ git+https://github.com/n0-computer/iroh-ffi@v1.2.0'`
+(this workspace does the same for that platform).
+
 ## From a notebook
 
 Jupyter and marimo run cells on an asyncio loop, and the server shares it,
