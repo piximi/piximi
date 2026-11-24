@@ -8,6 +8,7 @@ import { BackendProvider } from "core/backend";
 
 import { productionStore } from "store";
 
+import { AppTheme } from "./app/AppTheme";
 import { Application } from "./app/Application";
 import { BackendBoot } from "./app/BackendBoot";
 
@@ -16,14 +17,16 @@ const root = createRoot(domNode!);
 
 root.render(
   <Provider store={productionStore}>
-    <BackendBoot store={productionStore}>
-      {(backend) => (
-        <BackendProvider backend={backend}>
-          <DndProvider backend={HTML5Backend}>
-            <Application />
-          </DndProvider>
-        </BackendProvider>
-      )}
-    </BackendBoot>
+    <AppTheme>
+      <BackendBoot store={productionStore}>
+        {(backend) => (
+          <BackendProvider backend={backend}>
+            <DndProvider backend={HTML5Backend}>
+              <Application />
+            </DndProvider>
+          </BackendProvider>
+        )}
+      </BackendBoot>
+    </AppTheme>
   </Provider>,
 );

@@ -3,13 +3,8 @@ import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import { CssBaseline } from "@mui/material";
-import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
-
 import { resolveBasePath } from "core/backend/bootstrap";
 import { DataConnector } from "core/data-connector";
-
-import { usePreferredMuiTheme } from "hooks";
 
 import { HelpProvider } from "contexts";
 
@@ -25,7 +20,6 @@ import { MeasurementView } from "views/MeasurementViewer";
 import { WelcomeScreen } from "./WelcomeScreen";
 
 export const Application = () => {
-  const theme = usePreferredMuiTheme();
   const alertState = useSelector(selectAlertState);
 
   useEffect(() => {
@@ -40,23 +34,18 @@ export const Application = () => {
   }, []); // empty deps → runs once on mount
 
   return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <HelpProvider>
-          <HelpOverlay />
-          {alertState.visible && <AlertBar alertState={alertState} />}
-          <TaskProgressToasts />
-          <BrowserRouter basename={resolveBasePath()}>
-            <Routes>
-              <Route path="/" element={<WelcomeScreen />} />
-              <Route path="project" element={<ProjectViewer />} />
-              <Route path="imageviewer" element={<ImageViewer />} />
-              <Route path="measurements" element={<MeasurementView />} />
-            </Routes>
-          </BrowserRouter>
-        </HelpProvider>
-      </ThemeProvider>
-    </StyledEngineProvider>
+    <HelpProvider>
+      <HelpOverlay />
+      {alertState.visible && <AlertBar alertState={alertState} />}
+      <TaskProgressToasts />
+      <BrowserRouter basename={resolveBasePath()}>
+        <Routes>
+          <Route path="/" element={<WelcomeScreen />} />
+          <Route path="project" element={<ProjectViewer />} />
+          <Route path="imageviewer" element={<ImageViewer />} />
+          <Route path="measurements" element={<MeasurementView />} />
+        </Routes>
+      </BrowserRouter>
+    </HelpProvider>
   );
 };
