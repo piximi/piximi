@@ -1,13 +1,14 @@
 """Piximi in a notebook::
 
-    from piximi_engine.notebook import serve
+    from piximi_app.notebook import serve
     session = await serve("/path/to/images")   # renders the app in the cell
     session.project.add_images("more.tif")      # appears in the app at once
     await session.project.segment("cellcast-stardist-fluo", channels=[2])
 
 The frontend build is found the same way `piximi serve` finds it: given,
-`PIXIMI_FRONTEND_DIR`, or packaged with the engine; without one the session
-renders a link for a frontend served elsewhere.
+`PIXIMI_FRONTEND_DIR`, or packaged with this module; without one the session
+renders a link for a frontend served elsewhere. Needs the engine
+(``piximi[engine]``).
 """
 
 from __future__ import annotations
@@ -18,9 +19,10 @@ from pathlib import Path
 
 from piximi_link.notebook import NotebookSession, serve as serve_engine
 
-from .api import Project
-from .cli import find_frontend, frontend_version_warning
-from .engine import ReferenceEngine
+from piximi_engine.api import Project
+from piximi_engine.engine import ReferenceEngine
+
+from .bundle import find_frontend, frontend_version_warning
 
 
 class ProjectSession(NotebookSession):

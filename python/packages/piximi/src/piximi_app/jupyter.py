@@ -1,7 +1,7 @@
 """A "Piximi" tile in the JupyterLab launcher, through jupyter-server-proxy.
 
 Registered as a ``jupyter_serverproxy_servers`` entry point, so installing
-``piximi-engine`` next to ``jupyter-server-proxy`` is enough. The proxy
+``piximi[engine]`` next to ``jupyter-server-proxy`` is enough. The proxy
 starts ``piximi serve`` on first use and forwards ``<jupyter>/piximi/`` to
 it; the page learns that prefix from the proxy's ``X-Forwarded-Prefix``.
 
@@ -19,11 +19,11 @@ import sys
 
 
 def setup_piximi() -> dict:
-    # The proxy runs this in the Jupyter server's interpreter, which imports
-    # the engine; going through it rather than a `piximi` on PATH works
+    # The proxy runs this in the Jupyter server's interpreter, which has
+    # this package; going through it rather than a `piximi` on PATH works
     # whatever environment layering (uv run --with, a kernel's venv) is in
     # play.
-    command = [sys.executable, "-m", "piximi_engine.cli", "serve", "--port", "{port}", "--no-auth"]
+    command = [sys.executable, "-m", "piximi_app.cli", "serve", "--port", "{port}", "--no-auth"]
     images = os.environ.get("PIXIMI_IMAGES")
     if images:
         command.insert(4, images)

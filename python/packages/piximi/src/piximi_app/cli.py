@@ -5,55 +5,33 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
+import importlib.util
 import logging
 import os
 import sys
 from pathlib import Path
 
-from piximi_schema import PROTOCOL_VERSION
 from piximi_link.auth import Auth
 from piximi_link.server import serve
 from piximi_link.session import SessionHub
 
-from .engine import ReferenceEngine
-from .paths import ROOTS_ENV, roots_from_env
+from .bundle import find_frontend, frontend_version_warning
 
-PACKAGED_FRONTEND = Path(__file__).resolve().parent / "frontend"
-
-
-def find_frontend(explicit: str | None) -> Path | None:
-    """The frontend build to serve: as given, else from PIXIMI_FRONTEND_DIR,
-    else the copy packaged with this module, else none."""
-    candidates = [explicit, os.environ.get("PIXIMI_FRONTEND_DIR"), str(PACKAGED_FRONTEND)]
-    for candidate in candidates:
-        if candidate and (Path(candidate) / "index.html").is_file():
-            return Path(candidate).resolve()
-    return None
-
-
-def frontend_version_warning(frontend: Path) -> str | None:
-    """Why the build at ``frontend`` may not work with this engine: it is
-    stamped with the protocol it was built for (``piximi-frontend.json``,
-    written by ``pnpm engine:frontend``), and a page of another major would
-    fail on the first request whose shape changed."""
-    stamp = frontend / "piximi-frontend.json"
-    refresh = "run `pnpm engine:frontend` to refresh it"
-    if not stamp.is_file():
-        return f"The frontend build at {frontend} carries no protocol stamp, so it may predate this engine; {refresh}."
-    try:
-        version = str(json.loads(stamp.read_text(encoding="utf-8")).get("protocolVersion", ""))
-    except (OSError, ValueError):
-        return f"The frontend build at {frontend} has an unreadable protocol stamp; {refresh}."
-    if version.split(".")[0] != PROTOCOL_VERSION.split(".")[0]:
-        return (
-            f"The frontend build at {frontend} speaks protocol {version} and this engine "
-            f"{PROTOCOL_VERSION}; {refresh}."
-        )
-    return None
+# Mirrors `piximi_engine.paths.ROOTS_ENV`, which this module must not import
+# eagerly: the engine is an optional dependency.
+ROOTS_ENV = "PIXIMI_ROOTS"
+ENGINE_MISSING = "The reference engine is not installed here; install `piximi[engine]` to serve images from this machine."
 
 
 async def _serve(args: argparse.Namespace) -> None:
+    # Only "not installed" gets the friendly message; a broken install
+    # should fail with its own import error.
+    if importlib.util.find_spec("piximi_engine") is None:
+        print(ENGINE_MISSING, file=sys.stderr, flush=True)
+        raise SystemExit(2)
+    from piximi_engine.engine import ReferenceEngine
+    from piximi_engine.paths import roots_from_env
+
     images = Path(args.images).resolve() if args.images else None
     data_dir = Path(args.data_dir) if args.data_dir else (images or Path.cwd()) / ".piximi"
     if args.envs_dir:

@@ -55,7 +55,7 @@ default ``~/.local/share/appose``) as ``piximi-<plugin id>``."""
 CANCEL_GRACE = 5.0
 """Seconds a cancelled task may keep running before its worker is killed."""
 CLOSE_TIMEOUT = 5.0
-UNAVAILABLE_MESSAGE = "Install piximi-engine[appose] to run model plugins"
+UNAVAILABLE_MESSAGE = "Install piximi[appose] (or piximi-engine[appose]) to run model plugins"
 
 Progress = Callable[[str, float], None]
 """``(message, percent)``, percent -1 while indeterminate."""

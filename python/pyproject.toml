@@ -1,9 +1,9 @@
 [project]
 name = "piximi-workspace"
 version = "0.0.0"
-description = "uv workspace for Piximi's Python packages (schema, link, engine)."
+description = "uv workspace for Piximi's Python packages (schema, link, engine, model SDK, app)."
 requires-python = ">=3.12"
-dependencies = ["piximi-schema", "piximi-link", "piximi-engine", "piximi-model-sdk"]
+dependencies = ["piximi-schema", "piximi-link", "piximi-engine", "piximi-model-sdk", "piximi"]
 
 [tool.uv]
 package = false
@@ -13,6 +13,7 @@ piximi-schema = { workspace = true }
 piximi-link = { workspace = true }
 piximi-engine = { workspace = true }
 piximi-model-sdk = { workspace = true }
+piximi = { workspace = true }
 # Unreleased: PyPI has 0.12.0, without the worker handshake, shutdown and
 # shared-memory helpers the engine's plugin runner relies on. Plugin
 # environments get this same pin, since a worker must match the minor.

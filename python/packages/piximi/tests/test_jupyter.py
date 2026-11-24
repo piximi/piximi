@@ -3,7 +3,7 @@
 import sys
 from importlib.metadata import entry_points
 
-from piximi_engine.jupyter import setup_piximi
+from piximi_app.jupyter import setup_piximi
 
 
 def test_launcher_entry_point_is_registered():
@@ -16,7 +16,7 @@ def test_command_takes_the_proxied_port_and_optional_folder(monkeypatch):
     monkeypatch.delenv("PIXIMI_DATA_DIR", raising=False)
     config = setup_piximi()
     # The server's own interpreter, so no `piximi` executable has to be on PATH.
-    assert config["command"] == [sys.executable, "-m", "piximi_engine.cli", "serve", "--port", "{port}", "--no-auth"]
+    assert config["command"] == [sys.executable, "-m", "piximi_app.cli", "serve", "--port", "{port}", "--no-auth"]
     assert config["launcher_entry"]["title"] == "Piximi"
 
     monkeypatch.setenv("PIXIMI_IMAGES", "/data/images")

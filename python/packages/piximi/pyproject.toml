@@ -1,0 +1,39 @@
+[project]
+name = "piximi"
+version = "0.1.0"
+description = "Piximi from Python: the `piximi` command, the packaged frontend, the JupyterLab launcher tile and the notebook helper. Install with the `engine` extra to host the reference engine on this machine."
+requires-python = ">=3.12"
+dependencies = ["piximi-schema", "piximi-link"]
+
+[project.optional-dependencies]
+# The reference engine on this machine (`piximi serve <folder>`).
+engine = ["piximi-engine"]
+# Model plugins in their own environments.
+appose = ["piximi-engine[appose]"]
+# StarDist2D in the engine's own process.
+cellcast = ["piximi-engine[cellcast]"]
+
+[project.scripts]
+piximi = "piximi_app.cli:main"
+
+# A "Piximi" tile in the JupyterLab launcher when jupyter-server-proxy is installed.
+[project.entry-points.jupyter_serverproxy_servers]
+piximi = "piximi_app.jupyter:setup_piximi"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/piximi_app"]
+# The frontend build `pnpm engine:frontend` copies in is gitignored, which
+# hatch would otherwise honour; ship it when present.
+artifacts = ["src/piximi_app/frontend/"]
+
+[tool.hatch.build.targets.sdist]
+artifacts = ["src/piximi_app/frontend/"]
+
+[tool.uv.sources]
+piximi-schema = { workspace = true }
+piximi-link = { workspace = true }
+piximi-engine = { workspace = true }

@@ -18,7 +18,7 @@ import pytest
 
 from piximi_engine import ReferenceEngine
 from piximi_engine.api import Project
-from piximi_engine.notebook import serve
+from piximi_link.notebook import serve
 from piximi_link import Peer
 from piximi_link.peer import HandlerContext
 from piximi_link.transports.websocket import connect

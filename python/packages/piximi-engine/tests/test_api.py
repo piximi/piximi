@@ -1,5 +1,5 @@
-"""The Python API and the notebook session: what a kernel does with an
-engine, and that connected peers hear about it."""
+"""The Python API: what a kernel does with an engine, and that connected
+peers hear about it."""
 
 import asyncio
 from pathlib import Path
@@ -9,7 +9,7 @@ import numpy as np
 
 from piximi_engine import ReferenceEngine
 from piximi_engine.api import Project
-from piximi_engine.notebook import serve
+from piximi_link.notebook import serve
 from piximi_link import Peer
 from piximi_link.transports.websocket import connect
 from piximi_schema import PROTOCOL_VERSION
@@ -56,17 +56,6 @@ async def test_project_api_round_trip(engine: ReferenceEngine):
     labels = project.labels("a", kind="Cell")
     assert labels.shape == (32, 40) and labels.max() == 2
     assert (labels[4:12, 4:12] > 0).all()
-
-
-async def test_notebook_session_renders_and_serves(images_dir: Path):
-    session = await serve(images_dir, token="t0k")
-    try:
-        assert session.url.endswith("token=t0k") or "token=t0k" in session.url
-        assert "t0k" in session._repr_html_()
-        assert session.project.engine.meta.count("image") == 5
-        assert session.port > 0
-    finally:
-        await session.stop()
 
 
 async def test_project_api_edits_objects_and_kinds(engine: ReferenceEngine):

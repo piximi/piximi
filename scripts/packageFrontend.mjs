@@ -22,7 +22,7 @@ import { extname, join, relative, resolve, sep } from "node:path";
 const full = process.argv.includes("--full");
 const dist = resolve("dist");
 const target = resolve(
-  "python/packages/piximi-engine/src/piximi_engine/frontend",
+  "python/packages/piximi/src/piximi_app/frontend",
 );
 
 if (!existsSync(resolve(dist, "index.html"))) {

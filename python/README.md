@@ -7,7 +7,8 @@ Piximi's pluggable backends.
 | --- | --- |
 | `packages/piximi-schema` | The wire contract: Pydantic models for every type that crosses between the frontend and a backend, and the JSON Schema bundle generated from them (`schema/protocol.schema.json`). The frontend's `src/core/backend/protocol/` is generated from that bundle. |
 | `packages/piximi-link` | Transport and RPC, independent of what an engine does: msgpack framing that a relay can forward without decoding, a symmetric JSON-RPC peer (requests both ways, progress, cancellation), WebSocket transports, the `Engine` protocol an engine implements, and `SessionHub`, which serves one engine to many peers and broadcasts its events. `piximi-link-echo` serves a test peer; `piximi_link.testing.relay` is a frame-forwarding relay. The frontend's `src/core/backend/remote/` is the same design in TypeScript, and `crossLanguage.test.ts` runs one against the other. |
-| `packages/piximi-engine` | The reference engine: metadata in SQLite, pixels in zarr, compositing, RLE masks and measurements matching the frontend's, and a model registry: a threshold baseline in process, plus model plugins that each run in their own environment (see below). `piximi serve <folder>` imports a folder of TIFF/PNG/JPEG files and serves them. |
+| `packages/piximi-engine` | The reference engine: metadata in SQLite, pixels in zarr, compositing, RLE masks and measurements matching the frontend's, and a model registry: a threshold baseline in process, plus model plugins that each run in their own environment (see below) |
+| `packages/piximi` | The application: the `piximi` command, the packaged frontend build, the JupyterLab launcher tile and the notebook helper. `pip install 'piximi[engine]'` brings in the engine, and `piximi serve <folder>` imports a folder of TIFF/PNG/JPEG files and serves them. |
 | `packages/piximi-model-sdk` | What a model plugin implements: a `SegmentationModel` base class and a `Context` for progress and cancellation. Depends on numpy alone, so it installs into any plugin environment. |
 
 ## Serving a folder of images
@@ -29,8 +30,8 @@ Pages from loopback origins may always connect; add `--allow-origin` for
 others, or `--no-auth` to skip the token locally.
 
 A wheel built after `pnpm engine:frontend` carries the frontend inside the
-package (`piximi_engine/frontend/`), so an installed `piximi serve` needs no
-`--frontend` at all. `uv build --package piximi-engine` writes it to
+package (`piximi_app/frontend/`), so an installed `piximi serve` needs no
+`--frontend` at all. `uv build --package piximi` writes it to
 `python/dist/`. The packaged copy leaves out the in-browser model assets
 (ONNX Runtime for Cellpose-SAM, the StarDist/GlaS weights, ~130 MB), since a
 served page runs its models on the engine; `node scripts/packageFrontend.mjs
@@ -42,7 +43,7 @@ Jupyter and marimo run cells on an asyncio loop, and the server shares it,
 so the engine is a Python object in the same kernel as your analysis:
 
 ```python
-from piximi_engine.notebook import serve
+from piximi_app.notebook import serve
 
 session = await serve("/path/to/images")   # the last expression of a cell renders the app
 session.project.add_images("more.tif")      # shows up in the app at once
@@ -58,7 +59,7 @@ or `mo.iframe(session.url)` embeds it.
 ### Jupyter launcher, JupyterHub
 
 With [jupyter-server-proxy](https://jupyter-server-proxy.readthedocs.io/)
-installed next to `piximi-engine`, JupyterLab shows a **Piximi** tile that
+installed next to `piximi[engine]`, JupyterLab shows a **Piximi** tile that
 starts the engine (through the server's own interpreter, so nothing has to
 be on `PATH`) and proxies it under `<jupyter>/piximi/`. Set `PIXIMI_IMAGES`
 (and optionally `PIXIMI_DATA_DIR`, `PIXIMI_MODELS_DIR`) in the Jupyter
@@ -85,7 +86,7 @@ import marimo
 from starlette.applications import Starlette
 from starlette.routing import Mount
 from piximi_engine import ReferenceEngine
-from piximi_engine.cli import find_frontend
+from piximi_app.bundle import find_frontend
 from piximi_link.server import create_app
 from piximi_link.session import SessionHub
 
@@ -127,8 +128,8 @@ scratch on the engine with the same hyperparameters the app offers.
 The engine ships two segmenters: StarDist2D through
 [cellcast](https://github.com/uw-loci/cellcast) (numpy-only, GPU on macOS
 through wgpu) and [Cellpose 3](https://github.com/MouseLand/cellpose) on
-PyTorch. Install the runner with `pip install 'piximi-engine[appose]'`
-and both are listed; without it, `'piximi-engine[cellcast]'` runs
+PyTorch. Install the runner with `pip install 'piximi[appose]'`
+and both are listed; without it, `'piximi[cellcast]'` runs
 StarDist2D in the engine's own process instead. In the app, a model whose
 environment is not built shows as such, and **Build & Load** builds it
 with the build's phases in the task toast.

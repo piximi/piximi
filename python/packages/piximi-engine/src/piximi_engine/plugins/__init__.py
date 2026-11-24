@@ -1,7 +1,7 @@
 """Model plugins the engine ships, each in its own environment, which is
 built the first time one of its models is loaded. They are advertised
 through the ``piximi.models`` entry point group, so an engine that has the
-plugin runner (``piximi-engine[appose]``) lists them without configuration.
+plugin runner (``piximi[appose]``) lists them without configuration.
 """
 
 from pathlib import Path
