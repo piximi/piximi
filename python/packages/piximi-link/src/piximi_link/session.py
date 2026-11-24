@@ -112,6 +112,10 @@ class SessionHub:
         self.auth = auth or Auth(None)
         self.session_id = str(uuid.uuid4())
         self._peers: set[Peer] = set()
+        self._trusted: set[Peer] = set()
+        """Peers whose connection already authenticated them (see ``attach``)."""
+        self._initialized: set[Peer] = set()
+        """Peers that passed ``initialize``: the only ones served or told of events."""
         self._uploads: dict[Peer, set[str]] = {}
         """Uploads each peer has open, closed as cancelled if it goes away."""
         self._unsubscribe = engine.subscribe(self._broadcast)
@@ -120,15 +124,23 @@ class SessionHub:
     def peers(self) -> frozenset[Peer]:
         return frozenset(self._peers)
 
-    def attach(self, peer: Peer) -> None:
-        """Serves the protocol on ``peer`` until it closes."""
+    def attach(self, peer: Peer, *, trusted: bool = False) -> None:
+        """Serves the protocol on ``peer`` until it closes. Until it calls
+        ``initialize`` with a valid ticket, every other request is refused.
+        A ``trusted`` peer arrived over a connection that authenticated it
+        already, so its ``initialize`` needs no ticket (it still checks the
+        protocol version)."""
         self._peers.add(peer)
+        if trusted:
+            self._trusted.add(peer)
         self._register(peer)
         peer.on_notification("initialized", lambda _params: None)
         peer.on_notification("$/ping", lambda _params: None)
 
     def detach(self, peer: Peer) -> None:
         self._peers.discard(peer)
+        self._trusted.discard(peer)
+        self._initialized.discard(peer)
         for upload_id in self._uploads.pop(peer, ()):
             self._abandon(upload_id)
 
@@ -152,6 +164,8 @@ class SessionHub:
         for peer in list(self._peers):
             await peer.close()
         self._peers.clear()
+        self._trusted.clear()
+        self._initialized.clear()
 
     # ── Events ──────────────────────────────────────────────────────────────
 
@@ -159,9 +173,10 @@ class SessionHub:
         wire = event.to_wire()
         for peer in list(self._peers):
             if peer.closed:
-                self._peers.discard(peer)
+                self.detach(peer)
                 continue
-            peer.notify(event.type, wire)
+            if peer in self._initialized:
+                peer.notify(event.type, wire)
 
     # ── Methods ─────────────────────────────────────────────────────────────
 
@@ -186,8 +201,21 @@ class SessionHub:
 
             return handler
 
+        def serve(method: str, handler: Handler) -> None:
+            if method == "initialize":
+                peer.on_request(method, handler)
+                return
+
+            async def gated(params: Any, ctx: HandlerContext) -> Any:
+                if peer not in self._initialized:
+                    raise BackendError("UNAUTHORIZED", f"Call initialize before {method}")
+                return await handler(params, ctx)
+
+            peer.on_request(method, gated)
+
         async def initialize(params: InitializeParams, _ctx: HandlerContext) -> InitializeResult:
-            if not self.auth.redeem(params.auth.ticket if params.auth else None):
+            ticket = params.auth.ticket if params.auth else None
+            if peer not in self._trusted and not self.auth.redeem(ticket):
                 raise BackendError("UNAUTHORIZED", "A valid session ticket is required")
             if _major(params.protocol_version) != _major(PROTOCOL_VERSION):
                 raise BackendError(
@@ -195,6 +223,7 @@ class SessionHub:
                     f"Protocol {params.protocol_version} is not supported; "
                     f"this server speaks {PROTOCOL_VERSION}",
                 )
+            self._initialized.add(peer)
             return InitializeResult(
                 protocol_version=PROTOCOL_VERSION,
                 server_capabilities=engine.capabilities(),
@@ -378,76 +407,76 @@ class SessionHub:
         async def project_export(params: ProjectExportParams, ctx: HandlerContext):
             return await engine.project_export(params, ctx)
 
-        peer.on_request("initialize", typed(InitializeParams, initialize))
-        peer.on_request("shutdown", typed(None, shutdown))
-        peer.on_request("query/project", typed(None, lambda _ctx: engine.project()))
-        peer.on_request("query/images", typed(ImagesParams, images))
-        peer.on_request("query/imageIds", typed(ImageIdsParams, image_ids))
-        peer.on_request("query/imageCounts", typed(ImageCountsParams, image_counts))
-        peer.on_request("query/annotations", typed(AnnotationsParams, annotations))
-        peer.on_request("query/annotationIds", typed(AnnotationIdsParams, annotation_ids))
-        peer.on_request("query/annotationCounts", typed(AnnotationCountsParams, annotation_counts))
-        peer.on_request("query/masks", typed(MasksParams, masks))
-        peer.on_request(
+        serve("initialize", typed(InitializeParams, initialize))
+        serve("shutdown", typed(None, shutdown))
+        serve("query/project", typed(None, lambda _ctx: engine.project()))
+        serve("query/images", typed(ImagesParams, images))
+        serve("query/imageIds", typed(ImageIdsParams, image_ids))
+        serve("query/imageCounts", typed(ImageCountsParams, image_counts))
+        serve("query/annotations", typed(AnnotationsParams, annotations))
+        serve("query/annotationIds", typed(AnnotationIdsParams, annotation_ids))
+        serve("query/annotationCounts", typed(AnnotationCountsParams, annotation_counts))
+        serve("query/masks", typed(MasksParams, masks))
+        serve(
             "measurements/table", typed(MeasurementTableRequest, lambda p, _ctx: engine.measurement_table(p))
         )
-        peer.on_request("measurements/compute", typed(MeasurementsComputeParams, measurements_compute))
-        peer.on_request("images/delete", typed(ImagesDeleteParams, images_delete))
-        peer.on_request("annotations/delete", typed(AnnotationsDeleteParams, annotations_delete))
-        peer.on_request("images/categorize", typed(ImagesCategorizeParams, images_categorize))
-        peer.on_request("annotations/categorize", typed(AnnotationsCategorizeParams, annotations_categorize))
-        peer.on_request("categories/create", typed(CategoriesCreateParams, categories_create))
-        peer.on_request("categories/update", typed(CategoryUpdateParams, categories_update))
-        peer.on_request("categories/delete", typed(CategoriesDeleteParams, categories_delete))
-        peer.on_request("annotations/commit", typed(AnnotationsCommitParams, annotations_commit))
-        peer.on_request("annotations/update", typed(AnnotationsUpdateParams, annotations_update))
-        peer.on_request("images/update", typed(ImagesUpdateParams, images_update))
-        peer.on_request("kinds/create", typed(KindsCreateParams, kinds_create))
-        peer.on_request("kinds/update", typed(KindUpdateParams, kinds_update))
-        peer.on_request("kinds/delete", typed(KindsDeleteParams, kinds_delete))
-        peer.on_request("project/update", typed(ProjectUpdateParams, project_update))
-        peer.on_request("ingest/open", typed(IngestOpenParams, ingest_open))
-        peer.on_request("ingest/put", typed(IngestPutParams, ingest_put))
-        peer.on_request("ingest/close", typed(IngestCloseParams, ingest_close))
-        peer.on_request("ingest/browse", typed(BrowseParams, ingest_browse))
-        peer.on_request("ingest/inspect", typed(InspectParams, ingest_inspect))
-        peer.on_request("ingest/addPaths", typed(AddPathsParams, ingest_add_paths))
-        peer.on_request("export/annotations", typed(AnnotationsExportRequest, export_annotations))
-        peer.on_request("project/list", typed(None, project_list))
-        peer.on_request("project/create", typed(ProjectCreateParams, project_create))
-        peer.on_request("project/open", typed(ProjectIdParams, project_open))
-        peer.on_request("project/delete", typed(ProjectIdParams, project_delete))
-        peer.on_request("project/import", typed(ProjectImportParams, project_import))
-        peer.on_request("project/export", typed(ProjectExportParams, project_export))
-        peer.on_request("render/image", typed(RenderImageParams, render_image))
-        peer.on_request("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
-        peer.on_request("jobs/list", typed(None, jobs_list))
-        peer.on_request("jobs/cancel", typed(JobsCancelParams, jobs_cancel))
-        peer.on_request("segmentation/listModels", typed(None, list_models))
-        peer.on_request("segmentation/loadModel", typed(LoadModelParams, load_model))
-        peer.on_request("segmentation/run", typed(SegmentationRunParams, run))
-        peer.on_request("classification/listArchitectures", typed(None, list_architectures))
-        peer.on_request("classification/list", typed(None, list_classifiers))
-        peer.on_request(
+        serve("measurements/compute", typed(MeasurementsComputeParams, measurements_compute))
+        serve("images/delete", typed(ImagesDeleteParams, images_delete))
+        serve("annotations/delete", typed(AnnotationsDeleteParams, annotations_delete))
+        serve("images/categorize", typed(ImagesCategorizeParams, images_categorize))
+        serve("annotations/categorize", typed(AnnotationsCategorizeParams, annotations_categorize))
+        serve("categories/create", typed(CategoriesCreateParams, categories_create))
+        serve("categories/update", typed(CategoryUpdateParams, categories_update))
+        serve("categories/delete", typed(CategoriesDeleteParams, categories_delete))
+        serve("annotations/commit", typed(AnnotationsCommitParams, annotations_commit))
+        serve("annotations/update", typed(AnnotationsUpdateParams, annotations_update))
+        serve("images/update", typed(ImagesUpdateParams, images_update))
+        serve("kinds/create", typed(KindsCreateParams, kinds_create))
+        serve("kinds/update", typed(KindUpdateParams, kinds_update))
+        serve("kinds/delete", typed(KindsDeleteParams, kinds_delete))
+        serve("project/update", typed(ProjectUpdateParams, project_update))
+        serve("ingest/open", typed(IngestOpenParams, ingest_open))
+        serve("ingest/put", typed(IngestPutParams, ingest_put))
+        serve("ingest/close", typed(IngestCloseParams, ingest_close))
+        serve("ingest/browse", typed(BrowseParams, ingest_browse))
+        serve("ingest/inspect", typed(InspectParams, ingest_inspect))
+        serve("ingest/addPaths", typed(AddPathsParams, ingest_add_paths))
+        serve("export/annotations", typed(AnnotationsExportRequest, export_annotations))
+        serve("project/list", typed(None, project_list))
+        serve("project/create", typed(ProjectCreateParams, project_create))
+        serve("project/open", typed(ProjectIdParams, project_open))
+        serve("project/delete", typed(ProjectIdParams, project_delete))
+        serve("project/import", typed(ProjectImportParams, project_import))
+        serve("project/export", typed(ProjectExportParams, project_export))
+        serve("render/image", typed(RenderImageParams, render_image))
+        serve("render/thumbnails", typed(RenderThumbnailsParams, render_thumbnails))
+        serve("jobs/list", typed(None, jobs_list))
+        serve("jobs/cancel", typed(JobsCancelParams, jobs_cancel))
+        serve("segmentation/listModels", typed(None, list_models))
+        serve("segmentation/loadModel", typed(LoadModelParams, load_model))
+        serve("segmentation/run", typed(SegmentationRunParams, run))
+        serve("classification/listArchitectures", typed(None, list_architectures))
+        serve("classification/list", typed(None, list_classifiers))
+        serve(
             "classification/create",
             typed(ClassifierCreateRequest, lambda p, _ctx: engine.classification_create(p)),
         )
-        peer.on_request(
+        serve(
             "classification/update",
             typed(ClassifierUpdateRequest, lambda p, _ctx: engine.classification_update(p)),
         )
-        peer.on_request("classification/delete", typed(ClassifierRequest, classifier_delete))
-        peer.on_request("classification/fit", typed(ClassifierFitParams, classifier_fit))
-        peer.on_request("classification/predict", typed(ClassifierPredictParams, classifier_predict))
-        peer.on_request("classification/evaluate", typed(ClassifierRequest, classifier_evaluate))
-        peer.on_request(
+        serve("classification/delete", typed(ClassifierRequest, classifier_delete))
+        serve("classification/fit", typed(ClassifierFitParams, classifier_fit))
+        serve("classification/predict", typed(ClassifierPredictParams, classifier_predict))
+        serve("classification/evaluate", typed(ClassifierRequest, classifier_evaluate))
+        serve(
             "classification/acceptPredictions", typed(ClassificationTargetRequest, accept_predictions)
         )
-        peer.on_request(
+        serve(
             "classification/clearPredictions", typed(ClassificationTargetRequest, clear_predictions)
         )
-        peer.on_request("classification/export", typed(ClassifierRequest, classifier_export))
-        peer.on_request(
+        serve("classification/export", typed(ClassifierRequest, classifier_export))
+        serve(
             "classification/import",
             typed(ClassifierImportRequest, lambda p, _ctx: engine.classification_import(p)),
         )

@@ -1,7 +1,9 @@
 """The HTTP side of the server: token exchange, origin checks, and serving a
 frontend bundle with the backend location injected."""
 
+import asyncio
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from starlette.applications import Starlette
@@ -154,6 +156,45 @@ async def test_initialize_requires_a_ticket():
         ticket = hub.auth.issue_ticket("secret")
         result = await client.request("initialize", {**init, "auth": {"ticket": ticket}})
         assert result["sessionId"] == hub.session_id
+    finally:
+        await client.close()
+        await hub.close()
+
+
+async def test_nothing_is_served_or_told_before_initialize():
+    hub = SessionHub(NoEngine(), auth=Auth("secret"))
+    a, b = loopback_pair()
+    server, client = Peer(a), Peer(b)
+    hub.attach(server)
+    server.start()
+    client.start()
+    try:
+        with pytest.raises(BackendError) as info:
+            await client.request("query/project")
+        assert info.value.code == "UNAUTHORIZED"
+        heard = []
+        client.on_notification("images/didAdd", heard.append)
+        hub._broadcast(SimpleNamespace(type="images/didAdd", to_wire=lambda: {}))
+        await asyncio.sleep(0.01)
+        assert heard == [], "an uninitialized peer hears no events"
+    finally:
+        await client.close()
+        await hub.close()
+
+
+async def test_a_trusted_peer_initializes_without_a_ticket():
+    hub = SessionHub(NoEngine(), auth=Auth("secret"))
+    a, b = loopback_pair()
+    server, client = Peer(a), Peer(b)
+    hub.attach(server, trusted=True)
+    server.start()
+    client.start()
+    init = {"protocolVersion": PROTOCOL_VERSION, "clientInfo": {"name": "t", "version": "0"}, "clientCapabilities": []}
+    try:
+        assert (await client.request("initialize", init))["sessionId"] == hub.session_id
+        with pytest.raises(BackendError) as info:
+            await client.request("initialize", {**init, "protocolVersion": "0.0.1"})
+        assert info.value.code == "NOT_SUPPORTED", "the version check still applies"
     finally:
         await client.close()
         await hub.close()

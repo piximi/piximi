@@ -20,6 +20,11 @@ async def session(engine: ReferenceEngine):
     hub.attach(server)
     server.start()
     client.start()
+    # Every client starts here; the hub refuses anything else before it.
+    await client.request(
+        "initialize",
+        {"protocolVersion": PROTOCOL_VERSION, "clientInfo": {"name": "t", "version": "0"}, "clientCapabilities": []},
+    )
     yield hub, client
     await client.close()
     await hub.close()
